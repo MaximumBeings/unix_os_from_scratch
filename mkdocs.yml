@@ -65,6 +65,8 @@ nav:
       - "1. Booting a Multiboot2 Kernel": part1/01-booting-a-multiboot2-kernel-from-power-on-to-kernel-entry.md
   - "Part 2 -- Talking to Hardware: Early Device Drivers":
       - "2. VGA Text-Mode Output": part2/02-vga-text-mode-output-a-real-screen-driver.md
+  - "Part 3 -- Kernel Infrastructure: Descriptor Tables and Utilities":
+      - "3. A Real GDT and a Kernel printf": part3/03-a-real-gdt-and-a-kernel-printf.md
 
 extra:
   social: []
