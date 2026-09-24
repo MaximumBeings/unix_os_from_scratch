@@ -1,0 +1,68 @@
+site_name: Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development
+site_description: A Unix-Like Operating System in C, From Power-On to a Working Shell
+site_author: Oluwaseyi Awoga
+copyright: Copyright &copy; 2026 Oluwaseyi Awoga
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: deep orange
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: deep orange
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+  icon:
+    logo: material/console
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - toc:
+      permalink: true
+  - attr_list
+  - md_in_html
+  - footnotes
+
+plugins:
+  - search
+
+extra_css:
+  - stylesheets/extra.css
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - "Part 1 -- Booting: From Power-On to Kernel Entry":
+      - "1. Booting a Multiboot2 Kernel": part1/01-booting-a-multiboot2-kernel-from-power-on-to-kernel-entry.md
+
+extra:
+  social: []

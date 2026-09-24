@@ -1,0 +1,9 @@
+site/
+__pycache__/
+*.o
+*.bin
+*.iso
+isodir/
+_stale_site_to_delete*/
+_to_delete/
+_verify_*_bin
