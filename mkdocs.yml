@@ -68,6 +68,8 @@ nav:
   - "Part 3 -- Kernel Infrastructure: Descriptor Tables and Utilities":
       - "3. A Real GDT and a Kernel printf": part3/03-a-real-gdt-and-a-kernel-printf.md
       - "4. Interrupts: The IDT and a First Real ISR": part4/04-interrupts-the-idt-and-a-first-real-isr.md
+  - "Part 4 -- Hardware Interrupts: Making the Kernel Interactive":
+      - "5. PS/2 Keyboard Input, via a Real Hardware IRQ": part5/05-ps2-keyboard-input-via-a-real-hardware-irq.md
 
 extra:
   social: []
