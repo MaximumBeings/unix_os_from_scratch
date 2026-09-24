@@ -67,6 +67,7 @@ nav:
       - "2. VGA Text-Mode Output": part2/02-vga-text-mode-output-a-real-screen-driver.md
   - "Part 3 -- Kernel Infrastructure: Descriptor Tables and Utilities":
       - "3. A Real GDT and a Kernel printf": part3/03-a-real-gdt-and-a-kernel-printf.md
+      - "4. Interrupts: The IDT and a First Real ISR": part4/04-interrupts-the-idt-and-a-first-real-isr.md
 
 extra:
   social: []
