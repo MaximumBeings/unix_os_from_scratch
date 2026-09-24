@@ -80,6 +80,7 @@ nav:
       - "11. Kernel-Level Multitasking: Cooperative Task Switching": part11/11-kernel-level-multitasking-cooperative-task-switching.md
       - "12. Preemptive Multitasking: Letting the Timer Decide": part12/12-preemptive-multitasking-letting-the-timer-decide.md
       - "13. Synchronization Primitives: Spinlocks": part13/13-synchronization-primitives-spinlocks.md
+      - "14. Blocking Synchronization: Semaphores and Sleep/Wake": part14/14-blocking-synchronization-semaphores-and-sleep-wake.md
 
 extra:
   social: []
