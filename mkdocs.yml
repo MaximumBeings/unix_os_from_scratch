@@ -75,6 +75,7 @@ nav:
       - "7. Physical Memory: the Multiboot2 Memory Map and a Real Frame Allocator": part7/07-physical-memory-the-multiboot2-memory-map-and-a-real-frame-allocator.md
       - "8. Paging: Enabling Virtual Memory": part8/08-paging-enabling-virtual-memory.md
       - "9. A Kernel Heap: Real Dynamic Memory with kmalloc/kfree": part9/09-a-kernel-heap-real-dynamic-memory-with-kmalloc-kfree.md
+      - "10. Page Fault Handling: A Real ISR14": part10/10-page-fault-handling-a-real-isr14.md
 
 extra:
   social: []
