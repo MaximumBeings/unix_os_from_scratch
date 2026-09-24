@@ -83,6 +83,7 @@ nav:
       - "14. Blocking Synchronization: Semaphores and Sleep/Wake": part14/14-blocking-synchronization-semaphores-and-sleep-wake.md
   - "Part 7 -- Privilege: Running Code This Kernel Does Not Fully Trust":
       - "15. User Mode: Ring 3, a TSS, and a First System Call": part15/15-user-mode-ring-3-tss-and-a-first-system-call.md
+      - "16. Real Ring-3 Tasks in the Scheduler: sys_yield, sys_exit, Multiple User Tasks": part16/16-real-ring-3-tasks-in-the-scheduler.md
 
 extra:
   social: []
