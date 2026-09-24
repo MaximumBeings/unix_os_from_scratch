@@ -71,6 +71,8 @@ nav:
   - "Part 4 -- Hardware Interrupts: Making the Kernel Interactive":
       - "5. PS/2 Keyboard Input, via a Real Hardware IRQ": part5/05-ps2-keyboard-input-via-a-real-hardware-irq.md
       - "6. The PIT Timer and a Real Tick Counter": part6/06-the-pit-timer-and-a-real-tick-counter.md
+  - "Part 5 -- Memory: Discovering and Managing Real RAM":
+      - "7. Physical Memory: the Multiboot2 Memory Map and a Real Frame Allocator": part7/07-physical-memory-the-multiboot2-memory-map-and-a-real-frame-allocator.md
 
 extra:
   social: []
