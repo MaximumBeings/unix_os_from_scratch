@@ -73,6 +73,7 @@ nav:
       - "6. The PIT Timer and a Real Tick Counter": part6/06-the-pit-timer-and-a-real-tick-counter.md
   - "Part 5 -- Memory: Discovering and Managing Real RAM":
       - "7. Physical Memory: the Multiboot2 Memory Map and a Real Frame Allocator": part7/07-physical-memory-the-multiboot2-memory-map-and-a-real-frame-allocator.md
+      - "8. Paging: Enabling Virtual Memory": part8/08-paging-enabling-virtual-memory.md
 
 extra:
   social: []
