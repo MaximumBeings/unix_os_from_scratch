@@ -81,6 +81,8 @@ nav:
       - "12. Preemptive Multitasking: Letting the Timer Decide": part12/12-preemptive-multitasking-letting-the-timer-decide.md
       - "13. Synchronization Primitives: Spinlocks": part13/13-synchronization-primitives-spinlocks.md
       - "14. Blocking Synchronization: Semaphores and Sleep/Wake": part14/14-blocking-synchronization-semaphores-and-sleep-wake.md
+  - "Part 7 -- Privilege: Running Code This Kernel Does Not Fully Trust":
+      - "15. User Mode: Ring 3, a TSS, and a First System Call": part15/15-user-mode-ring-3-tss-and-a-first-system-call.md
 
 extra:
   social: []
