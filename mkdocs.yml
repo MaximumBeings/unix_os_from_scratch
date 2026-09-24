@@ -63,6 +63,8 @@ nav:
   - Getting Started: getting-started.md
   - "Part 1 -- Booting: From Power-On to Kernel Entry":
       - "1. Booting a Multiboot2 Kernel": part1/01-booting-a-multiboot2-kernel-from-power-on-to-kernel-entry.md
+  - "Part 2 -- Talking to Hardware: Early Device Drivers":
+      - "2. VGA Text-Mode Output": part2/02-vga-text-mode-output-a-real-screen-driver.md
 
 extra:
   social: []
