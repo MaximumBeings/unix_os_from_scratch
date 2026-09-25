@@ -92,6 +92,7 @@ nav:
       - "22. Removing Real Subdirectories: fat16_rmdir() and the Empty-Directory Rule": part22/22-removing-real-subdirectories-fat16.md
       - "23. Recursive Multi-Level Paths: Lifting FAT16's One-Level Scope": part23/23-recursive-multi-level-paths-fat16.md
       - "24. PCI Bus Enumeration: Finding the Hardware Before You Can Drive It": part24/24-pci-bus-enumeration.md
+      - "25. A Real RTL8139 Driver: One Real Frame, Sent and Received": part25/25-rtl8139-driver.md
 
 extra:
   social: []
