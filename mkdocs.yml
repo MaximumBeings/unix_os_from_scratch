@@ -87,6 +87,7 @@ nav:
       - "17. Per-Process Address Spaces: One Page Directory Per Task": part17/17-per-process-address-spaces.md
       - "18. Loading a Real ELF Binary: Parsing Program Headers and Mapping PT_LOAD Segments": part18/18-loading-a-real-elf-binary.md
       - "19. A Real Disk Driver: ATA PIO Mode, Reading and Writing Real Sectors": part19/19-a-real-disk-driver-ata-pio-mode.md
+      - "20. A Real Filesystem: FAT16, Files Addressed by Name Instead of by Raw LBA": part20/20-a-real-filesystem-fat16.md
 
 extra:
   social: []
