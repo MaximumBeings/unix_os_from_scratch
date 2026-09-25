@@ -85,6 +85,7 @@ nav:
       - "15. User Mode: Ring 3, a TSS, and a First System Call": part15/15-user-mode-ring-3-tss-and-a-first-system-call.md
       - "16. Real Ring-3 Tasks in the Scheduler: sys_yield, sys_exit, Multiple User Tasks": part16/16-real-ring-3-tasks-in-the-scheduler.md
       - "17. Per-Process Address Spaces: One Page Directory Per Task": part17/17-per-process-address-spaces.md
+      - "18. Loading a Real ELF Binary: Parsing Program Headers and Mapping PT_LOAD Segments": part18/18-loading-a-real-elf-binary.md
 
 extra:
   social: []
