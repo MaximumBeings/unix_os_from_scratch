@@ -96,6 +96,7 @@ nav:
       - "26. Interrupt-Driven RTL8139: A Real hlt, Woken by Real Hardware": part26/26-interrupt-driven-rtl8139.md
       - "27. Multi-Frame RTL8139: Real Round-Robin Transmit, Real CAPR Wraparound": part27/27-multi-frame-rtl8139.md
       - "28. Address Resolution Protocol: A Real ARP Request/Reply Over a Real Wire": part28/28-address-resolution-protocol.md
+      - "29. A Real ARP Cache: Completing RFC 826's Own Merge_flag Logic": part29/29-a-real-arp-cache.md
 
 extra:
   social: []
