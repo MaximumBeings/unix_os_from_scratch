@@ -86,6 +86,7 @@ nav:
       - "16. Real Ring-3 Tasks in the Scheduler: sys_yield, sys_exit, Multiple User Tasks": part16/16-real-ring-3-tasks-in-the-scheduler.md
       - "17. Per-Process Address Spaces: One Page Directory Per Task": part17/17-per-process-address-spaces.md
       - "18. Loading a Real ELF Binary: Parsing Program Headers and Mapping PT_LOAD Segments": part18/18-loading-a-real-elf-binary.md
+      - "19. A Real Disk Driver: ATA PIO Mode, Reading and Writing Real Sectors": part19/19-a-real-disk-driver-ata-pio-mode.md
 
 extra:
   social: []
