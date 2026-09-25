@@ -93,6 +93,7 @@ nav:
       - "23. Recursive Multi-Level Paths: Lifting FAT16's One-Level Scope": part23/23-recursive-multi-level-paths-fat16.md
       - "24. PCI Bus Enumeration: Finding the Hardware Before You Can Drive It": part24/24-pci-bus-enumeration.md
       - "25. A Real RTL8139 Driver: One Real Frame, Sent and Received": part25/25-rtl8139-driver.md
+      - "26. Interrupt-Driven RTL8139: A Real hlt, Woken by Real Hardware": part26/26-interrupt-driven-rtl8139.md
 
 extra:
   social: []
