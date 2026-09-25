@@ -95,6 +95,7 @@ nav:
       - "25. A Real RTL8139 Driver: One Real Frame, Sent and Received": part25/25-rtl8139-driver.md
       - "26. Interrupt-Driven RTL8139: A Real hlt, Woken by Real Hardware": part26/26-interrupt-driven-rtl8139.md
       - "27. Multi-Frame RTL8139: Real Round-Robin Transmit, Real CAPR Wraparound": part27/27-multi-frame-rtl8139.md
+      - "28. Address Resolution Protocol: A Real ARP Request/Reply Over a Real Wire": part28/28-address-resolution-protocol.md
 
 extra:
   social: []
