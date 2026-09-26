@@ -1,0 +1,2605 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A Unix-Like Operating System in C, From Power-On to a Working Shell">
+      
+      
+        <meta name="author" content="Oluwaseyi Awoga">
+      
+      
+      
+        <link rel="prev" href="../../part9/09-a-kernel-heap-real-dynamic-memory-with-kmalloc-kfree/">
+      
+      
+        <link rel="next" href="../../part11/11-kernel-level-multitasking-cooperative-task-switching/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>10. Page Fault Handling: A Real ISR14 - Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#10-page-fault-handling-a-real-isr14" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" class="md-header__button md-logo" aria-label="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 19V7H4v12zm0-16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm-7 14v-2h5v2zm-3.42-4L5.57 9H8.4l3.3 3.3c.39.39.39 1.03 0 1.42L8.42 17H5.59z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              10. Page Fault Handling: A Real ISR14
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="deep-orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="deep-orange"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" class="md-nav__button md-logo" aria-label="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 19V7H4v12zm0-16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm-7 14v-2h5v2zm-3.42-4L5.57 9H8.4l3.3 3.3c.39.39.39 1.03 0 1.42L8.42 17H5.59z"/></svg>
+
+    </a>
+    Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 1 -- Booting: From Power-On to Kernel Entry
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 1 -- Booting: From Power-On to Kernel Entry
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part1/01-booting-a-multiboot2-kernel-from-power-on-to-kernel-entry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1. Booting a Multiboot2 Kernel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 2 -- Talking to Hardware: Early Device Drivers
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 2 -- Talking to Hardware: Early Device Drivers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part2/02-vga-text-mode-output-a-real-screen-driver/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2. VGA Text-Mode Output
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 3 -- Kernel Infrastructure: Descriptor Tables and Utilities
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 3 -- Kernel Infrastructure: Descriptor Tables and Utilities
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/03-a-real-gdt-and-a-kernel-printf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3. A Real GDT and a Kernel printf
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part4/04-interrupts-the-idt-and-a-first-real-isr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4. Interrupts: The IDT and a First Real ISR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 4 -- Hardware Interrupts: Making the Kernel Interactive
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 4 -- Hardware Interrupts: Making the Kernel Interactive
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part5/05-ps2-keyboard-input-via-a-real-hardware-irq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5. PS/2 Keyboard Input, via a Real Hardware IRQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part6/06-the-pit-timer-and-a-real-tick-counter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6. The PIT Timer and a Real Tick Counter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 5 -- Memory: Discovering and Managing Real RAM
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 5 -- Memory: Discovering and Managing Real RAM
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part7/07-physical-memory-the-multiboot2-memory-map-and-a-real-frame-allocator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7. Physical Memory: the Multiboot2 Memory Map and a Real Frame Allocator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part8/08-paging-enabling-virtual-memory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8. Paging: Enabling Virtual Memory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part9/09-a-kernel-heap-real-dynamic-memory-with-kmalloc-kfree/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9. A Kernel Heap: Real Dynamic Memory with kmalloc/kfree
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10. Page Fault Handling: A Real ISR14
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10. Page Fault Handling: A Real ISR14
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-gap-chapter-8-left-open" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The gap Chapter 8 left open
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-real-pf-error-code-and-cr2-cited-from-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The real #PF error code and CR2, cited from source
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#010_isr14asm-a-stub-that-has-to-handle-a-real-error-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        010_isr14.asm: a stub that has to handle a real error code
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#010_isr_handlersc-decoding-what-the-cpu-actually-said" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        010_isr_handlers.c: decoding what the CPU actually said
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#010_idtc-one-new-gate-same-shape-as-every-other" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        010_idt.c: one new gate, same shape as every other
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#010_kmainc-proving-the-handler-works-by-actually-triggering-the-fault" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        010_kmain.c: proving the handler works by actually triggering the fault
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-it-for-real" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Building it, for real
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#booting-it-and-triggering-a-real-page-fault-on-purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Booting it, and triggering a real page fault on purpose
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#self-check-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Self-check questions
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 6 -- Scheduling: Running More Than One Task at Once
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 6 -- Scheduling: Running More Than One Task at Once
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11/11-kernel-level-multitasking-cooperative-task-switching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11. Kernel-Level Multitasking: Cooperative Task Switching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12/12-preemptive-multitasking-letting-the-timer-decide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12. Preemptive Multitasking: Letting the Timer Decide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13/13-synchronization-primitives-spinlocks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13. Synchronization Primitives: Spinlocks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14/14-blocking-synchronization-semaphores-and-sleep-wake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14. Blocking Synchronization: Semaphores and Sleep/Wake
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 7 -- Privilege: Running Code This Kernel Does Not Fully Trust
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 7 -- Privilege: Running Code This Kernel Does Not Fully Trust
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part15/15-user-mode-ring-3-tss-and-a-first-system-call/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15. User Mode: Ring 3, a TSS, and a First System Call
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16/16-real-ring-3-tasks-in-the-scheduler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    16. Real Ring-3 Tasks in the Scheduler: sys_yield, sys_exit, Multiple User Tasks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17/17-per-process-address-spaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    17. Per-Process Address Spaces: One Page Directory Per Task
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18/18-loading-a-real-elf-binary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    18. Loading a Real ELF Binary: Parsing Program Headers and Mapping PT_LOAD Segments
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19/19-a-real-disk-driver-ata-pio-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    19. A Real Disk Driver: ATA PIO Mode, Reading and Writing Real Sectors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20/20-a-real-filesystem-fat16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20. A Real Filesystem: FAT16, Files Addressed by Name Instead of by Raw LBA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part21/21-real-subdirectories-fat16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    21. Real Subdirectories: One Level of Nesting Inside FAT16
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part22/22-removing-real-subdirectories-fat16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    22. Removing Real Subdirectories: fat16_rmdir() and the Empty-Directory Rule
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part23/23-recursive-multi-level-paths-fat16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    23. Recursive Multi-Level Paths: Lifting FAT16's One-Level Scope
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part24/24-pci-bus-enumeration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    24. PCI Bus Enumeration: Finding the Hardware Before You Can Drive It
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part25/25-rtl8139-driver/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    25. A Real RTL8139 Driver: One Real Frame, Sent and Received
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part26/26-interrupt-driven-rtl8139/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    26. Interrupt-Driven RTL8139: A Real hlt, Woken by Real Hardware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part27/27-multi-frame-rtl8139/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    27. Multi-Frame RTL8139: Real Round-Robin Transmit, Real CAPR Wraparound
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part28/28-address-resolution-protocol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    28. Address Resolution Protocol: A Real ARP Request/Reply Over a Real Wire
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part29/29-a-real-arp-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    29. A Real ARP Cache: Completing RFC 826's Own Merge_flag Logic
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part30/30-a-real-fedwire-style-wire-transfer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    30. A Real Fedwire-Style Wire Transfer: AES-128, SHA-256, and HMAC From Scratch
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part31/31-a-real-arp-server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    31. A Real ARP Server: Answering Requests About This Kernel's Own Address
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part32/32-a-real-nacha-ach-p2p-split/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    32. A Real NACHA ACH Batch: P2P Group-Expense Splitting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part33/33-a-real-pay-in-4-bnpl-checkout/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    33. A Real "Pay in 4" BNPL Checkout: Regulation Z APR and an ISO 8583 Authorization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-gap-chapter-8-left-open" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The gap Chapter 8 left open
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-real-pf-error-code-and-cr2-cited-from-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The real #PF error code and CR2, cited from source
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#010_isr14asm-a-stub-that-has-to-handle-a-real-error-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        010_isr14.asm: a stub that has to handle a real error code
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#010_isr_handlersc-decoding-what-the-cpu-actually-said" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        010_isr_handlers.c: decoding what the CPU actually said
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#010_idtc-one-new-gate-same-shape-as-every-other" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        010_idt.c: one new gate, same shape as every other
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#010_kmainc-proving-the-handler-works-by-actually-triggering-the-fault" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        010_kmain.c: proving the handler works by actually triggering the fault
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-it-for-real" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Building it, for real
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#booting-it-and-triggering-a-real-page-fault-on-purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Booting it, and triggering a real page fault on purpose
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#self-check-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Self-check questions
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="10-page-fault-handling-a-real-isr14">10. Page Fault Handling: A Real ISR14<a class="headerlink" href="#10-page-fault-handling-a-real-isr14" title="Permanent link">&para;</a></h1>
+<p><strong>What you will understand:</strong> why turning paging on in Chapter 8 quietly left one real gap open -- no handler for the exception paging itself can raise -- the real #PF error-code bit layout and CR2 register cited from source, why an exception that pushes an error code needs an assembly stub genuinely different from Chapter 4's #DE stub, and how to prove a page fault handler actually works by triggering a real one on purpose rather than trusting it would fire correctly if it ever needed to.</p>
+<p><strong>What you need to know first:</strong> Chapter 4's <code>isr0_handler</code> (the shape every exception handler in this book follows: report honestly, halt, do not try to resume), Chapter 8's paging (the mechanism that can raise this exception at all), and Chapter 9's heap (whose completion made this the last real gap left open in this book's memory story). This chapter stays in Part 5, closing out the memory subsystem this Part has been building since Chapter 7.</p>
+<h2 id="the-gap-chapter-8-left-open">The gap Chapter 8 left open<a class="headerlink" href="#the-gap-chapter-8-left-open" title="Permanent link">&para;</a></h2>
+<p>Chapter 8 turned paging on. Every real run since then has stayed inside memory this kernel deliberately mapped -- the identity-mapped 0-64 MiB range, the one-off <code>0xC0000000</code> test page, the kernel heap's own region -- so nothing has ever actually raised a page fault on real hardware in this book. But the CPU does not know that discipline exists. The moment paging is live, <em>any</em> access to an unmapped or protection-violating address raises vector 14, whether this kernel planned for it or not -- and until this chapter, nothing in the IDT points vector 14 anywhere at all. A real page fault right now would find an empty gate and escalate into a double fault, then a triple fault, and reset the machine. This chapter closes that gap for real, not by assuming it will never happen, but by deliberately making it happen and proving the real handler catches it.</p>
+<h2 id="the-real-pf-error-code-and-cr2-cited-from-source">The real #PF error code and CR2, cited from source<a class="headerlink" href="#the-real-pf-error-code-and-cr2-cited-from-source" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p>"In addition, it sets the value of the CR2 register to the virtual address which caused the Page Fault."</p>
+</blockquote>
+<p>(OSDev Wiki, "Exceptions": https://wiki.osdev.org/Exceptions)</p>
+<p>Vector 14 is a <strong>fault</strong> (resumable, in principle) that <strong>does</strong> push a 32-bit error code -- unlike vector 0's #DE, which pushes none. The bits this chapter reads:</p>
+<blockquote>
+<p>"P (bit 0): When set, the page fault was caused by a page-protection violation. When not set, it was caused by a non-present page."
+"W (bit 1): When set, the page fault was caused by a write access. When not set, it was caused by a read access."
+"U (bit 2): When set, the page fault was caused while CPL = 3."</p>
+</blockquote>
+<p>(same page)</p>
+<p>Two real facts drive this chapter's design: the faulting <em>address</em> is not in the error code at all -- it is in CR2, a separate register the CPU sets before the handler runs -- and the error code itself only describes <em>why</em> the access failed, not <em>where</em>.</p>
+<h2 id="010_isr14asm-a-stub-that-has-to-handle-a-real-error-code"><code>010_isr14.asm</code>: a stub that has to handle a real error code<a class="headerlink" href="#010_isr14asm-a-stub-that-has-to-handle-a-real-error-code" title="Permanent link">&para;</a></h2>
+<p>Chapter 4's <code>isr0.asm</code> could <code>pusha</code>/<code>call</code>/<code>popa</code>/<code>iret</code> because #DE pushes nothing extra. #PF's real error code changes that shape:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">; Chapter 10: the real machine code the CPU jumps to on a #PF (Page</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1">; Fault). Unlike #DE at vector 0 (009_isr0.asm), the CPU pushes a real</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1">; 32-bit error code for this exception before jumping here (OSDev</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1">; Wiki, "Exceptions": vector 14's Error Code column reads "Yes") --</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="c1">; so this stub cannot simply pusha/popa/iret the way isr0's did. The</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1">; error code sits on the stack just above the eight registers pusha</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1">; pushes, and this stub reads it there, passes it as a real cdecl</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1">; argument to isr14_handler, and -- critically -- discards it with its</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1">; own `add esp, 4` before IRET, since IRET itself only ever pops</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1">; EIP/CS/EFLAGS and has no idea a fourth value is sitting underneath</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="c1">; them.</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="k">BITS</span><span class="w"> </span><span class="mi">32</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="k">section</span><span class="w"> </span><span class="nv">.text</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="k">extern</span><span class="w"> </span><span class="nv">isr14_handler</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="k">global</span><span class="w"> </span><span class="nv">isr14</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="nl">isr14:</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">    </span><span class="nf">pusha</span><span class="w">                    </span><span class="c1">; save eax, ecx, edx, ebx, esp, ebp, esi, edi</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">eax</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="nb">esp</span><span class="o">+</span><span class="mi">32</span><span class="p">]</span><span class="w">        </span><span class="c1">; the CPU's error code sits right above the</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">                              </span><span class="c1">; eight 4-byte registers pusha just pushed</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">    </span><span class="nf">push</span><span class="w"> </span><span class="nb">eax</span><span class="w">                 </span><span class="c1">; pass it as isr14_handler's one cdecl argument</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">    </span><span class="nf">call</span><span class="w"> </span><span class="nv">isr14_handler</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">    </span><span class="nf">add</span><span class="w"> </span><span class="nb">esp</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="w">                </span><span class="c1">; cdecl: caller cleans up its own pushed argument</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">    </span><span class="nf">popa</span><span class="w">                      </span><span class="c1">; restore every register pusha saved</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="w">    </span><span class="nf">add</span><span class="w"> </span><span class="nb">esp</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="w">                </span><span class="c1">; discard the CPU's own error code -- IRET</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="w">                              </span><span class="c1">; does not expect it and does not pop it</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="w">    </span><span class="nf">iret</span><span class="w">                      </span><span class="c1">; pops EIP, CS, and EFLAGS, exactly what</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="w">                              </span><span class="c1">; remains on the stack now</span>
+</code></pre></div>
+<p>Two real details matter here. First, <code>[esp+32]</code> is not an arbitrary offset -- <code>pusha</code> pushes exactly eight 4-byte registers, so the CPU's own error code, pushed <em>before</em> this stub ever ran, sits exactly 32 bytes above wherever <code>esp</code> lands right after <code>pusha</code> completes. Second, <code>add esp, 4</code> right before <code>iret</code> is not optional cleanup -- <code>iret</code> only ever pops EIP, CS, and EFLAGS; it has no idea a fourth value (the error code) is still sitting underneath them, and skipping this line would leave the stack permanently misaligned for every interrupt this kernel handles afterward.</p>
+<h2 id="010_isr_handlersc-decoding-what-the-cpu-actually-said"><code>010_isr_handlers.c</code>: decoding what the CPU actually said<a class="headerlink" href="#010_isr_handlersc-decoding-what-the-cpu-actually-said" title="Permanent link">&para;</a></h2>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="cp">#ifndef UNIX_OS_010_ISR_HANDLERS_H</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="cp">#define UNIX_OS_010_ISR_HANDLERS_H</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdint.h&gt;</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="cm">/* The real C handler 010_isr0.asm's stub calls on a #DE fault. Nothing</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="cm"> * in C calls it directly -- only the assembly stub does -- so this</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="cm"> * declaration exists purely so 010_isr_handlers.c has a header to</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="cm"> * define against, the same one-module-one-header shape every other</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="cm"> * file in this book already follows. */</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="kt">void</span><span class="w"> </span><span class="nf">isr0_handler</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="cm">/* The real C handler 010_isr14.asm's stub calls on a #PF fault, with</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="cm"> * the CPU's own real error code passed as its one argument -- the</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="cm"> * stub itself cannot decode the error code or read CR2, since neither</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="cm"> * is something a plain assembly stub has any business interpreting. */</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="kt">void</span><span class="w"> </span><span class="nf">isr14_handler</span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">error_code</span><span class="p">);</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="cp">#endif</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="cm">/* Chapter 5: this book's first real exception handler (isr0_handler,</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="cm"> * unchanged since). Chapter 10 adds this book's second: isr14_handler,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="cm"> * for #PF -- and unlike #DE, a page fault carries real, decodable</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="cm"> * information about exactly what went wrong, which this handler reads</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="cm"> * and prints rather than just reporting "a fault happened."</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="cm"> *</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="cm"> * Like isr0_handler, this one does not try to resume the faulting</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="cm"> * instruction -- this book has no demand paging, no swapping, nothing</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="cm"> * that could make an unmapped or protected address valid by the time</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="cm"> * this handler returns, so retrying would just fault again on the</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="cm"> * same instruction, forever. Reporting the fault honestly and halting</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="cm"> * is still the right call until a later chapter gives this kernel a</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="cm"> * real mechanism to fix the underlying mapping and actually resume. */</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"010_isr_handlers.h"</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"010_printf.h"</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="kt">void</span><span class="w"> </span><span class="nf">isr0_handler</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">*** CPU EXCEPTION: Divide Error (vector 0, #DE) ***</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"A DIV or IDIV instruction attempted to divide by zero.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"This handler does not resume the faulting instruction --</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"halting.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>
+<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"cli"</span><span class="p">);</span>
+<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(;;)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a><span class="w">        </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"hlt"</span><span class="p">);</span>
+<a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a><span class="p">}</span>
+<a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a>
+<a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a><span class="cm">/* Error code bit layout, cited field-for-field:</span>
+<a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a><span class="cm"> *   P (bit 0): "When set, the page fault was caused by a</span>
+<a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a><span class="cm"> *               page-protection violation. When not set, it was</span>
+<a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a><span class="cm"> *               caused by a non-present page."</span>
+<a id="__codelineno-2-34" name="__codelineno-2-34" href="#__codelineno-2-34"></a><span class="cm"> *   W (bit 1): "When set, the page fault was caused by a write</span>
+<a id="__codelineno-2-35" name="__codelineno-2-35" href="#__codelineno-2-35"></a><span class="cm"> *               access. When not set, it was caused by a read access."</span>
+<a id="__codelineno-2-36" name="__codelineno-2-36" href="#__codelineno-2-36"></a><span class="cm"> *   U (bit 2): "When set, the page fault was caused while CPL = 3."</span>
+<a id="__codelineno-2-37" name="__codelineno-2-37" href="#__codelineno-2-37"></a><span class="cm"> * (OSDev Wiki, "Exceptions", vector 14 / #PF: https://wiki.osdev.org/Exceptions)</span>
+<a id="__codelineno-2-38" name="__codelineno-2-38" href="#__codelineno-2-38"></a><span class="cm"> *</span>
+<a id="__codelineno-2-39" name="__codelineno-2-39" href="#__codelineno-2-39"></a><span class="cm"> * The faulting linear address itself is not part of the error code at</span>
+<a id="__codelineno-2-40" name="__codelineno-2-40" href="#__codelineno-2-40"></a><span class="cm"> * all -- the same page notes "it sets the value of the CR2 register</span>
+<a id="__codelineno-2-41" name="__codelineno-2-41" href="#__codelineno-2-41"></a><span class="cm"> * to the virtual address which caused the Page Fault," so this</span>
+<a id="__codelineno-2-42" name="__codelineno-2-42" href="#__codelineno-2-42"></a><span class="cm"> * handler reads CR2 directly rather than looking for it on the stack. */</span>
+<a id="__codelineno-2-43" name="__codelineno-2-43" href="#__codelineno-2-43"></a><span class="kt">void</span><span class="w"> </span><span class="nf">isr14_handler</span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">error_code</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-44" name="__codelineno-2-44" href="#__codelineno-2-44"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">faulting_address</span><span class="p">;</span>
+<a id="__codelineno-2-45" name="__codelineno-2-45" href="#__codelineno-2-45"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"mov %%cr2, %0"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"=r"</span><span class="w"> </span><span class="p">(</span><span class="n">faulting_address</span><span class="p">));</span>
+<a id="__codelineno-2-46" name="__codelineno-2-46" href="#__codelineno-2-46"></a>
+<a id="__codelineno-2-47" name="__codelineno-2-47" href="#__codelineno-2-47"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">*** CPU EXCEPTION: Page Fault (vector 14, #PF) ***</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-2-48" name="__codelineno-2-48" href="#__codelineno-2-48"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Faulting address (CR2): 0x%x</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">faulting_address</span><span class="p">);</span>
+<a id="__codelineno-2-49" name="__codelineno-2-49" href="#__codelineno-2-49"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Error code: 0x%x (%s, %s, %s)</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
+<a id="__codelineno-2-50" name="__codelineno-2-50" href="#__codelineno-2-50"></a><span class="w">            </span><span class="n">error_code</span><span class="p">,</span>
+<a id="__codelineno-2-51" name="__codelineno-2-51" href="#__codelineno-2-51"></a><span class="w">            </span><span class="p">(</span><span class="n">error_code</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x1u</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">"protection violation"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"non-present page"</span><span class="p">,</span>
+<a id="__codelineno-2-52" name="__codelineno-2-52" href="#__codelineno-2-52"></a><span class="w">            </span><span class="p">(</span><span class="n">error_code</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x2u</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">"write"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"read"</span><span class="p">,</span>
+<a id="__codelineno-2-53" name="__codelineno-2-53" href="#__codelineno-2-53"></a><span class="w">            </span><span class="p">(</span><span class="n">error_code</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x4u</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">"user mode"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"supervisor mode"</span><span class="p">);</span>
+<a id="__codelineno-2-54" name="__codelineno-2-54" href="#__codelineno-2-54"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"This handler does not resume the faulting instruction --</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-2-55" name="__codelineno-2-55" href="#__codelineno-2-55"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"halting.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-2-56" name="__codelineno-2-56" href="#__codelineno-2-56"></a>
+<a id="__codelineno-2-57" name="__codelineno-2-57" href="#__codelineno-2-57"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"cli"</span><span class="p">);</span>
+<a id="__codelineno-2-58" name="__codelineno-2-58" href="#__codelineno-2-58"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(;;)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-59" name="__codelineno-2-59" href="#__codelineno-2-59"></a><span class="w">        </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"hlt"</span><span class="p">);</span>
+<a id="__codelineno-2-60" name="__codelineno-2-60" href="#__codelineno-2-60"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-2-61" name="__codelineno-2-61" href="#__codelineno-2-61"></a><span class="p">}</span>
+</code></pre></div></p>
+<p><code>isr14_handler</code> reads CR2 itself, directly, via inline assembly -- not because the stub couldn't have read it too, but because CR2 is a CPU register, not a stack value, and reading it in C keeps the assembly stub's own job limited to exactly what only assembly can do (saving registers, matching the CPU's real calling convention). Like <code>isr0_handler</code> before it, this handler does not attempt to resume the faulting instruction: this book has no demand paging, no swap, nothing that could make address <code>0xE0000000</code> valid by the time this handler returns, so retrying would only fault again, forever. Reporting the fault -- the real faulting address, and a real, bit-by-bit decode of why it failed -- and halting honestly is still the right call.</p>
+<h2 id="010_idtc-one-new-gate-same-shape-as-every-other"><code>010_idt.c</code>: one new gate, same shape as every other<a class="headerlink" href="#010_idtc-one-new-gate-same-shape-as-every-other" title="Permanent link">&para;</a></h2>
+<p>The IDT descriptor itself does not know or care that vector 14's exception happens to push an error code -- that distinction lives entirely in <code>010_isr14.asm</code>'s own stub, not in how the gate gets installed:</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="cp">#ifndef UNIX_OS_010_IDT_H</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="cp">#define UNIX_OS_010_IDT_H</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="cm">/* Installs this book's IDT: Chapter 4's own #DE handler at vector 0,</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="cm"> * Chapter 5's own IRQ1 (keyboard) gate at vector 0x21, and Chapter</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="cm"> * 6's own IRQ0 (PIT) gate at vector 0x20, all unchanged, plus this</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="cm"> * chapter's new real gate at vector 14 -- #PF, the page fault</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="cm"> * exception paging has been capable of raising since Chapter 8, but</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="cm"> * that nothing installed a real handler for until now. */</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="kt">void</span><span class="w"> </span><span class="nf">idt_init</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="cp">#endif</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="cm">/* This book's Interrupt Descriptor Table, extended from Chapter 6. The</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="cm"> * struct layout, the type-attributes byte derivation, and every gate</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="cm"> * through vector 0x21 are unchanged -- see Chapters 4-6 for the full</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="cm"> * citation and derivation of those. This chapter adds exactly one</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="cm"> * more real gate: vector 14, #PF -- the page fault exception, live</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="cm"> * and capable of firing since Chapter 8 turned paging on, but with no</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="cm"> * real handler installed for it until now. */</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdint.h&gt;</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"010_idt.h"</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="k">struct</span><span class="w"> </span><span class="nc">idt_entry</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">offset_low</span><span class="p">;</span>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">selector</span><span class="p">;</span>
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w">  </span><span class="n">zero</span><span class="p">;</span>
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w">  </span><span class="n">type_attributes</span><span class="p">;</span>
+<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">offset_high</span><span class="p">;</span>
+<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="p">}</span><span class="w"> </span><span class="n">__attribute__</span><span class="p">((</span><span class="n">packed</span><span class="p">));</span>
+<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>
+<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="k">struct</span><span class="w"> </span><span class="nc">idt_ptr</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">limit</span><span class="p">;</span>
+<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">base</span><span class="p">;</span>
+<a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="p">}</span><span class="w"> </span><span class="n">__attribute__</span><span class="p">((</span><span class="n">packed</span><span class="p">));</span>
+<a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>
+<a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="cp">#define IDT_ENTRY_COUNT 256</span>
+<a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="k">static</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">idt_entry</span><span class="w"> </span><span class="n">idt_entries</span><span class="p">[</span><span class="n">IDT_ENTRY_COUNT</span><span class="p">];</span>
+<a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a><span class="k">static</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">idt_ptr</span><span class="w">   </span><span class="n">idt_pointer</span><span class="p">;</span>
+<a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a>
+<a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a><span class="k">extern</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">isr0</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span><span class="w">    </span><span class="cm">/* 010_isr0.asm -- unchanged from Chapter 4 */</span>
+<a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a><span class="k">extern</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">isr14</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span><span class="w">   </span><span class="cm">/* 010_isr14.asm -- this chapter's own stub */</span>
+<a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a><span class="k">extern</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">irq0</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span><span class="w">    </span><span class="cm">/* 010_irq0.asm -- unchanged from Chapter 6 */</span>
+<a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a><span class="k">extern</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">irq1</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span><span class="w">    </span><span class="cm">/* 010_irq1.asm -- unchanged from Chapter 5 */</span>
+<a id="__codelineno-4-34" name="__codelineno-4-34" href="#__codelineno-4-34"></a>
+<a id="__codelineno-4-35" name="__codelineno-4-35" href="#__codelineno-4-35"></a><span class="k">extern</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">idt_flush</span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">idt_ptr_addr</span><span class="p">);</span>
+<a id="__codelineno-4-36" name="__codelineno-4-36" href="#__codelineno-4-36"></a>
+<a id="__codelineno-4-37" name="__codelineno-4-37" href="#__codelineno-4-37"></a><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">idt_set_gate</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">vector</span><span class="p">,</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">handler</span><span class="p">,</span><span class="w"> </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">selector</span><span class="p">,</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">type_attributes</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-38" name="__codelineno-4-38" href="#__codelineno-4-38"></a><span class="w">    </span><span class="n">idt_entries</span><span class="p">[</span><span class="n">vector</span><span class="p">].</span><span class="n">offset_low</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">uint16_t</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="n">handler</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0xFFFF</span><span class="p">);</span>
+<a id="__codelineno-4-39" name="__codelineno-4-39" href="#__codelineno-4-39"></a><span class="w">    </span><span class="n">idt_entries</span><span class="p">[</span><span class="n">vector</span><span class="p">].</span><span class="n">offset_high</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">uint16_t</span><span class="p">)</span><span class="w"> </span><span class="p">((</span><span class="n">handler</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">16</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0xFFFF</span><span class="p">);</span>
+<a id="__codelineno-4-40" name="__codelineno-4-40" href="#__codelineno-4-40"></a><span class="w">    </span><span class="n">idt_entries</span><span class="p">[</span><span class="n">vector</span><span class="p">].</span><span class="n">selector</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="n">selector</span><span class="p">;</span>
+<a id="__codelineno-4-41" name="__codelineno-4-41" href="#__codelineno-4-41"></a><span class="w">    </span><span class="n">idt_entries</span><span class="p">[</span><span class="n">vector</span><span class="p">].</span><span class="n">zero</span><span class="w">            </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-4-42" name="__codelineno-4-42" href="#__codelineno-4-42"></a><span class="w">    </span><span class="n">idt_entries</span><span class="p">[</span><span class="n">vector</span><span class="p">].</span><span class="n">type_attributes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">type_attributes</span><span class="p">;</span>
+<a id="__codelineno-4-43" name="__codelineno-4-43" href="#__codelineno-4-43"></a><span class="p">}</span>
+<a id="__codelineno-4-44" name="__codelineno-4-44" href="#__codelineno-4-44"></a>
+<a id="__codelineno-4-45" name="__codelineno-4-45" href="#__codelineno-4-45"></a><span class="kt">void</span><span class="w"> </span><span class="nf">idt_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-46" name="__codelineno-4-46" href="#__codelineno-4-46"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">IDT_ENTRY_COUNT</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-47" name="__codelineno-4-47" href="#__codelineno-4-47"></a><span class="w">        </span><span class="n">idt_set_gate</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<a id="__codelineno-4-48" name="__codelineno-4-48" href="#__codelineno-4-48"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-4-49" name="__codelineno-4-49" href="#__codelineno-4-49"></a>
+<a id="__codelineno-4-50" name="__codelineno-4-50" href="#__codelineno-4-50"></a><span class="w">    </span><span class="cm">/* Vector 0: #DE, unchanged from Chapter 4. */</span>
+<a id="__codelineno-4-51" name="__codelineno-4-51" href="#__codelineno-4-51"></a><span class="w">    </span><span class="n">idt_set_gate</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="w"> </span><span class="n">isr0</span><span class="p">,</span><span class="w"> </span><span class="mh">0x08</span><span class="p">,</span><span class="w"> </span><span class="mh">0x8E</span><span class="p">);</span>
+<a id="__codelineno-4-52" name="__codelineno-4-52" href="#__codelineno-4-52"></a>
+<a id="__codelineno-4-53" name="__codelineno-4-53" href="#__codelineno-4-53"></a><span class="w">    </span><span class="cm">/* Vector 14: #PF, this chapter's own new gate. Same selector</span>
+<a id="__codelineno-4-54" name="__codelineno-4-54" href="#__codelineno-4-54"></a><span class="cm">     * (0x08) and 0x8E type-attributes byte as every other gate here --</span>
+<a id="__codelineno-4-55" name="__codelineno-4-55" href="#__codelineno-4-55"></a><span class="cm">     * the IDT descriptor itself does not know or care that this</span>
+<a id="__codelineno-4-56" name="__codelineno-4-56" href="#__codelineno-4-56"></a><span class="cm">     * particular vector's exception pushes an error code; only</span>
+<a id="__codelineno-4-57" name="__codelineno-4-57" href="#__codelineno-4-57"></a><span class="cm">     * 010_isr14.asm's own stub has to know that. */</span>
+<a id="__codelineno-4-58" name="__codelineno-4-58" href="#__codelineno-4-58"></a><span class="w">    </span><span class="n">idt_set_gate</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="w"> </span><span class="n">isr14</span><span class="p">,</span><span class="w"> </span><span class="mh">0x08</span><span class="p">,</span><span class="w"> </span><span class="mh">0x8E</span><span class="p">);</span>
+<a id="__codelineno-4-59" name="__codelineno-4-59" href="#__codelineno-4-59"></a>
+<a id="__codelineno-4-60" name="__codelineno-4-60" href="#__codelineno-4-60"></a><span class="w">    </span><span class="cm">/* Vector 0x20: IRQ0, the PIT timer, unchanged from Chapter 6. */</span>
+<a id="__codelineno-4-61" name="__codelineno-4-61" href="#__codelineno-4-61"></a><span class="w">    </span><span class="n">idt_set_gate</span><span class="p">(</span><span class="mh">0x20</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="w"> </span><span class="n">irq0</span><span class="p">,</span><span class="w"> </span><span class="mh">0x08</span><span class="p">,</span><span class="w"> </span><span class="mh">0x8E</span><span class="p">);</span>
+<a id="__codelineno-4-62" name="__codelineno-4-62" href="#__codelineno-4-62"></a>
+<a id="__codelineno-4-63" name="__codelineno-4-63" href="#__codelineno-4-63"></a><span class="w">    </span><span class="cm">/* Vector 0x21: IRQ1, the keyboard, unchanged from Chapter 5. */</span>
+<a id="__codelineno-4-64" name="__codelineno-4-64" href="#__codelineno-4-64"></a><span class="w">    </span><span class="n">idt_set_gate</span><span class="p">(</span><span class="mh">0x21</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="w"> </span><span class="n">irq1</span><span class="p">,</span><span class="w"> </span><span class="mh">0x08</span><span class="p">,</span><span class="w"> </span><span class="mh">0x8E</span><span class="p">);</span>
+<a id="__codelineno-4-65" name="__codelineno-4-65" href="#__codelineno-4-65"></a>
+<a id="__codelineno-4-66" name="__codelineno-4-66" href="#__codelineno-4-66"></a><span class="w">    </span><span class="n">idt_pointer</span><span class="p">.</span><span class="n">limit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">uint16_t</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">idt_entries</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<a id="__codelineno-4-67" name="__codelineno-4-67" href="#__codelineno-4-67"></a><span class="w">    </span><span class="n">idt_pointer</span><span class="p">.</span><span class="n">base</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="n">idt_entries</span><span class="p">;</span>
+<a id="__codelineno-4-68" name="__codelineno-4-68" href="#__codelineno-4-68"></a>
+<a id="__codelineno-4-69" name="__codelineno-4-69" href="#__codelineno-4-69"></a><span class="w">    </span><span class="n">idt_flush</span><span class="p">((</span><span class="kt">uint32_t</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="n">idt_pointer</span><span class="p">);</span>
+<a id="__codelineno-4-70" name="__codelineno-4-70" href="#__codelineno-4-70"></a><span class="p">}</span>
+</code></pre></div></p>
+<h2 id="010_kmainc-proving-the-handler-works-by-actually-triggering-the-fault"><code>010_kmain.c</code>: proving the handler works by actually triggering the fault<a class="headerlink" href="#010_kmainc-proving-the-handler-works-by-actually-triggering-the-fault" title="Permanent link">&para;</a></h2>
+<p>Everything through Chapter 9 runs first and unchanged -- the memory map, the physical memory manager's demonstration, the paging aliasing proof, and the full kernel heap demonstration -- for the same reason it always has: if anything below it broke, that would be the first real evidence. What's new sits at the very end, after this chapter's own regression proof that interrupts are still genuinely firing:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="cm">/* Chapter 10: this kernel finally handles the one CPU exception paging</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="cm"> * has been able to raise since Chapter 8 with nothing installed to</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="cm"> * catch it -- #PF, the page fault. Every chapter before this one has</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="cm"> * been careful to touch only memory that is genuinely mapped, so</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="cm"> * nothing has ever actually triggered a page fault on real hardware</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="cm"> * in this book. This chapter changes that on purpose: after proving</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="cm"> * interrupts are still genuinely running (a real wait for real IRQ0</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="cm"> * ticks, the same regression proof every chapter since Chapter 6 has</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="cm"> * relied on), it deliberately writes through a virtual address that</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="cm"> * was never mapped by anything -- 0xE0000000, directory index 896,</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="cm"> * nowhere near the identity map (0-15), the paging test page (768),</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="cm"> * or the kernel heap (832) -- and lets the real fault that produces</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="cm"> * fire, land in isr14_handler, and print exactly what the CPU says</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="cm"> * went wrong. */</span>
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdint.h&gt;</span>
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>
+<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"010_gdt.h"</span>
+<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"010_idt.h"</span>
+<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"010_keyboard.h"</span>
+<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"010_kheap.h"</span>
+<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"010_multiboot.h"</span>
+<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"010_paging.h"</span>
+<a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"010_pic.h"</span>
+<a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"010_pit.h"</span>
+<a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"010_pmm.h"</span>
+<a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"010_printf.h"</span>
+<a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"010_serial.h"</span>
+<a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"010_vga.h"</span>
+<a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a>
+<a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a><span class="cp">#define TIMER_FREQUENCY_HZ 100</span>
+<a id="__codelineno-5-32" name="__codelineno-5-32" href="#__codelineno-5-32"></a>
+<a id="__codelineno-5-33" name="__codelineno-5-33" href="#__codelineno-5-33"></a><span class="cm">/* Deliberately far outside the 0-64 MiB identity-mapped range (which</span>
+<a id="__codelineno-5-34" name="__codelineno-5-34" href="#__codelineno-5-34"></a><span class="cm"> * only ever occupies page-directory entries 0-15): 0xC0000000 &gt;&gt; 22 =</span>
+<a id="__codelineno-5-35" name="__codelineno-5-35" href="#__codelineno-5-35"></a><span class="cm"> * 768. Mapping here forces paging_map_page() to allocate a genuinely</span>
+<a id="__codelineno-5-36" name="__codelineno-5-36" href="#__codelineno-5-36"></a><span class="cm"> * new page table rather than reusing one paging_init() already built. */</span>
+<a id="__codelineno-5-37" name="__codelineno-5-37" href="#__codelineno-5-37"></a><span class="cp">#define TEST_VIRT_ADDR 0xC0000000u</span>
+<a id="__codelineno-5-38" name="__codelineno-5-38" href="#__codelineno-5-38"></a>
+<a id="__codelineno-5-39" name="__codelineno-5-39" href="#__codelineno-5-39"></a><span class="cm">/* This chapter's own deliberate fault target: 0xE0000000 &gt;&gt; 22 = 896,</span>
+<a id="__codelineno-5-40" name="__codelineno-5-40" href="#__codelineno-5-40"></a><span class="cm"> * a page-directory index nothing in this kernel has ever installed a</span>
+<a id="__codelineno-5-41" name="__codelineno-5-41" href="#__codelineno-5-41"></a><span class="cm"> * page table for -- not the identity map (0-15), not TEST_VIRT_ADDR's</span>
+<a id="__codelineno-5-42" name="__codelineno-5-42" href="#__codelineno-5-42"></a><span class="cm"> * own table (768), not the kernel heap's region starting at 832. */</span>
+<a id="__codelineno-5-43" name="__codelineno-5-43" href="#__codelineno-5-43"></a><span class="cp">#define PF_TEST_ADDR 0xE0000000u</span>
+<a id="__codelineno-5-44" name="__codelineno-5-44" href="#__codelineno-5-44"></a>
+<a id="__codelineno-5-45" name="__codelineno-5-45" href="#__codelineno-5-45"></a><span class="cm">/* Defined by 010_linker.ld, not by this file -- the linker is the one</span>
+<a id="__codelineno-5-46" name="__codelineno-5-46" href="#__codelineno-5-46"></a><span class="cm"> * part of this toolchain that genuinely knows where the kernel image's</span>
+<a id="__codelineno-5-47" name="__codelineno-5-47" href="#__codelineno-5-47"></a><span class="cm"> * last real section ends in physical memory. */</span>
+<a id="__codelineno-5-48" name="__codelineno-5-48" href="#__codelineno-5-48"></a><span class="k">extern</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">kernel_end</span><span class="p">[];</span>
+<a id="__codelineno-5-49" name="__codelineno-5-49" href="#__codelineno-5-49"></a>
+<a id="__codelineno-5-50" name="__codelineno-5-50" href="#__codelineno-5-50"></a><span class="kt">void</span><span class="w"> </span><span class="nf">kmain</span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">magic</span><span class="p">,</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">mboot_info_addr</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-51" name="__codelineno-5-51" href="#__codelineno-5-51"></a><span class="w">    </span><span class="n">serial_init</span><span class="p">();</span>
+<a id="__codelineno-5-52" name="__codelineno-5-52" href="#__codelineno-5-52"></a><span class="w">    </span><span class="n">vga_init</span><span class="p">();</span>
+<a id="__codelineno-5-53" name="__codelineno-5-53" href="#__codelineno-5-53"></a><span class="w">    </span><span class="n">vga_set_color</span><span class="p">(</span><span class="n">VGA_COLOR_LIGHT_GREEN</span><span class="p">,</span><span class="w"> </span><span class="n">VGA_COLOR_BLACK</span><span class="p">);</span>
+<a id="__codelineno-5-54" name="__codelineno-5-54" href="#__codelineno-5-54"></a>
+<a id="__codelineno-5-55" name="__codelineno-5-55" href="#__codelineno-5-55"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Unix OS from Scratch -- Chapter 10: kernel entry reached</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-5-56" name="__codelineno-5-56" href="#__codelineno-5-56"></a>
+<a id="__codelineno-5-57" name="__codelineno-5-57" href="#__codelineno-5-57"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">magic</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">MULTIBOOT2_BOOTLOADER_MAGIC</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-58" name="__codelineno-5-58" href="#__codelineno-5-58"></a><span class="w">        </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"FATAL: EAX held 0x%x at entry, not the real Multiboot2 magic 0x%x -- halting</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
+<a id="__codelineno-5-59" name="__codelineno-5-59" href="#__codelineno-5-59"></a><span class="w">                </span><span class="n">magic</span><span class="p">,</span><span class="w"> </span><span class="n">MULTIBOOT2_BOOTLOADER_MAGIC</span><span class="p">);</span>
+<a id="__codelineno-5-60" name="__codelineno-5-60" href="#__codelineno-5-60"></a><span class="w">        </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"cli"</span><span class="p">);</span>
+<a id="__codelineno-5-61" name="__codelineno-5-61" href="#__codelineno-5-61"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(;;)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"hlt"</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-5-62" name="__codelineno-5-62" href="#__codelineno-5-62"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-5-63" name="__codelineno-5-63" href="#__codelineno-5-63"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Multiboot2 magic confirmed in EAX: 0x%x</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">magic</span><span class="p">);</span>
+<a id="__codelineno-5-64" name="__codelineno-5-64" href="#__codelineno-5-64"></a>
+<a id="__codelineno-5-65" name="__codelineno-5-65" href="#__codelineno-5-65"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">multiboot_tag_mmap</span><span class="w"> </span><span class="o">*</span><span class="n">mmap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">multiboot_find_mmap</span><span class="p">(</span><span class="n">mboot_info_addr</span><span class="p">);</span>
+<a id="__codelineno-5-66" name="__codelineno-5-66" href="#__codelineno-5-66"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">mmap</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-67" name="__codelineno-5-67" href="#__codelineno-5-67"></a><span class="w">        </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"FATAL: no memory map tag in this boot information structure -- halting</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-5-68" name="__codelineno-5-68" href="#__codelineno-5-68"></a><span class="w">        </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"cli"</span><span class="p">);</span>
+<a id="__codelineno-5-69" name="__codelineno-5-69" href="#__codelineno-5-69"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(;;)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"hlt"</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-5-70" name="__codelineno-5-70" href="#__codelineno-5-70"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-5-71" name="__codelineno-5-71" href="#__codelineno-5-71"></a><span class="w">    </span><span class="n">multiboot_print_mmap</span><span class="p">(</span><span class="n">mmap</span><span class="p">);</span>
+<a id="__codelineno-5-72" name="__codelineno-5-72" href="#__codelineno-5-72"></a>
+<a id="__codelineno-5-73" name="__codelineno-5-73" href="#__codelineno-5-73"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">kernel_end_addr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">uintptr_t</span><span class="p">)</span><span class="w"> </span><span class="n">kernel_end</span><span class="p">;</span>
+<a id="__codelineno-5-74" name="__codelineno-5-74" href="#__codelineno-5-74"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Kernel image occupies physical 0x100000 - 0x%x</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">kernel_end_addr</span><span class="p">);</span>
+<a id="__codelineno-5-75" name="__codelineno-5-75" href="#__codelineno-5-75"></a>
+<a id="__codelineno-5-76" name="__codelineno-5-76" href="#__codelineno-5-76"></a><span class="w">    </span><span class="n">pmm_init</span><span class="p">(</span><span class="n">mmap</span><span class="p">,</span><span class="w"> </span><span class="mh">0x100000</span><span class="p">,</span><span class="w"> </span><span class="n">kernel_end_addr</span><span class="p">);</span>
+<a id="__codelineno-5-77" name="__codelineno-5-77" href="#__codelineno-5-77"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">free_frames</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pmm_count_free_frames</span><span class="p">();</span>
+<a id="__codelineno-5-78" name="__codelineno-5-78" href="#__codelineno-5-78"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Physical memory manager ready: %u free frames (%u KiB usable)</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
+<a id="__codelineno-5-79" name="__codelineno-5-79" href="#__codelineno-5-79"></a><span class="w">            </span><span class="n">free_frames</span><span class="p">,</span><span class="w"> </span><span class="n">free_frames</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+<a id="__codelineno-5-80" name="__codelineno-5-80" href="#__codelineno-5-80"></a>
+<a id="__codelineno-5-81" name="__codelineno-5-81" href="#__codelineno-5-81"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">f1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pmm_alloc_frame</span><span class="p">();</span>
+<a id="__codelineno-5-82" name="__codelineno-5-82" href="#__codelineno-5-82"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">f2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pmm_alloc_frame</span><span class="p">();</span>
+<a id="__codelineno-5-83" name="__codelineno-5-83" href="#__codelineno-5-83"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">f3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pmm_alloc_frame</span><span class="p">();</span>
+<a id="__codelineno-5-84" name="__codelineno-5-84" href="#__codelineno-5-84"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Allocated three real frames: 0x%x, 0x%x, 0x%x</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">f1</span><span class="p">,</span><span class="w"> </span><span class="n">f2</span><span class="p">,</span><span class="w"> </span><span class="n">f3</span><span class="p">);</span>
+<a id="__codelineno-5-85" name="__codelineno-5-85" href="#__codelineno-5-85"></a>
+<a id="__codelineno-5-86" name="__codelineno-5-86" href="#__codelineno-5-86"></a><span class="w">    </span><span class="n">pmm_free_frame</span><span class="p">(</span><span class="n">f2</span><span class="p">);</span>
+<a id="__codelineno-5-87" name="__codelineno-5-87" href="#__codelineno-5-87"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Freed the middle frame 0x%x -- %u free frames now</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">f2</span><span class="p">,</span><span class="w"> </span><span class="n">pmm_count_free_frames</span><span class="p">());</span>
+<a id="__codelineno-5-88" name="__codelineno-5-88" href="#__codelineno-5-88"></a>
+<a id="__codelineno-5-89" name="__codelineno-5-89" href="#__codelineno-5-89"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">f4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pmm_alloc_frame</span><span class="p">();</span>
+<a id="__codelineno-5-90" name="__codelineno-5-90" href="#__codelineno-5-90"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Allocated again: got 0x%x (matches the freed frame? %s)</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
+<a id="__codelineno-5-91" name="__codelineno-5-91" href="#__codelineno-5-91"></a><span class="w">            </span><span class="n">f4</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">f4</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">f2</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">"yes"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"no"</span><span class="p">);</span>
+<a id="__codelineno-5-92" name="__codelineno-5-92" href="#__codelineno-5-92"></a>
+<a id="__codelineno-5-93" name="__codelineno-5-93" href="#__codelineno-5-93"></a><span class="w">    </span><span class="n">paging_init</span><span class="p">();</span>
+<a id="__codelineno-5-94" name="__codelineno-5-94" href="#__codelineno-5-94"></a>
+<a id="__codelineno-5-95" name="__codelineno-5-95" href="#__codelineno-5-95"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">test_frame</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pmm_alloc_frame</span><span class="p">();</span>
+<a id="__codelineno-5-96" name="__codelineno-5-96" href="#__codelineno-5-96"></a><span class="w">    </span><span class="n">paging_map_page</span><span class="p">(</span><span class="n">TEST_VIRT_ADDR</span><span class="p">,</span><span class="w"> </span><span class="n">test_frame</span><span class="p">,</span><span class="w"> </span><span class="n">PAGE_PRESENT</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">PAGE_RW</span><span class="p">);</span>
+<a id="__codelineno-5-97" name="__codelineno-5-97" href="#__codelineno-5-97"></a>
+<a id="__codelineno-5-98" name="__codelineno-5-98" href="#__codelineno-5-98"></a><span class="w">    </span><span class="k">volatile</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="o">*</span><span class="n">via_virtual</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">volatile</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="n">TEST_VIRT_ADDR</span><span class="p">;</span>
+<a id="__codelineno-5-99" name="__codelineno-5-99" href="#__codelineno-5-99"></a><span class="w">    </span><span class="k">volatile</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="o">*</span><span class="n">via_identity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">volatile</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="n">test_frame</span><span class="p">;</span>
+<a id="__codelineno-5-100" name="__codelineno-5-100" href="#__codelineno-5-100"></a>
+<a id="__codelineno-5-101" name="__codelineno-5-101" href="#__codelineno-5-101"></a><span class="w">    </span><span class="o">*</span><span class="n">via_virtual</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xCAFEF00Du</span><span class="p">;</span>
+<a id="__codelineno-5-102" name="__codelineno-5-102" href="#__codelineno-5-102"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Wrote 0x%x through virtual address 0x%x</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">via_virtual</span><span class="p">,</span><span class="w"> </span><span class="n">TEST_VIRT_ADDR</span><span class="p">);</span>
+<a id="__codelineno-5-103" name="__codelineno-5-103" href="#__codelineno-5-103"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Reading the SAME physical frame (0x%x) through its identity-mapped address: 0x%x</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
+<a id="__codelineno-5-104" name="__codelineno-5-104" href="#__codelineno-5-104"></a><span class="w">            </span><span class="n">test_frame</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">via_identity</span><span class="p">);</span>
+<a id="__codelineno-5-105" name="__codelineno-5-105" href="#__codelineno-5-105"></a>
+<a id="__codelineno-5-106" name="__codelineno-5-106" href="#__codelineno-5-106"></a><span class="w">    </span><span class="n">kheap_init</span><span class="p">();</span>
+<a id="__codelineno-5-107" name="__codelineno-5-107" href="#__codelineno-5-107"></a>
+<a id="__codelineno-5-108" name="__codelineno-5-108" href="#__codelineno-5-108"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"kmalloc: three real allocations --</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-5-109" name="__codelineno-5-109" href="#__codelineno-5-109"></a><span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kmalloc</span><span class="p">(</span><span class="mi">64</span><span class="p">);</span>
+<a id="__codelineno-5-110" name="__codelineno-5-110" href="#__codelineno-5-110"></a><span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kmalloc</span><span class="p">(</span><span class="mi">128</span><span class="p">);</span>
+<a id="__codelineno-5-111" name="__codelineno-5-111" href="#__codelineno-5-111"></a><span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kmalloc</span><span class="p">(</span><span class="mi">32</span><span class="p">);</span>
+<a id="__codelineno-5-112" name="__codelineno-5-112" href="#__codelineno-5-112"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"  a=0x%x (64 bytes), b=0x%x (128 bytes), c=0x%x (32 bytes)</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
+<a id="__codelineno-5-113" name="__codelineno-5-113" href="#__codelineno-5-113"></a><span class="w">            </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">uintptr_t</span><span class="p">)</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">uintptr_t</span><span class="p">)</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">uintptr_t</span><span class="p">)</span><span class="w"> </span><span class="n">c</span><span class="p">);</span>
+<a id="__codelineno-5-114" name="__codelineno-5-114" href="#__codelineno-5-114"></a><span class="w">    </span><span class="n">kheap_dump</span><span class="p">();</span>
+<a id="__codelineno-5-115" name="__codelineno-5-115" href="#__codelineno-5-115"></a>
+<a id="__codelineno-5-116" name="__codelineno-5-116" href="#__codelineno-5-116"></a><span class="w">    </span><span class="n">kfree</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
+<a id="__codelineno-5-117" name="__codelineno-5-117" href="#__codelineno-5-117"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"kfree(b) -- middle block freed:</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-5-118" name="__codelineno-5-118" href="#__codelineno-5-118"></a><span class="w">    </span><span class="n">kheap_dump</span><span class="p">();</span>
+<a id="__codelineno-5-119" name="__codelineno-5-119" href="#__codelineno-5-119"></a>
+<a id="__codelineno-5-120" name="__codelineno-5-120" href="#__codelineno-5-120"></a><span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kmalloc</span><span class="p">(</span><span class="mi">128</span><span class="p">);</span>
+<a id="__codelineno-5-121" name="__codelineno-5-121" href="#__codelineno-5-121"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"kmalloc(128) again: got 0x%x (matches freed b? %s)</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
+<a id="__codelineno-5-122" name="__codelineno-5-122" href="#__codelineno-5-122"></a><span class="w">            </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">uintptr_t</span><span class="p">)</span><span class="w"> </span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">d</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">"yes"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"no"</span><span class="p">);</span>
+<a id="__codelineno-5-123" name="__codelineno-5-123" href="#__codelineno-5-123"></a><span class="w">    </span><span class="n">kheap_dump</span><span class="p">();</span>
+<a id="__codelineno-5-124" name="__codelineno-5-124" href="#__codelineno-5-124"></a>
+<a id="__codelineno-5-125" name="__codelineno-5-125" href="#__codelineno-5-125"></a><span class="w">    </span><span class="n">kfree</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
+<a id="__codelineno-5-126" name="__codelineno-5-126" href="#__codelineno-5-126"></a><span class="w">    </span><span class="n">kfree</span><span class="p">(</span><span class="n">c</span><span class="p">);</span>
+<a id="__codelineno-5-127" name="__codelineno-5-127" href="#__codelineno-5-127"></a><span class="w">    </span><span class="n">kfree</span><span class="p">(</span><span class="n">d</span><span class="p">);</span>
+<a id="__codelineno-5-128" name="__codelineno-5-128" href="#__codelineno-5-128"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Freed a, c, d -- coalesced back to one free block?</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-5-129" name="__codelineno-5-129" href="#__codelineno-5-129"></a><span class="w">    </span><span class="n">kheap_dump</span><span class="p">();</span>
+<a id="__codelineno-5-130" name="__codelineno-5-130" href="#__codelineno-5-130"></a>
+<a id="__codelineno-5-131" name="__codelineno-5-131" href="#__codelineno-5-131"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"kmalloc(20000) -- larger than the whole initial 16 KiB heap, forcing real growth:</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-5-132" name="__codelineno-5-132" href="#__codelineno-5-132"></a><span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">big</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kmalloc</span><span class="p">(</span><span class="mi">20000</span><span class="p">);</span>
+<a id="__codelineno-5-133" name="__codelineno-5-133" href="#__codelineno-5-133"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"  big=0x%x (20000 bytes)</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">uintptr_t</span><span class="p">)</span><span class="w"> </span><span class="n">big</span><span class="p">);</span>
+<a id="__codelineno-5-134" name="__codelineno-5-134" href="#__codelineno-5-134"></a><span class="w">    </span><span class="n">kheap_dump</span><span class="p">();</span>
+<a id="__codelineno-5-135" name="__codelineno-5-135" href="#__codelineno-5-135"></a><span class="w">    </span><span class="n">kfree</span><span class="p">(</span><span class="n">big</span><span class="p">);</span>
+<a id="__codelineno-5-136" name="__codelineno-5-136" href="#__codelineno-5-136"></a>
+<a id="__codelineno-5-137" name="__codelineno-5-137" href="#__codelineno-5-137"></a><span class="w">    </span><span class="n">gdt_init</span><span class="p">();</span>
+<a id="__codelineno-5-138" name="__codelineno-5-138" href="#__codelineno-5-138"></a><span class="w">    </span><span class="n">idt_init</span><span class="p">();</span>
+<a id="__codelineno-5-139" name="__codelineno-5-139" href="#__codelineno-5-139"></a><span class="w">    </span><span class="n">pic_remap</span><span class="p">(</span><span class="mh">0x20</span><span class="p">,</span><span class="w"> </span><span class="mh">0x28</span><span class="p">);</span>
+<a id="__codelineno-5-140" name="__codelineno-5-140" href="#__codelineno-5-140"></a><span class="w">    </span><span class="n">pic_disable_all</span><span class="p">();</span>
+<a id="__codelineno-5-141" name="__codelineno-5-141" href="#__codelineno-5-141"></a><span class="w">    </span><span class="n">keyboard_init</span><span class="p">();</span>
+<a id="__codelineno-5-142" name="__codelineno-5-142" href="#__codelineno-5-142"></a><span class="w">    </span><span class="n">pit_init</span><span class="p">(</span><span class="n">TIMER_FREQUENCY_HZ</span><span class="p">);</span>
+<a id="__codelineno-5-143" name="__codelineno-5-143" href="#__codelineno-5-143"></a>
+<a id="__codelineno-5-144" name="__codelineno-5-144" href="#__codelineno-5-144"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"GDT/IDT/PIC/PIT/keyboard all initialized -- enabling interrupts now</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-5-145" name="__codelineno-5-145" href="#__codelineno-5-145"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"sti"</span><span class="p">);</span>
+<a id="__codelineno-5-146" name="__codelineno-5-146" href="#__codelineno-5-146"></a>
+<a id="__codelineno-5-147" name="__codelineno-5-147" href="#__codelineno-5-147"></a><span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">pit_get_ticks</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">200</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-148" name="__codelineno-5-148" href="#__codelineno-5-148"></a><span class="w">        </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"hlt"</span><span class="p">);</span>
+<a id="__codelineno-5-149" name="__codelineno-5-149" href="#__codelineno-5-149"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-5-150" name="__codelineno-5-150" href="#__codelineno-5-150"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"%u real IRQ0 ticks delivered -- interrupts confirmed still working.</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">pit_get_ticks</span><span class="p">());</span>
+<a id="__codelineno-5-151" name="__codelineno-5-151" href="#__codelineno-5-151"></a>
+<a id="__codelineno-5-152" name="__codelineno-5-152" href="#__codelineno-5-152"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Deliberately writing through unmapped virtual address 0x%x to trigger a real #PF...</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
+<a id="__codelineno-5-153" name="__codelineno-5-153" href="#__codelineno-5-153"></a><span class="w">            </span><span class="n">PF_TEST_ADDR</span><span class="p">);</span>
+<a id="__codelineno-5-154" name="__codelineno-5-154" href="#__codelineno-5-154"></a><span class="w">    </span><span class="k">volatile</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="o">*</span><span class="n">bad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">volatile</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="n">PF_TEST_ADDR</span><span class="p">;</span>
+<a id="__codelineno-5-155" name="__codelineno-5-155" href="#__codelineno-5-155"></a><span class="w">    </span><span class="o">*</span><span class="n">bad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xDEADBEEFu</span><span class="p">;</span>
+<a id="__codelineno-5-156" name="__codelineno-5-156" href="#__codelineno-5-156"></a>
+<a id="__codelineno-5-157" name="__codelineno-5-157" href="#__codelineno-5-157"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"unreachable -- isr14_handler halts on this fault</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-5-158" name="__codelineno-5-158" href="#__codelineno-5-158"></a>
+<a id="__codelineno-5-159" name="__codelineno-5-159" href="#__codelineno-5-159"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(;;)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-160" name="__codelineno-5-160" href="#__codelineno-5-160"></a><span class="w">        </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"hlt"</span><span class="p">);</span>
+<a id="__codelineno-5-161" name="__codelineno-5-161" href="#__codelineno-5-161"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-5-162" name="__codelineno-5-162" href="#__codelineno-5-162"></a><span class="p">}</span>
+</code></pre></div>
+<p><code>PF_TEST_ADDR</code> (<code>0xE0000000</code>) was not picked arbitrarily. Its page-directory index (<code>0xE0000000 &gt;&gt; 22 = 896</code>) falls outside every range this kernel has ever mapped anything into: the identity map (indices 0-15), <code>TEST_VIRT_ADDR</code>'s own page table (index 768), and the kernel heap's region starting at <code>0xD0000000</code> (index 832). Nothing installed by any earlier chapter could accidentally make this address valid. The wait loop before it -- spinning on <code>pit_get_ticks()</code> until 200 real ticks have been delivered -- exists so this chapter's own real run still shows interrupts genuinely working <em>before</em> the deliberate fault ends execution for good; without it, this chapter's serial capture would show zero ticks, since the fault fires before the kernel would otherwise reach its normal <code>hlt</code> loop.</p>
+<h2 id="building-it-for-real">Building it, for real<a class="headerlink" href="#building-it-for-real" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>nasm<span class="w"> </span>-f<span class="w"> </span>elf32<span class="w"> </span>010_boot.asm<span class="w"> </span>-o<span class="w"> </span>boot.o
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>nasm<span class="w"> </span>-f<span class="w"> </span>elf32<span class="w"> </span>010_gdt_flush.asm<span class="w"> </span>-o<span class="w"> </span>gdt_flush.o
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>nasm<span class="w"> </span>-f<span class="w"> </span>elf32<span class="w"> </span>010_idt_flush.asm<span class="w"> </span>-o<span class="w"> </span>idt_flush.o
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>nasm<span class="w"> </span>-f<span class="w"> </span>elf32<span class="w"> </span>010_isr0.asm<span class="w"> </span>-o<span class="w"> </span>isr0.o
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>nasm<span class="w"> </span>-f<span class="w"> </span>elf32<span class="w"> </span>010_isr14.asm<span class="w"> </span>-o<span class="w"> </span>isr14.o
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>nasm<span class="w"> </span>-f<span class="w"> </span>elf32<span class="w"> </span>010_irq0.asm<span class="w"> </span>-o<span class="w"> </span>irq0.o
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>nasm<span class="w"> </span>-f<span class="w"> </span>elf32<span class="w"> </span>010_irq1.asm<span class="w"> </span>-o<span class="w"> </span>irq1.o
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>010_vga.c<span class="w"> </span>-o<span class="w"> </span>vga.o
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>010_serial.c<span class="w"> </span>-o<span class="w"> </span>serial.o
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>010_gdt.c<span class="w"> </span>-o<span class="w"> </span>gdt.o
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>010_idt.c<span class="w"> </span>-o<span class="w"> </span>idt.o
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>010_pic.c<span class="w"> </span>-o<span class="w"> </span>pic.o
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>010_pit.c<span class="w"> </span>-o<span class="w"> </span>pit.o
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>010_printf.c<span class="w"> </span>-o<span class="w"> </span>printf.o
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>010_isr_handlers.c<span class="w"> </span>-o<span class="w"> </span>isr_handlers.o
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>010_keyboard.c<span class="w"> </span>-o<span class="w"> </span>keyboard.o
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>010_multiboot.c<span class="w"> </span>-o<span class="w"> </span>multiboot.o
+<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>010_pmm.c<span class="w"> </span>-o<span class="w"> </span>pmm.o
+<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>010_paging.c<span class="w"> </span>-o<span class="w"> </span>paging.o
+<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>010_kheap.c<span class="w"> </span>-o<span class="w"> </span>kheap.o
+<a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>010_kmain.c<span class="w"> </span>-o<span class="w"> </span>kmain.o
+<a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a>ld<span class="w"> </span>-m<span class="w"> </span>elf_i386<span class="w"> </span>-T<span class="w"> </span>010_linker.ld<span class="w"> </span>-o<span class="w"> </span>kernel.bin<span class="w"> </span>boot.o<span class="w"> </span>gdt_flush.o<span class="w"> </span>idt_flush.o<span class="w"> </span>isr0.o<span class="w"> </span>isr14.o<span class="w"> </span>irq0.o<span class="w"> </span>irq1.o<span class="w"> </span>vga.o<span class="w"> </span>serial.o<span class="w"> </span>gdt.o<span class="w"> </span>idt.o<span class="w"> </span>pic.o<span class="w"> </span>pit.o<span class="w"> </span>printf.o<span class="w"> </span>isr_handlers.o<span class="w"> </span>keyboard.o<span class="w"> </span>multiboot.o<span class="w"> </span>pmm.o<span class="w"> </span>paging.o<span class="w"> </span>kheap.o<span class="w"> </span>kmain.o
+<a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a>grub-file<span class="w"> </span>--is-x86-multiboot2<span class="w"> </span>kernel.bin<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span>valid-multiboot2
+</code></pre></div>
+<p><strong>Output (cloud sandbox -- real, live-executed build output):</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>=== nasm -f elf32 /home/claude/unix_os_repo/docs/part10/code/010_boot.asm -o boot.o ===
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>=== nasm -f elf32 /home/claude/unix_os_repo/docs/part10/code/010_gdt_flush.asm -o gdt_flush.o ===
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>=== nasm -f elf32 /home/claude/unix_os_repo/docs/part10/code/010_idt_flush.asm -o idt_flush.o ===
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>=== nasm -f elf32 /home/claude/unix_os_repo/docs/part10/code/010_isr0.asm -o isr0.o ===
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>=== nasm -f elf32 /home/claude/unix_os_repo/docs/part10/code/010_isr14.asm -o isr14.o ===
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>=== nasm -f elf32 /home/claude/unix_os_repo/docs/part10/code/010_irq0.asm -o irq0.o ===
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>=== nasm -f elf32 /home/claude/unix_os_repo/docs/part10/code/010_irq1.asm -o irq1.o ===
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part10/code/010_vga.c -o vga.o ===
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>
+<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part10/code/010_serial.c -o serial.o ===
+<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a>
+<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part10/code/010_gdt.c -o gdt.o ===
+<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>
+<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part10/code/010_idt.c -o idt.o ===
+<a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a>
+<a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part10/code/010_pic.c -o pic.o ===
+<a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a>
+<a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part10/code/010_pit.c -o pit.o ===
+<a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a>
+<a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part10/code/010_printf.c -o printf.o ===
+<a id="__codelineno-7-28" name="__codelineno-7-28" href="#__codelineno-7-28"></a>
+<a id="__codelineno-7-29" name="__codelineno-7-29" href="#__codelineno-7-29"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part10/code/010_isr_handlers.c -o isr_handlers.o ===
+<a id="__codelineno-7-30" name="__codelineno-7-30" href="#__codelineno-7-30"></a>
+<a id="__codelineno-7-31" name="__codelineno-7-31" href="#__codelineno-7-31"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part10/code/010_keyboard.c -o keyboard.o ===
+<a id="__codelineno-7-32" name="__codelineno-7-32" href="#__codelineno-7-32"></a>
+<a id="__codelineno-7-33" name="__codelineno-7-33" href="#__codelineno-7-33"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part10/code/010_multiboot.c -o multiboot.o ===
+<a id="__codelineno-7-34" name="__codelineno-7-34" href="#__codelineno-7-34"></a>
+<a id="__codelineno-7-35" name="__codelineno-7-35" href="#__codelineno-7-35"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part10/code/010_pmm.c -o pmm.o ===
+<a id="__codelineno-7-36" name="__codelineno-7-36" href="#__codelineno-7-36"></a>
+<a id="__codelineno-7-37" name="__codelineno-7-37" href="#__codelineno-7-37"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part10/code/010_paging.c -o paging.o ===
+<a id="__codelineno-7-38" name="__codelineno-7-38" href="#__codelineno-7-38"></a>
+<a id="__codelineno-7-39" name="__codelineno-7-39" href="#__codelineno-7-39"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part10/code/010_kheap.c -o kheap.o ===
+<a id="__codelineno-7-40" name="__codelineno-7-40" href="#__codelineno-7-40"></a>
+<a id="__codelineno-7-41" name="__codelineno-7-41" href="#__codelineno-7-41"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part10/code/010_kmain.c -o kmain.o ===
+<a id="__codelineno-7-42" name="__codelineno-7-42" href="#__codelineno-7-42"></a>
+<a id="__codelineno-7-43" name="__codelineno-7-43" href="#__codelineno-7-43"></a>=== ld -m elf_i386 -T /home/claude/unix_os_repo/docs/part10/code/010_linker.ld -o kernel.bin boot.o gdt_flush.o idt_flush.o isr0.o isr14.o irq0.o irq1.o vga.o serial.o gdt.o idt.o pic.o pit.o printf.o isr_handlers.o keyboard.o multiboot.o pmm.o paging.o kheap.o kmain.o ===
+<a id="__codelineno-7-44" name="__codelineno-7-44" href="#__codelineno-7-44"></a>ld: warning: irq1.o: missing .note.GNU-stack section implies executable stack
+<a id="__codelineno-7-45" name="__codelineno-7-45" href="#__codelineno-7-45"></a>ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+<a id="__codelineno-7-46" name="__codelineno-7-46" href="#__codelineno-7-46"></a>ld: warning: kernel.bin has a LOAD segment with RWX permissions
+<a id="__codelineno-7-47" name="__codelineno-7-47" href="#__codelineno-7-47"></a>
+<a id="__codelineno-7-48" name="__codelineno-7-48" href="#__codelineno-7-48"></a>=== grub-file --is-x86-multiboot2 kernel.bin &amp;&amp; echo valid-multiboot2 ===
+<a id="__codelineno-7-49" name="__codelineno-7-49" href="#__codelineno-7-49"></a>valid-multiboot2
+</code></pre></div>
+<p>Twenty-one real source files this time -- seven assembled (one genuinely new: <code>010_isr14.asm</code>), fourteen compiled -- every C file still clean under <code>-Wall -Wextra</code>. The two linker warnings are the same benign ones every prior chapter has produced. <code>grub-file</code> still confirms a valid Multiboot2 image.</p>
+<h2 id="booting-it-and-triggering-a-real-page-fault-on-purpose">Booting it, and triggering a real page fault on purpose<a class="headerlink" href="#booting-it-and-triggering-a-real-page-fault-on-purpose" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>qemu-system-i386<span class="w"> </span>-cdrom<span class="w"> </span>kernel.iso<span class="w"> </span>-m<span class="w"> </span><span class="m">64</span><span class="w"> </span>-no-reboot<span class="w"> </span>-no-shutdown<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span>-serial<span class="w"> </span>file:serial_capture.txt<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span>-monitor<span class="w"> </span>unix:/tmp/qemu_monitor.sock,server,nowait<span class="w"> </span>-display<span class="w"> </span>none<span class="w"> </span><span class="p">&amp;</span>
+</code></pre></div>
+<p><strong>Output (cloud sandbox -- real, live-executed serial capture, QEMU 8.2.2, <code>-m 64</code>):</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Unix OS from Scratch -- Chapter 10: kernel entry reached
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>Multiboot2 magic confirmed in EAX: 0x36d76289
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>Multiboot2 memory map: 6 real entries, 24 bytes each
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>  base 0x0  length 0x9fc00  type 1 (available)
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>  base 0x9fc00  length 0x400  type 2
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>  base 0xf0000  length 0x10000  type 2
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>  base 0x100000  length 0x3ee0000  type 1 (available)
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>  base 0x3fe0000  length 0x20000  type 2
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>  base 0xfffc0000  length 0x40000  type 2
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>Kernel image occupies physical 0x100000 - 0x107fd0
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>Physical memory manager ready: 16088 free frames (64352 KiB usable)
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>Allocated three real frames: 0x108000, 0x109000, 0x10a000
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>Freed the middle frame 0x109000 -- 16086 free frames now
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>Allocated again: got 0x109000 (matches the freed frame? yes)
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>Paging: allocating page directory...
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>Paging: page directory at 0x10b000. Identity-mapping 0-64MiB (16 page tables)...
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>Paging: identity map built. Loading CR3 and setting CR0.PG...
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>Paging: CR0 = 0x80000011 (PG bit: 1). Paging is now live.
+<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>Wrote 0xcafef00d through virtual address 0xc0000000
+<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a>Reading the SAME physical frame (0x11c000) through its identity-mapped address: 0xcafef00d
+<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a>kheap: initialized at 0xd0000000, 16368 bytes usable (4 pages mapped)
+<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a>kmalloc: three real allocations --
+<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a>  a=0xd0000010 (64 bytes), b=0xd0000060 (128 bytes), c=0xd00000f0 (32 bytes)
+<a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a>  block 0: addr 0xd0000010 size 64 USED
+<a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a>  block 1: addr 0xd0000060 size 128 USED
+<a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a>  block 2: addr 0xd00000f0 size 32 USED
+<a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a>  block 3: addr 0xd0000120 size 16096 FREE
+<a id="__codelineno-9-28" name="__codelineno-9-28" href="#__codelineno-9-28"></a>kfree(b) -- middle block freed:
+<a id="__codelineno-9-29" name="__codelineno-9-29" href="#__codelineno-9-29"></a>  block 0: addr 0xd0000010 size 64 USED
+<a id="__codelineno-9-30" name="__codelineno-9-30" href="#__codelineno-9-30"></a>  block 1: addr 0xd0000060 size 128 FREE
+<a id="__codelineno-9-31" name="__codelineno-9-31" href="#__codelineno-9-31"></a>  block 2: addr 0xd00000f0 size 32 USED
+<a id="__codelineno-9-32" name="__codelineno-9-32" href="#__codelineno-9-32"></a>  block 3: addr 0xd0000120 size 16096 FREE
+<a id="__codelineno-9-33" name="__codelineno-9-33" href="#__codelineno-9-33"></a>kmalloc(128) again: got 0xd0000060 (matches freed b? yes)
+<a id="__codelineno-9-34" name="__codelineno-9-34" href="#__codelineno-9-34"></a>  block 0: addr 0xd0000010 size 64 USED
+<a id="__codelineno-9-35" name="__codelineno-9-35" href="#__codelineno-9-35"></a>  block 1: addr 0xd0000060 size 128 USED
+<a id="__codelineno-9-36" name="__codelineno-9-36" href="#__codelineno-9-36"></a>  block 2: addr 0xd00000f0 size 32 USED
+<a id="__codelineno-9-37" name="__codelineno-9-37" href="#__codelineno-9-37"></a>  block 3: addr 0xd0000120 size 16096 FREE
+<a id="__codelineno-9-38" name="__codelineno-9-38" href="#__codelineno-9-38"></a>Freed a, c, d -- coalesced back to one free block?
+<a id="__codelineno-9-39" name="__codelineno-9-39" href="#__codelineno-9-39"></a>  block 0: addr 0xd0000010 size 16368 FREE
+<a id="__codelineno-9-40" name="__codelineno-9-40" href="#__codelineno-9-40"></a>kmalloc(20000) -- larger than the whole initial 16 KiB heap, forcing real growth:
+<a id="__codelineno-9-41" name="__codelineno-9-41" href="#__codelineno-9-41"></a>kheap: growing by 5 page(s) (20480 bytes), old top 0xd0004000, new top 0xd0009000
+<a id="__codelineno-9-42" name="__codelineno-9-42" href="#__codelineno-9-42"></a>  big=0xd0000010 (20000 bytes)
+<a id="__codelineno-9-43" name="__codelineno-9-43" href="#__codelineno-9-43"></a>  block 0: addr 0xd0000010 size 20000 USED
+<a id="__codelineno-9-44" name="__codelineno-9-44" href="#__codelineno-9-44"></a>  block 1: addr 0xd0004e40 size 16832 FREE
+<a id="__codelineno-9-45" name="__codelineno-9-45" href="#__codelineno-9-45"></a>GDT/IDT/PIC/PIT/keyboard all initialized -- enabling interrupts now
+<a id="__codelineno-9-46" name="__codelineno-9-46" href="#__codelineno-9-46"></a>tick: 100
+<a id="__codelineno-9-47" name="__codelineno-9-47" href="#__codelineno-9-47"></a>tick: 200
+<a id="__codelineno-9-48" name="__codelineno-9-48" href="#__codelineno-9-48"></a>200 real IRQ0 ticks delivered -- interrupts confirmed still working.
+<a id="__codelineno-9-49" name="__codelineno-9-49" href="#__codelineno-9-49"></a>Deliberately writing through unmapped virtual address 0xe0000000 to trigger a real #PF...
+<a id="__codelineno-9-50" name="__codelineno-9-50" href="#__codelineno-9-50"></a>
+<a id="__codelineno-9-51" name="__codelineno-9-51" href="#__codelineno-9-51"></a>*** CPU EXCEPTION: Page Fault (vector 14, #PF) ***
+<a id="__codelineno-9-52" name="__codelineno-9-52" href="#__codelineno-9-52"></a>Faulting address (CR2): 0xe0000000
+<a id="__codelineno-9-53" name="__codelineno-9-53" href="#__codelineno-9-53"></a>Error code: 0x2 (non-present page, write, supervisor mode)
+<a id="__codelineno-9-54" name="__codelineno-9-54" href="#__codelineno-9-54"></a>This handler does not resume the faulting instruction --
+<a id="__codelineno-9-55" name="__codelineno-9-55" href="#__codelineno-9-55"></a>halting.
+</code></pre></div>
+<p>Every earlier chapter's own real evidence still holds: the free-frame count (<strong>16088</strong>) matches the same independent cross-check every chapter since Chapter 7 has used, recomputed from this run's own real memory map and kernel footprint; the heap's own allocation, free, reuse, and coalescing sequence from Chapter 9 runs identically. The 200-tick wait genuinely completes (<code>200 real IRQ0 ticks delivered</code>) before anything about the fault happens, confirming interrupts were still firing normally right up to the moment this chapter deliberately ended execution.</p>
+<p>The fault itself is the real new evidence. <code>CR2</code> reads back as <strong><code>0xE0000000</code></strong> -- exactly <code>PF_TEST_ADDR</code>, not merely a plausible-looking value, confirming the CPU's own record of the faulting address matches precisely what this chapter's code actually touched. The error code reads back as <strong><code>0x2</code></strong>, decoded live by the kernel itself as <em>non-present page, write, supervisor mode</em> -- and each of those three is independently checkable against what the code actually did: the access was a genuine write (<code>*bad = 0xDEADBEEFu</code>), to an address with no page table entry anywhere (non-present, not a protection violation), executed by kernel code, never having reached ring 3 (supervisor mode). The line <code>unreachable -- isr14_handler halts on this fault</code> never appears in the real capture above -- silence that is itself the proof the handler genuinely never returned control to the faulting code, exactly as its own comments say it should. The same output appears on the real VGA screen, captured the same way every prior chapter's screenshot was:</p>
+<p><img alt="Real QEMU screendump of Chapter 10's output: the Multiboot2 magic confirmation, the real memory map, the physical memory manager, paging, and kernel heap demonstrations carried forward from Chapters 7-9, 200 real IRQ0 tick confirmations, and the final real #PF -- CR2 reading 0xE0000000, the error code 0x2 decoded as a non-present, write, supervisor-mode fault, and the handler's own halt message -- all in light green on black" src="../images/010_vga_screendump.png" /></p>
+<h2 id="chapter-summary">Chapter summary<a class="headerlink" href="#chapter-summary" title="Permanent link">&para;</a></h2>
+<p>This chapter closed the one real gap Chapter 8 left open: paging could raise a page fault since the moment <code>CR0.PG</code> was first set, but nothing installed a handler for vector 14 until now. <code>010_isr14.asm</code> handles the real structural difference between an exception that pushes an error code and one that does not -- reading that error code off the stack, passing it to C as a real argument, and discarding it before <code>IRET</code>, which has no idea it is there. <code>isr14_handler</code> decodes that error code and reads <code>CR2</code> field-by-field, cited directly from the OSDev Wiki rather than approximated. Rather than trust the handler would work correctly if a page fault ever happened, this chapter made one happen on purpose -- a genuine write through an address deliberately chosen to fall outside every range this kernel has ever mapped -- and confirmed, from the real live-executed output, that <code>CR2</code> and the error code both matched exactly what the deliberate fault should have produced.</p>
+<h2 id="self-check-questions">Self-check questions<a class="headerlink" href="#self-check-questions" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Why can't <code>010_isr14.asm</code> use the same plain <code>pusha</code>/<code>call</code>/<code>popa</code>/<code>iret</code> shape <code>010_isr0.asm</code> uses for #DE?</li>
+<li><code>isr14_handler</code> reads the faulting address from CR2 rather than from its own <code>error_code</code> argument. Why does the error code not carry the faulting address itself?</li>
+<li>Why was <code>0xE0000000</code> chosen as this chapter's deliberate fault target, rather than, say, an address just past the kernel heap's current end?</li>
+<li>The real error code this chapter's fault produces is <code>0x2</code>. Walk through why each of the three decoded bits (present, write, user) comes out the way it does.</li>
+<li>Why does <code>010_kmain.c</code> wait for 200 real PIT ticks before triggering the deliberate page fault, instead of triggering it immediately after <code>STI</code>?</li>
+</ol>
+<p><strong>Worked answers</strong></p>
+<ol>
+<li>
+<h1 id="de-pushes-no-error-code-so-after-pushacallpopa-the-stack-is-back-to-exactly-what-the-cpu-pushed-on-entry-eipcseflags-and-a-plain-iret-pops-exactly-that-pf-pushes-a-real-32-bit-error-code-in-addition-to-eipcseflags-so-after-the-same-pushacallpopa-sequence-that-error-code-is-still-sitting-on-the-stack-underneath-eipcseflags-an-iret-at-that-point-would-pop-the-error-code-where-the-cpu-expects-eip-and-everything-after-it-would-be-wrong-the-stub-has-to-discard-that-error-code-add-esp-4-before-iret-can-run-safely">DE pushes no error code, so after <code>pusha</code>/<code>call</code>/<code>popa</code>, the stack is back to exactly what the CPU pushed on entry (EIP/CS/EFLAGS), and a plain <code>iret</code> pops exactly that. #PF pushes a real 32-bit error code in addition to EIP/CS/EFLAGS, so after the same <code>pusha</code>/<code>call</code>/<code>popa</code> sequence, that error code is still sitting on the stack underneath EIP/CS/EFLAGS -- an <code>iret</code> at that point would pop the error code where the CPU expects EIP, and everything after it would be wrong. The stub has to discard that error code (<code>add esp, 4</code>) before <code>iret</code> can run safely.<a class="headerlink" href="#de-pushes-no-error-code-so-after-pushacallpopa-the-stack-is-back-to-exactly-what-the-cpu-pushed-on-entry-eipcseflags-and-a-plain-iret-pops-exactly-that-pf-pushes-a-real-32-bit-error-code-in-addition-to-eipcseflags-so-after-the-same-pushacallpopa-sequence-that-error-code-is-still-sitting-on-the-stack-underneath-eipcseflags-an-iret-at-that-point-would-pop-the-error-code-where-the-cpu-expects-eip-and-everything-after-it-would-be-wrong-the-stub-has-to-discard-that-error-code-add-esp-4-before-iret-can-run-safely" title="Permanent link">&para;</a></h1>
+</li>
+<li>The error code and CR2 carry two different kinds of information: the error code says <em>why</em> the access failed (present/absent, read/write, supervisor/user), while CR2 says <em>where</em> the CPU was trying to go when it failed. The CPU designers put these in separate places because a handler often needs one without needing to re-derive the other, and cramming a full 32-bit address into the same register as a handful of status bits would not leave room for either to be used cleanly.</li>
+<li>Its page-directory index (<code>0xE0000000 &gt;&gt; 22 = 896</code>) needed to fall outside every range any earlier chapter's code could have mapped, so the fault is guaranteed to be genuine rather than an accident of some other chapter's own address choices. An address just past the heap's current end would be close to <code>0xD0000000</code>'s own region (index 832) and could accidentally become valid later if the heap ever grew enough to reach it -- <code>0xE0000000</code> has no such risk, since nothing in this book maps anywhere near index 896.</li>
+<li>Present (bit 0) is 0 because no page table entry exists at all for <code>0xE0000000</code> -- this is a non-present page, not a protection violation on an existing mapping. Write (bit 1) is 1 because the deliberate fault was a real store instruction (<code>*bad = 0xDEADBEEFu</code>), not a read. User (bit 2) is 0 because the fault happened inside <code>kmain</code>, running at CPL 0 (kernel/supervisor level) -- this book has no ring 3 code yet, so this bit could not read any other way.</li>
+<li>Triggering the fault immediately after <code>STI</code> would end execution (via the handler's own halt) before a single real IRQ0 interrupt had a chance to fire, so this chapter's own real run would show zero evidence that interrupts were still working after all of Chapters 6-9's own setup. Waiting for 200 real ticks first -- confirmed by <code>pit_get_ticks()</code>, not assumed -- proves the interrupt-handling machinery built across five earlier chapters is still genuinely functioning right up until the moment this chapter deliberately ends it.</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../../part9/09-a-kernel-heap-real-dynamic-memory-with-kmalloc-kfree/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 9. A Kernel Heap: Real Dynamic Memory with kmalloc/kfree">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                9. A Kernel Heap: Real Dynamic Memory with kmalloc/kfree
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../part11/11-kernel-level-multitasking-cooperative-task-switching/" class="md-footer__link md-footer__link--next" aria-label="Next: 11. Kernel-Level Multitasking: Cooperative Task Switching">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                11. Kernel-Level Multitasking: Cooperative Task Switching
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 Oluwaseyi Awoga
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,2395 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A Unix-Like Operating System in C, From Power-On to a Working Shell">
+      
+      
+        <meta name="author" content="Oluwaseyi Awoga">
+      
+      
+      
+        <link rel="prev" href="../../part7/07-physical-memory-the-multiboot2-memory-map-and-a-real-frame-allocator/">
+      
+      
+        <link rel="next" href="../../part9/09-a-kernel-heap-real-dynamic-memory-with-kmalloc-kfree/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>8. Paging: Enabling Virtual Memory - Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#8-paging-enabling-virtual-memory" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" class="md-header__button md-logo" aria-label="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 19V7H4v12zm0-16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm-7 14v-2h5v2zm-3.42-4L5.57 9H8.4l3.3 3.3c.39.39.39 1.03 0 1.42L8.42 17H5.59z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              8. Paging: Enabling Virtual Memory
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="deep-orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="deep-orange"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" class="md-nav__button md-logo" aria-label="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 19V7H4v12zm0-16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm-7 14v-2h5v2zm-3.42-4L5.57 9H8.4l3.3 3.3c.39.39.39 1.03 0 1.42L8.42 17H5.59z"/></svg>
+
+    </a>
+    Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 1 -- Booting: From Power-On to Kernel Entry
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 1 -- Booting: From Power-On to Kernel Entry
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part1/01-booting-a-multiboot2-kernel-from-power-on-to-kernel-entry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1. Booting a Multiboot2 Kernel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 2 -- Talking to Hardware: Early Device Drivers
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 2 -- Talking to Hardware: Early Device Drivers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part2/02-vga-text-mode-output-a-real-screen-driver/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2. VGA Text-Mode Output
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 3 -- Kernel Infrastructure: Descriptor Tables and Utilities
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 3 -- Kernel Infrastructure: Descriptor Tables and Utilities
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/03-a-real-gdt-and-a-kernel-printf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3. A Real GDT and a Kernel printf
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part4/04-interrupts-the-idt-and-a-first-real-isr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4. Interrupts: The IDT and a First Real ISR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 4 -- Hardware Interrupts: Making the Kernel Interactive
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 4 -- Hardware Interrupts: Making the Kernel Interactive
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part5/05-ps2-keyboard-input-via-a-real-hardware-irq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5. PS/2 Keyboard Input, via a Real Hardware IRQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part6/06-the-pit-timer-and-a-real-tick-counter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6. The PIT Timer and a Real Tick Counter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 5 -- Memory: Discovering and Managing Real RAM
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 5 -- Memory: Discovering and Managing Real RAM
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part7/07-physical-memory-the-multiboot2-memory-map-and-a-real-frame-allocator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7. Physical Memory: the Multiboot2 Memory Map and a Real Frame Allocator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8. Paging: Enabling Virtual Memory
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8. Paging: Enabling Virtual Memory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-a-flat-address-space-runs-out-of-road" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why a flat address space runs out of road
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-real-32-bit-page-directory-page-table-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The real 32-bit page directory / page table layout
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#008_pagingh008_pagingc-real-page-tables-built-from-real-frames" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        008_paging.h/008_paging.c: real page tables, built from real frames
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#008_kmainc-proving-translation-is-real-not-printing-a-claim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        008_kmain.c: proving translation is real, not printing a claim
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-it-for-real" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Building it, for real
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#booting-it-and-switching-paging-on-for-real" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Booting it, and switching paging on for real
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#self-check-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Self-check questions
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part9/09-a-kernel-heap-real-dynamic-memory-with-kmalloc-kfree/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9. A Kernel Heap: Real Dynamic Memory with kmalloc/kfree
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10/10-page-fault-handling-a-real-isr14/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10. Page Fault Handling: A Real ISR14
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 6 -- Scheduling: Running More Than One Task at Once
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 6 -- Scheduling: Running More Than One Task at Once
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11/11-kernel-level-multitasking-cooperative-task-switching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11. Kernel-Level Multitasking: Cooperative Task Switching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12/12-preemptive-multitasking-letting-the-timer-decide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12. Preemptive Multitasking: Letting the Timer Decide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13/13-synchronization-primitives-spinlocks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13. Synchronization Primitives: Spinlocks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14/14-blocking-synchronization-semaphores-and-sleep-wake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14. Blocking Synchronization: Semaphores and Sleep/Wake
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 7 -- Privilege: Running Code This Kernel Does Not Fully Trust
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 7 -- Privilege: Running Code This Kernel Does Not Fully Trust
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part15/15-user-mode-ring-3-tss-and-a-first-system-call/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15. User Mode: Ring 3, a TSS, and a First System Call
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16/16-real-ring-3-tasks-in-the-scheduler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    16. Real Ring-3 Tasks in the Scheduler: sys_yield, sys_exit, Multiple User Tasks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17/17-per-process-address-spaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    17. Per-Process Address Spaces: One Page Directory Per Task
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18/18-loading-a-real-elf-binary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    18. Loading a Real ELF Binary: Parsing Program Headers and Mapping PT_LOAD Segments
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19/19-a-real-disk-driver-ata-pio-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    19. A Real Disk Driver: ATA PIO Mode, Reading and Writing Real Sectors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20/20-a-real-filesystem-fat16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20. A Real Filesystem: FAT16, Files Addressed by Name Instead of by Raw LBA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part21/21-real-subdirectories-fat16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    21. Real Subdirectories: One Level of Nesting Inside FAT16
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part22/22-removing-real-subdirectories-fat16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    22. Removing Real Subdirectories: fat16_rmdir() and the Empty-Directory Rule
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part23/23-recursive-multi-level-paths-fat16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    23. Recursive Multi-Level Paths: Lifting FAT16's One-Level Scope
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part24/24-pci-bus-enumeration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    24. PCI Bus Enumeration: Finding the Hardware Before You Can Drive It
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part25/25-rtl8139-driver/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    25. A Real RTL8139 Driver: One Real Frame, Sent and Received
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part26/26-interrupt-driven-rtl8139/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    26. Interrupt-Driven RTL8139: A Real hlt, Woken by Real Hardware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part27/27-multi-frame-rtl8139/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    27. Multi-Frame RTL8139: Real Round-Robin Transmit, Real CAPR Wraparound
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part28/28-address-resolution-protocol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    28. Address Resolution Protocol: A Real ARP Request/Reply Over a Real Wire
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part29/29-a-real-arp-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    29. A Real ARP Cache: Completing RFC 826's Own Merge_flag Logic
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part30/30-a-real-fedwire-style-wire-transfer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    30. A Real Fedwire-Style Wire Transfer: AES-128, SHA-256, and HMAC From Scratch
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part31/31-a-real-arp-server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    31. A Real ARP Server: Answering Requests About This Kernel's Own Address
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part32/32-a-real-nacha-ach-p2p-split/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    32. A Real NACHA ACH Batch: P2P Group-Expense Splitting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part33/33-a-real-pay-in-4-bnpl-checkout/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    33. A Real "Pay in 4" BNPL Checkout: Regulation Z APR and an ISO 8583 Authorization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-a-flat-address-space-runs-out-of-road" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why a flat address space runs out of road
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-real-32-bit-page-directory-page-table-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The real 32-bit page directory / page table layout
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#008_pagingh008_pagingc-real-page-tables-built-from-real-frames" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        008_paging.h/008_paging.c: real page tables, built from real frames
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#008_kmainc-proving-translation-is-real-not-printing-a-claim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        008_kmain.c: proving translation is real, not printing a claim
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-it-for-real" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Building it, for real
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#booting-it-and-switching-paging-on-for-real" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Booting it, and switching paging on for real
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#self-check-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Self-check questions
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="8-paging-enabling-virtual-memory">8. Paging: Enabling Virtual Memory<a class="headerlink" href="#8-paging-enabling-virtual-memory" title="Permanent link">&para;</a></h1>
+<p><strong>What you will understand:</strong> why a flat physical address space stops being enough the moment a kernel wants to give processes their own private memory, the real 32-bit (non-PAE) x86 page directory/page table layout field-for-field, how to build and install page tables using this book's own physical memory manager rather than static arrays, how <code>CR3</code> and <code>CR0</code>'s <code>PG</code> bit actually switch translation on, and how to prove -- not just claim -- that the CPU is genuinely translating addresses rather than passing them through unchanged.</p>
+<p><strong>What you need to know first:</strong> Chapter 7's physical memory manager (<code>pmm_alloc_frame</code>/<code>pmm_free_frame</code>), whose frames this chapter's page tables are built out of directly, and the Multiboot2 memory map that seeds it. This chapter stays inside Chapter 7's own Part, since paging is still fundamentally about managing this machine's real memory -- just at a new layer above the physical frames Chapter 7 already tracks.</p>
+<h2 id="why-a-flat-address-space-runs-out-of-road">Why a flat address space runs out of road<a class="headerlink" href="#why-a-flat-address-space-runs-out-of-road" title="Permanent link">&para;</a></h2>
+<p>Every chapter through Chapter 7 has used physical addresses directly: the VGA buffer at <code>0xB8000</code>, the kernel's own load address at <code>0x100000</code>, the frames <code>pmm_alloc_frame</code> hands out. That has worked because this kernel has had exactly one thing running -- itself. A real operating system needs more than that: several programs, each believing it owns the whole address space, none able to read or corrupt another's memory just by guessing an address. Paging is the hardware feature that makes that possible -- a layer of indirection between the addresses code actually uses (virtual addresses) and the real physical RAM those addresses end up touching, enforced by the CPU on every single memory access once enabled.</p>
+<p>This chapter does not yet build separate address spaces for separate programs -- there is only one program, this kernel, and nothing yet to protect it from. What this chapter does build is the real mechanism underneath that: a genuine page directory and page tables, installed into a real CPU register, with paging switched on and proven to actually translate.</p>
+<h2 id="the-real-32-bit-page-directory-page-table-layout">The real 32-bit page directory / page table layout<a class="headerlink" href="#the-real-32-bit-page-directory-page-table-layout" title="Permanent link">&para;</a></h2>
+<p>Without PAE, x86 paging is a two-level structure, cited here field-for-field rather than approximated:</p>
+<blockquote>
+<p>"Each table... is 1024 32-bit entries... Both tables contain 1024 4-byte entries, making them 4 KiB each."</p>
+</blockquote>
+<p>(OSDev Wiki, "Paging": https://wiki.osdev.org/Paging)</p>
+<p>A <strong>page directory</strong> is one 4 KiB page: 1024 entries, each a 32-bit <strong>PDE</strong> (page directory entry) pointing at a <strong>page table</strong>. Each page table is itself one 4 KiB page: 1024 entries, each a 32-bit <strong>PTE</strong> (page table entry) pointing at one real 4 KiB physical frame. One page table therefore covers 1024 x 4 KiB = 4 MiB of virtual address space; the full directory of 1024 tables covers the entire 4 GiB a 32-bit address can reach.</p>
+<p>Both entry types share the same bit layout for the bits this chapter uses:</p>
+<ul>
+<li><strong>bit 0 (Present):</strong> "If the bit is set, the page is actually in physical memory at the moment."</li>
+<li><strong>bit 1 (Read/Write):</strong> "the page will be read/write. When not set, the page is read-only."</li>
+<li><strong>bit 2 (User/Supervisor):</strong> privilege level required to access the page.</li>
+<li><strong>bits 12-31:</strong> the physical address of the page table (in a PDE) or the physical page frame (in a PTE) -- both 4 KiB aligned, since the low 12 bits of a 4 KiB-aligned address are always zero and are reused for flag bits instead. For a PTE specifically: "The address is not that of a page table, but instead a 4 KiB block of physical memory."</li>
+</ul>
+<p><code>CR3</code>, <code>CR0</code>: "Load CR3 with the address of the page directory," and paging itself is switched on by setting bit 31 (<code>PG</code>) of <code>CR0</code> -- OSDev's own cited example sets both <code>PE</code> (bit 0, already set since real mode) and <code>PG</code> together with <code>or eax, 0x80000001</code>.</p>
+<h2 id="008_pagingh008_pagingc-real-page-tables-built-from-real-frames"><code>008_paging.h</code>/<code>008_paging.c</code>: real page tables, built from real frames<a class="headerlink" href="#008_pagingh008_pagingc-real-page-tables-built-from-real-frames" title="Permanent link">&para;</a></h2>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="cp">#ifndef UNIX_OS_008_PAGING_H</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="cp">#define UNIX_OS_008_PAGING_H</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdint.h&gt;</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="cp">#define PAGE_PRESENT 0x1u</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="cp">#define PAGE_RW      0x2u</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="kt">void</span><span class="w"> </span><span class="nf">paging_init</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="kt">void</span><span class="w"> </span><span class="nf">paging_map_page</span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">vaddr</span><span class="p">,</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">paddr</span><span class="p">,</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">flags</span><span class="p">);</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="cp">#endif</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdint.h&gt;</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"008_paging.h"</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"008_pmm.h"</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"008_printf.h"</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="cm">/* This chapter identity-maps the same 0-64 MiB range that chapter 7's</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="cm"> * physical memory manager already manages (MAX_MANAGED_MEMORY there),</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="cm"> * so every physical frame this kernel can ever hand out from</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="cm"> * pmm_alloc_frame() already has a valid virtual address equal to its</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="cm"> * own physical address. One page table covers 4 MiB (1024 entries *</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="cm"> * 4 KiB), so 64 MiB needs exactly 16 page tables -- and 16 page</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="cm"> * directory entries out of the 1024 this kernel's single page</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="cm"> * directory has room for. */</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="cp">#define IDENTITY_MAP_TABLES 16u</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="cp">#define ENTRIES_PER_TABLE   1024u</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="cp">#define PAGE_DIR_ENTRIES    1024u</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="cm">/* The physical address of this kernel's one and only page directory,</span>
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="cm"> * set once by paging_init() and read by every later paging_map_page()</span>
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="cm"> * call. Storing only the physical address -- not a C pointer typed at</span>
+<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="cm"> * some virtual mapping -- is deliberate: this whole file only ever</span>
+<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="cm"> * touches memory that lives inside the identity-mapped 0-64 MiB</span>
+<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="cm"> * range, so a frame's physical address always doubles as a valid,</span>
+<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="cm"> * dereferenceable pointer, both before and after paging is switched</span>
+<a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a><span class="cm"> * on. */</span>
+<a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a><span class="k">static</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">page_directory_phys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a>
+<a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a><span class="cm">/* Physical addresses in this kernel are also valid pointers, but only</span>
+<a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a><span class="cm"> * because everything this file touches lives inside the</span>
+<a id="__codelineno-1-31" name="__codelineno-1-31" href="#__codelineno-1-31"></a><span class="cm"> * identity-mapped range -- this helper exists to make that fact</span>
+<a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a><span class="cm"> * explicit at every use, not to hide a general physical-to-virtual</span>
+<a id="__codelineno-1-33" name="__codelineno-1-33" href="#__codelineno-1-33"></a><span class="cm"> * translation this kernel does not have. */</span>
+<a id="__codelineno-1-34" name="__codelineno-1-34" href="#__codelineno-1-34"></a><span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="o">*</span><span class="nf">phys_ptr</span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">phys_addr</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-35" name="__codelineno-1-35" href="#__codelineno-1-35"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="n">phys_addr</span><span class="p">;</span>
+<a id="__codelineno-1-36" name="__codelineno-1-36" href="#__codelineno-1-36"></a><span class="p">}</span>
+<a id="__codelineno-1-37" name="__codelineno-1-37" href="#__codelineno-1-37"></a>
+<a id="__codelineno-1-38" name="__codelineno-1-38" href="#__codelineno-1-38"></a><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">zero_frame</span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">phys_addr</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-39" name="__codelineno-1-39" href="#__codelineno-1-39"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">phys_ptr</span><span class="p">(</span><span class="n">phys_addr</span><span class="p">);</span>
+<a id="__codelineno-1-40" name="__codelineno-1-40" href="#__codelineno-1-40"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">ENTRIES_PER_TABLE</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-41" name="__codelineno-1-41" href="#__codelineno-1-41"></a><span class="w">        </span><span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-1-42" name="__codelineno-1-42" href="#__codelineno-1-42"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-1-43" name="__codelineno-1-43" href="#__codelineno-1-43"></a><span class="p">}</span>
+<a id="__codelineno-1-44" name="__codelineno-1-44" href="#__codelineno-1-44"></a>
+<a id="__codelineno-1-45" name="__codelineno-1-45" href="#__codelineno-1-45"></a><span class="kt">void</span><span class="w"> </span><span class="nf">paging_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-46" name="__codelineno-1-46" href="#__codelineno-1-46"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Paging: allocating page directory...</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-1-47" name="__codelineno-1-47" href="#__codelineno-1-47"></a>
+<a id="__codelineno-1-48" name="__codelineno-1-48" href="#__codelineno-1-48"></a><span class="w">    </span><span class="n">page_directory_phys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pmm_alloc_frame</span><span class="p">();</span>
+<a id="__codelineno-1-49" name="__codelineno-1-49" href="#__codelineno-1-49"></a><span class="w">    </span><span class="n">zero_frame</span><span class="p">(</span><span class="n">page_directory_phys</span><span class="p">);</span>
+<a id="__codelineno-1-50" name="__codelineno-1-50" href="#__codelineno-1-50"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="o">*</span><span class="n">page_directory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">phys_ptr</span><span class="p">(</span><span class="n">page_directory_phys</span><span class="p">);</span>
+<a id="__codelineno-1-51" name="__codelineno-1-51" href="#__codelineno-1-51"></a>
+<a id="__codelineno-1-52" name="__codelineno-1-52" href="#__codelineno-1-52"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Paging: page directory at 0x%x. Identity-mapping 0-64MiB (16 page tables)...</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">page_directory_phys</span><span class="p">);</span>
+<a id="__codelineno-1-53" name="__codelineno-1-53" href="#__codelineno-1-53"></a>
+<a id="__codelineno-1-54" name="__codelineno-1-54" href="#__codelineno-1-54"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">dir_index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">dir_index</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">IDENTITY_MAP_TABLES</span><span class="p">;</span><span class="w"> </span><span class="n">dir_index</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-55" name="__codelineno-1-55" href="#__codelineno-1-55"></a><span class="w">        </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">table_phys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pmm_alloc_frame</span><span class="p">();</span>
+<a id="__codelineno-1-56" name="__codelineno-1-56" href="#__codelineno-1-56"></a><span class="w">        </span><span class="n">zero_frame</span><span class="p">(</span><span class="n">table_phys</span><span class="p">);</span>
+<a id="__codelineno-1-57" name="__codelineno-1-57" href="#__codelineno-1-57"></a><span class="w">        </span><span class="kt">uint32_t</span><span class="w"> </span><span class="o">*</span><span class="n">table</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">phys_ptr</span><span class="p">(</span><span class="n">table_phys</span><span class="p">);</span>
+<a id="__codelineno-1-58" name="__codelineno-1-58" href="#__codelineno-1-58"></a>
+<a id="__codelineno-1-59" name="__codelineno-1-59" href="#__codelineno-1-59"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">table_index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">table_index</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">ENTRIES_PER_TABLE</span><span class="p">;</span><span class="w"> </span><span class="n">table_index</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-60" name="__codelineno-1-60" href="#__codelineno-1-60"></a><span class="w">            </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">frame_addr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">dir_index</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">ENTRIES_PER_TABLE</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">table_index</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4096u</span><span class="p">;</span>
+<a id="__codelineno-1-61" name="__codelineno-1-61" href="#__codelineno-1-61"></a><span class="w">            </span><span class="n">table</span><span class="p">[</span><span class="n">table_index</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">frame_addr</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">PAGE_PRESENT</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">PAGE_RW</span><span class="p">;</span>
+<a id="__codelineno-1-62" name="__codelineno-1-62" href="#__codelineno-1-62"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-1-63" name="__codelineno-1-63" href="#__codelineno-1-63"></a>
+<a id="__codelineno-1-64" name="__codelineno-1-64" href="#__codelineno-1-64"></a><span class="w">        </span><span class="n">page_directory</span><span class="p">[</span><span class="n">dir_index</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">table_phys</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">PAGE_PRESENT</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">PAGE_RW</span><span class="p">;</span>
+<a id="__codelineno-1-65" name="__codelineno-1-65" href="#__codelineno-1-65"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-1-66" name="__codelineno-1-66" href="#__codelineno-1-66"></a>
+<a id="__codelineno-1-67" name="__codelineno-1-67" href="#__codelineno-1-67"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Paging: identity map built. Loading CR3 and setting CR0.PG...</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-1-68" name="__codelineno-1-68" href="#__codelineno-1-68"></a>
+<a id="__codelineno-1-69" name="__codelineno-1-69" href="#__codelineno-1-69"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="n">__volatile__</span><span class="w"> </span><span class="p">(</span><span class="s">"mov %0, %%cr3"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"r"</span><span class="w"> </span><span class="p">(</span><span class="n">page_directory_phys</span><span class="p">));</span>
+<a id="__codelineno-1-70" name="__codelineno-1-70" href="#__codelineno-1-70"></a>
+<a id="__codelineno-1-71" name="__codelineno-1-71" href="#__codelineno-1-71"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">cr0</span><span class="p">;</span>
+<a id="__codelineno-1-72" name="__codelineno-1-72" href="#__codelineno-1-72"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="n">__volatile__</span><span class="w"> </span><span class="p">(</span><span class="s">"mov %%cr0, %0"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"=r"</span><span class="w"> </span><span class="p">(</span><span class="n">cr0</span><span class="p">));</span>
+<a id="__codelineno-1-73" name="__codelineno-1-73" href="#__codelineno-1-73"></a><span class="w">    </span><span class="n">cr0</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="mh">0x80000000u</span><span class="p">;</span>
+<a id="__codelineno-1-74" name="__codelineno-1-74" href="#__codelineno-1-74"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="n">__volatile__</span><span class="w"> </span><span class="p">(</span><span class="s">"mov %0, %%cr0"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"r"</span><span class="w"> </span><span class="p">(</span><span class="n">cr0</span><span class="p">));</span>
+<a id="__codelineno-1-75" name="__codelineno-1-75" href="#__codelineno-1-75"></a>
+<a id="__codelineno-1-76" name="__codelineno-1-76" href="#__codelineno-1-76"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">cr0_readback</span><span class="p">;</span>
+<a id="__codelineno-1-77" name="__codelineno-1-77" href="#__codelineno-1-77"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="n">__volatile__</span><span class="w"> </span><span class="p">(</span><span class="s">"mov %%cr0, %0"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"=r"</span><span class="w"> </span><span class="p">(</span><span class="n">cr0_readback</span><span class="p">));</span>
+<a id="__codelineno-1-78" name="__codelineno-1-78" href="#__codelineno-1-78"></a>
+<a id="__codelineno-1-79" name="__codelineno-1-79" href="#__codelineno-1-79"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Paging: CR0 = 0x%x (PG bit: %u). Paging is now live.</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">cr0_readback</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">cr0_readback</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">31</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mi">1u</span><span class="p">);</span>
+<a id="__codelineno-1-80" name="__codelineno-1-80" href="#__codelineno-1-80"></a><span class="p">}</span>
+<a id="__codelineno-1-81" name="__codelineno-1-81" href="#__codelineno-1-81"></a>
+<a id="__codelineno-1-82" name="__codelineno-1-82" href="#__codelineno-1-82"></a><span class="kt">void</span><span class="w"> </span><span class="nf">paging_map_page</span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">vaddr</span><span class="p">,</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">paddr</span><span class="p">,</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">flags</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-83" name="__codelineno-1-83" href="#__codelineno-1-83"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">dir_index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vaddr</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">22</span><span class="p">;</span>
+<a id="__codelineno-1-84" name="__codelineno-1-84" href="#__codelineno-1-84"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">table_index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">vaddr</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">12</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x3FFu</span><span class="p">;</span>
+<a id="__codelineno-1-85" name="__codelineno-1-85" href="#__codelineno-1-85"></a>
+<a id="__codelineno-1-86" name="__codelineno-1-86" href="#__codelineno-1-86"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="o">*</span><span class="n">page_directory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">phys_ptr</span><span class="p">(</span><span class="n">page_directory_phys</span><span class="p">);</span>
+<a id="__codelineno-1-87" name="__codelineno-1-87" href="#__codelineno-1-87"></a>
+<a id="__codelineno-1-88" name="__codelineno-1-88" href="#__codelineno-1-88"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">table_phys</span><span class="p">;</span>
+<a id="__codelineno-1-89" name="__codelineno-1-89" href="#__codelineno-1-89"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="n">page_directory</span><span class="p">[</span><span class="n">dir_index</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">PAGE_PRESENT</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-90" name="__codelineno-1-90" href="#__codelineno-1-90"></a><span class="w">        </span><span class="n">table_phys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pmm_alloc_frame</span><span class="p">();</span>
+<a id="__codelineno-1-91" name="__codelineno-1-91" href="#__codelineno-1-91"></a><span class="w">        </span><span class="n">zero_frame</span><span class="p">(</span><span class="n">table_phys</span><span class="p">);</span>
+<a id="__codelineno-1-92" name="__codelineno-1-92" href="#__codelineno-1-92"></a><span class="w">        </span><span class="n">page_directory</span><span class="p">[</span><span class="n">dir_index</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">table_phys</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">PAGE_PRESENT</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">PAGE_RW</span><span class="p">;</span>
+<a id="__codelineno-1-93" name="__codelineno-1-93" href="#__codelineno-1-93"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-1-94" name="__codelineno-1-94" href="#__codelineno-1-94"></a><span class="w">        </span><span class="n">table_phys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">page_directory</span><span class="p">[</span><span class="n">dir_index</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0xFFFFF000u</span><span class="p">;</span>
+<a id="__codelineno-1-95" name="__codelineno-1-95" href="#__codelineno-1-95"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-1-96" name="__codelineno-1-96" href="#__codelineno-1-96"></a>
+<a id="__codelineno-1-97" name="__codelineno-1-97" href="#__codelineno-1-97"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="o">*</span><span class="n">table</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">phys_ptr</span><span class="p">(</span><span class="n">table_phys</span><span class="p">);</span>
+<a id="__codelineno-1-98" name="__codelineno-1-98" href="#__codelineno-1-98"></a><span class="w">    </span><span class="n">table</span><span class="p">[</span><span class="n">table_index</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">paddr</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0xFFFFF000u</span><span class="p">)</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">flags</span><span class="p">;</span>
+<a id="__codelineno-1-99" name="__codelineno-1-99" href="#__codelineno-1-99"></a>
+<a id="__codelineno-1-100" name="__codelineno-1-100" href="#__codelineno-1-100"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="n">__volatile__</span><span class="w"> </span><span class="p">(</span><span class="s">"invlpg (%0)"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"r"</span><span class="w"> </span><span class="p">(</span><span class="n">vaddr</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"memory"</span><span class="p">);</span>
+<a id="__codelineno-1-101" name="__codelineno-1-101" href="#__codelineno-1-101"></a><span class="p">}</span>
+</code></pre></div></p>
+<p>Four real decisions worth slowing down on:</p>
+<p><strong>Identity-map the same 0-64 MiB range Chapter 7's own PMM already manages -- deliberately including the kernel's own frames.</strong> The moment <code>CR0.PG</code> is set, the CPU stops treating every address as physical and starts running every single memory access -- including the very next instruction fetch after the <code>mov</code> that set the bit -- through the page tables. If the kernel's own code, stack, and the page tables themselves were not mapped at their own physical addresses, the CPU would fault on the instruction that just enabled paging. Identity-mapping the whole 64 MiB range Chapter 7 already promised to manage means every frame this kernel could ever touch -- past, present, or future -- already has a valid virtual mapping equal to its own physical address, and every chapter built before this one keeps running completely unaware paging is even on.</p>
+<p><strong>Page directory and page table frames come from <code>pmm_alloc_frame()</code>, not a static C array.</strong> Chapter 7's own physical memory manager exists specifically so this kernel never again has to guess where it is safe to put something in physical memory -- this chapter is the first to actually put that promise to work for something other than a demonstration. Seventeen real frames come out of the same allocator every future chapter will keep using: one for the page directory, sixteen for the identity-mapping page tables.</p>
+<p><strong><code>phys_ptr</code> makes an assumption explicit instead of hiding it.</strong> Every structure <code>008_paging.c</code> touches -- the page directory, every page table -- lives inside the identity-mapped 0-64 MiB range, so a physical address doubles as a valid, dereferenceable pointer both before and after paging is switched on. That is true here specifically because of the identity map this file itself builds; <code>phys_ptr</code> names that assumption at every call site rather than letting a bare cast hide it.</p>
+<p><strong><code>paging_map_page</code> allocates a new page table on demand, exactly when a PDE isn't present yet.</strong> The identity map only ever installs the first 16 of 1024 possible page directory entries. Mapping a virtual address whose directory index falls outside that range -- this chapter's own test does exactly that -- forces this function down its real "allocate a fresh table" path, not the identity map's already-built one. <code>invlpg</code> on the newly-mapped virtual address matters here for a real reason: the CPU is free to cache old translations in its TLB, and without invalidating the one entry this call just changed, a stale translation could silently survive the update.</p>
+<h2 id="008_kmainc-proving-translation-is-real-not-printing-a-claim"><code>008_kmain.c</code>: proving translation is real, not printing a claim<a class="headerlink" href="#008_kmainc-proving-translation-is-real-not-printing-a-claim" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="cm">/* Chapter 8: this kernel turns on paging for the first time. Everything</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="cm"> * built up through chapter 7 -- the physical memory manager above all</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="cm"> * -- keeps running completely unaware of it, because this chapter's</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="cm"> * page tables identity-map the entire 0-64 MiB range the PMM already</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="cm"> * manages: every physical address this kernel has ever handed out</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="cm"> * stays valid as a virtual address too. The real proof that paging is</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="cm"> * doing genuine translation, not standing in as a no-op, comes right</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="cm"> * after: a fresh frame gets mapped at 0xC0000000 -- a virtual address</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="cm"> * nowhere near the identity-mapped range -- written through that</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="cm"> * virtual address, and then read back through the *same* physical</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="cm"> * frame's identity-mapped address. Two different virtual addresses,</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="cm"> * one physical frame, one real value. */</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdint.h&gt;</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"008_gdt.h"</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"008_idt.h"</span>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"008_keyboard.h"</span>
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"008_multiboot.h"</span>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"008_paging.h"</span>
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"008_pic.h"</span>
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"008_pit.h"</span>
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"008_pmm.h"</span>
+<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"008_printf.h"</span>
+<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"008_serial.h"</span>
+<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"008_vga.h"</span>
+<a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a>
+<a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a><span class="cp">#define TIMER_FREQUENCY_HZ 100</span>
+<a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a>
+<a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a><span class="cm">/* Deliberately far outside the 0-64 MiB identity-mapped range (which</span>
+<a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a><span class="cm"> * only ever occupies page-directory entries 0-15): 0xC0000000 &gt;&gt; 22 =</span>
+<a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a><span class="cm"> * 768. Mapping here forces paging_map_page() to allocate a genuinely</span>
+<a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a><span class="cm"> * new page table rather than reusing one paging_init() already built. */</span>
+<a id="__codelineno-2-34" name="__codelineno-2-34" href="#__codelineno-2-34"></a><span class="cp">#define TEST_VIRT_ADDR 0xC0000000u</span>
+<a id="__codelineno-2-35" name="__codelineno-2-35" href="#__codelineno-2-35"></a>
+<a id="__codelineno-2-36" name="__codelineno-2-36" href="#__codelineno-2-36"></a><span class="cm">/* Defined by 008_linker.ld, not by this file -- the linker is the one</span>
+<a id="__codelineno-2-37" name="__codelineno-2-37" href="#__codelineno-2-37"></a><span class="cm"> * part of this toolchain that genuinely knows where the kernel image's</span>
+<a id="__codelineno-2-38" name="__codelineno-2-38" href="#__codelineno-2-38"></a><span class="cm"> * last real section ends in physical memory. */</span>
+<a id="__codelineno-2-39" name="__codelineno-2-39" href="#__codelineno-2-39"></a><span class="k">extern</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">kernel_end</span><span class="p">[];</span>
+<a id="__codelineno-2-40" name="__codelineno-2-40" href="#__codelineno-2-40"></a>
+<a id="__codelineno-2-41" name="__codelineno-2-41" href="#__codelineno-2-41"></a><span class="kt">void</span><span class="w"> </span><span class="nf">kmain</span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">magic</span><span class="p">,</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">mboot_info_addr</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-42" name="__codelineno-2-42" href="#__codelineno-2-42"></a><span class="w">    </span><span class="n">serial_init</span><span class="p">();</span>
+<a id="__codelineno-2-43" name="__codelineno-2-43" href="#__codelineno-2-43"></a><span class="w">    </span><span class="n">vga_init</span><span class="p">();</span>
+<a id="__codelineno-2-44" name="__codelineno-2-44" href="#__codelineno-2-44"></a><span class="w">    </span><span class="n">vga_set_color</span><span class="p">(</span><span class="n">VGA_COLOR_LIGHT_GREEN</span><span class="p">,</span><span class="w"> </span><span class="n">VGA_COLOR_BLACK</span><span class="p">);</span>
+<a id="__codelineno-2-45" name="__codelineno-2-45" href="#__codelineno-2-45"></a>
+<a id="__codelineno-2-46" name="__codelineno-2-46" href="#__codelineno-2-46"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Unix OS from Scratch -- Chapter 8: kernel entry reached</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-2-47" name="__codelineno-2-47" href="#__codelineno-2-47"></a>
+<a id="__codelineno-2-48" name="__codelineno-2-48" href="#__codelineno-2-48"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">magic</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">MULTIBOOT2_BOOTLOADER_MAGIC</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-49" name="__codelineno-2-49" href="#__codelineno-2-49"></a><span class="w">        </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"FATAL: EAX held 0x%x at entry, not the real Multiboot2 magic 0x%x -- halting</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
+<a id="__codelineno-2-50" name="__codelineno-2-50" href="#__codelineno-2-50"></a><span class="w">                </span><span class="n">magic</span><span class="p">,</span><span class="w"> </span><span class="n">MULTIBOOT2_BOOTLOADER_MAGIC</span><span class="p">);</span>
+<a id="__codelineno-2-51" name="__codelineno-2-51" href="#__codelineno-2-51"></a><span class="w">        </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"cli"</span><span class="p">);</span>
+<a id="__codelineno-2-52" name="__codelineno-2-52" href="#__codelineno-2-52"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(;;)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"hlt"</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-2-53" name="__codelineno-2-53" href="#__codelineno-2-53"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-2-54" name="__codelineno-2-54" href="#__codelineno-2-54"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Multiboot2 magic confirmed in EAX: 0x%x</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">magic</span><span class="p">);</span>
+<a id="__codelineno-2-55" name="__codelineno-2-55" href="#__codelineno-2-55"></a>
+<a id="__codelineno-2-56" name="__codelineno-2-56" href="#__codelineno-2-56"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">multiboot_tag_mmap</span><span class="w"> </span><span class="o">*</span><span class="n">mmap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">multiboot_find_mmap</span><span class="p">(</span><span class="n">mboot_info_addr</span><span class="p">);</span>
+<a id="__codelineno-2-57" name="__codelineno-2-57" href="#__codelineno-2-57"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">mmap</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-58" name="__codelineno-2-58" href="#__codelineno-2-58"></a><span class="w">        </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"FATAL: no memory map tag in this boot information structure -- halting</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-2-59" name="__codelineno-2-59" href="#__codelineno-2-59"></a><span class="w">        </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"cli"</span><span class="p">);</span>
+<a id="__codelineno-2-60" name="__codelineno-2-60" href="#__codelineno-2-60"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(;;)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"hlt"</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-2-61" name="__codelineno-2-61" href="#__codelineno-2-61"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-2-62" name="__codelineno-2-62" href="#__codelineno-2-62"></a><span class="w">    </span><span class="n">multiboot_print_mmap</span><span class="p">(</span><span class="n">mmap</span><span class="p">);</span>
+<a id="__codelineno-2-63" name="__codelineno-2-63" href="#__codelineno-2-63"></a>
+<a id="__codelineno-2-64" name="__codelineno-2-64" href="#__codelineno-2-64"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">kernel_end_addr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">uintptr_t</span><span class="p">)</span><span class="w"> </span><span class="n">kernel_end</span><span class="p">;</span>
+<a id="__codelineno-2-65" name="__codelineno-2-65" href="#__codelineno-2-65"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Kernel image occupies physical 0x100000 - 0x%x</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">kernel_end_addr</span><span class="p">);</span>
+<a id="__codelineno-2-66" name="__codelineno-2-66" href="#__codelineno-2-66"></a>
+<a id="__codelineno-2-67" name="__codelineno-2-67" href="#__codelineno-2-67"></a><span class="w">    </span><span class="n">pmm_init</span><span class="p">(</span><span class="n">mmap</span><span class="p">,</span><span class="w"> </span><span class="mh">0x100000</span><span class="p">,</span><span class="w"> </span><span class="n">kernel_end_addr</span><span class="p">);</span>
+<a id="__codelineno-2-68" name="__codelineno-2-68" href="#__codelineno-2-68"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">free_frames</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pmm_count_free_frames</span><span class="p">();</span>
+<a id="__codelineno-2-69" name="__codelineno-2-69" href="#__codelineno-2-69"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Physical memory manager ready: %u free frames (%u KiB usable)</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
+<a id="__codelineno-2-70" name="__codelineno-2-70" href="#__codelineno-2-70"></a><span class="w">            </span><span class="n">free_frames</span><span class="p">,</span><span class="w"> </span><span class="n">free_frames</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+<a id="__codelineno-2-71" name="__codelineno-2-71" href="#__codelineno-2-71"></a>
+<a id="__codelineno-2-72" name="__codelineno-2-72" href="#__codelineno-2-72"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">f1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pmm_alloc_frame</span><span class="p">();</span>
+<a id="__codelineno-2-73" name="__codelineno-2-73" href="#__codelineno-2-73"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">f2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pmm_alloc_frame</span><span class="p">();</span>
+<a id="__codelineno-2-74" name="__codelineno-2-74" href="#__codelineno-2-74"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">f3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pmm_alloc_frame</span><span class="p">();</span>
+<a id="__codelineno-2-75" name="__codelineno-2-75" href="#__codelineno-2-75"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Allocated three real frames: 0x%x, 0x%x, 0x%x</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">f1</span><span class="p">,</span><span class="w"> </span><span class="n">f2</span><span class="p">,</span><span class="w"> </span><span class="n">f3</span><span class="p">);</span>
+<a id="__codelineno-2-76" name="__codelineno-2-76" href="#__codelineno-2-76"></a>
+<a id="__codelineno-2-77" name="__codelineno-2-77" href="#__codelineno-2-77"></a><span class="w">    </span><span class="n">pmm_free_frame</span><span class="p">(</span><span class="n">f2</span><span class="p">);</span>
+<a id="__codelineno-2-78" name="__codelineno-2-78" href="#__codelineno-2-78"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Freed the middle frame 0x%x -- %u free frames now</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">f2</span><span class="p">,</span><span class="w"> </span><span class="n">pmm_count_free_frames</span><span class="p">());</span>
+<a id="__codelineno-2-79" name="__codelineno-2-79" href="#__codelineno-2-79"></a>
+<a id="__codelineno-2-80" name="__codelineno-2-80" href="#__codelineno-2-80"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">f4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pmm_alloc_frame</span><span class="p">();</span>
+<a id="__codelineno-2-81" name="__codelineno-2-81" href="#__codelineno-2-81"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Allocated again: got 0x%x (matches the freed frame? %s)</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
+<a id="__codelineno-2-82" name="__codelineno-2-82" href="#__codelineno-2-82"></a><span class="w">            </span><span class="n">f4</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">f4</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">f2</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">"yes"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"no"</span><span class="p">);</span>
+<a id="__codelineno-2-83" name="__codelineno-2-83" href="#__codelineno-2-83"></a>
+<a id="__codelineno-2-84" name="__codelineno-2-84" href="#__codelineno-2-84"></a><span class="w">    </span><span class="n">paging_init</span><span class="p">();</span>
+<a id="__codelineno-2-85" name="__codelineno-2-85" href="#__codelineno-2-85"></a>
+<a id="__codelineno-2-86" name="__codelineno-2-86" href="#__codelineno-2-86"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">test_frame</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pmm_alloc_frame</span><span class="p">();</span>
+<a id="__codelineno-2-87" name="__codelineno-2-87" href="#__codelineno-2-87"></a><span class="w">    </span><span class="n">paging_map_page</span><span class="p">(</span><span class="n">TEST_VIRT_ADDR</span><span class="p">,</span><span class="w"> </span><span class="n">test_frame</span><span class="p">,</span><span class="w"> </span><span class="n">PAGE_PRESENT</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">PAGE_RW</span><span class="p">);</span>
+<a id="__codelineno-2-88" name="__codelineno-2-88" href="#__codelineno-2-88"></a>
+<a id="__codelineno-2-89" name="__codelineno-2-89" href="#__codelineno-2-89"></a><span class="w">    </span><span class="k">volatile</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="o">*</span><span class="n">via_virtual</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">volatile</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="n">TEST_VIRT_ADDR</span><span class="p">;</span>
+<a id="__codelineno-2-90" name="__codelineno-2-90" href="#__codelineno-2-90"></a><span class="w">    </span><span class="k">volatile</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="o">*</span><span class="n">via_identity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">volatile</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="n">test_frame</span><span class="p">;</span>
+<a id="__codelineno-2-91" name="__codelineno-2-91" href="#__codelineno-2-91"></a>
+<a id="__codelineno-2-92" name="__codelineno-2-92" href="#__codelineno-2-92"></a><span class="w">    </span><span class="o">*</span><span class="n">via_virtual</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xCAFEF00Du</span><span class="p">;</span>
+<a id="__codelineno-2-93" name="__codelineno-2-93" href="#__codelineno-2-93"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Wrote 0x%x through virtual address 0x%x</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">via_virtual</span><span class="p">,</span><span class="w"> </span><span class="n">TEST_VIRT_ADDR</span><span class="p">);</span>
+<a id="__codelineno-2-94" name="__codelineno-2-94" href="#__codelineno-2-94"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Reading the SAME physical frame (0x%x) through its identity-mapped address: 0x%x</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
+<a id="__codelineno-2-95" name="__codelineno-2-95" href="#__codelineno-2-95"></a><span class="w">            </span><span class="n">test_frame</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">via_identity</span><span class="p">);</span>
+<a id="__codelineno-2-96" name="__codelineno-2-96" href="#__codelineno-2-96"></a>
+<a id="__codelineno-2-97" name="__codelineno-2-97" href="#__codelineno-2-97"></a><span class="w">    </span><span class="n">gdt_init</span><span class="p">();</span>
+<a id="__codelineno-2-98" name="__codelineno-2-98" href="#__codelineno-2-98"></a><span class="w">    </span><span class="n">idt_init</span><span class="p">();</span>
+<a id="__codelineno-2-99" name="__codelineno-2-99" href="#__codelineno-2-99"></a><span class="w">    </span><span class="n">pic_remap</span><span class="p">(</span><span class="mh">0x20</span><span class="p">,</span><span class="w"> </span><span class="mh">0x28</span><span class="p">);</span>
+<a id="__codelineno-2-100" name="__codelineno-2-100" href="#__codelineno-2-100"></a><span class="w">    </span><span class="n">pic_disable_all</span><span class="p">();</span>
+<a id="__codelineno-2-101" name="__codelineno-2-101" href="#__codelineno-2-101"></a><span class="w">    </span><span class="n">keyboard_init</span><span class="p">();</span>
+<a id="__codelineno-2-102" name="__codelineno-2-102" href="#__codelineno-2-102"></a><span class="w">    </span><span class="n">pit_init</span><span class="p">(</span><span class="n">TIMER_FREQUENCY_HZ</span><span class="p">);</span>
+<a id="__codelineno-2-103" name="__codelineno-2-103" href="#__codelineno-2-103"></a>
+<a id="__codelineno-2-104" name="__codelineno-2-104" href="#__codelineno-2-104"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"GDT/IDT/PIC/PIT/keyboard all initialized -- enabling interrupts now</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-2-105" name="__codelineno-2-105" href="#__codelineno-2-105"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"sti"</span><span class="p">);</span>
+<a id="__codelineno-2-106" name="__codelineno-2-106" href="#__codelineno-2-106"></a>
+<a id="__codelineno-2-107" name="__codelineno-2-107" href="#__codelineno-2-107"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(;;)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-108" name="__codelineno-2-108" href="#__codelineno-2-108"></a><span class="w">        </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"hlt"</span><span class="p">);</span>
+<a id="__codelineno-2-109" name="__codelineno-2-109" href="#__codelineno-2-109"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-2-110" name="__codelineno-2-110" href="#__codelineno-2-110"></a><span class="p">}</span>
+</code></pre></div>
+<p>The proof this chapter leans on is deliberately simple and checkable by eye: <code>0xC0000000</code> is nowhere near the identity-mapped 0-64 MiB range (<code>0xC0000000 &gt;&gt; 22 = 768</code>, far past directory entries 0-15), so mapping a frame there forces <code>paging_map_page</code> down its real "allocate a new page table" path. Writing <code>0xCAFEF00D</code> through that virtual address and then reading the exact same value back through the <em>same physical frame's</em> own identity-mapped address is not something a broken or bypassed page table could produce by accident -- if paging were silently off, or the mapping pointed at the wrong frame, the two reads would either fault or disagree. Everything through Chapter 7 -- the memory map, the physical memory manager's own alloc/free/alloc-again demonstration -- runs first and unchanged, both to keep this book's continuity and to give this chapter something real to protect: if the identity map were wrong, that code would be the first thing to break.</p>
+<h2 id="building-it-for-real">Building it, for real<a class="headerlink" href="#building-it-for-real" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>nasm<span class="w"> </span>-f<span class="w"> </span>elf32<span class="w"> </span>008_boot.asm<span class="w"> </span>-o<span class="w"> </span>boot.o
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>nasm<span class="w"> </span>-f<span class="w"> </span>elf32<span class="w"> </span>008_gdt_flush.asm<span class="w"> </span>-o<span class="w"> </span>gdt_flush.o
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>nasm<span class="w"> </span>-f<span class="w"> </span>elf32<span class="w"> </span>008_idt_flush.asm<span class="w"> </span>-o<span class="w"> </span>idt_flush.o
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>nasm<span class="w"> </span>-f<span class="w"> </span>elf32<span class="w"> </span>008_isr0.asm<span class="w"> </span>-o<span class="w"> </span>isr0.o
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>nasm<span class="w"> </span>-f<span class="w"> </span>elf32<span class="w"> </span>008_irq0.asm<span class="w"> </span>-o<span class="w"> </span>irq0.o
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>nasm<span class="w"> </span>-f<span class="w"> </span>elf32<span class="w"> </span>008_irq1.asm<span class="w"> </span>-o<span class="w"> </span>irq1.o
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>008_vga.c<span class="w"> </span>-o<span class="w"> </span>vga.o
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>008_serial.c<span class="w"> </span>-o<span class="w"> </span>serial.o
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>008_gdt.c<span class="w"> </span>-o<span class="w"> </span>gdt.o
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>008_idt.c<span class="w"> </span>-o<span class="w"> </span>idt.o
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>008_pic.c<span class="w"> </span>-o<span class="w"> </span>pic.o
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>008_pit.c<span class="w"> </span>-o<span class="w"> </span>pit.o
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>008_printf.c<span class="w"> </span>-o<span class="w"> </span>printf.o
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>008_isr_handlers.c<span class="w"> </span>-o<span class="w"> </span>isr_handlers.o
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>008_keyboard.c<span class="w"> </span>-o<span class="w"> </span>keyboard.o
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>008_multiboot.c<span class="w"> </span>-o<span class="w"> </span>multiboot.o
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>008_pmm.c<span class="w"> </span>-o<span class="w"> </span>pmm.o
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>008_paging.c<span class="w"> </span>-o<span class="w"> </span>paging.o
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>008_kmain.c<span class="w"> </span>-o<span class="w"> </span>kmain.o
+<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>ld<span class="w"> </span>-m<span class="w"> </span>elf_i386<span class="w"> </span>-T<span class="w"> </span>008_linker.ld<span class="w"> </span>-o<span class="w"> </span>kernel.bin<span class="w"> </span>boot.o<span class="w"> </span>gdt_flush.o<span class="w"> </span>idt_flush.o<span class="w"> </span>isr0.o<span class="w"> </span>irq0.o<span class="w"> </span>irq1.o<span class="w"> </span>vga.o<span class="w"> </span>serial.o<span class="w"> </span>gdt.o<span class="w"> </span>idt.o<span class="w"> </span>pic.o<span class="w"> </span>pit.o<span class="w"> </span>printf.o<span class="w"> </span>isr_handlers.o<span class="w"> </span>keyboard.o<span class="w"> </span>multiboot.o<span class="w"> </span>pmm.o<span class="w"> </span>paging.o<span class="w"> </span>kmain.o
+<a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a>grub-file<span class="w"> </span>--is-x86-multiboot2<span class="w"> </span>kernel.bin<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span>valid-multiboot2
+</code></pre></div>
+<p><strong>Output (cloud sandbox -- real, live-executed build output):</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>=== nasm -f elf32 /home/claude/unix_os_repo/docs/part8/code/008_boot.asm -o boot.o ===
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>=== nasm -f elf32 /home/claude/unix_os_repo/docs/part8/code/008_gdt_flush.asm -o gdt_flush.o ===
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>=== nasm -f elf32 /home/claude/unix_os_repo/docs/part8/code/008_idt_flush.asm -o idt_flush.o ===
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>=== nasm -f elf32 /home/claude/unix_os_repo/docs/part8/code/008_isr0.asm -o isr0.o ===
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>=== nasm -f elf32 /home/claude/unix_os_repo/docs/part8/code/008_irq0.asm -o irq0.o ===
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>=== nasm -f elf32 /home/claude/unix_os_repo/docs/part8/code/008_irq1.asm -o irq1.o ===
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part8/code/008_vga.c -o vga.o ===
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part8/code/008_serial.c -o serial.o ===
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part8/code/008_gdt.c -o gdt.o ===
+<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>
+<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part8/code/008_idt.c -o idt.o ===
+<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>
+<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part8/code/008_pic.c -o pic.o ===
+<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>
+<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part8/code/008_pit.c -o pit.o ===
+<a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>
+<a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part8/code/008_printf.c -o printf.o ===
+<a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a>
+<a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part8/code/008_isr_handlers.c -o isr_handlers.o ===
+<a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a>
+<a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part8/code/008_keyboard.c -o keyboard.o ===
+<a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a>
+<a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part8/code/008_multiboot.c -o multiboot.o ===
+<a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a>
+<a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part8/code/008_pmm.c -o pmm.o ===
+<a id="__codelineno-4-34" name="__codelineno-4-34" href="#__codelineno-4-34"></a>
+<a id="__codelineno-4-35" name="__codelineno-4-35" href="#__codelineno-4-35"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part8/code/008_paging.c -o paging.o ===
+<a id="__codelineno-4-36" name="__codelineno-4-36" href="#__codelineno-4-36"></a>
+<a id="__codelineno-4-37" name="__codelineno-4-37" href="#__codelineno-4-37"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c /home/claude/unix_os_repo/docs/part8/code/008_kmain.c -o kmain.o ===
+<a id="__codelineno-4-38" name="__codelineno-4-38" href="#__codelineno-4-38"></a>
+<a id="__codelineno-4-39" name="__codelineno-4-39" href="#__codelineno-4-39"></a>=== ld -m elf_i386 -T /home/claude/unix_os_repo/docs/part8/code/008_linker.ld -o kernel.bin boot.o gdt_flush.o idt_flush.o isr0.o irq0.o irq1.o vga.o serial.o gdt.o idt.o pic.o pit.o printf.o isr_handlers.o keyboard.o multiboot.o pmm.o paging.o kmain.o ===
+<a id="__codelineno-4-40" name="__codelineno-4-40" href="#__codelineno-4-40"></a>ld: warning: irq1.o: missing .note.GNU-stack section implies executable stack
+<a id="__codelineno-4-41" name="__codelineno-4-41" href="#__codelineno-4-41"></a>ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+<a id="__codelineno-4-42" name="__codelineno-4-42" href="#__codelineno-4-42"></a>ld: warning: kernel.bin has a LOAD segment with RWX permissions
+<a id="__codelineno-4-43" name="__codelineno-4-43" href="#__codelineno-4-43"></a>
+<a id="__codelineno-4-44" name="__codelineno-4-44" href="#__codelineno-4-44"></a>=== grub-file --is-x86-multiboot2 kernel.bin &amp;&amp; echo valid-multiboot2 ===
+<a id="__codelineno-4-45" name="__codelineno-4-45" href="#__codelineno-4-45"></a>valid-multiboot2
+</code></pre></div>
+<p>Nineteen real source files this time -- six assembled, thirteen compiled, two of them (<code>008_paging.h</code>/<code>008_paging.c</code>) genuinely new this chapter -- every C file still clean under <code>-Wall -Wextra</code>. The two linker warnings are the same benign ones every prior chapter has produced (a missing <code>.note.GNU-stack</code> section on one assembly object, and an RWX-permission LOAD segment) -- neither is new, and neither has ever affected this kernel booting correctly. <code>grub-file</code> still confirms a valid Multiboot2 image.</p>
+<h2 id="booting-it-and-switching-paging-on-for-real">Booting it, and switching paging on for real<a class="headerlink" href="#booting-it-and-switching-paging-on-for-real" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>qemu-system-i386<span class="w"> </span>-cdrom<span class="w"> </span>kernel.iso<span class="w"> </span>-m<span class="w"> </span><span class="m">64</span><span class="w"> </span>-no-reboot<span class="w"> </span>-no-shutdown<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span>-serial<span class="w"> </span>file:serial_capture.txt<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span>-monitor<span class="w"> </span>unix:/tmp/qemu_monitor.sock,server,nowait<span class="w"> </span>-display<span class="w"> </span>none<span class="w"> </span><span class="p">&amp;</span>
+</code></pre></div>
+<p><strong>Output (cloud sandbox -- real, live-executed serial capture, QEMU 8.2.2, <code>-m 64</code>):</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Unix OS from Scratch -- Chapter 8: kernel entry reached
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>Multiboot2 magic confirmed in EAX: 0x36d76289
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>Multiboot2 memory map: 6 real entries, 24 bytes each
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>  base 0x0  length 0x9fc00  type 1 (available)
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>  base 0x9fc00  length 0x400  type 2
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>  base 0xf0000  length 0x10000  type 2
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>  base 0x100000  length 0x3ee0000  type 1 (available)
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>  base 0x3fe0000  length 0x20000  type 2
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>  base 0xfffc0000  length 0x40000  type 2
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>Kernel image occupies physical 0x100000 - 0x107464
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>Physical memory manager ready: 16088 free frames (64352 KiB usable)
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>Allocated three real frames: 0x108000, 0x109000, 0x10a000
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>Freed the middle frame 0x109000 -- 16086 free frames now
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>Allocated again: got 0x109000 (matches the freed frame? yes)
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>Paging: allocating page directory...
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>Paging: page directory at 0x10b000. Identity-mapping 0-64MiB (16 page tables)...
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>Paging: identity map built. Loading CR3 and setting CR0.PG...
+<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>Paging: CR0 = 0x80000011 (PG bit: 1). Paging is now live.
+<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>Wrote 0xcafef00d through virtual address 0xc0000000
+<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>Reading the SAME physical frame (0x11c000) through its identity-mapped address: 0xcafef00d
+<a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a>GDT/IDT/PIC/PIT/keyboard all initialized -- enabling interrupts now
+<a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a>tick: 100
+<a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a>tick: 200
+<a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a>tick: 300
+<a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a>tick: 400
+<a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a>tick: 500
+<a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a>tick: 600
+<a id="__codelineno-6-28" name="__codelineno-6-28" href="#__codelineno-6-28"></a>tick: 700
+<a id="__codelineno-6-29" name="__codelineno-6-29" href="#__codelineno-6-29"></a>tick: 800
+</code></pre></div>
+<p>Nothing above is asserted without being checked. The free-frame count (<strong>16088</strong>) was recomputed independently from this run's own real numbers -- the available region above 1 MiB (<code>0x100000</code>-<code>0x3fe0000</code>, 16096 frames) minus the kernel's own real footprint (<code>0x100000</code>-<code>0x107464</code>, rounded up to 8 whole frames) -- and matches the kernel's own live-printed figure exactly, the same cross-check discipline Chapter 7 established. The page directory landed at <code>0x10b000</code>, immediately after the four frames already handed out by Chapter 7's own alloc/free/alloc-again demonstration (<code>0x108000</code>-<code>0x10a000</code> plus the reused <code>0x109000</code>) -- real evidence the allocator Chapter 7 built is still the single source of every physical frame this kernel uses, paging included. <code>CR0</code> reads back as <code>0x80000011</code>: bit 31 (<code>PG</code>) set, alongside the low bits already set before this chapter ever ran (<code>PE</code>, protected mode, and the numeric-extension bit <code>NE</code>) -- confirmed by masking and printing that exact bit rather than just trusting the <code>mov</code> succeeded. And the aliasing proof itself: <code>0xCAFEF00D</code>, written through the virtual address <code>0xC0000000</code> -- a page directory index (768) nowhere near the 16 identity-mapped entries this chapter's own identity map installs -- reads back identically through the <em>same physical frame's</em> (<code>0x11c000</code>) own identity-mapped address. Two different virtual addresses, one real physical frame, one real value: the CPU is genuinely translating, not passing addresses through unchanged. Interrupts, the PIT, and the keyboard -- everything Chapters 4 through 6 built -- keep running completely unaware paging is on, exactly as the identity map was designed to guarantee, confirmed by the same real tick lines every prior chapter has shown. The same output appears on the real VGA screen, captured the same way every prior chapter's screenshot was:</p>
+<p><img alt="Real QEMU screendump of Chapter 8's output: the Multiboot2 magic confirmation, the real memory map, the physical memory manager's free-frame count and alloc/free/alloc-again sequence, the page directory address, the CR0 readback confirming the PG bit is set, the virtual/physical aliasing proof writing 0xCAFEF00D through 0xC0000000 and reading it back through the identity-mapped physical frame, and the first several IRQ0 tick lines after interrupts are re-enabled -- all in light green on black" src="../images/008_vga_screendump.png" /></p>
+<h2 id="chapter-summary">Chapter summary<a class="headerlink" href="#chapter-summary" title="Permanent link">&para;</a></h2>
+<p>This chapter gave the kernel its first real layer of address translation: a genuine two-level page directory and page table structure, built field-for-field to the real 32-bit x86 layout, using Chapter 7's own physical memory manager for every frame involved rather than a static array standing in for it. The entire 0-64 MiB range Chapter 7 already manages was identity-mapped first, specifically so switching <code>CR0.PG</code> on would not immediately fault the kernel's own next instruction -- and every subsystem built in earlier chapters (interrupts, the PIT, the keyboard) kept working afterward, completely unaware paging had been enabled underneath it. The chapter's real claim -- that the CPU is now genuinely translating addresses, not passing them through unchanged -- was not left as an assertion: a fresh frame was mapped at a virtual address chosen specifically to fall outside the identity map, written through that virtual address, and read back through the same physical frame's own identity-mapped address, with both values shown to match in a real, live-executed run.</p>
+<h2 id="self-check-questions">Self-check questions<a class="headerlink" href="#self-check-questions" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Why does <code>paging_init</code> identity-map the kernel's own already-in-use frames, rather than leaving them out since they are not free memory Chapter 7 would ever hand out?</li>
+<li>What would happen, concretely, if <code>CR0.PG</code> were set while the current instruction pointer's own physical address had no valid page table entry mapping it?</li>
+<li>Why does <code>008_paging.c</code> allocate its page directory and page table frames from <code>pmm_alloc_frame()</code> instead of declaring them as static C arrays, the way earlier chapters might have?</li>
+<li><code>paging_map_page</code> calls <code>invlpg</code> after installing a new PTE. What real, concrete bug could appear if that call were removed?</li>
+<li>Why does mapping <code>0xC0000000</code> specifically (rather than, say, <code>0x00500000</code>) force <code>paging_map_page</code> to exercise its "allocate a new page table" path rather than reusing one <code>paging_init</code> already built?</li>
+</ol>
+<p><strong>Worked answers</strong></p>
+<ol>
+<li>The moment <code>CR0.PG</code> is set, every memory access -- including the kernel's own currently executing code, its stack, and the page tables it is reading from -- goes through address translation. If the kernel's own running frames were not mapped, the very instruction that set the <code>PG</code> bit would be the next fetch to fault, since the CPU would find no valid translation for the address it is currently executing from.</li>
+<li>The CPU would take a page fault on that fetch -- and since this kernel has not yet installed a page fault handler (or any handler capable of resolving one), that fault would itself fail to be serviced correctly, typically escalating to a double fault and then a triple fault, which resets the machine. This is exactly why the identity map covers the kernel's own frames rather than only "genuinely free" ones.</li>
+<li>Chapter 7's physical memory manager exists so this kernel never has to guess where it is safe to place something in physical memory -- a static array's address is fixed at link time and is not guaranteed to avoid every frame that might already be in use elsewhere, especially as this book grows. Allocating through <code>pmm_alloc_frame()</code> keeps page directory and page table frames inside the one real, authoritative record of what physical memory is actually free.</li>
+<li>The CPU is free to cache virtual-to-physical translations in its TLB (translation lookaside buffer) independently of what the in-memory page tables currently say. Without <code>invlpg</code> on the specific virtual address just changed, a stale translation already cached from before the update could survive and be used on the next access to that address -- reading or writing the wrong physical frame even though the page table itself now says otherwise.</li>
+<li><code>paging_init</code> only ever installs page directory entries 0 through 15 (covering 0-64 MiB, <code>0x00000000</code>-<code>0x03FFFFFF</code>). A virtual address's directory index is its top 10 bits (<code>vaddr &gt;&gt; 22</code>); for <code>0xC0000000</code> that index is 768, and for <code>0x00500000</code> it is 1 -- already inside the identity map's own range, and already backed by a page table <code>paging_init</code> built. Only an address whose directory index falls outside 0-15 forces <code>paging_map_page</code> down its "no PDE present yet, allocate a new table" branch, which is exactly why this chapter's own test deliberately picks one that does.</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../../part7/07-physical-memory-the-multiboot2-memory-map-and-a-real-frame-allocator/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 7. Physical Memory: the Multiboot2 Memory Map and a Real Frame Allocator">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                7. Physical Memory: the Multiboot2 Memory Map and a Real Frame Allocator
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../part9/09-a-kernel-heap-real-dynamic-memory-with-kmalloc-kfree/" class="md-footer__link md-footer__link--next" aria-label="Next: 9. A Kernel Heap: Real Dynamic Memory with kmalloc/kfree">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                9. A Kernel Heap: Real Dynamic Memory with kmalloc/kfree
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 Oluwaseyi Awoga
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

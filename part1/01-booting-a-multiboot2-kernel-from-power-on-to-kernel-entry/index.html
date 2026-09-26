@@ -1,0 +1,2308 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A Unix-Like Operating System in C, From Power-On to a Working Shell">
+      
+      
+        <meta name="author" content="Oluwaseyi Awoga">
+      
+      
+      
+        <link rel="prev" href="../../getting-started/">
+      
+      
+        <link rel="next" href="../../part2/02-vga-text-mode-output-a-real-screen-driver/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>1. Booting a Multiboot2 Kernel - Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#1-booting-a-multiboot2-kernel-from-power-on-to-kernel-entry" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" class="md-header__button md-logo" aria-label="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 19V7H4v12zm0-16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm-7 14v-2h5v2zm-3.42-4L5.57 9H8.4l3.3 3.3c.39.39.39 1.03 0 1.42L8.42 17H5.59z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              1. Booting a Multiboot2 Kernel
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="deep-orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="deep-orange"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" class="md-nav__button md-logo" aria-label="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 19V7H4v12zm0-16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm-7 14v-2h5v2zm-3.42-4L5.57 9H8.4l3.3 3.3c.39.39.39 1.03 0 1.42L8.42 17H5.59z"/></svg>
+
+    </a>
+    Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 1 -- Booting: From Power-On to Kernel Entry
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 1 -- Booting: From Power-On to Kernel Entry
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1. Booting a Multiboot2 Kernel
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1. Booting a Multiboot2 Kernel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-booting-actually-means" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What "booting" actually means
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-multiboot2-header-the-one-contract-grub-requires" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Multiboot2 header: the one contract GRUB requires
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#001_bootasm-the-entry-point-grub-actually-jumps-to" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        001_boot.asm: the entry point GRUB actually jumps to
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#001_linkerld-placing-the-kernel-where-grub-expects-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        001_linker.ld: placing the kernel where GRUB expects it
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#001_kmainc-the-first-c-this-books-machine-has-ever-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        001_kmain.c: the first C this book's machine has ever run
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-and-booting-it-for-real" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Building and booting it, for real
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#toolchain-and-verification-discipline-for-this-book" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Toolchain and verification discipline for this book
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#self-check-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Self-check questions
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 2 -- Talking to Hardware: Early Device Drivers
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 2 -- Talking to Hardware: Early Device Drivers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part2/02-vga-text-mode-output-a-real-screen-driver/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2. VGA Text-Mode Output
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 3 -- Kernel Infrastructure: Descriptor Tables and Utilities
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 3 -- Kernel Infrastructure: Descriptor Tables and Utilities
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/03-a-real-gdt-and-a-kernel-printf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3. A Real GDT and a Kernel printf
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part4/04-interrupts-the-idt-and-a-first-real-isr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4. Interrupts: The IDT and a First Real ISR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 4 -- Hardware Interrupts: Making the Kernel Interactive
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 4 -- Hardware Interrupts: Making the Kernel Interactive
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part5/05-ps2-keyboard-input-via-a-real-hardware-irq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5. PS/2 Keyboard Input, via a Real Hardware IRQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part6/06-the-pit-timer-and-a-real-tick-counter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6. The PIT Timer and a Real Tick Counter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 5 -- Memory: Discovering and Managing Real RAM
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 5 -- Memory: Discovering and Managing Real RAM
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part7/07-physical-memory-the-multiboot2-memory-map-and-a-real-frame-allocator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7. Physical Memory: the Multiboot2 Memory Map and a Real Frame Allocator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part8/08-paging-enabling-virtual-memory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8. Paging: Enabling Virtual Memory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part9/09-a-kernel-heap-real-dynamic-memory-with-kmalloc-kfree/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9. A Kernel Heap: Real Dynamic Memory with kmalloc/kfree
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10/10-page-fault-handling-a-real-isr14/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10. Page Fault Handling: A Real ISR14
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 6 -- Scheduling: Running More Than One Task at Once
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 6 -- Scheduling: Running More Than One Task at Once
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11/11-kernel-level-multitasking-cooperative-task-switching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11. Kernel-Level Multitasking: Cooperative Task Switching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12/12-preemptive-multitasking-letting-the-timer-decide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12. Preemptive Multitasking: Letting the Timer Decide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13/13-synchronization-primitives-spinlocks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13. Synchronization Primitives: Spinlocks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14/14-blocking-synchronization-semaphores-and-sleep-wake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14. Blocking Synchronization: Semaphores and Sleep/Wake
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 7 -- Privilege: Running Code This Kernel Does Not Fully Trust
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 7 -- Privilege: Running Code This Kernel Does Not Fully Trust
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part15/15-user-mode-ring-3-tss-and-a-first-system-call/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15. User Mode: Ring 3, a TSS, and a First System Call
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16/16-real-ring-3-tasks-in-the-scheduler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    16. Real Ring-3 Tasks in the Scheduler: sys_yield, sys_exit, Multiple User Tasks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17/17-per-process-address-spaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    17. Per-Process Address Spaces: One Page Directory Per Task
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18/18-loading-a-real-elf-binary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    18. Loading a Real ELF Binary: Parsing Program Headers and Mapping PT_LOAD Segments
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19/19-a-real-disk-driver-ata-pio-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    19. A Real Disk Driver: ATA PIO Mode, Reading and Writing Real Sectors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20/20-a-real-filesystem-fat16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20. A Real Filesystem: FAT16, Files Addressed by Name Instead of by Raw LBA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part21/21-real-subdirectories-fat16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    21. Real Subdirectories: One Level of Nesting Inside FAT16
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part22/22-removing-real-subdirectories-fat16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    22. Removing Real Subdirectories: fat16_rmdir() and the Empty-Directory Rule
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part23/23-recursive-multi-level-paths-fat16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    23. Recursive Multi-Level Paths: Lifting FAT16's One-Level Scope
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part24/24-pci-bus-enumeration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    24. PCI Bus Enumeration: Finding the Hardware Before You Can Drive It
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part25/25-rtl8139-driver/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    25. A Real RTL8139 Driver: One Real Frame, Sent and Received
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part26/26-interrupt-driven-rtl8139/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    26. Interrupt-Driven RTL8139: A Real hlt, Woken by Real Hardware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part27/27-multi-frame-rtl8139/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    27. Multi-Frame RTL8139: Real Round-Robin Transmit, Real CAPR Wraparound
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part28/28-address-resolution-protocol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    28. Address Resolution Protocol: A Real ARP Request/Reply Over a Real Wire
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part29/29-a-real-arp-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    29. A Real ARP Cache: Completing RFC 826's Own Merge_flag Logic
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part30/30-a-real-fedwire-style-wire-transfer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    30. A Real Fedwire-Style Wire Transfer: AES-128, SHA-256, and HMAC From Scratch
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part31/31-a-real-arp-server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    31. A Real ARP Server: Answering Requests About This Kernel's Own Address
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part32/32-a-real-nacha-ach-p2p-split/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    32. A Real NACHA ACH Batch: P2P Group-Expense Splitting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part33/33-a-real-pay-in-4-bnpl-checkout/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    33. A Real "Pay in 4" BNPL Checkout: Regulation Z APR and an ISO 8583 Authorization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-booting-actually-means" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What "booting" actually means
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-multiboot2-header-the-one-contract-grub-requires" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Multiboot2 header: the one contract GRUB requires
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#001_bootasm-the-entry-point-grub-actually-jumps-to" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        001_boot.asm: the entry point GRUB actually jumps to
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#001_linkerld-placing-the-kernel-where-grub-expects-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        001_linker.ld: placing the kernel where GRUB expects it
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#001_kmainc-the-first-c-this-books-machine-has-ever-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        001_kmain.c: the first C this book's machine has ever run
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-and-booting-it-for-real" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Building and booting it, for real
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#toolchain-and-verification-discipline-for-this-book" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Toolchain and verification discipline for this book
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chapter-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chapter summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#self-check-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Self-check questions
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="1-booting-a-multiboot2-kernel-from-power-on-to-kernel-entry">1. Booting a Multiboot2 Kernel: From Power-On to Kernel Entry<a class="headerlink" href="#1-booting-a-multiboot2-kernel-from-power-on-to-kernel-entry" title="Permanent link">&para;</a></h1>
+<p><strong>What you will understand:</strong> what a real x86-64 machine actually does between the moment you press power and the moment any code you wrote begins running; why this book does not write its own bootloader, and what GRUB and the Multiboot2 standard do instead; the exact, real, spec-required shape of a Multiboot2 header (checked against GNU's own Multiboot2 Specification, quoted directly below rather than paraphrased from memory); and why a kernel's very first C function has to talk to raw hardware ports before it can print a single character, since there is no operating system underneath it to ask.</p>
+<p><strong>What you need to know first:</strong> working C (functions, pointers, the <code>static</code> keyword) and enough x86 assembly to read a short, heavily-commented file (you do not need to write assembly from scratch -- every instruction used here is explained where it appears). No prior OS-development experience is assumed.</p>
+<h2 id="what-booting-actually-means">What "booting" actually means<a class="headerlink" href="#what-booting-actually-means" title="Permanent link">&para;</a></h2>
+<p>Every program you have ever run -- in this book's sibling series or anywhere else -- ran <em>on top of</em> an operating system. <code>malloc</code> asked the OS for memory. <code>printf</code> asked the OS to write to a file descriptor. Even a CUDA kernel launch went through an OS-owned driver. This book builds the thing all of that sits on, and that means starting from a moment none of those sibling books ever had to think about: the instant the CPU has power and <em>nothing else exists yet</em>. No memory allocator, no filesystem, no notion of "a process," not even a guarantee that the .bss segment has been zeroed by anyone but us.</p>
+<p>Getting from that moment to a running kernel is a real, well-defined chain of handoffs, not a single magic step:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>+-------------------------------------------------------------------+
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>|  From power-on to your first line of C, one real step at a time    |
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>|                                                                     |
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>|  [1] BIOS / UEFI firmware                                          |
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>|      - runs first, built into the motherboard                      |
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>|      - finds a bootable device, loads ITS first stage               |
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>|      |                                                              |
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>|  [2] GRUB (the bootloader we did NOT write)                         |
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>|      - reads /boot/grub/grub.cfg from the ISO                       |
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>|      - finds kernel.bin, scans its first 32KB for a real            |
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>|        Multiboot2 header (magic 0xE85250D6)                         |
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>|      - loads kernel.bin into memory at 1 MiB, switches the CPU      |
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>|        into 32-bit protected mode, and jumps to its entry point     |
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>|      |                                                              |
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>|  [3] Our _start (001_boot.asm)                                      |
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>|      - CPU is already in 32-bit protected mode (GRUB's job, not     |
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>|        ours -- real-mode setup and the mode switch are GRUB's own   |
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>|        real, established work this book does not redo)              |
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>|      - no stack yet -- first instruction sets esp                   |
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>|      |                                                              |
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>|  [4] Our kmain() (001_kmain.c)                                      |
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>|      - the first C function THIS BOOK wrote that the machine runs   |
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>|      - talks to real hardware (the COM1 UART) directly, no OS       |
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>|        underneath to ask for help                                   |
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>+-------------------------------------------------------------------+
+</code></pre></div>
+<p>Steps [1] and [2] are real, existing software this book deliberately does not reimplement -- writing a BIOS/UEFI-compatible bootloader from scratch is its own, mostly unrelated project (real-mode 16-bit assembly, A20 line handling, a hand-rolled protected-mode switch), and it would teach almost nothing about what an <em>operating system</em> actually does once it is running. GRUB already solves that problem correctly, for real hardware, today. What this book owns starts at step [3]: the moment GRUB hands control to code we wrote, in a well-defined machine state that a real, published standard -- Multiboot2 -- guarantees.</p>
+<h2 id="the-multiboot2-header-the-one-contract-grub-requires">The Multiboot2 header: the one contract GRUB requires<a class="headerlink" href="#the-multiboot2-header-the-one-contract-grub-requires" title="Permanent link">&para;</a></h2>
+<p>GRUB does not know or care what your kernel does. It cares about exactly one thing before it will load and jump to a binary: does that binary contain a correctly-formed Multiboot2 header, somewhere in its first 32 KiB? GNU's own Multiboot2 Specification states the required fields plainly, quoted here rather than paraphrased:</p>
+<blockquote>
+<p>"The field 'magic' is the magic number identifying the header, which must be the hexadecimal value 0xE85250D6."</p>
+<p>"The field 'header_length' specifies the Length of Multiboot2 header in bytes including magic fields."</p>
+<p>"The field 'checksum' is a 32-bit unsigned value which, when added to the other magic fields (i.e. 'magic', 'architecture' and 'header_length'), must have a 32-bit unsigned sum of zero."</p>
+<p>"Tags are terminated by a tag of type '0' and size '8'."</p>
+</blockquote>
+<p>(GNU Multiboot2 Specification, via the GNU GRUB manual: https://www.gnu.org/software/grub/manual/multiboot2/multiboot.html)</p>
+<p>Every one of those four requirements maps directly onto a field in <code>001_boot.asm</code> below, in the same order:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>+------------------------------------------------------------+
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>|  001_boot.asm's own Multiboot2 header, field by field        |
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>|                                                                |
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>|  offset 0   magic          0xE85250D6   (fixed, spec-defined) |
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>|  offset 4   architecture   0            (0 = i386 protected)  |
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>|  offset 8   header_length  header_end - header_start (bytes)  |
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>|  offset 12  checksum       0x100000000 - (magic+arch+len)     |
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>|                            -- forces magic+arch+len+checksum  |
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>|                               to sum to zero mod 2^32, which  |
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>|                               is exactly what GRUB checks     |
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>|  offset 16  end tag: type=0, size=8 (flags=0, implied)        |
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>+------------------------------------------------------------+
+</code></pre></div>
+<p><code>0x100000000 - x</code> is two's-complement subtraction from 2^32: adding it back to <code>x</code> always produces exactly <code>2^32</code>, which is <code>0</code> in 32-bit unsigned arithmetic -- precisely the "32-bit unsigned sum of zero" the spec requires, computed by the assembler once at build time rather than by us doing modular arithmetic by hand.</p>
+<h2 id="001_bootasm-the-entry-point-grub-actually-jumps-to"><code>001_boot.asm</code>: the entry point GRUB actually jumps to<a class="headerlink" href="#001_bootasm-the-entry-point-grub-actually-jumps-to" title="Permanent link">&para;</a></h2>
+<p>By the time GRUB jumps to <code>_start</code>, it has already done real, nontrivial work on our behalf: switched the CPU into 32-bit protected mode, loaded <code>kernel.bin</code> at the 1 MiB physical address, and set up a handful of machine-state guarantees the Multiboot2 spec promises (a valid GDT, paging disabled, interrupts disabled). What it has <em>not</em> done is give us a stack -- <code>esp</code> is whatever GRUB last left it as, not something a C function can safely build a call frame on. <code>_start</code>'s only two jobs, in order, are to fix that and then get out of the way:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">; Chapter 1: the Multiboot2 header GRUB scans for, plus the tiny assembly</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1">; entry point every C function in this book ultimately runs under. GRUB</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="c1">; hands control to _start in 32-bit protected mode with no stack set up</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1">; and no guarantee the .bss segment has been zeroed by anything but us --</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="c1">; so this file's only two jobs are: point esp at a real stack, then call</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="c1">; into C.</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="k">BITS</span><span class="w"> </span><span class="mi">32</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="k">section</span><span class="w"> </span><span class="nv">.multiboot_header</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="k">align</span><span class="w"> </span><span class="mi">8</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="nl">header_start:</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="kd">dd</span><span class="w"> </span><span class="mh">0xe85250d6</span><span class="w">                </span><span class="c1">; magic number (multiboot2)</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="kd">dd</span><span class="w"> </span><span class="mi">0</span><span class="w">                         </span><span class="c1">; architecture 0 (protected mode i386)</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">    </span><span class="kd">dd</span><span class="w"> </span><span class="nv">header_end</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">header_start</span><span class="w"> </span><span class="c1">; header length</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">    </span><span class="kd">dd</span><span class="w"> </span><span class="mh">0x100000000</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="mh">0xe85250d6</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="nv">header_end</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">header_start</span><span class="p">))</span><span class="w"> </span><span class="c1">; checksum</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">    </span><span class="c1">; end tag</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">    </span><span class="kd">dw</span><span class="w"> </span><span class="mi">0</span>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">    </span><span class="kd">dw</span><span class="w"> </span><span class="mi">0</span>
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">    </span><span class="kd">dd</span><span class="w"> </span><span class="mi">8</span>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="nl">header_end:</span>
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="k">section</span><span class="w"> </span><span class="nv">.text</span>
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="k">extern</span><span class="w"> </span><span class="nv">kmain</span>
+<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="k">global</span><span class="w"> </span><span class="nv">_start</span>
+<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="nl">_start:</span>
+<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">esp</span><span class="p">,</span><span class="w"> </span><span class="nv">stack_top</span>
+<a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a><span class="w">    </span><span class="nf">call</span><span class="w"> </span><span class="nv">kmain</span>
+<a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a><span class="w">    </span><span class="nf">cli</span>
+<a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a><span class="nl">.hang:</span>
+<a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a><span class="w">    </span><span class="nf">hlt</span>
+<a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a><span class="w">    </span><span class="nf">jmp</span><span class="w"> </span><span class="nv">.hang</span>
+<a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a>
+<a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a><span class="k">section</span><span class="w"> </span><span class="nv">.bss</span>
+<a id="__codelineno-2-34" name="__codelineno-2-34" href="#__codelineno-2-34"></a><span class="k">align</span><span class="w"> </span><span class="mi">16</span>
+<a id="__codelineno-2-35" name="__codelineno-2-35" href="#__codelineno-2-35"></a><span class="nl">stack_bottom:</span>
+<a id="__codelineno-2-36" name="__codelineno-2-36" href="#__codelineno-2-36"></a><span class="w">    </span><span class="kd">resb</span><span class="w"> </span><span class="mi">16384</span>
+<a id="__codelineno-2-37" name="__codelineno-2-37" href="#__codelineno-2-37"></a><span class="nl">stack_top:</span>
+</code></pre></div>
+<p><code>stack_bottom</code>/<code>stack_top</code> live in <code>.bss</code>, a 16 KiB block the linker script below reserves but the file itself stores no bytes for (that is what <code>.bss</code> -- "block started by symbol" -- means: size without file content). <code>mov esp, stack_top</code> points the stack pointer at the <em>high</em> end of that block, since x86 stacks grow downward; <code>call kmain</code> is then a completely ordinary C function call, with a real stack underneath it for the first time. If <code>kmain</code> ever returns (this chapter's own <code>kmain</code> won't, once the last section below is in place), <code>cli</code>/<code>hlt</code>/<code>jmp .hang</code> disables interrupts and parks the CPU in a halt loop rather than falling off the end of <code>_start</code> into undefined memory.</p>
+<h2 id="001_linkerld-placing-the-kernel-where-grub-expects-it"><code>001_linker.ld</code>: placing the kernel where GRUB expects it<a class="headerlink" href="#001_linkerld-placing-the-kernel-where-grub-expects-it" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>/* Chapter 1: places the kernel at the 1 MiB physical-address mark, the
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a> * conventional Multiboot2 load address (below it is real-mode-era memory
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a> * GRUB and the BIOS still use; above it is free for us) -- and lists the
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a> * multiboot header section FIRST so it lands within the first 8 KiB of
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a> * the file, where the Multiboot2 spec requires GRUB to be able to find it. */
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>ENTRY(_start)
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>SECTIONS
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>{
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    . = 1M;
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    .multiboot_header : { *(.multiboot_header) }
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    .text   : { *(.text) }
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>    .rodata : { *(.rodata) }
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>    .data   : { *(.data) }
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>    .bss    : { *(.bss) }
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>}
+</code></pre></div>
+<p><code>. = 1M</code> places the very first byte of <code>.multiboot_header</code> at physical address <code>0x00100000</code> -- the conventional Multiboot2 load address, chosen because everything below 1 MiB is real-mode-era memory the BIOS and GRUB itself may still be using. Listing <code>.multiboot_header</code> as the <em>first</em> section in <code>SECTIONS</code> is not cosmetic: the Multiboot2 spec requires GRUB to find the header within the binary's first 32 KiB, and without this ordering nothing stops the linker from placing <code>.text</code> first and pushing the header past that boundary. The resulting physical memory layout:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>+-------------------------------------------------------+
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>|  Physical memory after GRUB hands off (001_linker.ld)   |
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>|                                                           |
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>|  0x00000000 +----------------------------+               |
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>|              | BIOS / real-mode-era data  |  (untouched)  |
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>|  0x00100000  +----------------------------+  (== 1 MiB)   |
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>|              | .multiboot_header          |  must sit     |
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>|              |                            |  within the   |
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>|              |                            |  first 8 KiB  |
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>|              +----------------------------+               |
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>|              | .text  (_start, kmain, ...)|               |
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>|              +----------------------------+               |
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>|              | .rodata                    |               |
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>|              +----------------------------+               |
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>|              | .data                      |               |
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>|              +----------------------------+               |
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>|              | .bss   (stack_bottom..top) |  our stack    |
+<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>|              +----------------------------+               |
+<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>+-------------------------------------------------------+
+</code></pre></div>
+<h2 id="001_kmainc-the-first-c-this-books-machine-has-ever-run"><code>001_kmain.c</code>: the first C this book's machine has ever run<a class="headerlink" href="#001_kmainc-the-first-c-this-books-machine-has-ever-run" title="Permanent link">&para;</a></h2>
+<p><code>kmain</code> has no <code>printf</code>, no <code>stdout</code>, nothing -- those are OS services, and step [4] in the very first diagram above <em>is</em> the OS being built. The only way to produce output right now is to talk to a real hardware device directly, through the x86 <code>in</code>/<code>out</code> instructions, which read and write a CPU I/O port rather than a memory address. This chapter uses the COM1 serial UART (I/O ports <code>0x3F8</code>-<code>0x3FF</code>) rather than the VGA text-mode framebuffer for one deliberate reason: QEMU's <code>-serial stdio</code> flag turns that UART's real output into plain text on this book's own terminal, which can be captured exactly and locked into this page -- no screenshot of a virtual monitor required, the same "genuinely run, exact output locked in" discipline this book's sibling series has followed throughout.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="cm">/* Chapter 1: our first freestanding "kernel". It writes to the COM1 serial</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="cm"> * port rather than the VGA text buffer so this book can lock its exact,</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="cm"> * real, captured text output into the page -- no screenshot of a virtual</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="cm"> * monitor needed, just QEMU's own -serial stdio flag. Everything above</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="cm"> * main() (the boot stub in 001_boot.asm and this file's own outb/inb pair)</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="cm"> * exists because, the instant GRUB hands control to _start, there is no</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="cm"> * C runtime, no stack the compiler can assume, and no OS underneath us to</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="cm"> * ask for I/O -- kmain() below is the first C function this machine has</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="cm"> * ever run that WE wrote, and serial_puts() is the first output any part</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="cm"> * of this book produces without an operating system's help. */</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">outb</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">port</span><span class="p">,</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"outb %0, %1"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"a"</span><span class="p">(</span><span class="n">val</span><span class="p">),</span><span class="w"> </span><span class="s">"Nd"</span><span class="p">(</span><span class="n">port</span><span class="p">));</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="p">}</span>
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="nf">inb</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">port</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span>
+<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"inb %1, %0"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"=a"</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"Nd"</span><span class="p">(</span><span class="n">port</span><span class="p">));</span>
+<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span>
+<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a><span class="p">}</span>
+<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>
+<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a><span class="cp">#define COM1 0x3F8</span>
+<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>
+<a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">serial_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a><span class="w">    </span><span class="n">outb</span><span class="p">(</span><span class="n">COM1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="p">);</span>
+<a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a><span class="w">    </span><span class="n">outb</span><span class="p">(</span><span class="n">COM1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mh">0x80</span><span class="p">);</span>
+<a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a><span class="w">    </span><span class="n">outb</span><span class="p">(</span><span class="n">COM1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mh">0x03</span><span class="p">);</span>
+<a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a><span class="w">    </span><span class="n">outb</span><span class="p">(</span><span class="n">COM1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mh">0x00</span><span class="p">);</span>
+<a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a><span class="w">    </span><span class="n">outb</span><span class="p">(</span><span class="n">COM1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mh">0x03</span><span class="p">);</span>
+<a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a><span class="w">    </span><span class="n">outb</span><span class="p">(</span><span class="n">COM1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mh">0xC7</span><span class="p">);</span>
+<a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a><span class="w">    </span><span class="n">outb</span><span class="p">(</span><span class="n">COM1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mh">0x0B</span><span class="p">);</span>
+<a id="__codelineno-5-32" name="__codelineno-5-32" href="#__codelineno-5-32"></a><span class="p">}</span>
+<a id="__codelineno-5-33" name="__codelineno-5-33" href="#__codelineno-5-33"></a>
+<a id="__codelineno-5-34" name="__codelineno-5-34" href="#__codelineno-5-34"></a><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">serial_transmit_empty</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-35" name="__codelineno-5-35" href="#__codelineno-5-35"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">inb</span><span class="p">(</span><span class="n">COM1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x20</span><span class="p">;</span>
+<a id="__codelineno-5-36" name="__codelineno-5-36" href="#__codelineno-5-36"></a><span class="p">}</span>
+<a id="__codelineno-5-37" name="__codelineno-5-37" href="#__codelineno-5-37"></a>
+<a id="__codelineno-5-38" name="__codelineno-5-38" href="#__codelineno-5-38"></a><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">serial_putc</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-39" name="__codelineno-5-39" href="#__codelineno-5-39"></a><span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">serial_transmit_empty</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-5-40" name="__codelineno-5-40" href="#__codelineno-5-40"></a><span class="w">    </span><span class="n">outb</span><span class="p">(</span><span class="n">COM1</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="p">)</span><span class="n">c</span><span class="p">);</span>
+<a id="__codelineno-5-41" name="__codelineno-5-41" href="#__codelineno-5-41"></a><span class="p">}</span>
+<a id="__codelineno-5-42" name="__codelineno-5-42" href="#__codelineno-5-42"></a>
+<a id="__codelineno-5-43" name="__codelineno-5-43" href="#__codelineno-5-43"></a><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">serial_puts</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-44" name="__codelineno-5-44" href="#__codelineno-5-44"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(;</span><span class="w"> </span><span class="o">*</span><span class="n">s</span><span class="p">;</span><span class="w"> </span><span class="n">s</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="n">serial_putc</span><span class="p">(</span><span class="o">*</span><span class="n">s</span><span class="p">);</span>
+<a id="__codelineno-5-45" name="__codelineno-5-45" href="#__codelineno-5-45"></a><span class="p">}</span>
+<a id="__codelineno-5-46" name="__codelineno-5-46" href="#__codelineno-5-46"></a>
+<a id="__codelineno-5-47" name="__codelineno-5-47" href="#__codelineno-5-47"></a><span class="cm">/* QEMU's isa-debug-exit device (real, standard OS-dev technique): a write</span>
+<a id="__codelineno-5-48" name="__codelineno-5-48" href="#__codelineno-5-48"></a><span class="cm"> * to I/O port 0xf4 makes QEMU itself exit with status (value &lt;&lt; 1) | 1,</span>
+<a id="__codelineno-5-49" name="__codelineno-5-49" href="#__codelineno-5-49"></a><span class="cm"> * instead of the kernel having to halt forever and an outside process</span>
+<a id="__codelineno-5-50" name="__codelineno-5-50" href="#__codelineno-5-50"></a><span class="cm"> * having to kill QEMU to get its output back. Without real hardware</span>
+<a id="__codelineno-5-51" name="__codelineno-5-51" href="#__codelineno-5-51"></a><span class="cm"> * behind this port, this instruction is meaningless outside QEMU -- a</span>
+<a id="__codelineno-5-52" name="__codelineno-5-52" href="#__codelineno-5-52"></a><span class="cm"> * real kernel bound for real hardware would never do this; it exists here</span>
+<a id="__codelineno-5-53" name="__codelineno-5-53" href="#__codelineno-5-53"></a><span class="cm"> * only so this chapter's own locked output ends cleanly and</span>
+<a id="__codelineno-5-54" name="__codelineno-5-54" href="#__codelineno-5-54"></a><span class="cm"> * deterministically, without a stray "killed by timeout" line that has</span>
+<a id="__codelineno-5-55" name="__codelineno-5-55" href="#__codelineno-5-55"></a><span class="cm"> * nothing to do with the kernel's own behavior. */</span>
+<a id="__codelineno-5-56" name="__codelineno-5-56" href="#__codelineno-5-56"></a><span class="cp">#define QEMU_DEBUG_EXIT_PORT 0xf4</span>
+<a id="__codelineno-5-57" name="__codelineno-5-57" href="#__codelineno-5-57"></a>
+<a id="__codelineno-5-58" name="__codelineno-5-58" href="#__codelineno-5-58"></a><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">qemu_exit</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">code</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-59" name="__codelineno-5-59" href="#__codelineno-5-59"></a><span class="w">    </span><span class="n">outb</span><span class="p">(</span><span class="n">QEMU_DEBUG_EXIT_PORT</span><span class="p">,</span><span class="w"> </span><span class="n">code</span><span class="p">);</span>
+<a id="__codelineno-5-60" name="__codelineno-5-60" href="#__codelineno-5-60"></a><span class="p">}</span>
+<a id="__codelineno-5-61" name="__codelineno-5-61" href="#__codelineno-5-61"></a>
+<a id="__codelineno-5-62" name="__codelineno-5-62" href="#__codelineno-5-62"></a><span class="kt">void</span><span class="w"> </span><span class="nf">kmain</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-63" name="__codelineno-5-63" href="#__codelineno-5-63"></a><span class="w">    </span><span class="n">serial_init</span><span class="p">();</span>
+<a id="__codelineno-5-64" name="__codelineno-5-64" href="#__codelineno-5-64"></a><span class="w">    </span><span class="n">serial_puts</span><span class="p">(</span><span class="s">"Unix OS from Scratch -- Chapter 1: kernel entry reached</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-5-65" name="__codelineno-5-65" href="#__codelineno-5-65"></a><span class="w">    </span><span class="n">serial_puts</span><span class="p">(</span><span class="s">"multiboot2 + nasm + freestanding gcc + ld + qemu pipeline: OK</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-5-66" name="__codelineno-5-66" href="#__codelineno-5-66"></a><span class="w">    </span><span class="n">qemu_exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<a id="__codelineno-5-67" name="__codelineno-5-67" href="#__codelineno-5-67"></a><span class="p">}</span>
+</code></pre></div>
+<p><code>outb</code>/<code>inb</code> are thin wrappers around the x86 <code>outb</code>/<code>inb</code> instructions (inline assembly, <code>"a"(val)</code> and <code>"Nd"(port)</code> pin the value into register <code>al</code> and the port into <code>dx</code>, which is what those instructions require). <code>serial_init</code> is the standard 8250/16550 UART initialization sequence -- disable interrupts, set the baud-rate divisor for 38400 baud, select 8 data bits/no parity/1 stop bit, and enable a 14-byte FIFO -- taking this chapter's word for the specific register values here; a later chapter revisits the UART on its own terms rather than re-deriving the full 8250 programming model in a chapter about booting. <code>serial_transmit_empty</code> polls the UART's line-status register until it reports the transmit buffer is free, and <code>serial_putc</code>/<code>serial_puts</code> build ordinary character/string output on top of that one primitive -- this book's very first "print statement," running with no operating system underneath it at all.</p>
+<p>The final piece, <code>qemu_exit</code>, is not part of a real kernel at all: it writes to I/O port <code>0xf4</code>, which QEMU's own <code>isa-debug-exit</code> device (enabled below with <code>-device isa-debug-exit,iobase=0xf4,iosize=0x04</code>) turns into a clean, deterministic QEMU process exit -- exit code <code>(value &lt;&lt; 1) | 1</code>. On real hardware this instruction would do nothing meaningful; it exists purely so this chapter's own locked output below ends the moment the kernel is done, rather than needing an external process to kill a kernel that halts forever.</p>
+<h2 id="building-and-booting-it-for-real">Building and booting it, for real<a class="headerlink" href="#building-and-booting-it-for-real" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>nasm<span class="w"> </span>-f<span class="w"> </span>elf32<span class="w"> </span>001_boot.asm<span class="w"> </span>-o<span class="w"> </span>boot.o
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>gcc<span class="w"> </span>-m32<span class="w"> </span>-ffreestanding<span class="w"> </span>-fno-stack-protector<span class="w"> </span>-fno-pic<span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-c<span class="w"> </span>001_kmain.c<span class="w"> </span>-o<span class="w"> </span>kmain.o
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>ld<span class="w"> </span>-m<span class="w"> </span>elf_i386<span class="w"> </span>-T<span class="w"> </span>001_linker.ld<span class="w"> </span>-o<span class="w"> </span>kernel.bin<span class="w"> </span>boot.o<span class="w"> </span>kmain.o
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>grub-file<span class="w"> </span>--is-x86-multiboot2<span class="w"> </span>kernel.bin
+</code></pre></div>
+<p><strong>Output (cloud sandbox -- real, live-executed build output):</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>=== nasm -f elf32 001_boot.asm -o boot.o ===
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>(no output = clean assemble)
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>=== gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c 001_kmain.c -o kmain.o ===
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>(no output = clean compile, zero warnings)
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>=== ld -m elf_i386 -T 001_linker.ld -o kernel.bin boot.o kmain.o ===
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>ld: warning: boot.o: missing .note.GNU-stack section implies executable stack
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>ld: warning: kernel.bin has a LOAD segment with RWX permissions
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>=== grub-file --is-x86-multiboot2 kernel.bin ===
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>kernel.bin: VALID Multiboot2 image
+</code></pre></div>
+<p><strong>[COMMON TRAP]</strong> Read that <code>ld</code> output again: two real warnings, not zero. <code>missing .note.GNU-stack section implies executable stack</code> and <code>kernel.bin has a LOAD segment with RWX permissions</code> are <code>ld</code> correctly noticing that this binary has no explicit stack-permission metadata and, as a direct result, ends up with one segment that is simultaneously readable, writable, and executable -- a genuine security anti-pattern <code>ld</code> is right to flag on any <em>ordinary</em> Linux binary. They are not bugs to silence with a flag: a freestanding, pre-paging kernel has no MMU-enforced page permissions to speak of yet regardless of what the ELF header claims, so these two warnings simply do not apply to what <code>kernel.bin</code> actually is at this stage. A later chapter, once this book has real paging, revisits this exact warning and gives <code>.text</code> genuinely non-writable, non-executable-<code>.data</code> protection for real -- worth remembering now, not silencing now.</p>
+<p>Turning the linked binary into something GRUB can actually boot means packing it into a bootable ISO alongside a <code>grub.cfg</code> GRUB reads at boot time, naming the exact same <code>kernel.bin</code> this chapter just linked:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>set timeout=0
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>set default=0
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>menuentry "Unix OS from Scratch -- Chapter 1" {
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    multiboot2 /boot/kernel.bin
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>    boot
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>}
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>isodir/boot/grub
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>cp<span class="w"> </span>kernel.bin<span class="w"> </span>isodir/boot/kernel.bin
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>cp<span class="w"> </span>grub.cfg<span class="w"> </span>isodir/boot/grub/grub.cfg
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>grub-mkrescue<span class="w"> </span>-o<span class="w"> </span>kernel.iso<span class="w"> </span>isodir
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>qemu-system-x86_64<span class="w"> </span>-cdrom<span class="w"> </span>kernel.iso<span class="w"> </span>-serial<span class="w"> </span>stdio<span class="w"> </span>-display<span class="w"> </span>none<span class="w"> </span>-no-reboot<span class="w"> </span>-m<span class="w"> </span>256M<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span>-device<span class="w"> </span>isa-debug-exit,iobase<span class="o">=</span>0xf4,iosize<span class="o">=</span>0x04
+</code></pre></div>
+<p><strong>Output (cloud sandbox -- real, live-executed boot output, QEMU 8.2.2):</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>=== qemu-system-x86_64 -cdrom kernel.iso -serial stdio -display none -no-reboot -m 256M -device isa-debug-exit,iobase=0xf4,iosize=0x04 ===
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>Unix OS from Scratch -- Chapter 1: kernel entry reached
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>multiboot2 + nasm + freestanding gcc + ld + qemu pipeline: OK
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>QEMU real exit code: 1
+</code></pre></div>
+<p>That <code>Unix OS from Scratch -- Chapter 1: kernel entry reached</code> line did not come from a print statement running under Linux, macOS, or any operating system at all -- it came from a real x86-64 CPU, real-emulated by QEMU down to actual instruction execution, running a kernel this chapter wrote, talking to a real (emulated) UART chip through raw I/O ports, with no operating system underneath it. <code>QEMU real exit code: 1</code> confirms <code>qemu_exit(0)</code> reached the end of <code>kmain</code> and QEMU's own <code>isa-debug-exit</code> device shut the machine down deterministically -- <code>(0 &lt;&lt; 1) | 1 = 1</code> -- rather than this chapter needing to kill a hung process to get its output back.</p>
+<h2 id="toolchain-and-verification-discipline-for-this-book">Toolchain and verification discipline for this book<a class="headerlink" href="#toolchain-and-verification-discipline-for-this-book" title="Permanent link">&para;</a></h2>
+<p>Bare-metal kernel development needs a real bootloader (GRUB), a real hardware emulator (QEMU), and a real assembler (NASM) working together with an ordinary freestanding-C toolchain -- confirmed, this session, on the cloud sandbox: QEMU 8.2.2, NASM 2.16.01, <code>grub-mkrescue</code>/<code>xorriso</code> 1.5.6 (GRUB 2.12), and <code>gcc</code>/<code>ld</code> (13.3.0/2.42) with <code>-m32 -ffreestanding</code> rather than a separate cross-compiler, since this book's own kernel targets x86, the same architecture the cloud sandbox itself already runs on. The connected device was checked directly, not assumed: it has <code>grub-mkrescue</code> but no <code>qemu-system-x86_64</code>, no <code>nasm</code>, and -- as this series' own sibling Hammer book already found in its own Appendix C -- no root access to install either (<code>sudo -n true</code> fails with the same real "no new privileges" error). That makes this book's own verification story different from every sibling book's CPU-vectorized chapters, and closer to Hammer's own CUDA backend or its Appendix C/D: every kernel this book builds is genuinely assembled, compiled, linked, and <em>booted</em> -- but only on the cloud sandbox. The device still receives and md5-verifies every source file this book commits, the same cross-machine discipline as always; it simply is not the machine doing the booting.</p>
+<h2 id="chapter-summary">Chapter summary<a class="headerlink" href="#chapter-summary" title="Permanent link">&para;</a></h2>
+<p>Booting a bare-metal kernel is a real, four-step handoff: BIOS/UEFI firmware to GRUB, GRUB to a hand-written 32-bit entry stub, that stub to the first C function this book wrote. This book does not reimplement the first two steps -- GRUB already does them correctly, for real hardware -- and instead relies on GRUB's one real contract, the Multiboot2 header, whose exact required fields (magic number, header length, a checksum that forces a 32-bit sum of zero, and a type-0/size-8 end tag) were quoted directly from GNU's own Multiboot2 Specification and checked field-by-field against this chapter's own <code>001_boot.asm</code>. The entry stub's only job is to establish a stack before calling into C, since none exists yet; the first C code has no <code>printf</code>, no heap, and no OS underneath it, so it talks to the COM1 UART directly through raw port I/O, and QEMU's own <code>-serial stdio</code> flag turns that into real, capturable, locked text output. The build itself surfaced two real, honest <code>ld</code> warnings about executable-stack and RWX-segment permissions -- correctly triggered, and correctly not yet fixable, since this kernel has no paging yet to enforce anything different. This book's own bare-metal work is cloud-sandbox-only going forward, a toolchain-availability limit confirmed directly on the connected device rather than assumed.</p>
+<h2 id="self-check-questions">Self-check questions<a class="headerlink" href="#self-check-questions" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Why does this book use GRUB and the Multiboot2 standard instead of writing its own bootloader from scratch, and what real machine-state guarantees does that choice buy <code>_start</code> for free?</li>
+<li>What three things does the Multiboot2 checksum field's value have to make true when added to <code>magic</code>, <code>architecture</code>, and <code>header_length</code> -- and why does <code>0x100000000 - x</code> compute exactly that?</li>
+<li>Why does <code>_start</code> have to set up a stack before it can safely <code>call kmain</code>, when an ordinary hosted C program never has to do this itself?</li>
+<li>Why does this chapter choose the COM1 serial port over the VGA text buffer for its very first kernel output, given this book's own discipline of locking exact, real output into every page?</li>
+<li>The <code>ld</code> build in this chapter produced two real warnings rather than a clean link. Why are they real and correct, and why does this chapter not silence them with a linker flag?</li>
+</ol>
+<p><strong>Worked answers</strong></p>
+<ol>
+<li>Writing a BIOS/UEFI-compatible bootloader means real-mode 16-bit assembly, A20-line handling, and a hand-rolled protected-mode switch -- a mostly separate skill from what an operating system itself does once running, and GRUB already solves it correctly for real hardware today. By the time GRUB jumps to <code>_start</code>, the CPU is already in 32-bit protected mode with a valid GDT, paging disabled, and interrupts disabled -- guarantees this book gets for free rather than having to establish itself.</li>
+<li>The sum of <code>magic + architecture + header_length + checksum</code> has to be exactly zero, modulo 2^32 (a "32-bit unsigned sum of zero," per the spec quoted in this chapter). <code>0x100000000</code> is <code>2^32</code>; subtracting <code>x</code> (the sum of the other three fields) from it and adding that result back to <code>x</code> always produces exactly <code>2^32</code>, which truncates to <code>0</code> in 32-bit unsigned arithmetic -- exactly the required sum, computed once by the assembler at build time.</li>
+<li>A hosted C program's stack is set up by the OS and its C runtime (<code>_start</code> in glibc, long before <code>main</code> runs) before any of the programmer's own code executes. This book's own <code>_start</code> runs the instant GRUB hands off control, with <code>esp</code> left at whatever value GRUB happened to leave it -- not a safe place to build a call frame -- so <code>_start</code> has to point <code>esp</code> at real, reserved memory (<code>stack_top</code>, in <code>.bss</code>) itself before <code>call kmain</code> can work at all.</li>
+<li>The VGA text buffer would require a screenshot of QEMU's virtual monitor to verify, which cannot be locked into this page as exact, checkable text the way this book's sibling series always has. QEMU's <code>-serial stdio</code> flag turns the COM1 UART's real output into plain terminal text instead, letting this chapter capture and lock in the kernel's exact real output, byte for byte, the same discipline the rest of this book's own series follows.</li>
+<li><code>missing .note.GNU-stack section</code> and <code>LOAD segment with RWX permissions</code> are <code>ld</code> correctly noticing that this binary has no stack-permission metadata and ends up with one segment that is readable, writable, and executable at once -- a real anti-pattern on an ordinary Linux binary. But this kernel has no paging yet, so there is no MMU-enforced page-permission system for those ELF-level flags to actually control regardless of what they claim; silencing the warning would hide a real signal without fixing anything, since the actual fix (real, enforced page permissions) does not exist until a later chapter builds paging.</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../../getting-started/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Getting Started">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Getting Started
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../part2/02-vga-text-mode-output-a-real-screen-driver/" class="md-footer__link md-footer__link--next" aria-label="Next: 2. VGA Text-Mode Output">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                2. VGA Text-Mode Output
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 Oluwaseyi Awoga
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
