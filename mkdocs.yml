@@ -102,6 +102,7 @@ nav:
       - "32. A Real NACHA ACH Batch: P2P Group-Expense Splitting": part32/32-a-real-nacha-ach-p2p-split.md
       - "33. A Real \"Pay in 4\" BNPL Checkout: Regulation Z APR and an ISO 8583 Authorization": part33/33-a-real-pay-in-4-bnpl-checkout.md
       - "34. An Insurance Comparison App: Quote Aggregation Across Carriers, in ACORD XML": part34/34-an-insurance-comparison-app.md
+      - "35. A Micro-Investing / Robo-Advisor App: Round-Up Investing, Real FIX 4.4 Orders": part35/35-a-micro-investing-robo-advisor-app.md
 
 extra:
   social: []
