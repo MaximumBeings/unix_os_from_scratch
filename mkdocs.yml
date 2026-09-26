@@ -99,6 +99,7 @@ nav:
       - "29. A Real ARP Cache: Completing RFC 826's Own Merge_flag Logic": part29/29-a-real-arp-cache.md
       - "30. A Real Fedwire-Style Wire Transfer: AES-128, SHA-256, and HMAC From Scratch": part30/30-a-real-fedwire-style-wire-transfer.md
       - "31. A Real ARP Server: Answering Requests About This Kernel's Own Address": part31/31-a-real-arp-server.md
+      - "32. A Real NACHA ACH Batch: P2P Group-Expense Splitting": part32/32-a-real-nacha-ach-p2p-split.md
 
 extra:
   social: []
