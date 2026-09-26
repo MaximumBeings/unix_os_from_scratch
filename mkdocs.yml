@@ -104,6 +104,7 @@ nav:
       - "34. An Insurance Comparison App: Quote Aggregation Across Carriers, in ACORD XML": part34/34-an-insurance-comparison-app.md
       - "35. A Micro-Investing / Robo-Advisor App: Round-Up Investing, Real FIX 4.4 Orders": part35/35-a-micro-investing-robo-advisor-app.md
       - "36. A Personal Budgeting / Cash-Flow Tracker: Real OFX, Automatic Categorization, and a Cash-Flow-Gap Forecast": part36/36-a-personal-budgeting-cash-flow-tracker.md
+      - "37. A Video-Streaming / Media-Delivery App: Real HTTP Range Requests and a Real Adaptive-Bitrate HLS Manifest": part37/37-a-video-streaming-media-delivery-app.md
 
 extra:
   social: []
