@@ -101,6 +101,7 @@ nav:
       - "31. A Real ARP Server: Answering Requests About This Kernel's Own Address": part31/31-a-real-arp-server.md
       - "32. A Real NACHA ACH Batch: P2P Group-Expense Splitting": part32/32-a-real-nacha-ach-p2p-split.md
       - "33. A Real \"Pay in 4\" BNPL Checkout: Regulation Z APR and an ISO 8583 Authorization": part33/33-a-real-pay-in-4-bnpl-checkout.md
+      - "34. An Insurance Comparison App: Quote Aggregation Across Carriers, in ACORD XML": part34/34-an-insurance-comparison-app.md
 
 extra:
   social: []
