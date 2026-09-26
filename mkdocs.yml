@@ -98,6 +98,7 @@ nav:
       - "28. Address Resolution Protocol: A Real ARP Request/Reply Over a Real Wire": part28/28-address-resolution-protocol.md
       - "29. A Real ARP Cache: Completing RFC 826's Own Merge_flag Logic": part29/29-a-real-arp-cache.md
       - "30. A Real Fedwire-Style Wire Transfer: AES-128, SHA-256, and HMAC From Scratch": part30/30-a-real-fedwire-style-wire-transfer.md
+      - "31. A Real ARP Server: Answering Requests About This Kernel's Own Address": part31/31-a-real-arp-server.md
 
 extra:
   social: []
