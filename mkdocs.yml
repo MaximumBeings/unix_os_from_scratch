@@ -107,6 +107,7 @@ nav:
       - "37. A Video-Streaming / Media-Delivery App: Real HTTP Range Requests and a Real Adaptive-Bitrate HLS Manifest": part37/37-a-video-streaming-media-delivery-app.md
       - "38. An ATM System: Real ISO 8583 Withdrawals, a Real ISO 9564-1 PIN Block, and Cash-Dispense Sequencing": part38/38-an-atm-system.md
       - "39. POS (Point-of-Sale) and Smart Terminals: A Real EMV Contact Chip Transaction": part39/39-pos-point-of-sale-and-smart-terminals.md
+      - "40. Billing & Payment Systems: A Real Subscription Billing Engine": part40/40-billing-and-payment-systems.md
 
 extra:
   social: []
