@@ -112,6 +112,7 @@ nav:
       - "42. Sports Ticket Aggregation: A Real GS1 Ticket Identifier and a Rotating Anti-Fraud Barcode": part42/42-sports-ticket-aggregation.md
       - "43. Betting Systems: Real Odds Formats and a Real Betfair Exchange API Shape": part43/43-betting-systems.md
       - "44. Car Rental: A Real OTA Vehicle Availability and Reservation Codec": part44/44-car-rental.md
+      - "45. A Minimal IP Layer: Real IPv4 and a Real ICMP Echo (Ping)": part45/45-minimal-ip-layer.md
 
 extra:
   social: []
