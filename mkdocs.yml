@@ -110,6 +110,7 @@ nav:
       - "40. Billing & Payment Systems: A Real Subscription Billing Engine": part40/40-billing-and-payment-systems.md
       - "41. Flight Ticket Aggregation: A Real OTA Multi-Carrier Fare Search": part41/41-flight-ticket-aggregation.md
       - "42. Sports Ticket Aggregation: A Real GS1 Ticket Identifier and a Rotating Anti-Fraud Barcode": part42/42-sports-ticket-aggregation.md
+      - "43. Betting Systems: Real Odds Formats and a Real Betfair Exchange API Shape": part43/43-betting-systems.md
 
 extra:
   social: []
