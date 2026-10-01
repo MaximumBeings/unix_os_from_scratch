@@ -98,6 +98,28 @@ pp->x = 5;     // "pp->x" is shorthand for "(*pp).x" -- the real, idiomatic way
                // to access a struct field through a pointer to it
 ```
 
+**Which one came first, historically:** `(*pp).x` is the logically prior form, and it's worth understanding *why* it has to be written with those parentheses before `->` is introduced at all. `.` binds tighter than (is evaluated before) unary `*`, so `*pp.x` — no parentheses — would parse as `*(pp.x)`: "dereference whatever `pp.x` is," which is nonsense here, since `pp` is a pointer, not a struct, and has no field named `x` to begin with. The parentheses in `(*pp).x` are there to force the real, intended order: dereference `pp` *first* (producing the actual `struct point`), *then* access its `.x` field. `->` was added directly to the language specifically to remove that awkward, error-prone parenthesization for what is, in real C code, an extremely common operation — accessing a field through a pointer is closer to the *normal* case than the exception, once code is built out of functions that take pointers to structs rather than whole structs by value (passing a whole struct by value means copying every one of its own bytes onto the stack on every single call; passing a pointer copies only one address, regardless of how large the struct itself is — exactly why this book's own functions, like every real C function working with structs, almost always take a pointer). `pp->x` is not a different, newer *feature* so much as real, deliberate syntactic relief for the single most common real use of `(*pp).x` — and both forms still compile to the exact same real machine code today; `->` buys nothing at runtime, only at the keyboard.
+
+This equivalence holds exactly the same way through an array of structs, tying this section directly back to Section 5's own pointer arithmetic:
+
+```c
+struct point pts[3] = { {1, 2}, {3, 4}, {5, 6} };
+struct point *pp = pts;   // arrays decay to a pointer here too (Section 5)
+
+printf("%d\n", (*pp).x);        // 1
+printf("%d\n", pp->x);           // 1 -- identical
+printf("%d\n", pts[0].x);         // 1 -- also identical: pts[0] IS *(pts + 0)
+
+printf("%d\n", (*(pp + 1)).y);    // 4
+printf("%d\n", (pp + 1)->y);       // 4 -- identical (note: "pp + 1 -> y" with no
+                                   // parentheses would be a real syntax error --
+                                   // -> binds to its own immediate left operand,
+                                   // not to the whole "pp + 1" expression)
+printf("%d\n", pts[1].y);          // 4 -- also identical
+```
+
+Every one of those six lines reads the exact same real bytes — `pts[1]`'s own real address is computed identically whether you write it as array indexing, as pointer-arithmetic-plus-dereference, or (via `->`) as pointer-arithmetic-plus-member-access; they are not three competing features, but three different surface spellings of the one real underlying mechanism Section 5 already described.
+
 Every struct field is laid out in memory in declaration order, though the compiler is free to insert **padding** bytes between fields to satisfy each field's own natural alignment requirement (a 4-byte `uint32_t` field, for instance, is conventionally placed at an address that is itself a multiple of 4) — which matters enormously the moment a struct's own byte layout has to match something real and external, like a network header or an IDT entry, rather than only being used internally. This book's own code handles that with GCC's `__attribute__((packed))`, which tells the compiler "lay this struct out with *no* padding at all, fields exactly adjacent, exactly in declaration order" — visible directly in `046_idt.c`'s own real IDT entry struct:
 
 ```c
