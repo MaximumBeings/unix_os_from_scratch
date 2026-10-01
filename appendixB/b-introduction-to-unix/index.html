@@ -13,28 +13,28 @@
       
       
       
-        <link rel="prev" href="..">
+        <link rel="prev" href="../../appendixA/a-introduction-to-assembly/">
       
       
-        <link rel="next" href="../part1/01-booting-a-multiboot2-kernel-from-power-on-to-kernel-entry/">
+        <link rel="next" href="../../appendixC/c-introduction-to-c/">
       
       
         
       
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
-        <title>Getting Started - Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development</title>
+        <title>Appendix B. Introduction to Unix - Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -53,9 +53,9 @@
       
     
     
-      <link rel="stylesheet" href="../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#getting-started" class="md-skip">
+        <a href="#appendix-b-introduction-to-unix" class="md-skip">
           Skip to content
         </a>
       
@@ -96,7 +96,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" class="md-header__button md-logo" aria-label="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" data-md-component="logo">
+    <a href="../.." title="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" class="md-header__button md-logo" aria-label="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 19V7H4v12zm0-16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm-7 14v-2h5v2zm-3.42-4L5.57 9H8.4l3.3 3.3c.39.39.39 1.03 0 1.42L8.42 17H5.59z"/></svg>
@@ -116,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Getting Started
+              Appendix B. Introduction to Unix
             
           </span>
         </div>
@@ -222,7 +222,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" class="md-nav__button md-logo" aria-label="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" data-md-component="logo">
+    <a href="../.." title="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" class="md-nav__button md-logo" aria-label="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 19V7H4v12zm0-16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm-7 14v-2h5v2zm-3.42-4L5.57 9H8.4l3.3 3.3c.39.39.39 1.03 0 1.42L8.42 17H5.59z"/></svg>
@@ -240,7 +240,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -264,37 +264,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Getting Started
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
         
   
   
@@ -310,70 +283,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#installing-a-toolchain" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Installing a toolchain
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#the-honesty-discipline-this-book-follows" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The honesty discipline this book follows
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#compile-line-conventions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Compile-line conventions
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Prerequisites
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -439,7 +348,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part1/01-booting-a-multiboot2-kernel-from-power-on-to-kernel-entry/" class="md-nav__link">
+      <a href="../../part1/01-booting-a-multiboot2-kernel-from-power-on-to-kernel-entry/" class="md-nav__link">
         
   
   
@@ -528,7 +437,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part2/02-vga-text-mode-output-a-real-screen-driver/" class="md-nav__link">
+      <a href="../../part2/02-vga-text-mode-output-a-real-screen-driver/" class="md-nav__link">
         
   
   
@@ -617,7 +526,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part3/03-a-real-gdt-and-a-kernel-printf/" class="md-nav__link">
+      <a href="../../part3/03-a-real-gdt-and-a-kernel-printf/" class="md-nav__link">
         
   
   
@@ -645,7 +554,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part4/04-interrupts-the-idt-and-a-first-real-isr/" class="md-nav__link">
+      <a href="../../part4/04-interrupts-the-idt-and-a-first-real-isr/" class="md-nav__link">
         
   
   
@@ -734,7 +643,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part5/05-ps2-keyboard-input-via-a-real-hardware-irq/" class="md-nav__link">
+      <a href="../../part5/05-ps2-keyboard-input-via-a-real-hardware-irq/" class="md-nav__link">
         
   
   
@@ -762,7 +671,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part6/06-the-pit-timer-and-a-real-tick-counter/" class="md-nav__link">
+      <a href="../../part6/06-the-pit-timer-and-a-real-tick-counter/" class="md-nav__link">
         
   
   
@@ -851,7 +760,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part7/07-physical-memory-the-multiboot2-memory-map-and-a-real-frame-allocator/" class="md-nav__link">
+      <a href="../../part7/07-physical-memory-the-multiboot2-memory-map-and-a-real-frame-allocator/" class="md-nav__link">
         
   
   
@@ -879,7 +788,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part8/08-paging-enabling-virtual-memory/" class="md-nav__link">
+      <a href="../../part8/08-paging-enabling-virtual-memory/" class="md-nav__link">
         
   
   
@@ -907,7 +816,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part9/09-a-kernel-heap-real-dynamic-memory-with-kmalloc-kfree/" class="md-nav__link">
+      <a href="../../part9/09-a-kernel-heap-real-dynamic-memory-with-kmalloc-kfree/" class="md-nav__link">
         
   
   
@@ -935,7 +844,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part10/10-page-fault-handling-a-real-isr14/" class="md-nav__link">
+      <a href="../../part10/10-page-fault-handling-a-real-isr14/" class="md-nav__link">
         
   
   
@@ -1024,7 +933,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part11/11-kernel-level-multitasking-cooperative-task-switching/" class="md-nav__link">
+      <a href="../../part11/11-kernel-level-multitasking-cooperative-task-switching/" class="md-nav__link">
         
   
   
@@ -1052,7 +961,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part12/12-preemptive-multitasking-letting-the-timer-decide/" class="md-nav__link">
+      <a href="../../part12/12-preemptive-multitasking-letting-the-timer-decide/" class="md-nav__link">
         
   
   
@@ -1080,7 +989,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part13/13-synchronization-primitives-spinlocks/" class="md-nav__link">
+      <a href="../../part13/13-synchronization-primitives-spinlocks/" class="md-nav__link">
         
   
   
@@ -1108,7 +1017,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part14/14-blocking-synchronization-semaphores-and-sleep-wake/" class="md-nav__link">
+      <a href="../../part14/14-blocking-synchronization-semaphores-and-sleep-wake/" class="md-nav__link">
         
   
   
@@ -1197,7 +1106,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part15/15-user-mode-ring-3-tss-and-a-first-system-call/" class="md-nav__link">
+      <a href="../../part15/15-user-mode-ring-3-tss-and-a-first-system-call/" class="md-nav__link">
         
   
   
@@ -1225,7 +1134,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part16/16-real-ring-3-tasks-in-the-scheduler/" class="md-nav__link">
+      <a href="../../part16/16-real-ring-3-tasks-in-the-scheduler/" class="md-nav__link">
         
   
   
@@ -1253,7 +1162,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part17/17-per-process-address-spaces/" class="md-nav__link">
+      <a href="../../part17/17-per-process-address-spaces/" class="md-nav__link">
         
   
   
@@ -1281,7 +1190,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part18/18-loading-a-real-elf-binary/" class="md-nav__link">
+      <a href="../../part18/18-loading-a-real-elf-binary/" class="md-nav__link">
         
   
   
@@ -1309,7 +1218,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part19/19-a-real-disk-driver-ata-pio-mode/" class="md-nav__link">
+      <a href="../../part19/19-a-real-disk-driver-ata-pio-mode/" class="md-nav__link">
         
   
   
@@ -1337,7 +1246,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part20/20-a-real-filesystem-fat16/" class="md-nav__link">
+      <a href="../../part20/20-a-real-filesystem-fat16/" class="md-nav__link">
         
   
   
@@ -1365,7 +1274,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part21/21-real-subdirectories-fat16/" class="md-nav__link">
+      <a href="../../part21/21-real-subdirectories-fat16/" class="md-nav__link">
         
   
   
@@ -1393,7 +1302,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part22/22-removing-real-subdirectories-fat16/" class="md-nav__link">
+      <a href="../../part22/22-removing-real-subdirectories-fat16/" class="md-nav__link">
         
   
   
@@ -1421,7 +1330,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part23/23-recursive-multi-level-paths-fat16/" class="md-nav__link">
+      <a href="../../part23/23-recursive-multi-level-paths-fat16/" class="md-nav__link">
         
   
   
@@ -1449,7 +1358,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part24/24-pci-bus-enumeration/" class="md-nav__link">
+      <a href="../../part24/24-pci-bus-enumeration/" class="md-nav__link">
         
   
   
@@ -1477,7 +1386,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part25/25-rtl8139-driver/" class="md-nav__link">
+      <a href="../../part25/25-rtl8139-driver/" class="md-nav__link">
         
   
   
@@ -1505,7 +1414,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part26/26-interrupt-driven-rtl8139/" class="md-nav__link">
+      <a href="../../part26/26-interrupt-driven-rtl8139/" class="md-nav__link">
         
   
   
@@ -1533,7 +1442,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part27/27-multi-frame-rtl8139/" class="md-nav__link">
+      <a href="../../part27/27-multi-frame-rtl8139/" class="md-nav__link">
         
   
   
@@ -1561,7 +1470,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part28/28-address-resolution-protocol/" class="md-nav__link">
+      <a href="../../part28/28-address-resolution-protocol/" class="md-nav__link">
         
   
   
@@ -1589,7 +1498,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part29/29-a-real-arp-cache/" class="md-nav__link">
+      <a href="../../part29/29-a-real-arp-cache/" class="md-nav__link">
         
   
   
@@ -1617,7 +1526,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part30/30-a-real-fedwire-style-wire-transfer/" class="md-nav__link">
+      <a href="../../part30/30-a-real-fedwire-style-wire-transfer/" class="md-nav__link">
         
   
   
@@ -1645,7 +1554,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part31/31-a-real-arp-server/" class="md-nav__link">
+      <a href="../../part31/31-a-real-arp-server/" class="md-nav__link">
         
   
   
@@ -1673,7 +1582,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part32/32-a-real-nacha-ach-p2p-split/" class="md-nav__link">
+      <a href="../../part32/32-a-real-nacha-ach-p2p-split/" class="md-nav__link">
         
   
   
@@ -1701,7 +1610,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part33/33-a-real-pay-in-4-bnpl-checkout/" class="md-nav__link">
+      <a href="../../part33/33-a-real-pay-in-4-bnpl-checkout/" class="md-nav__link">
         
   
   
@@ -1729,7 +1638,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part34/34-an-insurance-comparison-app/" class="md-nav__link">
+      <a href="../../part34/34-an-insurance-comparison-app/" class="md-nav__link">
         
   
   
@@ -1757,7 +1666,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part35/35-a-micro-investing-robo-advisor-app/" class="md-nav__link">
+      <a href="../../part35/35-a-micro-investing-robo-advisor-app/" class="md-nav__link">
         
   
   
@@ -1785,7 +1694,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part36/36-a-personal-budgeting-cash-flow-tracker/" class="md-nav__link">
+      <a href="../../part36/36-a-personal-budgeting-cash-flow-tracker/" class="md-nav__link">
         
   
   
@@ -1813,7 +1722,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part37/37-a-video-streaming-media-delivery-app/" class="md-nav__link">
+      <a href="../../part37/37-a-video-streaming-media-delivery-app/" class="md-nav__link">
         
   
   
@@ -1841,7 +1750,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part38/38-an-atm-system/" class="md-nav__link">
+      <a href="../../part38/38-an-atm-system/" class="md-nav__link">
         
   
   
@@ -1869,7 +1778,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part39/39-pos-point-of-sale-and-smart-terminals/" class="md-nav__link">
+      <a href="../../part39/39-pos-point-of-sale-and-smart-terminals/" class="md-nav__link">
         
   
   
@@ -1897,7 +1806,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part40/40-billing-and-payment-systems/" class="md-nav__link">
+      <a href="../../part40/40-billing-and-payment-systems/" class="md-nav__link">
         
   
   
@@ -1925,7 +1834,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part41/41-flight-ticket-aggregation/" class="md-nav__link">
+      <a href="../../part41/41-flight-ticket-aggregation/" class="md-nav__link">
         
   
   
@@ -1953,7 +1862,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part42/42-sports-ticket-aggregation/" class="md-nav__link">
+      <a href="../../part42/42-sports-ticket-aggregation/" class="md-nav__link">
         
   
   
@@ -1981,7 +1890,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part43/43-betting-systems/" class="md-nav__link">
+      <a href="../../part43/43-betting-systems/" class="md-nav__link">
         
   
   
@@ -2009,7 +1918,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part44/44-car-rental/" class="md-nav__link">
+      <a href="../../part44/44-car-rental/" class="md-nav__link">
         
   
   
@@ -2037,7 +1946,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part45/45-minimal-ip-layer/" class="md-nav__link">
+      <a href="../../part45/45-minimal-ip-layer/" class="md-nav__link">
         
   
   
@@ -2065,7 +1974,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../part46/46-dynamic-idt-gate-installation/" class="md-nav__link">
+      <a href="../../part46/46-dynamic-idt-gate-installation/" class="md-nav__link">
         
   
   
@@ -2097,8 +2006,10 @@
       
   
   
+    
   
   
+  
     
     
     
@@ -2109,13 +2020,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" checked>
         
           
           <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="">
@@ -2136,7 +2045,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_10">
             <span class="md-nav__icon md-icon"></span>
             
@@ -2154,7 +2063,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../appendixA/a-introduction-to-assembly/" class="md-nav__link">
+      <a href="../../appendixA/a-introduction-to-assembly/" class="md-nav__link">
         
   
   
@@ -2179,10 +2088,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../appendixB/b-introduction-to-unix/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix B. Introduction to Unix
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -2198,6 +2134,125 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-where-unix-came-from" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Where Unix came from
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-the-unix-philosophy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. The Unix philosophy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-the-kernel-user-space-split" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. The kernel / user-space split
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-processes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Processes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-files-inodes-and-the-filesystem-tree" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Files, inodes, and the filesystem tree
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-permissions-and-the-multi-user-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Permissions and the multi-user model
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-the-shell" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. The shell
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-what-unix-like-means-for-this-book-specifically" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. What "Unix-like" means for this book specifically
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -2210,7 +2265,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../appendixC/c-introduction-to-c/" class="md-nav__link">
+      <a href="../../appendixC/c-introduction-to-c/" class="md-nav__link">
         
   
   
@@ -2238,7 +2293,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../appendixD/d-self-check-answers/" class="md-nav__link">
+      <a href="../../appendixD/d-self-check-answers/" class="md-nav__link">
         
   
   
@@ -2293,10 +2348,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#installing-a-toolchain" class="md-nav__link">
+  <a href="#1-where-unix-came-from" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installing a toolchain
+        1. Where Unix came from
       
     </span>
   </a>
@@ -2304,10 +2359,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-honesty-discipline-this-book-follows" class="md-nav__link">
+  <a href="#2-the-unix-philosophy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The honesty discipline this book follows
+        2. The Unix philosophy
       
     </span>
   </a>
@@ -2315,10 +2370,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#compile-line-conventions" class="md-nav__link">
+  <a href="#3-the-kernel-user-space-split" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Compile-line conventions
+        3. The kernel / user-space split
       
     </span>
   </a>
@@ -2326,10 +2381,65 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
+  <a href="#4-processes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Prerequisites
+        4. Processes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-files-inodes-and-the-filesystem-tree" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Files, inodes, and the filesystem tree
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-permissions-and-the-multi-user-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Permissions and the multi-user model
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-the-shell" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. The shell
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-what-unix-like-means-for-this-book-specifically" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. What "Unix-like" means for this book specifically
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further reading
       
     </span>
   </a>
@@ -2353,34 +2463,49 @@
 
 
 
-<h1 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h1>
-<p>This book builds a bare-metal, x86-64-targeted, Unix-family-inspired kernel in C, assembled and linked with an ordinary freestanding toolchain -- no separate cross-compiler is needed, since this book's own kernel targets the same architecture (x86-64/i386-compatible) its cloud authoring machine already runs on. Booting is real: every kernel this book builds is packed into a bootable ISO with GRUB and genuinely booted in QEMU, a real, complete x86 hardware emulator -- not a simulator that approximates behavior, an emulator that actually executes the compiled machine code.</p>
-<h2 id="installing-a-toolchain">Installing a toolchain<a class="headerlink" href="#installing-a-toolchain" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>nasm<span class="w"> </span>-v<span class="w">                    </span><span class="c1"># x86 assembler, needed from Chapter 1 onward</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>gcc<span class="w"> </span>--version<span class="w">               </span><span class="c1"># freestanding C compiler (-ffreestanding), needed from Chapter 1 onward</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>ld<span class="w"> </span>--version<span class="w">                 </span><span class="c1"># linker, needed from Chapter 1 onward</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>grub-mkrescue<span class="w"> </span>--version<span class="w">     </span><span class="c1"># builds a bootable ISO from a Multiboot2 kernel</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>qemu-system-x86_64<span class="w"> </span>--version<span class="w"> </span><span class="c1"># boots that ISO for real</span>
-</code></pre></div>
-<p>On Debian/Ubuntu, all five come from <code>apt-get install nasm build-essential qemu-system-x86 grub-pc-bin grub-common xorriso mtools</code>. <code>gcc</code>/<code>ld</code> are used with <code>-m32 -ffreestanding</code> rather than a dedicated cross-compiler; this works because a freestanding kernel needs no host operating system's headers or runtime, and an ordinary Linux <code>gcc</code> can already emit i386/x86-64 machine code directly.</p>
-<h2 id="the-honesty-discipline-this-book-follows">The honesty discipline this book follows<a class="headerlink" href="#the-honesty-discipline-this-book-follows" title="Permanent link">&para;</a></h2>
-<p>This book's own two authoring machines, confirmed directly rather than assumed: a cloud sandbox (x86_64, with a real, working <code>nasm</code>/<code>gcc</code>/<code>ld</code>/<code>grub-mkrescue</code>/<code>qemu-system-x86_64</code> toolchain, all version-checked in Chapter 1) and a connected device (an aarch64 macOS-hosted Linux VM, with <code>gcc</code> and <code>grub-mkrescue</code> but <strong>no</strong> <code>nasm</code> and <strong>no</strong> <code>qemu-system-x86_64</code> at all -- and no root access to install either, checked directly with <code>which</code>/<code>sudo -n true</code>, not assumed). The gap runs deeper than those two missing tools: the device's own <code>gcc</code> targets aarch64 and genuinely rejects <code>-m32</code> outright (<code>gcc: error: unrecognized command-line option '-m32'</code>, confirmed directly), so even this book's freestanding <strong>C compile step</strong> cannot run there, not only the assembly and boot steps -- an architecture-target mismatch, not a missing-package one, and not fixable by installing anything. That means, unlike a book whose real hardware-facing work can be cross-verified on two different real machines, every real build-and-boot step in this book happens on the cloud sandbox only:</p>
+<h1 id="appendix-b-introduction-to-unix">Appendix B. Introduction to Unix<a class="headerlink" href="#appendix-b-introduction-to-unix" title="Permanent link">&para;</a></h1>
+<p>This book is called "Unix OS from Scratch," and almost every chapter builds some piece of what "Unix" actually means as a concrete, running system — processes, files, system calls, a shell-reachable filesystem — without ever pausing to lay out what Unix <em>is</em>, where it came from, or why its own ideas turned out to be worth rebuilding four decades later. This appendix is that pause.</p>
+<h2 id="1-where-unix-came-from">1. Where Unix came from<a class="headerlink" href="#1-where-unix-came-from" title="Permanent link">&para;</a></h2>
+<p>Unix began in 1969 at Bell Labs, written by Ken Thompson and Dennis Ritchie (joined soon after by many others, including Brian Kernighan, Doug McIlroy, and Rob Pike), after Bell Labs withdrew from the much larger, more ambitious Multics project. Multics aimed to be an all-encompassing, feature-complete timesharing system; Unix, deliberately, was almost its opposite — a small team's own reaction against that complexity, built first in assembly on a spare PDP-7, then rewritten in 1973 in a new, still-young language, C, designed by Ritchie specifically to make that rewrite practical.</p>
+<p>Rewriting the kernel itself in a high-level language was, at the time, a genuinely radical choice — operating systems were assumed to need assembly for both speed and direct hardware access. That choice is exactly why Unix could be <em>ported</em> at all: a C compiler targeting a new machine, plus a comparatively small amount of per-architecture assembly (boot code, interrupt handling, context switching — precisely the parts Appendix A covers, and precisely the parts of this book's own kernel still written in assembly), was enough to bring Unix to a new architecture, instead of rewriting the entire system by hand each time.</p>
+<p>AT&amp;T, under a 1956 antitrust consent decree, was barred from selling software commercially — so through the 1970s it licensed Unix's own source code to universities essentially at cost, most consequentially to the University of California, Berkeley, whose own Computer Systems Research Group built the Berkeley Software Distribution (BSD), adding (among much else) the real virtual memory and TCP/IP networking stack that became the template nearly every subsequent networked operating system — including, indirectly, this book's own ARP/IP/ICMP chapters' own conceptual model of what a network stack's job even is — would follow. That licensing arrangement, and the two resulting lineages (AT&amp;T's own commercial System V, and the BSD line) is the root of Unix's own, famously fragmented family tree, and the direct reason "Unix" today names a <em>style of system design</em> far more than it names one specific codebase.</p>
+<p><strong>POSIX</strong> (Portable Operating System Interface), standardized by IEEE starting in 1988, is the real attempt to write down, formally, what every one of those divergent Unix-like systems actually had to agree on to call themselves compatible — the real specification for things like <code>fork()</code>, <code>open()</code>, <code>read()</code>/<code>write()</code>, and the exit-status conventions this book's own later chapters assume without ever stating as a formal requirement. <strong>Linux</strong> (Linus Torvalds, 1991) and the various BSDs are both Unix-like, POSIX-influenced systems that are not derived from AT&amp;T's own original source code at all — clean, independent reimplementations of the same real ideas, the same relationship this book's own kernel has to the real Unix systems it draws its own design from.</p>
+<h2 id="2-the-unix-philosophy">2. The Unix philosophy<a class="headerlink" href="#2-the-unix-philosophy" title="Permanent link">&para;</a></h2>
+<p>Doug McIlroy's own, often-quoted summary, from the Bell Labs internal memo introducing the Unix philosophy, captures the real design stance better than any longer explanation: "Write programs that do one thing and do it well. Write programs to work together. Write programs to handle text streams, because that is a universal interface."</p>
+<p>Three real, concrete consequences of that stance, each one directly visible in what this book's own kernel actually builds:</p>
 <ul>
-<li><strong>Assembly, compilation, and linking</strong> (NASM, <code>gcc -ffreestanding</code>, <code>ld</code>) happen for real, and their exact real output -- including real linker warnings, when <code>ld</code> produces them -- is captured and locked into the page unedited.</li>
-<li><strong>Booting</strong> happens for real, in QEMU, a genuine x86 hardware emulator that executes the compiled machine code rather than approximating it; this book's kernels talk to real (emulated) hardware devices -- the serial UART first, more later -- through the same I/O-port instructions a real physical machine would use.</li>
-<li><strong>Cross-machine verification</strong>, this book's sibling series' own standing discipline, still applies wherever it can: every source file this book commits is still sent to the connected device and verified byte-identical via md5sum, the same as every sibling book. What differs is that the device is not the machine doing the booting, a toolchain-availability limit confirmed directly (not assumed) the same way this author's Hammer compiler book found for its own Appendix C/D.</li>
-<li><strong>Real facts this book states about x86 architecture, the Multiboot2 standard, or any other real specification</strong> are cited to that specification's own real, current documentation, quoted directly rather than paraphrased from memory wherever a direct quote is practical.</li>
+<li><strong>"Everything is a file."</strong> A real Unix kernel exposes an enormous range of genuinely different things — ordinary data, a directory, a terminal, a device, (on Linux) even kernel-internal state via <code>/proc</code> — through one single, small interface: <code>open()</code>, <code>read()</code>, <code>write()</code>, <code>close()</code>. A program doesn't need a different API for a disk file versus a keyboard versus a network socket; it needs one API, applied to many different real things behind it. This book's own kernel does not go that far (its own <code>fat16_read()</code>/<code>fat16_write()</code> are specific to one real filesystem, not a general VFS layer), but the <em>reason</em> its FAT16 work (Chapters 20-23) matters at all — giving a program a name-based, uniform way to reach data, rather than a raw LBA sector number — is the same real idea in miniature.</li>
+<li><strong>Small, composable tools over one large program.</strong> A real Unix shell lets <code>cat file | grep pattern | sort</code> chain three genuinely separate, independently-written programs into one pipeline, each one doing a single, well-defined job and knowing nothing about the other two. This book's own kernel does not yet have pipes or multiple user-space programs cooperating this way (Chapter 18's own ELF loader runs exactly one), but the discipline behind each of this book's own individual chapters — one driver, one subsystem, one real, narrow job, building on what came before rather than growing one monolithic function — is the same real design instinct scaled down to source files instead of running programs.</li>
+<li><strong>Plain text as the default interchange format</strong>, wherever a binary format isn't specifically required — which is exactly why so many of this book's own real-world protocols (ISO 8583's text-coded data elements, OFX, FIX, XML-based formats like ACORD and OTA) are text, not binary, despite the real performance cost: a human being can read, debug, and reason about them directly, the same real tradeoff Unix itself made deliberately, over and over, since 1969.</li>
 </ul>
-<p>Every chapter states which of the above applies to its own code, so nothing is left for a reader to guess about how a claim in this book was actually established.</p>
-<h2 id="compile-line-conventions">Compile-line conventions<a class="headerlink" href="#compile-line-conventions" title="Permanent link">&para;</a></h2>
+<h2 id="3-the-kernel-user-space-split">3. The kernel / user-space split<a class="headerlink" href="#3-the-kernel-user-space-split" title="Permanent link">&para;</a></h2>
+<p>A Unix-like system draws one real, hardware-enforced line between two worlds: the <strong>kernel</strong>, which runs with full access to the machine (every instruction, every physical address, direct control of every device), and <strong>user space</strong>, where ordinary programs run with the hardware itself preventing them from touching anything the kernel hasn't explicitly allowed.</p>
+<p>On x86, that line is <strong>privilege rings</strong> (Chapter 15's own real subject): ring 0 for the kernel, ring 3 for user programs (rings 1-2 exist in the architecture but essentially no real OS uses them). The CPU itself — not a software convention, not a gentleman's agreement — refuses to execute certain instructions (<code>cli</code>, <code>hlt</code>, writing to certain control registers) and refuses certain memory accesses at all, the instant code running in ring 3 attempts them. This is not a performance optimization; it is the entire real reason a buggy or malicious user program cannot simply crash or compromise the whole machine.</p>
+<p>A user-space program that needs the kernel to do something on its behalf — read a file, allocate memory, write to the screen — cannot just call a kernel function directly; ring 3 code cannot even see where the kernel's own functions live in memory in general, let alone call into ring 0 safely. It issues a <strong>system call</strong>: a deliberate, controlled transition from ring 3 to ring 0, through exactly one narrow, kernel-defined door, at exactly one kernel-defined address, with the kernel retaining full control over what happens on the other side of that door. This book's own Chapter 15 is precisely that: <code>int 0x80</code> as the controlled door, a fixed calling convention (syscall number in <code>eax</code>, up to two arguments in <code>ebx</code>/<code>ecx</code>, cited directly from the real Linux i386 convention) as the agreed shape of a request, and the CPU's own real DPL=3 gate-privilege check (Appendix A, Section 9) as what makes ring 3 code allowed to knock on this one specific door at all, while every other door in the IDT stays firmly ring-0-only.</p>
+<h2 id="4-processes">4. Processes<a class="headerlink" href="#4-processes" title="Permanent link">&para;</a></h2>
+<p>A <strong>process</strong> is a running instance of a program — its own private (or privately-mapped) memory, its own register state, its own sense of what it's currently doing — as distinct from the program's own file on disk, which is just static bytes until something runs it. Real Unix systems create new processes with <code>fork()</code> (clone the calling process, nearly identically, into a second, independent one) and <code>exec()</code> (replace a process's own running program with a different one entirely, in place) — two separate, composable real operations, rather than one combined "spawn a new program" call, specifically so a shell can <code>fork()</code> to get a new process, then do setup work (redirecting its own stdin/stdout) <em>before</em> <code>exec()</code>-ing the actual command, all without the original shell process itself ever being replaced.</p>
+<p>This book's kernel does not implement <code>fork()</code>/<code>exec()</code> at all — Chapter 18's own ELF loader (<code>elf_load()</code>) is closer, conceptually, to <code>exec()</code> alone: parsing a real ELF binary's own program headers and mapping its <code>PT_LOAD</code> segments into a fresh address space. What this book's kernel <em>does</em> build, in real, working form, is the layer underneath process management: Chapter 11's own cooperative task switching (each task voluntarily yielding), Chapter 12's own preemptive scheduling (the PIT timer forcibly interrupting a task whether it wants to yield or not, the real mechanism that stops one runaway process from starving every other process on a real multi-user system), and Chapter 17's own per-process address spaces (one page directory per task, so one task's own memory corruption cannot reach into another's) — the real, concrete machinery "a process" is built out of, well below the <code>fork()</code>/<code>exec()</code> API that would eventually sit on top of it.</p>
+<h2 id="5-files-inodes-and-the-filesystem-tree">5. Files, inodes, and the filesystem tree<a class="headerlink" href="#5-files-inodes-and-the-filesystem-tree" title="Permanent link">&para;</a></h2>
+<p>A real Unix filesystem presents every file and directory as nodes in one single tree, rooted at <code>/</code> — unlike, say, Windows' own per-drive letter scheme (<code>C:\</code>, <code>D:\</code>), a Unix system mounts additional storage <em>into</em> that one tree at an arbitrary directory, so <code>/home</code>, <code>/mnt/usb</code>, and the root filesystem itself can be three entirely separate physical devices while still looking, to any program, like one seamless namespace.</p>
+<p>Internally, a real Unix filesystem separates a file's own <em>name</em> from its own <em>data and metadata</em>: an <strong>inode</strong> holds the real file size, permissions, owner, timestamps, and the real on-disk block pointers, identified only by a number — a directory, underneath, is nothing more than a list of (name, inode number) pairs. This is exactly why a real Unix <strong>hard link</strong> can make the same file appear under two different names in two different directories at once (two directory entries, one shared inode) in a way that is genuinely structurally impossible on filesystems that don't separate the two concepts.</p>
+<p>This book's own FAT16 work (Chapters 20-23) implements a meaningfully simpler, older, real design: FAT16 has no inode-like separate metadata structure at all — a directory entry <em>is</em> the file's own name, size, and starting cluster, all in one place, which is exactly why FAT16 has no concept of a hard link, and why this book's own <code>fat16_rmdir()</code> (Chapter 22) has to enforce "a directory must be empty before it can be removed" as an explicit rule its own code checks, rather than inheriting that guarantee from a more general structure underneath. Building FAT16 first, rather than something inode-based, is itself a real, deliberate pedagogical choice this book made: FAT16's own directory-entry-as-metadata design is simple enough to implement convincingly in a few chapters, while still teaching the same real core lesson — a filesystem's whole job is translating a human-meaningful name into the raw sectors that actually hold the data, exactly the lesson Chapter 20's own page states directly: "files addressed by name instead of by raw LBA."</p>
+<h2 id="6-permissions-and-the-multi-user-model">6. Permissions and the multi-user model<a class="headerlink" href="#6-permissions-and-the-multi-user-model" title="Permanent link">&para;</a></h2>
+<p>Real Unix systems were built, from the start, to be genuinely multi-user: several different people, each with their own account, sharing one physical machine, each one needing to be protected from the others' own mistakes or malice. The real permission model built for that: every file has an owner (a user) and a group, plus three independent permission bits — read, write, execute — for each of three audiences (the owner, the owning group, everyone else) — the familiar <code>rwxr-xr-x</code> a real <code>ls -l</code> prints.</p>
+<p><strong><code>root</code></strong> (user ID 0) is the one real account exempt from nearly every one of those checks — the real, deliberate "someone has to actually be able to fix things" escape hatch every real multi-user system needs, and exactly why real Unix security practice treats logging in <em>as</em> root, for day-to-day work, as a serious mistake: every one of the system's own real protections is specifically the thing root doesn't get.</p>
+<p>This book's own kernel has no concept of a user account at all, and ring 3 (Chapter 15) is this book's own entire real security boundary — every piece of user-space code this book ever runs is implicitly "the same user," with the kernel/user-space split itself doing the real protective work a multi-user permission system would otherwise need to layer on top. A reader who goes on to add real multi-user support to a kernel like this one's would be building exactly the layer real Unix adds on top of the ring-based split this book already has working: per-file ownership metadata, and a permission check consulted on every real <code>open()</code>.</p>
+<h2 id="7-the-shell">7. The shell<a class="headerlink" href="#7-the-shell" title="Permanent link">&para;</a></h2>
+<p>A real Unix <strong>shell</strong> is, itself, just an ordinary user-space program — not a privileged part of the kernel at all — whose entire job is reading a line of text, interpreting it as a command (plus arguments, plus any real redirection or pipe syntax), and using exactly the same real process-creation primitives (<code>fork()</code>/<code>exec()</code>) any other program could use, to actually run it. That a shell is "just a program" is itself a real, significant design statement: anyone can write a different one (and many real shells — <code>sh</code>, <code>csh</code>, <code>bash</code>, <code>zsh</code>, <code>fish</code> — genuinely coexist on real systems today), because the shell holds no privilege an ordinary program lacks; it is a convenience layered on top of real, already-general kernel facilities, not a special case the kernel has to know about.</p>
+<p>This book's kernel has no shell of its own (yet) — Chapter 18's own ELF loader runs exactly one fixed user-space program, <code>046_user_program.c</code>'s own real descendants, directly from <code>kmain()</code>, rather than through an interactive command line a human types into. Building a real shell on top of what this book's kernel already has working is, largely, an exercise in exactly the pieces already covered above: <code>fork()</code>/<code>exec()</code>-equivalent process creation (this book has the scheduling and address-space machinery <code>fork()</code> would need, but not <code>fork()</code> itself), a way to read a line of real keyboard input (Chapter 5, already built), and a way to look a typed name up in the filesystem and run it (Chapters 18 and 20-23, already built) — a genuine, concrete "what's left" for anyone extending this book's own kernel toward something closer to a complete, interactive Unix.</p>
+<h2 id="8-what-unix-like-means-for-this-book-specifically">8. What "Unix-like" means for this book specifically<a class="headerlink" href="#8-what-unix-like-means-for-this-book-specifically" title="Permanent link">&para;</a></h2>
+<p>This book never claims POSIX compliance, and is not attempting to be a complete, usable Unix — stated as plainly here as every individual chapter's own "Deliberately out of scope" section states its own narrower limits. What makes "Unix OS from Scratch" an honest title is that every major piece this book <em>does</em> build is a real, working, from-scratch implementation of a genuine Unix concept, not a simulation or a stand-in: a real kernel/user-space privilege split enforced by actual CPU rings (not a software convention); a real system call mechanism, not a function call dressed up to look like one; real preemptive, multi-task scheduling; real per-process virtual address spaces; a real, working filesystem that resolves human-readable names to on-disk data; and, in this book's own later chapters, real network protocols (ARP, IPv4, ICMP) implemented against their own real specifications rather than invented from scratch.</p>
+<p>What's missing, relative to a complete Unix, is mostly <em>breadth</em>, not a different <em>kind</em> of system: no <code>fork()</code>/<code>exec()</code> (only the lower-level scheduling and address-space primitives they'd be built from), no multi-user permission model, no shell, no general virtual filesystem layer across multiple real filesystem types, no complete POSIX API surface. Every one of those is a real, substantial additional project — and, not coincidentally, every one of them is buildable, incrementally, on exactly the foundation this book already finished laying.</p>
+<h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Assembly (<code>.asm</code>, NASM syntax): <code>nasm -f elf32 file.asm -o file.o</code> (32-bit protected-mode object files, this book's own convention until a later chapter moves to 64-bit long mode)</li>
-<li>Freestanding C (<code>.c</code>): <code>gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -Wall -Wextra -c file.c -o file.o</code></li>
-<li>Linking: <code>ld -m elf_i386 -T linker.ld -o kernel.bin *.o</code>, with each chapter's own linker script shown in full where it is introduced</li>
-<li>Packing and booting: each chapter shows its own exact <code>grub-mkrescue</code>/<code>qemu-system-x86_64</code> invocation, including every flag, inline where the kernel it applies to is introduced</li>
+<li><strong>Ritchie &amp; Thompson, "The UNIX Time-Sharing System"</strong> (1974, <em>Communications of the ACM</em>) — the real, original paper describing Unix's own early design, written by its own two primary creators.</li>
+<li><strong>Kernighan &amp; Pike, <em>The Unix Programming Environment</em></strong> (1984) — the real, classic explanation of the Unix philosophy in practice, from two Bell Labs Unix veterans.</li>
+<li><strong>W. Richard Stevens, <em>Advanced Programming in the UNIX Environment</em></strong> — the real, standard reference for the actual POSIX system call API this appendix only sketches the shape of.</li>
+<li><strong>The POSIX.1 standard itself</strong> (IEEE Std 1003.1), and the <strong>Linux man-pages project</strong> (man7.org), as the real, living documentation of the exact system call contracts a complete Unix-like kernel has to honor.</li>
 </ul>
-<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
-<p>This book assumes working knowledge of C (functions, pointers, <code>struct</code>s, the <code>static</code> keyword) and enough x86 assembly to read a short, heavily-commented file -- no prior assembly-writing experience is assumed, and every instruction this book uses is explained the first time it appears. No prior operating-systems or bare-metal development experience is assumed either; Chapter 1 builds the real boot chain (firmware, bootloader, kernel entry) from nothing before any kernel code is written.</p>
 
 
 
@@ -2416,7 +2541,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href=".." class="md-footer__link md-footer__link--prev" aria-label="Previous: Home">
+          <a href="../../appendixA/a-introduction-to-assembly/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Appendix A. Introduction to x86 Assembly">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2426,20 +2551,20 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Home
+                Appendix A. Introduction to x86 Assembly
               </div>
             </div>
           </a>
         
         
           
-          <a href="../part1/01-booting-a-multiboot2-kernel-from-power-on-to-kernel-entry/" class="md-footer__link md-footer__link--next" aria-label="Next: 1. Booting a Multiboot2 Kernel">
+          <a href="../../appendixC/c-introduction-to-c/" class="md-footer__link md-footer__link--next" aria-label="Next: Appendix C. Introduction to C">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                1. Booting a Multiboot2 Kernel
+                Appendix C. Introduction to C
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -2480,10 +2605,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

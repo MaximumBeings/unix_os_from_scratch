@@ -1,0 +1,2880 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A Unix-Like Operating System in C, From Power-On to a Working Shell">
+      
+      
+        <meta name="author" content="Oluwaseyi Awoga">
+      
+      
+      
+        <link rel="prev" href="../../part46/46-dynamic-idt-gate-installation/">
+      
+      
+        <link rel="next" href="../../appendixB/b-introduction-to-unix/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Appendix A. Introduction to x86 Assembly - Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#appendix-a-introduction-to-x86-assembly" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" class="md-header__button md-logo" aria-label="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 19V7H4v12zm0-16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm-7 14v-2h5v2zm-3.42-4L5.57 9H8.4l3.3 3.3c.39.39.39 1.03 0 1.42L8.42 17H5.59z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Appendix A. Introduction to x86 Assembly
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="deep-orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="deep-orange"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" class="md-nav__button md-logo" aria-label="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 19V7H4v12zm0-16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm-7 14v-2h5v2zm-3.42-4L5.57 9H8.4l3.3 3.3c.39.39.39 1.03 0 1.42L8.42 17H5.59z"/></svg>
+
+    </a>
+    Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 1 -- Booting: From Power-On to Kernel Entry
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 1 -- Booting: From Power-On to Kernel Entry
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part1/01-booting-a-multiboot2-kernel-from-power-on-to-kernel-entry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1. Booting a Multiboot2 Kernel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 2 -- Talking to Hardware: Early Device Drivers
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 2 -- Talking to Hardware: Early Device Drivers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part2/02-vga-text-mode-output-a-real-screen-driver/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2. VGA Text-Mode Output
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 3 -- Kernel Infrastructure: Descriptor Tables and Utilities
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 3 -- Kernel Infrastructure: Descriptor Tables and Utilities
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/03-a-real-gdt-and-a-kernel-printf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3. A Real GDT and a Kernel printf
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part4/04-interrupts-the-idt-and-a-first-real-isr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4. Interrupts: The IDT and a First Real ISR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 4 -- Hardware Interrupts: Making the Kernel Interactive
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 4 -- Hardware Interrupts: Making the Kernel Interactive
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part5/05-ps2-keyboard-input-via-a-real-hardware-irq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5. PS/2 Keyboard Input, via a Real Hardware IRQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part6/06-the-pit-timer-and-a-real-tick-counter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6. The PIT Timer and a Real Tick Counter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 5 -- Memory: Discovering and Managing Real RAM
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 5 -- Memory: Discovering and Managing Real RAM
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part7/07-physical-memory-the-multiboot2-memory-map-and-a-real-frame-allocator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7. Physical Memory: the Multiboot2 Memory Map and a Real Frame Allocator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part8/08-paging-enabling-virtual-memory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8. Paging: Enabling Virtual Memory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part9/09-a-kernel-heap-real-dynamic-memory-with-kmalloc-kfree/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9. A Kernel Heap: Real Dynamic Memory with kmalloc/kfree
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10/10-page-fault-handling-a-real-isr14/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10. Page Fault Handling: A Real ISR14
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 6 -- Scheduling: Running More Than One Task at Once
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 6 -- Scheduling: Running More Than One Task at Once
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11/11-kernel-level-multitasking-cooperative-task-switching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11. Kernel-Level Multitasking: Cooperative Task Switching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12/12-preemptive-multitasking-letting-the-timer-decide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12. Preemptive Multitasking: Letting the Timer Decide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13/13-synchronization-primitives-spinlocks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13. Synchronization Primitives: Spinlocks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14/14-blocking-synchronization-semaphores-and-sleep-wake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14. Blocking Synchronization: Semaphores and Sleep/Wake
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 7 -- Privilege: Running Code This Kernel Does Not Fully Trust
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 7 -- Privilege: Running Code This Kernel Does Not Fully Trust
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part15/15-user-mode-ring-3-tss-and-a-first-system-call/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15. User Mode: Ring 3, a TSS, and a First System Call
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16/16-real-ring-3-tasks-in-the-scheduler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    16. Real Ring-3 Tasks in the Scheduler: sys_yield, sys_exit, Multiple User Tasks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17/17-per-process-address-spaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    17. Per-Process Address Spaces: One Page Directory Per Task
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18/18-loading-a-real-elf-binary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    18. Loading a Real ELF Binary: Parsing Program Headers and Mapping PT_LOAD Segments
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19/19-a-real-disk-driver-ata-pio-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    19. A Real Disk Driver: ATA PIO Mode, Reading and Writing Real Sectors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20/20-a-real-filesystem-fat16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20. A Real Filesystem: FAT16, Files Addressed by Name Instead of by Raw LBA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part21/21-real-subdirectories-fat16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    21. Real Subdirectories: One Level of Nesting Inside FAT16
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part22/22-removing-real-subdirectories-fat16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    22. Removing Real Subdirectories: fat16_rmdir() and the Empty-Directory Rule
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part23/23-recursive-multi-level-paths-fat16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    23. Recursive Multi-Level Paths: Lifting FAT16's One-Level Scope
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part24/24-pci-bus-enumeration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    24. PCI Bus Enumeration: Finding the Hardware Before You Can Drive It
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part25/25-rtl8139-driver/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    25. A Real RTL8139 Driver: One Real Frame, Sent and Received
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part26/26-interrupt-driven-rtl8139/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    26. Interrupt-Driven RTL8139: A Real hlt, Woken by Real Hardware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part27/27-multi-frame-rtl8139/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    27. Multi-Frame RTL8139: Real Round-Robin Transmit, Real CAPR Wraparound
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part28/28-address-resolution-protocol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    28. Address Resolution Protocol: A Real ARP Request/Reply Over a Real Wire
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part29/29-a-real-arp-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    29. A Real ARP Cache: Completing RFC 826's Own Merge_flag Logic
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part30/30-a-real-fedwire-style-wire-transfer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    30. A Real Fedwire-Style Wire Transfer: AES-128, SHA-256, and HMAC From Scratch
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part31/31-a-real-arp-server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    31. A Real ARP Server: Answering Requests About This Kernel's Own Address
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part32/32-a-real-nacha-ach-p2p-split/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    32. A Real NACHA ACH Batch: P2P Group-Expense Splitting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part33/33-a-real-pay-in-4-bnpl-checkout/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    33. A Real "Pay in 4" BNPL Checkout: Regulation Z APR and an ISO 8583 Authorization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part34/34-an-insurance-comparison-app/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    34. An Insurance Comparison App: Quote Aggregation Across Carriers, in ACORD XML
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part35/35-a-micro-investing-robo-advisor-app/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    35. A Micro-Investing / Robo-Advisor App: Round-Up Investing, Real FIX 4.4 Orders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part36/36-a-personal-budgeting-cash-flow-tracker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    36. A Personal Budgeting / Cash-Flow Tracker: Real OFX, Automatic Categorization, and a Cash-Flow-Gap Forecast
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part37/37-a-video-streaming-media-delivery-app/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    37. A Video-Streaming / Media-Delivery App: Real HTTP Range Requests and a Real Adaptive-Bitrate HLS Manifest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part38/38-an-atm-system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    38. An ATM System: Real ISO 8583 Withdrawals, a Real ISO 9564-1 PIN Block, and Cash-Dispense Sequencing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part39/39-pos-point-of-sale-and-smart-terminals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    39. POS (Point-of-Sale) and Smart Terminals: A Real EMV Contact Chip Transaction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part40/40-billing-and-payment-systems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    40. Billing & Payment Systems: A Real Subscription Billing Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part41/41-flight-ticket-aggregation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    41. Flight Ticket Aggregation: A Real OTA Multi-Carrier Fare Search
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part42/42-sports-ticket-aggregation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    42. Sports Ticket Aggregation: A Real GS1 Ticket Identifier and a Rotating Anti-Fraud Barcode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part43/43-betting-systems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    43. Betting Systems: Real Odds Formats and a Real Betfair Exchange API Shape
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part44/44-car-rental/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    44. Car Rental: A Real OTA Vehicle Availability and Reservation Codec
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part45/45-minimal-ip-layer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    45. A Minimal IP Layer: Real IPv4 and a Real ICMP Echo (Ping)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part46/46-dynamic-idt-gate-installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    46. Dynamic IDT Gate Installation: Closing a Gap Chapter 26 Left Open
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix -- Primers and Self-Check Answers
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Appendix -- Primers and Self-Check Answers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix A. Introduction to x86 Assembly
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix A. Introduction to x86 Assembly
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-assembly-actually-is" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What assembly actually is
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-registers-the-cpus-own-tiny-fixed-set-of-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Registers: the CPU's own, tiny, fixed set of variables
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-real-mode-protected-mode-and-why-this-book-only-ever-uses-the-latter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Real mode, protected mode, and why this book only ever uses the latter
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-reading-nasm-syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Reading NASM syntax
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-moving-data-mov-and-addressing-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Moving data: mov and addressing modes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-arithmetic-logic-and-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Arithmetic, logic, and comparison
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-control-flow-jumps-loops-and-function-calls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Control flow: jumps, loops, and function calls
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-the-stack-stack-frames-and-the-cdecl-calling-convention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. The stack, stack frames, and the cdecl calling convention
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-why-an-interrupt-handler-cannot-be-an-ordinary-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Why an interrupt handler cannot be an ordinary function
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-inline-assembly-in-c" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Inline assembly in C
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-a-complete-worked-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. A complete worked example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../appendixB/b-introduction-to-unix/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix B. Introduction to Unix
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../appendixC/c-introduction-to-c/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix C. Introduction to C
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../appendixD/d-self-check-answers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix D. Self-Check Answers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-assembly-actually-is" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What assembly actually is
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-registers-the-cpus-own-tiny-fixed-set-of-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Registers: the CPU's own, tiny, fixed set of variables
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-real-mode-protected-mode-and-why-this-book-only-ever-uses-the-latter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Real mode, protected mode, and why this book only ever uses the latter
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-reading-nasm-syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Reading NASM syntax
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-moving-data-mov-and-addressing-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Moving data: mov and addressing modes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-arithmetic-logic-and-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Arithmetic, logic, and comparison
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-control-flow-jumps-loops-and-function-calls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Control flow: jumps, loops, and function calls
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-the-stack-stack-frames-and-the-cdecl-calling-convention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. The stack, stack frames, and the cdecl calling convention
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-why-an-interrupt-handler-cannot-be-an-ordinary-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Why an interrupt handler cannot be an ordinary function
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-inline-assembly-in-c" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Inline assembly in C
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-a-complete-worked-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. A complete worked example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="appendix-a-introduction-to-x86-assembly">Appendix A. Introduction to x86 Assembly<a class="headerlink" href="#appendix-a-introduction-to-x86-assembly" title="Permanent link">&para;</a></h1>
+<p>This appendix exists because the book you just read assumes you already know how to read a file like <code>001_boot.asm</code>. If you don't yet, this is where that gets fixed. It is a self-contained primer on x86 assembly language — specifically the 32-bit "protected mode" dialect this book's own kernel is written in, assembled with NASM — covering enough of the real architecture that you could, after reading it, open any <code>.asm</code> file in this book's own <code>docs/partNN/code/</code> directories and understand exactly what it does and why it has to be written that way.</p>
+<p>It is not a complete reference to the x86 instruction set, which runs to thousands of pages across Intel's and AMD's own official manuals. It is everything an ordinary systems programmer actually uses in practice, explained from first principles, with real examples pulled directly from this book's own code wherever one illustrates the point better than an invented snippet would.</p>
+<h2 id="1-what-assembly-actually-is">1. What assembly actually is<a class="headerlink" href="#1-what-assembly-actually-is" title="Permanent link">&para;</a></h2>
+<p>A CPU does not understand C, or Python, or any other language with variables, loops, or function calls as such. A CPU understands a fixed, small vocabulary of instructions — move this value from here to there, add these two numbers, jump to this address if that comparison came out zero — each one encoded as a sequence of raw bytes (<strong>machine code</strong>) that the CPU's own decoder reads and executes one instruction at a time.</p>
+<p>Assembly language is the thinnest possible human-readable skin over that machine code: one assembly instruction almost always corresponds to exactly one machine instruction, in the same order, with no hidden control flow and no implicit anything. Where a C compiler decides, on your behalf, how to lay out a <code>for</code> loop in terms of comparisons and jumps, in assembly <em>you</em> write the comparisons and jumps yourself, explicitly, in the exact order the CPU will execute them.</p>
+<p>This is why this book needed assembly at all, in an otherwise overwhelmingly C codebase: a handful of real, specific jobs genuinely cannot be expressed in C, because C itself assumes things assembly cannot assume yet — that a stack already exists, that a return address on the stack means what C's own <code>call</code>/<code>ret</code> convention expects it to mean, that general-purpose registers are free for the compiler to allocate as it pleases. Every chapter's own <code>.asm</code> files in this book exist at exactly the handful of places where one of those assumptions is not yet true: the very first instruction the CPU executes after boot (no stack exists yet), the entry point of every interrupt handler (the CPU just forcibly interrupted whatever was running, mid-instruction, and every register has to be saved by hand before any C function can safely run), and the exact instant a task switch swaps one call stack for another (<code>esp</code> itself has to change, which no C statement can express).</p>
+<h2 id="2-registers-the-cpus-own-tiny-fixed-set-of-variables">2. Registers: the CPU's own, tiny, fixed set of variables<a class="headerlink" href="#2-registers-the-cpus-own-tiny-fixed-set-of-variables" title="Permanent link">&para;</a></h2>
+<p>A register is a small, fixed piece of storage built directly into the CPU itself — reading or writing one is far faster than reading or writing memory, which is exactly why a CPU has so few of them (compared to how much RAM a machine has) and why using them well is most of what makes assembly fast.</p>
+<p>This book's own 32-bit (<code>BITS 32</code>) code uses the IA-32 register set, inherited with only minor renaming from the original 16-bit 8086 of 1978 — every 32-bit register's own name starts with <code>E</code> ("Extended") precisely because it is the 16-bit register of the same short name, widened to 32 bits.</p>
+<p><strong>General-purpose registers</strong> (eight of them, each 32 bits wide):</p>
+<table>
+<thead>
+<tr>
+<th>32-bit</th>
+<th>16-bit</th>
+<th>8-bit (low)</th>
+<th>Conventional use (not enforced by hardware)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>eax</code></td>
+<td><code>ax</code></td>
+<td><code>al</code></td>
+<td>the accumulator — arithmetic results, function return values</td>
+</tr>
+<tr>
+<td><code>ebx</code></td>
+<td><code>bx</code></td>
+<td><code>bl</code></td>
+<td>general purpose — this book's own <code>isr128.asm</code> uses it for a syscall's second argument</td>
+</tr>
+<tr>
+<td><code>ecx</code></td>
+<td><code>cx</code></td>
+<td><code>cl</code></td>
+<td>loop counters; the implicit count for shift/rotate instructions</td>
+</tr>
+<tr>
+<td><code>edx</code></td>
+<td><code>dx</code></td>
+<td><code>dl</code></td>
+<td>general purpose; paired with <code>eax</code> for 64-bit arithmetic results</td>
+</tr>
+<tr>
+<td><code>esi</code></td>
+<td><code>si</code></td>
+<td>—</td>
+<td>"source index" — the source pointer for string instructions</td>
+</tr>
+<tr>
+<td><code>edi</code></td>
+<td><code>di</code></td>
+<td>—</td>
+<td>"destination index" — the destination pointer for string instructions</td>
+</tr>
+<tr>
+<td><code>ebp</code></td>
+<td><code>bp</code></td>
+<td>—</td>
+<td>"base pointer" — conventionally the base of the current stack frame</td>
+</tr>
+<tr>
+<td><code>esp</code></td>
+<td><code>sp</code></td>
+<td>—</td>
+<td>"stack pointer" — always points at the top of the current stack</td>
+</tr>
+</tbody>
+</table>
+<p>None of these "conventional uses" are enforced by the hardware — <code>eax</code> is not magically faster at arithmetic than <code>ebx</code> is. They are conventions, followed by compilers and calling conventions (Section 8) so that code written by different people, or different tools, can cooperate. <code>esp</code> is the one real exception: several instructions (<code>push</code>, <code>pop</code>, <code>call</code>, <code>ret</code>) read and write it implicitly, so treating it as "the stack pointer and nothing else" is not optional.</p>
+<p><strong>Segment registers</strong> (six of them, each 16 bits): <code>cs</code> (code segment), <code>ds</code> (data segment), <code>ss</code> (stack segment), <code>es</code>, <code>fs</code>, <code>gs</code>. In the real-mode era these held an actual memory segment's own base address, shifted. This book's kernel runs in a <strong>flat memory model</strong> (Chapter 3's own GDT) where every segment register's own selector points at a descriptor covering the entire 4 GiB address space — so segmentation is, deliberately, made to do nothing. You will see <code>cs</code>/<code>ds</code> loaded with fixed selector values (<code>0x08</code>, <code>0x10</code>) in this book's own early boot and GDT code, and essentially never touched again.</p>
+<p><strong><code>eip</code></strong> (the instruction pointer) always holds the address of the next instruction to execute. You cannot <code>mov</code> into <code>eip</code> directly — the only ways to change it are <code>jmp</code>, <code>call</code>, <code>ret</code>, a conditional jump, or <code>iret</code>, each of which has its own real rules about what else happens at the same time (Section 7).</p>
+<p><strong><code>eflags</code></strong> is a 32-bit register where individual <em>bits</em>, not the whole register, each mean something — a "flags register." The ones this book's own code actually reads or sets:</p>
+<ul>
+<li><strong>ZF</strong> (Zero Flag) — set when an arithmetic or compare instruction's own result was zero. <code>je</code>/<code>jz</code> branch on this.</li>
+<li><strong>CF</strong> (Carry Flag) — set when an unsigned operation overflowed (or underflowed). <code>jc</code>/<code>jb</code> branch on this.</li>
+<li><strong>SF</strong> (Sign Flag) — set to the result's own most-significant bit (i.e., "was the signed result negative").</li>
+<li><strong>OF</strong> (Overflow Flag) — set when a <em>signed</em> operation overflowed.</li>
+<li><strong>IF</strong> (Interrupt Flag, bit 9) — when clear, the CPU ignores every maskable hardware interrupt. <code>cli</code> clears it, <code>sti</code> sets it. This book's own <code>046_idt.c</code> (Chapter 46) reads this exact bit directly, via <code>pushfl</code>/<code>popl</code>, to decide whether to restore interrupts after a critical section.</li>
+</ul>
+<h2 id="3-real-mode-protected-mode-and-why-this-book-only-ever-uses-the-latter">3. Real mode, protected mode, and why this book only ever uses the latter<a class="headerlink" href="#3-real-mode-protected-mode-and-why-this-book-only-ever-uses-the-latter" title="Permanent link">&para;</a></h2>
+<p>The original 8086 only ever addressed memory in <strong>real mode</strong>: 20-bit addresses built from a 16-bit segment register shifted left 4 bits, plus a 16-bit offset — a maximum of 1 MiB of memory, no memory protection of any kind, and any code could read or write any address, including the CPU's own most privileged structures.</p>
+<p><strong>Protected mode</strong>, introduced with the 80286 and matured on the 80386 (the first true 32-bit x86), adds real memory protection: a Global Descriptor Table (Chapter 3) that defines what each segment selector is actually allowed to access and at what privilege level, and — once paging is enabled (Chapter 8) — a page-table-based virtual memory system that can give each process its own private address space.</p>
+<p>This book never writes a single line of real-mode code, because GRUB has already done that work: by the time <code>_start</code> (Chapter 1's own <code>001_boot.asm</code>) receives control, the Multiboot2 specification guarantees the CPU is already in 32-bit protected mode, with a valid (if minimal) GDT, paging disabled, and interrupts disabled. Every instruction in every <code>.asm</code> file in this book assumes that starting point.</p>
+<h2 id="4-reading-nasm-syntax">4. Reading NASM syntax<a class="headerlink" href="#4-reading-nasm-syntax" title="Permanent link">&para;</a></h2>
+<p>This book uses NASM (the Netwide Assembler), which uses <strong>Intel syntax</strong>: <code>destination, source</code> order (the opposite of AT&amp;T syntax, which GNU <code>as</code> defaults to), and no <code>%</code>/<code>$</code> sigils on register or immediate operands.</p>
+<p>A minimal, real example, Chapter 1's own <code>001_boot.asm</code>, read line by line:</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">BITS</span><span class="w"> </span><span class="mi">32</span>
+</code></pre></div>
+Tells the assembler to emit 32-bit instruction encodings (as opposed to 16- or 64-bit). Not optional — the same mnemonic can encode to different bytes depending on the target bit width.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">section</span><span class="w"> </span><span class="nv">.multiboot_header</span>
+</code></pre></div>
+NASM output is organized into <strong>sections</strong>, each of which the linker (Chapter 1's own <code>ld</code>, driven by <code>001_linker.ld</code>) places somewhere in the final binary. <code>.text</code> conventionally holds code, <code>.data</code> holds initialized variables, <code>.bss</code> holds <em>uninitialized</em> variables (space is reserved, but nothing is written into the final binary file for it — the loader is expected to zero it, or, in this book's own case, nothing guarantees it is zeroed at all, which is exactly the kind of real hazard later chapters have to account for).</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">align</span><span class="w"> </span><span class="mi">8</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nl">header_start:</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kd">dd</span><span class="w"> </span><span class="mh">0xe85250d6</span>
+</code></pre></div>
+<code>align 8</code> pads the current position in the section up to the next multiple of 8 bytes. <code>header_start:</code> defines a <strong>label</strong> — a name for "the address of whatever comes right after this line" — not a variable, not a function by itself, just a named address the rest of the file (or another file, if declared <code>global</code>) can refer to. <code>dd</code> ("define doubleword") emits the literal 4-byte value <code>0xe85250d6</code> directly into the output — this is data, not an instruction, sitting inside a code file because the Multiboot2 specification requires this exact magic number at this exact alignment for GRUB's own header scanner to recognize the kernel at all.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">section</span><span class="w"> </span><span class="nv">.text</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">extern</span><span class="w"> </span><span class="nv">kmain</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">global</span><span class="w"> </span><span class="nv">_start</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="nl">_start:</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">esp</span><span class="p">,</span><span class="w"> </span><span class="nv">stack_top</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="nf">call</span><span class="w"> </span><span class="nv">kmain</span>
+</code></pre></div>
+<code>extern kmain</code> tells the assembler that the symbol <code>kmain</code> is defined somewhere else (in this case, a C file — Chapter 1's own <code>001_kmain.c</code>) and to leave a relocation for the linker to resolve later. <code>global _start</code> does the opposite: it makes the label <code>_start</code>, defined in <em>this</em> file, visible to the linker as an externally-callable symbol — <code>001_linker.ld</code> uses exactly this name to set the ELF entry point. <code>mov esp, stack_top</code> is this file's entire reason for existing: GRUB leaves <code>esp</code> at whatever value it happened to have, not a safe place to build a call frame, so this instruction points it at real, reserved memory before anything else can safely run. <code>call kmain</code> is an ordinary function call into C — the moment execution crosses from <code>001_boot.asm</code> into <code>001_kmain.c</code>.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">section</span><span class="w"> </span><span class="nv">.bss</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">align</span><span class="w"> </span><span class="mi">16</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nl">stack_bottom:</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="kd">resb</span><span class="w"> </span><span class="mi">16384</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="nl">stack_top:</span>
+</code></pre></div>
+<code>resb 16384</code> reserves 16384 bytes of <em>uninitialized</em> space (no value written to the binary file, hence <code>.bss</code>) and labels its start <code>stack_bottom</code>. <code>stack_top</code> is the label immediately after those 16384 bytes — since the x86 stack grows <em>downward</em> (toward lower addresses) on every <code>push</code>, "the top of the stack" for a freshly-allocated region is its highest address, which is exactly where <code>stack_bottom: resb 16384 \n stack_top:</code> places the <code>stack_top</code> label.</p>
+<h2 id="5-moving-data-mov-and-addressing-modes">5. Moving data: <code>mov</code> and addressing modes<a class="headerlink" href="#5-moving-data-mov-and-addressing-modes" title="Permanent link">&para;</a></h2>
+<p><code>mov destination, source</code> copies a value — it does not "move" anything away from the source in the sense a filesystem <code>mv</code> would; the source is left unchanged. The breadth of what <code>mov</code> can do comes entirely from how many different ways x86 lets you specify an operand:</p>
+<ul>
+<li><strong>Immediate</strong>: a literal constant baked into the instruction itself. <code>mov eax, 42</code></li>
+<li><strong>Register</strong>: a register's own current value. <code>mov eax, ebx</code></li>
+<li><strong>Direct memory</strong>: a fixed address. <code>mov eax, [0x1000]</code> (the square brackets mean "the value <em>at</em> this address," not the address itself)</li>
+<li><strong>Register indirect</strong>: an address held in a register. <code>mov eax, [ebx]</code> — "load the 4 bytes starting at whatever address <code>ebx</code> currently holds"</li>
+<li><strong>Base + displacement</strong>: a register plus a constant offset, the classic shape for reading a struct field through a pointer. <code>mov eax, [ebx + 4]</code></li>
+<li><strong>Base + index + scale + displacement</strong>, the full real addressing mode x86 supports: <code>mov eax, [ebx + ecx*4 + 8]</code> — "the address is <code>ebx</code>, plus <code>ecx</code> scaled by 4 (the real size of a 4-byte element — this is literal array indexing), plus a further fixed offset of 8."</li>
+</ul>
+<p>This last form is exactly how a compiler implements <code>array[i]</code> for an <code>int</code> array under the hood, and recognizing it on sight is one of the most useful single skills for reading any compiler-generated or hand-written assembly.</p>
+<p><code>mov</code> can also move to or from memory using a register holding a <em>computed</em> address — this book's own interrupt descriptor table code (<code>046_idt.c</code>, via the C compiler, not hand-written ASM) ultimately compiles down to exactly this pattern to write each 8-byte IDT entry.</p>
+<p>A real, important restriction: x86 has no single instruction to move memory directly to memory — <code>mov [edi], [esi]</code> is not legal. Moving a block of memory means loading into a register first, then storing, or using a dedicated string instruction (<code>movsb</code>/<code>movsd</code> and friends, which this book's own code does not use, since <code>memcpy</code>-style work is done in C).</p>
+<h2 id="6-arithmetic-logic-and-comparison">6. Arithmetic, logic, and comparison<a class="headerlink" href="#6-arithmetic-logic-and-comparison" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nf">add</span><span class="w"> </span><span class="nb">eax</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="w">        </span><span class="c1">; eax = eax + 5</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nf">sub</span><span class="w"> </span><span class="nb">eax</span><span class="p">,</span><span class="w"> </span><span class="nb">ebx</span><span class="w">       </span><span class="c1">; eax = eax - ebx</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="nf">inc</span><span class="w"> </span><span class="nb">eax</span><span class="w">            </span><span class="c1">; eax = eax + 1</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="nf">dec</span><span class="w"> </span><span class="nb">ecx</span><span class="w">            </span><span class="c1">; ecx = ecx - 1</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="nf">and</span><span class="w"> </span><span class="nb">eax</span><span class="p">,</span><span class="w"> </span><span class="mh">0xFF</span><span class="w">      </span><span class="c1">; eax = eax &amp; 0xFF  (clear all bits above the low byte)</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="nf">or</span><span class="w">  </span><span class="nb">eax</span><span class="p">,</span><span class="w"> </span><span class="mh">0x80</span><span class="w">      </span><span class="c1">; eax = eax | 0x80</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="nf">xor</span><span class="w"> </span><span class="nb">eax</span><span class="p">,</span><span class="w"> </span><span class="nb">eax</span><span class="w">       </span><span class="c1">; eax = eax ^ eax   -- a real, extremely common idiom for "eax = 0,"</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">                   </span><span class="c1">; one byte shorter to encode than "mov eax, 0" and setting ZF as a</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">                   </span><span class="c1">; free side effect</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="nf">not</span><span class="w"> </span><span class="nb">eax</span><span class="w">            </span><span class="c1">; eax = ~eax (bitwise complement)</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="nf">shl</span><span class="w"> </span><span class="nb">eax</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="w">         </span><span class="c1">; eax = eax &lt;&lt; 4  (shift left -- real IDT-entry bit-packing code,</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">                   </span><span class="c1">; e.g. splitting a 32-bit handler address into offset_low/offset_high,</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">                   </span><span class="c1">; uses exactly this)</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="nf">shr</span><span class="w"> </span><span class="nb">eax</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="w">         </span><span class="c1">; eax = eax &gt;&gt; 4  (logical shift right -- zero-fills from the top)</span>
+</code></pre></div>
+<p>Every one of these updates <code>eflags</code> as a side effect — <code>add</code>, <code>sub</code>, <code>and</code>, <code>or</code>, <code>xor</code>, <code>shl</code>, and <code>shr</code> all set ZF/SF/CF/OF according to their own real result, which is what makes the next two instructions meaningful:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nf">cmp</span><span class="w"> </span><span class="nb">eax</span><span class="p">,</span><span class="w"> </span><span class="nb">ebx</span><span class="w">    </span><span class="c1">; computes eax - ebx, THROWS AWAY the result, keeps only the flags</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nf">test</span><span class="w"> </span><span class="nb">eax</span><span class="p">,</span><span class="w"> </span><span class="nb">eax</span><span class="w">   </span><span class="c1">; computes eax &amp; eax, THROWS AWAY the result, keeps only the flags</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">                </span><span class="c1">; (the idiomatic way to ask "is eax zero?" without an extra register)</span>
+</code></pre></div>
+<p><code>cmp</code> and <code>test</code> exist purely to set flags for a <em>following</em> conditional jump — they never write their own arithmetic result anywhere.</p>
+<h2 id="7-control-flow-jumps-loops-and-function-calls">7. Control flow: jumps, loops, and function calls<a class="headerlink" href="#7-control-flow-jumps-loops-and-function-calls" title="Permanent link">&para;</a></h2>
+<p>Unconditional jump — <code>eip</code> is simply overwritten:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nf">jmp</span><span class="w"> </span><span class="nv">some_label</span>
+</code></pre></div>
+<p>Conditional jumps — taken only if the relevant flag(s), set by the <em>previous</em> <code>cmp</code>/<code>test</code>/arithmetic instruction, satisfy the named condition:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nf">cmp</span><span class="w"> </span><span class="nb">eax</span><span class="p">,</span><span class="w"> </span><span class="nb">ebx</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="no">je</span><span class="w">  </span><span class="kd">equ</span><span class="nv">al_label</span><span class="w">     </span><span class="c1">; jump if ZF=1 (eax == ebx)</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="nf">jne</span><span class="w"> </span><span class="nv">not_equal_label</span><span class="w"> </span><span class="c1">; jump if ZF=0 (eax != ebx)</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="nf">jl</span><span class="w">  </span><span class="nv">less_label</span><span class="w">       </span><span class="c1">; jump if less (signed)</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="nf">jg</span><span class="w">  </span><span class="nv">greater_label</span><span class="w">    </span><span class="c1">; jump if greater (signed)</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="nf">jb</span><span class="w">  </span><span class="nv">below_label</span><span class="w">       </span><span class="c1">; jump if below (unsigned)</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="nf">ja</span><span class="w">  </span><span class="nv">above_label</span><span class="w">       </span><span class="c1">; jump if above (unsigned)</span>
+</code></pre></div>
+<p>The signed/unsigned distinction matters because the <em>same bit pattern</em> in a register means a different thing depending on how you intend to interpret it — <code>jl</code>/<code>jg</code> consult SF and OF together (the real signed-overflow-aware comparison); <code>jb</code>/<code>ja</code> consult only CF (the real unsigned comparison). Using the wrong one against the wrong kind of value is a real, classic class of bug.</p>
+<p><code>call</code> and <code>ret</code> are what make a <em>function</em> a function, rather than just a label you <code>jmp</code> to:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nf">call</span><span class="w"> </span><span class="nv">some_function</span><span class="w">   </span><span class="c1">; pushes the address of the NEXT instruction onto the stack,</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">                      </span><span class="c1">; then jumps to some_function</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="nf">...</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="nl">some_function:</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="nf">...</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span><span class="nf">ret</span><span class="w">               </span><span class="c1">; pops that saved address off the stack, jumps to it</span>
+</code></pre></div>
+<p>This is the entire real mechanism by which <code>call kmain</code> in Chapter 1's own <code>001_boot.asm</code> ends up, eventually, returning — except in that specific case it never does, because <code>kmain</code> itself never returns; Chapter 1's own code deliberately follows <code>call kmain</code> with <code>cli</code> / an infinite <code>hlt</code> loop precisely because there is nothing sensible to <code>ret</code> <em>to</em>.</p>
+<h2 id="8-the-stack-stack-frames-and-the-cdecl-calling-convention">8. The stack, stack frames, and the cdecl calling convention<a class="headerlink" href="#8-the-stack-stack-frames-and-the-cdecl-calling-convention" title="Permanent link">&para;</a></h2>
+<p>The x86 stack grows <strong>downward</strong>: <code>push</code> first decrements <code>esp</code> by 4 (on this architecture, a <code>push</code> always moves a full 32-bit value), then writes the value at the new <code>[esp]</code>. <code>pop</code> does the reverse — read <code>[esp]</code>, then increment <code>esp</code> by 4.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nf">push</span><span class="w"> </span><span class="nb">eax</span><span class="w">    </span><span class="c1">; esp -= 4; [esp] = eax</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nf">pop</span><span class="w">  </span><span class="nb">ebx</span><span class="w">    </span><span class="c1">; ebx = [esp]; esp += 4</span>
+</code></pre></div>
+<p>A <strong>calling convention</strong> is an agreement, not a hardware feature, about exactly how arguments get passed, who cleans the stack up afterward, and which registers a called function is and isn't allowed to clobber. This book's own C code compiles under the C convention GCC defaults to on this target, <strong>cdecl</strong>:</p>
+<ul>
+<li>Arguments are pushed onto the stack <strong>right to left</strong>, before <code>call</code>.</li>
+<li>The <strong>caller</strong> cleans up the stack afterward (typically <code>add esp, N</code> after the call returns) — this is exactly why Chapter 25's own <code>isr128.asm</code> has <code>add esp, 8</code> immediately after <code>call isr128_handler</code>: two 4-byte arguments were pushed, and cdecl makes the caller, not the callee, responsible for discarding them.</li>
+<li><code>eax</code> carries the return value.</li>
+<li><code>eax</code>, <code>ecx</code>, and <code>edx</code> are <strong>caller-saved</strong> ("volatile") — a called function is free to clobber them, so the caller must save any it still needs before the call. <code>ebx</code>, <code>esi</code>, <code>edi</code>, and <code>ebp</code> are <strong>callee-saved</strong> — a called function that uses them must save and restore their original values itself.</li>
+</ul>
+<p>A <strong>stack frame</strong> is the conventional pattern a function uses to give itself a stable base for its own local variables and arguments, immune to any further pushes/pops the function itself does:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nl">my_function:</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">    </span><span class="nf">push</span><span class="w"> </span><span class="nb">ebp</span><span class="w">          </span><span class="c1">; save caller's own frame pointer</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">    </span><span class="nf">mov</span><span class="w">  </span><span class="nb">ebp</span><span class="p">,</span><span class="w"> </span><span class="nb">esp</span><span class="w">      </span><span class="c1">; ebp = a fixed snapshot of esp, right now</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">    </span><span class="nf">sub</span><span class="w">  </span><span class="nb">esp</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="w">       </span><span class="c1">; reserve 16 bytes of local variable space</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span><span class="c1">; [ebp - 4], [ebp - 8], ... refer to locals; [ebp + 8], [ebp + 12], ...</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">    </span><span class="c1">; refer to arguments the caller pushed (ebp+4 is the saved return address itself)</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">    </span><span class="nf">mov</span><span class="w">  </span><span class="nb">esp</span><span class="p">,</span><span class="w"> </span><span class="nb">ebp</span><span class="w">      </span><span class="c1">; discard locals</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">    </span><span class="nf">pop</span><span class="w">  </span><span class="nb">ebp</span><span class="w">           </span><span class="c1">; restore caller's own frame pointer</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">    </span><span class="nf">ret</span>
+</code></pre></div>
+<p>GCC emits exactly this "prologue/epilogue" pattern for every ordinary C function in this book (unless frame-pointer omission is enabled) — understanding it is what makes a disassembled C function readable as a sequence of named local-variable accesses rather than raw stack-offset arithmetic.</p>
+<h2 id="9-why-an-interrupt-handler-cannot-be-an-ordinary-function">9. Why an interrupt handler cannot be an ordinary function<a class="headerlink" href="#9-why-an-interrupt-handler-cannot-be-an-ordinary-function" title="Permanent link">&para;</a></h2>
+<p>Every ISR stub in this book — <code>001</code> through <code>046</code>'s own <code>isr0.asm</code>, <code>irq0.asm</code>, <code>irq11.asm</code>, <code>isr128.asm</code>, <code>isr13.asm</code>, <code>isr14.asm</code>, and Chapter 46's own new <code>dynisr.asm</code> — follows the identical real shape:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">extern</span><span class="w"> </span><span class="nv">some_handler</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="k">global</span><span class="w"> </span><span class="nv">some_isr</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="nl">some_isr:</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span><span class="nf">pusha</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">    </span><span class="nf">call</span><span class="w"> </span><span class="nv">some_handler</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">    </span><span class="nf">popa</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">    </span><span class="nf">iret</span>
+</code></pre></div>
+<p>Two real, specific reasons this cannot be an ordinary <code>call</code>/<code>ret</code> function:</p>
+<p><strong>First</strong>, the "caller" here is the CPU itself, interrupting whatever instruction sequence was running at an arbitrary, unpredictable point — unlike an ordinary function call, nothing has pre-saved the registers the interrupted code still needs. <code>pusha</code> saves all eight general-purpose registers (<code>eax</code>, <code>ecx</code>, <code>edx</code>, <code>ebx</code>, the original <code>esp</code>, <code>ebp</code>, <code>esi</code>, <code>edi</code>, in that fixed order) in one instruction; <code>popa</code> restores them in the complementary order, immediately before returning — so the interrupted code resumes with every register exactly as it left them, with no idea an interrupt ever happened.</p>
+<p><strong>Second</strong>, the CPU's own interrupt mechanism pushes a fixed set of values onto the stack <em>before</em> the handler's first instruction ever runs — at minimum <code>eflags</code>, <code>cs</code>, and <code>eip</code> (and, for some vectors, a hardware-pushed error code; Chapter 10's own page-fault handler is a real example that has one, which its own stub must pop separately before <code>iret</code>) — and expects the handler to leave via <code>iret</code> ("interrupt return"), a dedicated instruction that pops exactly those pushed values back off and resumes execution at the interrupted instruction. A plain <code>ret</code> would pop the wrong thing entirely, since nothing about an interrupt's own entry resembles an ordinary <code>call</code>.</p>
+<p><code>INT n</code> (a <em>software</em> interrupt, the mechanism Chapter 15's own ring-3 syscall path uses via <code>int 0x80</code>) and a genuine <em>hardware</em> interrupt (an external device signaling the CPU through the 8259 PIC, Chapters 5-6 onward) both ultimately dispatch through the exact same IDT mechanism and both leave via <code>iret</code> — the CPU-level entry/exit protocol does not distinguish them. Chapter 46's own appendix-worthy detail: writing a <em>new</em> IDT entry, after boot, at runtime — the real subject of that chapter's own <code>idt_install_gate()</code> — is simply writing 8 ordinary bytes into an array already sitting in memory; no special instruction is needed to "activate" a new gate, because the CPU re-reads the IDT from memory on every single interrupt, with no caching to invalidate.</p>
+<h2 id="10-inline-assembly-in-c">10. Inline assembly in C<a class="headerlink" href="#10-inline-assembly-in-c" title="Permanent link">&para;</a></h2>
+<p>Several chapters in this book need to execute a single, specific instruction — <code>cli</code>, <code>hlt</code>, reading a port with <code>in</code>, writing a port with <code>out</code>, reading <code>eflags</code> — from the middle of an ordinary C function, where writing and linking a whole separate <code>.asm</code> file would be needlessly heavy. GCC's own <strong>extended inline assembly</strong> syntax (used throughout this book's own <code>046_idt.c</code>, <code>046_rtl8139.c</code>, and others) handles this:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"cli"</span><span class="p">);</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"pushfl; popl %0"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"=r"</span><span class="w"> </span><span class="p">(</span><span class="n">eflags</span><span class="p">));</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"outb %0, %1"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"a"</span><span class="w"> </span><span class="p">(</span><span class="n">value</span><span class="p">),</span><span class="w"> </span><span class="s">"Nd"</span><span class="w"> </span><span class="p">(</span><span class="n">port</span><span class="p">));</span>
+</code></pre></div>
+<p>The general shape is <code>__asm__ volatile ("instructions" : outputs : inputs : clobbers)</code>. <code>"=r" (eflags)</code> tells GCC "this instruction writes to some register, and when it's done, copy that register's value into the C variable <code>eflags</code>" — GCC itself picks which real register to use and emits the matching constraint letter in the actual assembled instruction. <code>volatile</code> tells the optimizer not to assume this inline block can be reordered or eliminated just because its own C-visible outputs look unused — essential for an instruction like <code>cli</code> whose entire real purpose is a side effect (disabling interrupts) the compiler has no way to model as a data dependency.</p>
+<h2 id="11-a-complete-worked-example">11. A complete worked example<a class="headerlink" href="#11-a-complete-worked-example" title="Permanent link">&para;</a></h2>
+<p>Put every piece above together against one more real file, Chapter 46's own <code>046_dynisr.asm</code> — small enough to read in full, and a genuine, if minimal, real ISR:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">BITS</span><span class="w"> </span><span class="mi">32</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="k">section</span><span class="w"> </span><span class="nv">.text</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="k">extern</span><span class="w"> </span><span class="nv">dynisr_demo_handler</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="k">global</span><span class="w"> </span><span class="nv">dynisr_demo</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="nl">dynisr_demo:</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="w">    </span><span class="nf">pusha</span>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="w">    </span><span class="nf">call</span><span class="w"> </span><span class="nv">dynisr_demo_handler</span>
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="w">    </span><span class="nf">popa</span>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="w">    </span><span class="nf">iret</span>
+</code></pre></div>
+<p>Reading it top to bottom, with everything above now in hand: <code>BITS 32</code> targets this book's own 32-bit protected-mode build. <code>extern dynisr_demo_handler</code> declares a C function, defined elsewhere (<code>046_kmain.c</code>), that this file will call. <code>global dynisr_demo</code> exposes this stub's own label to the linker, so <code>046_kmain.c</code> can take its address (<code>(uint32_t) dynisr_demo</code>) and hand it to <code>idt_install_gate()</code> as the real handler for a brand-new vector. <code>pusha</code> saves every general-purpose register by hand, because whatever was running when <code>int $0x90</code> fired had no chance to save anything itself. <code>call dynisr_demo_handler</code> is an ordinary cdecl call into C — by this point every x86 and C concept above has conspired to make this one line behave exactly like any other function call. <code>popa</code> restores every register <code>pusha</code> just saved, and <code>iret</code> — not <code>ret</code> — pops the CPU's own pushed <code>eflags</code>/<code>cs</code>/<code>eip</code> and resumes whatever was interrupted, with no trace that anything happened at all.</p>
+<h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
+<p>This appendix deliberately covers only what a reader of this book's own code needs. For the real, complete, authoritative references:</p>
+<ul>
+<li><strong>Intel 64 and IA-32 Architectures Software Developer's Manuals</strong> (Intel's own official, free PDF set) — the real, primary source for every instruction's own exact encoding, behavior, and flag effects.</li>
+<li><strong>AMD64 Architecture Programmer's Manual</strong> (AMD's own official set) — the real second primary source this book's own earlier chapters already cite wherever Intel's own manual is silent on a specific detail.</li>
+<li><strong>The NASM Manual</strong> (nasm.us) — the real, authoritative reference for NASM's own specific directive and syntax set, as opposed to the instruction set itself.</li>
+<li><strong>OSDev Wiki</strong> (wiki.osdev.org) — a real, community-maintained reference this book's own chapters have cited directly, dozens of times, for exactly the kind of practical "how do I actually use this in a kernel" detail the official manuals state correctly but explain poorly.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../../part46/46-dynamic-idt-gate-installation/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 46. Dynamic IDT Gate Installation: Closing a Gap Chapter 26 Left Open">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                46. Dynamic IDT Gate Installation: Closing a Gap Chapter 26 Left Open
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../appendixB/b-introduction-to-unix/" class="md-footer__link md-footer__link--next" aria-label="Next: Appendix B. Introduction to Unix">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Appendix B. Introduction to Unix
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 Oluwaseyi Awoga
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

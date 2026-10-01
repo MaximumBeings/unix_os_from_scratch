@@ -1,0 +1,2816 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A Unix-Like Operating System in C, From Power-On to a Working Shell">
+      
+      
+        <meta name="author" content="Oluwaseyi Awoga">
+      
+      
+      
+        <link rel="prev" href="../../appendixB/b-introduction-to-unix/">
+      
+      
+        <link rel="next" href="../../appendixD/d-self-check-answers/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Appendix C. Introduction to C - Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#appendix-c-introduction-to-c" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" class="md-header__button md-logo" aria-label="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 19V7H4v12zm0-16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm-7 14v-2h5v2zm-3.42-4L5.57 9H8.4l3.3 3.3c.39.39.39 1.03 0 1.42L8.42 17H5.59z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Appendix C. Introduction to C
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="deep-orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="deep-orange"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" class="md-nav__button md-logo" aria-label="Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 19V7H4v12zm0-16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm-7 14v-2h5v2zm-3.42-4L5.57 9H8.4l3.3 3.3c.39.39.39 1.03 0 1.42L8.42 17H5.59z"/></svg>
+
+    </a>
+    Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 1 -- Booting: From Power-On to Kernel Entry
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 1 -- Booting: From Power-On to Kernel Entry
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part1/01-booting-a-multiboot2-kernel-from-power-on-to-kernel-entry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1. Booting a Multiboot2 Kernel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 2 -- Talking to Hardware: Early Device Drivers
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 2 -- Talking to Hardware: Early Device Drivers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part2/02-vga-text-mode-output-a-real-screen-driver/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2. VGA Text-Mode Output
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 3 -- Kernel Infrastructure: Descriptor Tables and Utilities
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 3 -- Kernel Infrastructure: Descriptor Tables and Utilities
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part3/03-a-real-gdt-and-a-kernel-printf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3. A Real GDT and a Kernel printf
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part4/04-interrupts-the-idt-and-a-first-real-isr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4. Interrupts: The IDT and a First Real ISR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 4 -- Hardware Interrupts: Making the Kernel Interactive
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 4 -- Hardware Interrupts: Making the Kernel Interactive
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part5/05-ps2-keyboard-input-via-a-real-hardware-irq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5. PS/2 Keyboard Input, via a Real Hardware IRQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part6/06-the-pit-timer-and-a-real-tick-counter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6. The PIT Timer and a Real Tick Counter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 5 -- Memory: Discovering and Managing Real RAM
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 5 -- Memory: Discovering and Managing Real RAM
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part7/07-physical-memory-the-multiboot2-memory-map-and-a-real-frame-allocator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7. Physical Memory: the Multiboot2 Memory Map and a Real Frame Allocator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part8/08-paging-enabling-virtual-memory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8. Paging: Enabling Virtual Memory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part9/09-a-kernel-heap-real-dynamic-memory-with-kmalloc-kfree/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    9. A Kernel Heap: Real Dynamic Memory with kmalloc/kfree
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part10/10-page-fault-handling-a-real-isr14/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10. Page Fault Handling: A Real ISR14
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 6 -- Scheduling: Running More Than One Task at Once
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 6 -- Scheduling: Running More Than One Task at Once
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part11/11-kernel-level-multitasking-cooperative-task-switching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11. Kernel-Level Multitasking: Cooperative Task Switching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part12/12-preemptive-multitasking-letting-the-timer-decide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12. Preemptive Multitasking: Letting the Timer Decide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part13/13-synchronization-primitives-spinlocks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13. Synchronization Primitives: Spinlocks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part14/14-blocking-synchronization-semaphores-and-sleep-wake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14. Blocking Synchronization: Semaphores and Sleep/Wake
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Part 7 -- Privilege: Running Code This Kernel Does Not Fully Trust
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Part 7 -- Privilege: Running Code This Kernel Does Not Fully Trust
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part15/15-user-mode-ring-3-tss-and-a-first-system-call/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15. User Mode: Ring 3, a TSS, and a First System Call
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part16/16-real-ring-3-tasks-in-the-scheduler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    16. Real Ring-3 Tasks in the Scheduler: sys_yield, sys_exit, Multiple User Tasks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part17/17-per-process-address-spaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    17. Per-Process Address Spaces: One Page Directory Per Task
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part18/18-loading-a-real-elf-binary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    18. Loading a Real ELF Binary: Parsing Program Headers and Mapping PT_LOAD Segments
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part19/19-a-real-disk-driver-ata-pio-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    19. A Real Disk Driver: ATA PIO Mode, Reading and Writing Real Sectors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part20/20-a-real-filesystem-fat16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20. A Real Filesystem: FAT16, Files Addressed by Name Instead of by Raw LBA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part21/21-real-subdirectories-fat16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    21. Real Subdirectories: One Level of Nesting Inside FAT16
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part22/22-removing-real-subdirectories-fat16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    22. Removing Real Subdirectories: fat16_rmdir() and the Empty-Directory Rule
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part23/23-recursive-multi-level-paths-fat16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    23. Recursive Multi-Level Paths: Lifting FAT16's One-Level Scope
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part24/24-pci-bus-enumeration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    24. PCI Bus Enumeration: Finding the Hardware Before You Can Drive It
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part25/25-rtl8139-driver/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    25. A Real RTL8139 Driver: One Real Frame, Sent and Received
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part26/26-interrupt-driven-rtl8139/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    26. Interrupt-Driven RTL8139: A Real hlt, Woken by Real Hardware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part27/27-multi-frame-rtl8139/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    27. Multi-Frame RTL8139: Real Round-Robin Transmit, Real CAPR Wraparound
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part28/28-address-resolution-protocol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    28. Address Resolution Protocol: A Real ARP Request/Reply Over a Real Wire
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part29/29-a-real-arp-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    29. A Real ARP Cache: Completing RFC 826's Own Merge_flag Logic
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part30/30-a-real-fedwire-style-wire-transfer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    30. A Real Fedwire-Style Wire Transfer: AES-128, SHA-256, and HMAC From Scratch
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part31/31-a-real-arp-server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    31. A Real ARP Server: Answering Requests About This Kernel's Own Address
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part32/32-a-real-nacha-ach-p2p-split/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    32. A Real NACHA ACH Batch: P2P Group-Expense Splitting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part33/33-a-real-pay-in-4-bnpl-checkout/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    33. A Real "Pay in 4" BNPL Checkout: Regulation Z APR and an ISO 8583 Authorization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part34/34-an-insurance-comparison-app/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    34. An Insurance Comparison App: Quote Aggregation Across Carriers, in ACORD XML
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part35/35-a-micro-investing-robo-advisor-app/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    35. A Micro-Investing / Robo-Advisor App: Round-Up Investing, Real FIX 4.4 Orders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part36/36-a-personal-budgeting-cash-flow-tracker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    36. A Personal Budgeting / Cash-Flow Tracker: Real OFX, Automatic Categorization, and a Cash-Flow-Gap Forecast
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part37/37-a-video-streaming-media-delivery-app/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    37. A Video-Streaming / Media-Delivery App: Real HTTP Range Requests and a Real Adaptive-Bitrate HLS Manifest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part38/38-an-atm-system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    38. An ATM System: Real ISO 8583 Withdrawals, a Real ISO 9564-1 PIN Block, and Cash-Dispense Sequencing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part39/39-pos-point-of-sale-and-smart-terminals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    39. POS (Point-of-Sale) and Smart Terminals: A Real EMV Contact Chip Transaction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part40/40-billing-and-payment-systems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    40. Billing & Payment Systems: A Real Subscription Billing Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part41/41-flight-ticket-aggregation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    41. Flight Ticket Aggregation: A Real OTA Multi-Carrier Fare Search
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part42/42-sports-ticket-aggregation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    42. Sports Ticket Aggregation: A Real GS1 Ticket Identifier and a Rotating Anti-Fraud Barcode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part43/43-betting-systems/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    43. Betting Systems: Real Odds Formats and a Real Betfair Exchange API Shape
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part44/44-car-rental/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    44. Car Rental: A Real OTA Vehicle Availability and Reservation Codec
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part45/45-minimal-ip-layer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    45. A Minimal IP Layer: Real IPv4 and a Real ICMP Echo (Ping)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part46/46-dynamic-idt-gate-installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    46. Dynamic IDT Gate Installation: Closing a Gap Chapter 26 Left Open
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix -- Primers and Self-Check Answers
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Appendix -- Primers and Self-Check Answers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../appendixA/a-introduction-to-assembly/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix A. Introduction to x86 Assembly
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../appendixB/b-introduction-to-unix/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix B. Introduction to Unix
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix C. Introduction to C
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix C. Introduction to C
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-c-is-and-isnt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What C is, and isn't
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-compilation-from-text-to-machine-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Compilation: from text to machine code
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-types-what-a-variable-actually-is" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Types: what a variable actually is
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-pointers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Pointers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-arrays" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Arrays
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-structs-grouping-related-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Structs: grouping related data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-typedef-naming-a-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. typedef: naming a type
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-functions-and-the-difference-between-a-declaration-and-a-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Functions, and the difference between a declaration and a definition
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-static-two-genuinely-different-meanings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. static: two genuinely different meanings
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-the-preprocessor-include-define-and-ifndef" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. The preprocessor: #include, #define, and #ifndef
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-freestanding-c-what-a-kernel-doesnt-get-for-free" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Freestanding C: what a kernel doesn't get for free
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-reading-this-books-own-code-with-everything-above-in-hand" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Reading this book's own code with everything above in hand
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../appendixD/d-self-check-answers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Appendix D. Self-Check Answers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-c-is-and-isnt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. What C is, and isn't
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-compilation-from-text-to-machine-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Compilation: from text to machine code
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-types-what-a-variable-actually-is" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Types: what a variable actually is
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-pointers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Pointers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-arrays" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Arrays
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-structs-grouping-related-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Structs: grouping related data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-typedef-naming-a-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. typedef: naming a type
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-functions-and-the-difference-between-a-declaration-and-a-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Functions, and the difference between a declaration and a definition
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-static-two-genuinely-different-meanings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. static: two genuinely different meanings
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-the-preprocessor-include-define-and-ifndef" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. The preprocessor: #include, #define, and #ifndef
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-freestanding-c-what-a-kernel-doesnt-get-for-free" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Freestanding C: what a kernel doesn't get for free
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-reading-this-books-own-code-with-everything-above-in-hand" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Reading this book's own code with everything above in hand
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="appendix-c-introduction-to-c">Appendix C. Introduction to C<a class="headerlink" href="#appendix-c-introduction-to-c" title="Permanent link">&para;</a></h1>
+<p>Nearly every line of this book's own kernel — everything except the small handful of files Appendix A already covered — is C. This appendix is a comprehensive, standalone introduction to the language itself, and, in its final sections, to the specific, narrower dialect of C a <strong>freestanding</strong> kernel like this one's actually gets to use: no standard library, no heap until the kernel builds its own (Chapter 9), no operating system underneath to lean on, because this code <em>is</em> the operating system.</p>
+<h2 id="1-what-c-is-and-isnt">1. What C is, and isn't<a class="headerlink" href="#1-what-c-is-and-isnt" title="Permanent link">&para;</a></h2>
+<p>C is a small, statically-typed, compiled language, designed by Dennis Ritchie at Bell Labs in the early 1970s specifically to make rewriting Unix itself practical (Appendix B, Section 1) — a language with almost no runtime machinery of its own, deliberately close to what the underlying hardware actually does, while still being portable across genuinely different real architectures.</p>
+<p>"Close to the hardware" is the single most important thing to understand about C before anything else: a C <code>int</code> is not an infinite-precision mathematical integer, it is a fixed number of bits that can genuinely overflow; a C pointer is not a safe, checked reference, it is a real memory address that the language will happily let you corrupt; C performs essentially no automatic bounds checking, no automatic memory management, and very little automatic anything. This is not a design flaw to be worked around — it is the entire reason a kernel can be written in C at all, since a kernel's whole job is manipulating real memory addresses and real hardware registers directly, which a more "protective" language would actively get in the way of.</p>
+<h2 id="2-compilation-from-text-to-machine-code">2. Compilation: from text to machine code<a class="headerlink" href="#2-compilation-from-text-to-machine-code" title="Permanent link">&para;</a></h2>
+<p>A C <strong>compiler</strong> (GCC, in this book's own case) translates a <code>.c</code> source file into real machine code (Appendix A, Section 1) in several real, distinct stages: <strong>preprocessing</strong> (textual substitution — expanding <code>#include</code> and <code>#define</code>, Section 10 below), <strong>compilation proper</strong> (parsing the C into an internal representation, then generating assembly), <strong>assembly</strong> (NASM-equivalent translation of that generated assembly into real machine code, an object file), and <strong>linking</strong> (combining multiple object files — and resolving every <code>extern</code> reference between them — into one final executable, the real job this book's own <code>001_linker.ld</code> and every later chapter's own linker script controls).</p>
+<p>This book's own <code>build.sh</code> runs exactly this pipeline: <code>gcc -m32 -ffreestanding ... -c file.c -o build/file.o</code> for each C file (stopping after the "assembly" stage, <code>-c</code>, to produce an object file rather than a complete program), then one final <code>ld</code> invocation linking every object file — C and NASM-assembled alike — into one <code>kernel.bin</code>.</p>
+<p><code>-ffreestanding</code> is not a minor flag — it is what tells GCC this code will never have a real C standard library, a real <code>main()</code> with the usual hosted-environment guarantees, or a real C runtime doing setup work before any of this book's own code runs (Section 11 covers exactly what that means in practice).</p>
+<h2 id="3-types-what-a-variable-actually-is">3. Types: what a variable actually is<a class="headerlink" href="#3-types-what-a-variable-actually-is" title="Permanent link">&para;</a></h2>
+<p>Every C variable has a fixed, compile-time-known <strong>type</strong>, which determines both how many bytes it occupies and how the bits in those bytes are supposed to be interpreted.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kt">char</span><span class="w">  </span><span class="n">c</span><span class="p">;</span><span class="w">   </span><span class="c1">// typically 1 byte</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kt">short</span><span class="w"> </span><span class="n">s</span><span class="p">;</span><span class="w">   </span><span class="c1">// typically 2 bytes</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kt">int</span><span class="w">   </span><span class="n">i</span><span class="p">;</span><span class="w">   </span><span class="c1">// typically 4 bytes (on every target this book builds for)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kt">long</span><span class="w">  </span><span class="n">l</span><span class="p">;</span><span class="w">   </span><span class="c1">// 4 or 8 bytes, architecture-dependent -- genuinely ambiguous, which is</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">           </span><span class="c1">// exactly why this book never uses it for anything size-sensitive</span>
+</code></pre></div>
+<p>The real, standard-mandated sizes of these "built-in" types are deliberately <em>not</em> fixed across every C implementation — only minimum ranges are guaranteed. This is exactly the real problem <code>&lt;stdint.h&gt;</code>'s own fixed-width types solve, and exactly why every single struct in this book's own code that has to match a real, external byte layout (an IDT entry, an Ethernet frame header, an IPv4 header) uses them instead of the built-in types:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kt">uint8_t</span><span class="w">   </span><span class="c1">// exactly 8 bits, unsigned</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kt">int8_t</span><span class="w">    </span><span class="c1">// exactly 8 bits, signed</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kt">uint16_t</span><span class="w">  </span><span class="c1">// exactly 16 bits, unsigned</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="kt">uint32_t</span><span class="w">  </span><span class="c1">// exactly 32 bits, unsigned</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="kt">int32_t</span><span class="w">   </span><span class="c1">// exactly 32 bits, signed</span>
+</code></pre></div>
+<p><code>unsigned</code> versus signed matters beyond just the sign bit: an <code>unsigned</code> value wraps around on overflow (defined, predictable behavior — <code>0xFFFFFFFFu + 1</code> is exactly <code>0</code>), while a signed integer overflowing is, by the C standard, <strong>undefined behavior</strong> — not merely "implementation-defined," genuinely <em>unspecified</em>, meaning the compiler is allowed to assume it never happens and optimize accordingly, which can produce real, surprising results far stranger than a simple wraparound. This is exactly why this book's own checksum and bit-manipulation code (<code>045_ip.c</code>'s own <code>ip4_checksum()</code>, for one real example) is careful to work in <code>uint32_t</code> throughout, not <code>int</code>.</p>
+<h2 id="4-pointers">4. Pointers<a class="headerlink" href="#4-pointers" title="Permanent link">&para;</a></h2>
+<p>A pointer is a variable whose own value is a memory address — nothing more mysterious than that, though the notation takes some getting used to:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">42</span><span class="p">;</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">x</span><span class="p">;</span><span class="w">     </span><span class="c1">// p now holds the ADDRESS of x ("&amp;" = "address of")</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">;</span><span class="w">       </span><span class="c1">// y = 42        ("*" here = "the value AT this address" --</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">                   </span><span class="c1">// this specific use is called "dereferencing")</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="o">*</span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span><span class="w">          </span><span class="c1">// x is now 100 -- writing THROUGH the pointer</span>
+</code></pre></div>
+<p>The type a pointer is declared with (<code>int *</code>, as opposed to a bare, untyped address) tells the compiler how many bytes to read or write when you dereference it, and — critically for the next idiom — how far to move for pointer <em>arithmetic</em>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">arr</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="mi">40</span><span class="p">,</span><span class="w"> </span><span class="mi">50</span><span class="p">};</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">arr</span><span class="p">;</span><span class="w">        </span><span class="c1">// arrays decay to a pointer to their first element</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="kt">int</span><span class="w"> </span><span class="n">second</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="p">(</span><span class="n">p</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"> </span><span class="c1">// = 20 -- "p + 1" advances by sizeof(int) BYTES, not 1 byte,</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">                        </span><span class="c1">// because p's own type is "pointer to int"</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="kt">int</span><span class="w"> </span><span class="n">same</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span><span class="w">        </span><span class="c1">// identical to *(p + 1) -- array indexing IS pointer</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">                        </span><span class="c1">// arithmetic, by definition, in C</span>
+</code></pre></div>
+<p><strong><code>NULL</code></strong> (conventionally the address <code>0</code>) is C's own real convention for "this pointer does not currently point at anything valid." Dereferencing a null pointer is undefined behavior — on this book's own freestanding kernel, with paging enabled (Chapter 8) and address 0 never mapped, it is specifically a real page fault, caught by Chapter 10's own <code>isr14</code> handler, rather than silent corruption.</p>
+<p>A pointer's own real power — and real danger — is that nothing in the language itself stops you from computing an address that doesn't actually correspond to anything valid, or from reading past the end of a real buffer. This book's own established discipline, since early in its own recent work, of running native tests under AddressSanitizer and UndefinedBehaviorSanitizer <em>before</em> ever booting a chapter's own code exists specifically because this exact class of error — a real buffer overread, a real use of uninitialized memory — is not something the C compiler itself catches, and several of this book's own real, documented bugs (Chapter 41's own <code>ota_parse_response()</code> comparing uninitialized trailing bytes, among others) were exactly this.</p>
+<h2 id="5-arrays">5. Arrays<a class="headerlink" href="#5-arrays" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kt">uint8_t</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="mi">64</span><span class="p">];</span><span class="w">          </span><span class="c1">// 64 bytes, contiguous, on the stack (if local)</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kt">uint8_t</span><span class="w"> </span><span class="n">matrix</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">4</span><span class="p">];</span><span class="w">         </span><span class="c1">// 16 bytes total, laid out row-major --</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">                              </span><span class="c1">// matrix[r][c] is at offset (r*4 + c)</span>
+</code></pre></div>
+<p>An array's own size is fixed at compile time (or, for a local array, computed once at the point it's declared) and is part of its own type — <code>uint8_t[64]</code> and <code>uint8_t[32]</code> are genuinely different types, which is exactly why this book's own function signatures are so consistent about always passing an explicit length alongside any buffer pointer (<code>veh_build_avail_request(const veh_avail_request_t *req, uint8_t *out, uint32_t out_size)</code>, one real example among dozens): once an array "decays" to a bare pointer at a function boundary, its own compile-time size information is gone, and the only way the called function can know how much space it actually has to work with is if the caller tells it explicitly.</p>
+<p>C performs <strong>no bounds checking</strong> on array access, at all, ever — <code>buffer[1000]</code> on a 64-byte array compiles and runs without complaint, reading or writing whatever real memory happens to sit past the buffer's own end. This is, again, not a defect to be apologized for; it is the direct, unavoidable consequence of arrays in C being nothing more than "a pointer, plus compiler-enforced arithmetic" — and it is exactly why every one of this book's own wire-format parsers checks lengths explicitly, by hand, before ever indexing into a buffer with an offset that came from untrusted input.</p>
+<h2 id="6-structs-grouping-related-data">6. Structs: grouping related data<a class="headerlink" href="#6-structs-grouping-related-data" title="Permanent link">&para;</a></h2>
+<p>A <code>struct</code> groups several named fields, of possibly different types, into one single composite type — the real, direct C tool for modeling anything that is naturally "several pieces of related data, together":</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">point</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="p">;</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="p">};</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="k">struct</span><span class="w"> </span><span class="nc">point</span><span class="w"> </span><span class="n">p</span><span class="p">;</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="n">p</span><span class="p">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="n">p</span><span class="p">.</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="k">struct</span><span class="w"> </span><span class="nc">point</span><span class="w"> </span><span class="o">*</span><span class="n">pp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">p</span><span class="p">;</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="n">pp</span><span class="o">-&gt;</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w">     </span><span class="c1">// "pp-&gt;x" is shorthand for "(*pp).x" -- the real, idiomatic way</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">               </span><span class="c1">// to access a struct field through a pointer to it</span>
+</code></pre></div>
+<p>Every struct field is laid out in memory in declaration order, though the compiler is free to insert <strong>padding</strong> bytes between fields to satisfy each field's own natural alignment requirement (a 4-byte <code>uint32_t</code> field, for instance, is conventionally placed at an address that is itself a multiple of 4) — which matters enormously the moment a struct's own byte layout has to match something real and external, like a network header or an IDT entry, rather than only being used internally. This book's own code handles that with GCC's <code>__attribute__((packed))</code>, which tells the compiler "lay this struct out with <em>no</em> padding at all, fields exactly adjacent, exactly in declaration order" — visible directly in <code>046_idt.c</code>'s own real IDT entry struct:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">struct</span><span class="w"> </span><span class="nc">idt_entry</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">offset_low</span><span class="p">;</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">selector</span><span class="p">;</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w">  </span><span class="n">zero</span><span class="p">;</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w">  </span><span class="n">type_attributes</span><span class="p">;</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">offset_high</span><span class="p">;</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="p">}</span><span class="w"> </span><span class="n">__attribute__</span><span class="p">((</span><span class="n">packed</span><span class="p">));</span>
+</code></pre></div>
+<p>Without <code>packed</code>, the compiler would be free to insert padding that makes this struct's own in-memory layout disagree with the real 8-byte IDT entry format the CPU itself expects — a real, serious bug class this book's own low-level structs avoid entirely by being explicit about it, every single time a struct's own layout has to match something outside this book's own code's control.</p>
+<h2 id="7-typedef-naming-a-type">7. <code>typedef</code>: naming a type<a class="headerlink" href="#7-typedef-naming-a-type" title="Permanent link">&para;</a></h2>
+<p><code>typedef</code> gives an existing type a new name — purely a readability and convenience tool; it creates no new, distinct type the way a <code>struct</code> declaration does:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">typedef</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="kt">uint32_t</span><span class="p">;</span><span class="w">   </span><span class="c1">// (this is, in fact, essentially how &lt;stdint.h&gt;</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">                                 </span><span class="c1">// itself defines uint32_t under the hood)</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">pickup_location</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">return_location</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="p">}</span><span class="w"> </span><span class="n">veh_rental_core_t</span><span class="p">;</span><span class="w">             </span><span class="c1">// the struct itself is anonymous; "veh_rental_core_t"</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">                                 </span><span class="c1">// is now a real, usable type name for it</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="n">veh_rental_core_t</span><span class="w"> </span><span class="n">core</span><span class="p">;</span><span class="w">          </span><span class="c1">// no "struct" keyword needed, unlike a plain</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">                                 </span><span class="c1">// "struct point p;" declaration above</span>
+</code></pre></div>
+<p>This exact <code>typedef struct { ... } some_name_t;</code> pattern — an anonymous struct, immediately given a name via <code>typedef</code> — is used relentlessly throughout this book's own code (every <code>_t</code>-suffixed type name in every <code>.h</code> file you've read is built this way) specifically because it lets every later piece of code refer to the type by one short, clean name, without ever needing to write out <code>struct veh_rental_core</code> (note: no <code>_t</code>) every time.</p>
+<h2 id="8-functions-and-the-difference-between-a-declaration-and-a-definition">8. Functions, and the difference between a declaration and a definition<a class="headerlink" href="#8-functions-and-the-difference-between-a-declaration-and-a-definition" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1">// declaration (a "prototype") -- in a .h file, tells OTHER files this</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="c1">// function exists, what it takes, and what it returns, without providing</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="c1">// its actual body</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="kt">uint32_t</span><span class="w"> </span><span class="nf">ip4_checksum</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="o">*</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">len</span><span class="p">);</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="c1">// definition -- in a .c file, the actual real implementation</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="kt">uint32_t</span><span class="w"> </span><span class="nf">ip4_checksum</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="o">*</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">len</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">acc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">    </span><span class="c1">// ... real work ...</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="kt">uint16_t</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="p">((</span><span class="kt">uint16_t</span><span class="p">)</span><span class="w"> </span><span class="n">acc</span><span class="p">);</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="p">}</span>
+</code></pre></div>
+<p>This book's own two-file-per-module convention (<code>045_ip.h</code> + <code>045_ip.c</code>, and so on throughout) is exactly this split, applied consistently: the header declares the real public interface other files are allowed to depend on; the <code>.c</code> file holds the real implementation, including any <code>static</code> helper functions (Section 9) meant to stay private to that one file.</p>
+<p><code>const</code> on a parameter (<code>const uint8_t *data</code>) is a real, compiler-enforced promise: this function will not modify what <code>data</code> points to. It costs nothing at runtime — it is purely a compile-time check — and it documents, directly in the function's own signature, exactly which of this book's own build/parse function pairs <em>read</em> a buffer versus which ones <em>write</em> into one, a distinction every single codec chapter in this book relies on being unambiguous.</p>
+<h2 id="9-static-two-genuinely-different-meanings">9. <code>static</code>: two genuinely different meanings<a class="headerlink" href="#9-static-two-genuinely-different-meanings" title="Permanent link">&para;</a></h2>
+<p>C overloads the keyword <code>static</code> for two real, unrelated purposes, both used constantly throughout this book:</p>
+<p><strong>At file scope</strong> (a function or a global variable declared <code>static</code> outside any function), it means "this name is private to this translation unit" — invisible to, and un-linkable from, any other <code>.c</code> file, even if another file declares a function with the exact same name. This is exactly how every one of this book's own internal helper functions (<code>append_bytes()</code>, <code>match_literal()</code>, <code>cstr_bytes_len()</code>, and dozens more, repeated with the <em>same</em> name across many different chapter's own codec files without ever colliding) stays private to its own one file: <code>static</code> is what makes that safe.</p>
+<p><strong>Inside a function</strong>, <code>static</code> on a local variable means something entirely different: that variable is allocated once, for the entire lifetime of the program (not freshly created on every call, the way an ordinary local variable is), and retains its own value between calls. This book's own <code>045_rtl8139.c</code> uses exactly this for <code>static volatile uint32_t irq_count</code>, and Chapter 46's own demo uses it for <code>g_dynisr_count</code> — both need a single, persistent counter that survives across many separate function calls (many separate real interrupts), which an ordinary stack-allocated local could never do.</p>
+<h2 id="10-the-preprocessor-include-define-and-ifndef">10. The preprocessor: <code>#include</code>, <code>#define</code>, and <code>#ifndef</code><a class="headerlink" href="#10-the-preprocessor-include-define-and-ifndef" title="Permanent link">&para;</a></h2>
+<p>The preprocessor runs <em>before</em> real C compilation and performs purely textual substitution — it has no understanding of C's own grammar at all, which is both its own power and the real source of several classic C pitfalls.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"045_ip.h"</span><span class="w">      </span><span class="c1">// textually pastes the entire contents of 045_ip.h</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">                         </span><span class="c1">// right here, as if you had typed it in by hand</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="cp">#define IP4_HEADER_LEN 20u   </span><span class="c1">// every later occurrence of IP4_HEADER_LEN in this</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">                             </span><span class="c1">// file is replaced, textually, with "20u" -- there is</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">                             </span><span class="c1">// no real "variable" here at all, just find-and-replace</span>
+</code></pre></div>
+<p>Every single header in this book opens with an <strong>include guard</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="cp">#ifndef UNIX_OS_045_IP_H</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="cp">#define UNIX_OS_045_IP_H</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="c1">// ... the entire real header content ...</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="cp">#endif</span>
+</code></pre></div>
+<p>A header file can easily end up <code>#include</code>d more than once in the same real translation unit (directly, and indirectly, through some other header that itself includes it) — without a guard, every struct and function prototype inside would be defined twice, a real compile error. <code>#ifndef UNIX_OS_045_IP_H</code> / <code>#define UNIX_OS_045_IP_H</code> makes the <em>second</em> inclusion a no-op: the symbol is already defined, so the preprocessor skips straight to the matching <code>#endif</code>, emitting nothing the second time.</p>
+<h2 id="11-freestanding-c-what-a-kernel-doesnt-get-for-free">11. Freestanding C: what a kernel doesn't get for free<a class="headerlink" href="#11-freestanding-c-what-a-kernel-doesnt-get-for-free" title="Permanent link">&para;</a></h2>
+<p>An ordinary ("hosted") C program takes an enormous amount of real infrastructure for granted: a C runtime that runs before <code>main()</code> and sets up a real stack and a real heap; a standard library providing <code>malloc()</code>/<code>free()</code>, <code>printf()</code>, <code>memcpy()</code>, and hundreds of other real functions; an operating system underneath handling every real system call those library functions eventually make. This book's own kernel has none of that, by definition — it <em>is</em> the thing that would otherwise provide it — and <code>-ffreestanding</code> is GCC's own acknowledgment of exactly that fact.</p>
+<p>Concretely, this book's own code:</p>
+<ul>
+<li><strong>Writes its own <code>kprintf()</code></strong> (<code>046_printf.c</code>, grounded since very early in the book) rather than using the real C standard library's own <code>printf()</code> — the kernel has no libc linked in at all, so no standard <code>printf()</code> exists to call, and the one this book writes deliberately supports only a small, fixed subset of real format specifiers (<code>%d</code>, <code>%u</code>, <code>%x</code>, <code>%c</code>, <code>%s</code>, and one two-character extension) — a real, documented limitation that directly caused at least one real bug in this book's own history (Chapter 42's own <code>%.*s</code> precision-specifier bug) when code assumed libc-level format-string support this kernel's own <code>kprintf()</code> was never written to provide.</li>
+<li><strong>Builds its own heap</strong> (Chapter 9's own <code>kmalloc()</code>/<code>kfree()</code>) on top of Chapter 7's own physical frame allocator — there is no real <code>malloc()</code> to call, because <code>malloc()</code> itself would need to be implemented in terms of something, and in a freestanding kernel, that "something" has to be this book's own code, all the way down.</li>
+<li><strong>Never calls any real OS-provided function</strong> — no <code>open()</code>, no <code>read()</code>, no <code>fork()</code> — since this kernel sits exactly where an OS <em>providing</em> those functions to other programs would sit; the few functions that sound like real libc functions (<code>zero_bytes()</code>, <code>bytes_eq()</code>, <code>cstr_bytes_len()</code>, scattered across nearly every chapter's own kmain.c) are this book's own small, local reimplementations of real, standard ideas (<code>memset</code>, <code>memcmp</code>, <code>strlen</code>), written from scratch because no standard library is linked in to provide the real ones.</li>
+<li><strong>Relies on GCC's own built-in support for <code>&lt;stdint.h&gt;</code></strong> specifically, even in freestanding mode — unlike the rest of the standard library, the fixed-width integer types are considered part of the compiler's own "freestanding" guarantee (they describe real properties of the target architecture itself, not library behavior), which is exactly why this book's own code can <code>#include &lt;stdint.h&gt;</code> freely in every single file without that one include ever being a real libc dependency in disguise.</li>
+</ul>
+<h2 id="12-reading-this-books-own-code-with-everything-above-in-hand">12. Reading this book's own code with everything above in hand<a class="headerlink" href="#12-reading-this-books-own-code-with-everything-above-in-hand" title="Permanent link">&para;</a></h2>
+<p>Put every section together against one more complete, real, short example — the actual <code>veh_offer_t</code> validation logic from Chapter 44's own <code>044_rental.c</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">lit_eq</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="o">*</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">len</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">lit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">lit</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="sc">'\0'</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">len</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="p">(</span><span class="kt">uint8_t</span><span class="p">)</span><span class="w"> </span><span class="n">lit</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">        </span><span class="n">i</span><span class="o">++</span><span class="p">;</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">len</span><span class="p">;</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="p">}</span>
+</code></pre></div>
+<p><code>static</code> (Section 9): private to this one <code>.c</code> file. <code>const uint8_t *s</code> and <code>const char *lit</code> (Sections 4, 8): two pointer parameters, both promised not to be modified. <code>uint32_t len</code> (Section 3): an explicit length accompanying the pointer <code>s</code>, exactly because <code>s</code>'s own compile-time size information is long gone by the time it reached this function as a bare pointer (Section 5). <code>lit[i] != '\0'</code>: walking a real, null-terminated C string one byte at a time — the conventional C idiom for "where does this string end," since a bare <code>char *</code> carries no length of its own at all. <code>i &gt;= len</code>: the real, explicit bounds check this function performs by hand, because nothing in the language would stop <code>s[i]</code> from reading past the real end of <code>s</code> if this check were ever left out. <code>(uint8_t) lit[i]</code>: an explicit cast, converting <code>lit[i]</code> (a <code>char</code>, whose own signedness is implementation-defined) to <code>uint8_t</code> before comparing it against <code>s[i]</code> (already <code>uint8_t</code>) — removing any ambiguity about whether the comparison is signed or unsigned, the same real discipline Section 3 discussed.</p>
+<p>Every one of this book's own functions, across every one of its 46 chapters, is built from exactly these same real, small pieces — the only thing that changes, chapter to chapter, is which real problem they're assembled to solve.</p>
+<h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Kernighan &amp; Ritchie, <em>The C Programming Language</em>, 2nd edition</strong> — the real, canonical reference, written by the language's own co-designer, still the standard starting point four decades later.</li>
+<li><strong>The C11 standard itself</strong> (ISO/IEC 9899:2011), and the real, freely-available C99/C11 rationale documents — for exactly what the language does and does not guarantee, in its own precise, authoritative words.</li>
+<li><strong>"Undefined Behavior" writeups</strong> from the LLVM and GCC project blogs — real, practical explanations of why undefined behavior is not merely "unspecified" but actively exploited by real optimizing compilers, directly relevant to this book's own discipline of testing under UndefinedBehaviorSanitizer before ever booting new code.</li>
+<li><strong>OSDev Wiki's own "Bare Bones" and "Meaty Skeleton" tutorials</strong> (wiki.osdev.org) — the real, practical starting point this book's own earliest chapters are built in the same spirit as, for exactly what "freestanding C" means in the specific context of writing a kernel.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../../appendixB/b-introduction-to-unix/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Appendix B. Introduction to Unix">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Appendix B. Introduction to Unix
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../appendixD/d-self-check-answers/" class="md-footer__link md-footer__link--next" aria-label="Next: Appendix D. Self-Check Answers">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Appendix D. Self-Check Answers
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 Oluwaseyi Awoga
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
