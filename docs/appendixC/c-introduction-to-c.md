@@ -216,6 +216,338 @@ static int lit_eq(const uint8_t *s, uint32_t len, const char *lit) {
 
 Every one of this book's own functions, across every one of its 46 chapters, is built from exactly these same real, small pieces — the only thing that changes, chapter to chapter, is which real problem they're assembled to solve.
 
+## 13. Five complete, worked examples
+
+Every one of the five programs below was actually compiled and run — the first four under both AddressSanitizer and UndefinedBehaviorSanitizer, the same proactive discipline this book's own native tests have used since Chapter 41 — to confirm the real output shown is genuinely what each one produces.
+
+### Example 1: pointers and arrays, together
+
+```c
+#include <stdio.h>
+
+static void swap(int *a, int *b) {
+    int tmp = *a;
+    *a = *b;
+    *b = tmp;
+}
+
+static int sum_array(const int *arr, int len) {
+    int total = 0;
+    for (int i = 0; i < len; i++) {
+        total += arr[i];      /* arr[i] is exactly *(arr + i) */
+    }
+    return total;
+}
+
+int main(void) {
+    int numbers[5] = {10, 20, 30, 40, 50};
+    int *p = numbers;   /* arrays decay to a pointer to their first element */
+
+    printf("numbers[2] = %d, *(p + 2) = %d  (same real address)\n",
+           numbers[2], *(p + 2));
+
+    printf("sizeof(numbers) = %zu bytes, sizeof(p) = %zu bytes "
+           "(the array still knows its size here; the pointer never did)\n",
+           sizeof(numbers), sizeof(p));
+
+    printf("before swap: numbers[0]=%d, numbers[4]=%d\n", numbers[0], numbers[4]);
+    swap(&numbers[0], &numbers[4]);
+    printf("after swap:  numbers[0]=%d, numbers[4]=%d\n", numbers[0], numbers[4]);
+
+    printf("sum = %d\n", sum_array(numbers, 5));
+
+    return 0;
+}
+```
+
+```
+gcc -Wall -Wextra -fsanitize=address,undefined -o pointers_arrays pointers_arrays.c
+./pointers_arrays
+```
+
+**Real captured output** (on this real, 64-bit host -- this book's own kernel, targeting 32-bit, would show `sizeof(p) = 4 bytes` instead, the one real, environment-dependent number in this output):
+```text
+numbers[2] = 30, *(p + 2) = 30  (same real address)
+sizeof(numbers) = 20 bytes, sizeof(p) = 8 bytes (the array still knows its size here; the pointer never did)
+before swap: numbers[0]=10, numbers[4]=50
+after swap:  numbers[0]=50, numbers[4]=10
+sum = 150
+```
+
+`swap()` genuinely modifies the caller's own variables because it receives their *addresses*, not copies of their values — the real, direct reason C passes "by value" for everything, with pointers as the one real, explicit tool for anything that needs to act otherwise. `sizeof(numbers)` and `sizeof(p)` diverging is Section 5's own real point made visible: the array itself still knows it holds 5 `int`s; the pointer, once assigned, never carried that information at all.
+
+### Example 2: a struct holding a pointer to its own type
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct node {
+    int value;
+    struct node *next;   /* a struct may hold a pointer to its own type --
+                          * this is exactly what makes a linked list possible */
+} node_t;
+
+static node_t *push_front(node_t *head, int value) {
+    node_t *n = malloc(sizeof(node_t));
+    if (n == NULL) {
+        fprintf(stderr, "out of memory\n");
+        exit(1);
+    }
+    n->value = value;
+    n->next = head;
+    return n;
+}
+
+static void print_list(const node_t *head) {
+    for (const node_t *n = head; n != NULL; n = n->next) {
+        printf("%d", n->value);
+        if (n->next != NULL) {
+            printf(" -> ");
+        }
+    }
+    printf("\n");
+}
+
+static void free_list(node_t *head) {
+    while (head != NULL) {
+        node_t *next = head->next;
+        free(head);
+        head = next;
+    }
+}
+
+int main(void) {
+    node_t *list = NULL;
+    for (int i = 1; i <= 5; i++) {
+        list = push_front(list, i);
+    }
+    print_list(list);
+    free_list(list);
+    return 0;
+}
+```
+
+```
+gcc -Wall -Wextra -fsanitize=address,undefined -o linked_list linked_list.c
+./linked_list
+```
+
+**Real captured output:**
+```text
+5 -> 4 -> 3 -> 2 -> 1
+```
+
+`struct node { ...; struct node *next; }` is legal specifically because `next` is only a *pointer* to another `node` — a struct containing an actual, embedded copy of itself would need infinite memory, but a pointer is always a fixed, small size regardless of what it points to. This book's own kernel never uses `malloc()`/`free()` (Section 11 — this example deliberately runs hosted, with a real libc, to isolate the struct/pointer idea from Appendix C's own later freestanding concerns), but every other real idea here — the typedef'd struct, the `->` operator, walking a chain of pointers until `NULL` — is identical to how this book's own ARP cache (Chapter 29) and scheduler (Chapters 11-12) link their own records together.
+
+### Example 3: a real, two-file project — the header/implementation split this book uses throughout
+
+`stack.h`:
+```c
+#ifndef STACK_H
+#define STACK_H
+
+#define STACK_MAX 8
+
+typedef struct {
+    int items[STACK_MAX];
+    int count;
+} stack_t;
+
+void stack_init(stack_t *s);
+int stack_push(stack_t *s, int value);   /* returns 1 on success, 0 if full */
+int stack_pop(stack_t *s, int *out_value); /* returns 1 on success, 0 if empty */
+
+#endif
+```
+
+`stack.c`:
+```c
+#include "stack.h"
+
+void stack_init(stack_t *s) {
+    s->count = 0;
+}
+
+int stack_push(stack_t *s, int value) {
+    if (s->count >= STACK_MAX) {
+        return 0;
+    }
+    s->items[s->count] = value;
+    s->count++;
+    return 1;
+}
+
+int stack_pop(stack_t *s, int *out_value) {
+    if (s->count == 0) {
+        return 0;
+    }
+    s->count--;
+    *out_value = s->items[s->count];
+    return 1;
+}
+```
+
+`main.c`:
+```c
+#include <stdio.h>
+#include "stack.h"
+
+int main(void) {
+    stack_t s;
+    stack_init(&s);
+
+    for (int i = 1; i <= 5; i++) {
+        int ok = stack_push(&s, i * 10);
+        printf("push(%d): %s\n", i * 10, ok ? "OK" : "FULL");
+    }
+
+    int value;
+    while (stack_pop(&s, &value)) {
+        printf("pop() -> %d\n", value);
+    }
+    printf("pop() on empty stack: %s\n", stack_pop(&s, &value) ? "OK" : "EMPTY, as expected");
+
+    return 0;
+}
+```
+
+```
+gcc -Wall -Wextra -fsanitize=address,undefined -c stack.c -o stack.o
+gcc -Wall -Wextra -fsanitize=address,undefined -c main.c -o main.o
+gcc -fsanitize=address,undefined -o stack_demo stack.o main.o
+./stack_demo
+```
+
+**Real captured output:**
+```text
+push(10): OK
+push(20): OK
+push(30): OK
+push(40): OK
+push(50): OK
+pop() -> 50
+pop() -> 40
+pop() -> 30
+pop() -> 20
+pop() -> 10
+pop() on empty stack: EMPTY, as expected
+```
+
+`stack.h`'s own include guard (Section 10) means this header is safe to `#include` from both `stack.c` and `main.c` in the same real build without a redefinition error. `stack.c` never includes `<stdio.h>` and never calls `printf` — it has exactly one job, the real data structure's own logic — while `main.c` owns every bit of this program's own user-facing output, the same real separation of concerns this book's own `.h`/`.c` pairs maintain in every single chapter.
+
+### Example 4: a real bug, caught by AddressSanitizer, exactly the way this book catches its own
+
+```c
+#include <stdio.h>
+#include <stdint.h>
+
+/* Copies at most `max` bytes of a NUL-terminated string into `out`,
+ * mirroring this book's own established style of hand-written,
+ * restricted-subset string helpers (e.g. 044_veh.c's own
+ * cstr_bytes_len()) rather than calling a real libc string function. */
+static uint32_t copy_bounded(const char *src, uint8_t *out, uint32_t max) {
+    uint32_t i = 0;
+    /* BUG: this loop condition allows i == max, one past the real end
+     * of a max-byte buffer. */
+    while (src[i] != '\0' && i <= max) {
+        out[i] = (uint8_t) src[i];
+        i++;
+    }
+    return i;
+}
+
+int main(void) {
+    uint8_t buf[8];
+    uint32_t n = copy_bounded("ABCDEFGHI", buf, sizeof(buf));
+    printf("copied %u bytes\n", n);
+    return 0;
+}
+```
+
+```
+gcc -Wall -Wextra -fsanitize=address,undefined -g -o buggy_copy buggy_copy.c
+./buggy_copy
+```
+
+**Real captured output** (abridged -- AddressSanitizer's own real report is considerably longer):
+```text
+==2235==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7f2813f00028 at pc 0x55559bd103ab bp 0x7ffddc690de0 sp 0x7ffddc690dd0
+WRITE of size 1 at 0x7f2813f00028 thread T0
+    #0 0x55559bd103aa in copy_bounded buggy_copy.c:14
+    #1 0x55559bd104ec in main buggy_copy.c:22
+...
+SUMMARY: AddressSanitizer: stack-buffer-overflow buggy_copy.c:14 in copy_bounded
+```
+
+A nine-character input against an 8-byte buffer is exactly what makes `i <= max` reach `i == 8` with `src[8]` still non-NUL (`'I'`), writing `out[8]` — one byte past the real end of `buf`. The real compiler issued no warning at all for this; `-Wall -Wextra` catch many real mistakes, but not this one, because `i <= max` is syntactically ordinary, unremarkable C. Only AddressSanitizer's own real, instrumented bounds checking caught it, immediately, pinpointing the exact line — the identical real tool and discipline this book's own Chapter 41 onward native tests rely on, for exactly this class of bug. The one-character fix:
+
+```c
+    while (src[i] != '\0' && i < max) {   /* FIXED: i < max, never i == max */
+```
+
+```
+./buggy_copy
+```
+
+**Real captured output, after the fix:**
+```text
+copied 8 bytes
+```
+
+### Example 5: `static`'s two, genuinely different meanings, both demonstrated
+
+```c
+#include <stdio.h>
+
+/* "static" at file scope: private to this one translation unit.
+ * A second file could define its own, unrelated "helper()" with no
+ * collision at all, the same way this book's own append_bytes(),
+ * repeated across many different chapters' own codec files, never
+ * collides at link time. */
+static int helper(int x) {
+    return x * 2;
+}
+
+/* "static" on a LOCAL variable: a completely different real meaning
+ * -- allocated once, for the entire life of the program, retaining
+ * its value between calls, rather than being freshly created (and
+ * losing its value) every time the function returns -- exactly how
+ * this book's own 046_rtl8139.c's own "static volatile uint32_t
+ * irq_count" survives across many separate real interrupts. */
+static int call_counter(void) {
+    static int count = 0;
+    count++;
+    return count;
+}
+
+int main(void) {
+    printf("helper(21) = %d\n", helper(21));
+
+    for (int i = 0; i < 4; i++) {
+        printf("call_counter() = %d\n", call_counter());
+    }
+
+    return 0;
+}
+```
+
+```
+gcc -Wall -Wextra -fsanitize=address,undefined -o static_demo static_demo.c
+./static_demo
+```
+
+**Real captured output:**
+```text
+helper(21) = 42
+call_counter() = 1
+call_counter() = 2
+call_counter() = 3
+call_counter() = 4
+```
+
+`helper()`'s own `static` would matter only if a second `.c` file in the same real program also defined a function named `helper` — this one-file example can't show the collision it prevents directly, but Section 9's own real point stands: nothing here exports `helper` for any other file to even see. `call_counter()`'s own `count`, by contrast, visibly keeps counting across four separate calls — an ordinary (non-`static`) local would reset to `0` on every single call, and this function would print `1` four times in a row instead.
+
 ## Further reading
 
 - **Kernighan & Ritchie, *The C Programming Language*, 2nd edition** — the real, canonical reference, written by the language's own co-designer, still the standard starting point four decades later.

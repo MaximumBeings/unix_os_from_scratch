@@ -263,6 +263,324 @@ dynisr_demo:
 
 Reading it top to bottom, with everything above now in hand: `BITS 32` targets this book's own 32-bit protected-mode build. `extern dynisr_demo_handler` declares a C function, defined elsewhere (`046_kmain.c`), that this file will call. `global dynisr_demo` exposes this stub's own label to the linker, so `046_kmain.c` can take its address (`(uint32_t) dynisr_demo`) and hand it to `idt_install_gate()` as the real handler for a brand-new vector. `pusha` saves every general-purpose register by hand, because whatever was running when `int $0x90` fired had no chance to save anything itself. `call dynisr_demo_handler` is an ordinary cdecl call into C — by this point every x86 and C concept above has conspired to make this one line behave exactly like any other function call. `popa` restores every register `pusha` just saved, and `iret` — not `ret` — pops the CPU's own pushed `eflags`/`cs`/`eip` and resumes whatever was interrupted, with no trace that anything happened at all.
 
+## 12. Five complete, worked examples
+
+Everything above is explained against short fragments. This section gives five complete, real programs — every one of the first four actually assembled, linked, and run (on a real x86-64 Linux host, using the real 32-bit instruction set and the real 32-bit Linux syscall ABI this book's own `015_isr128.asm`/`025_isr128.asm` already model from the kernel side) to confirm the real output shown is genuinely what each one produces, not a prediction. The fifth is this book's own real Chapter 46 code, reproduced and walked through in full.
+
+### Example 1: a complete program, start to finish
+
+The smallest possible real, standalone program — no C, no libc, nothing but this file and the two real Linux syscalls (`write`, `exit`) needed to print a message and stop cleanly:
+
+```nasm
+BITS 32
+
+section .data
+    msg db "Hello from x86 assembly!", 0x0a
+    msg_len equ $ - msg
+
+section .text
+global _start
+_start:
+    mov eax, 4          ; sys_write
+    mov ebx, 1          ; fd 1 = stdout
+    mov ecx, msg
+    mov edx, msg_len
+    int 0x80
+
+    mov eax, 1          ; sys_exit
+    mov ebx, 0
+    int 0x80
+```
+
+`$` is NASM's own real "current address" symbol, so `msg_len equ $ - msg` computes the real string's length at assemble time, without the programmer ever having to count characters by hand. `int 0x80` here is the exact same real instruction `025_isr128.asm`'s own stub exists to receive on the other side — the real Linux kernel's own syscall dispatcher reads `eax` for the syscall number and `ebx`/`ecx`/`edx` for the first three arguments, the identical real calling convention this book's own `isr128_handler()` implements for its own, much smaller, one-syscall kernel.
+
+Build and run exactly as this book's own `build.sh` builds every chapter's own kernel:
+
+```
+nasm -f elf32 hello.asm -o hello.o
+ld -m elf_i386 hello.o -o hello
+./hello
+```
+
+**Real captured output:**
+```text
+Hello from x86 assembly!
+```
+
+### Example 2: addressing modes and manual arithmetic
+
+Sums a real array using the full base+index+scale addressing mode (Section 5), then converts the result to a decimal string by hand — no `itoa`, no libc, just `div` and the digit-by-digit remainder trick every real integer-to-string routine is built from underneath:
+
+```nasm
+BITS 32
+
+section .data
+    numbers dd 10, 20, 30, 40, 50
+    count   equ 5
+    newline db 0x0a
+
+section .bss
+    digits resb 12
+
+section .text
+global _start
+_start:
+    xor eax, eax            ; eax = running sum
+    xor ecx, ecx            ; ecx = index
+sum_loop:
+    cmp ecx, count
+    jge sum_done
+    mov edx, [numbers + ecx*4]   ; base + index*scale addressing mode
+    add eax, edx
+    inc ecx
+    jmp sum_loop
+sum_done:
+    ; eax now holds the sum -- convert it to a decimal ASCII string
+    mov edi, digits
+    add edi, 11
+    mov ebx, 10
+convert_loop:
+    xor edx, edx
+    div ebx                      ; eax = eax/10, edx = eax%10
+    add dl, '0'
+    dec edi
+    mov [edi], dl
+    test eax, eax
+    jnz convert_loop
+
+    ; print the digits, from edi through the end of the buffer
+    mov esi, edi
+    lea edx, [digits + 11]
+    sub edx, edi                 ; edx = length
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, esi
+    int 0x80
+
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, newline
+    mov edx, 1
+    int 0x80
+
+    mov eax, 1
+    xor ebx, ebx
+    int 0x80
+```
+
+`div ebx` is a real, single instruction dividing the 64-bit value in `edx:eax` by `ebx`, leaving the quotient in `eax` and the remainder in `edx` — real unsigned division, which is exactly why `xor edx, edx` has to run immediately before every single division: `div` reads `edx` as the real high half of its own dividend, and a stale nonzero value left over from the previous digit would silently corrupt the next one. The digits come out least-significant-first, so this routine builds the string backward from the end of its own buffer (`dec edi` before every store), rather than building it forward and reversing it afterward.
+
+```
+nasm -f elf32 sumarray.asm -o sumarray.o
+ld -m elf_i386 sumarray.o -o sumarray
+./sumarray
+```
+
+**Real captured output:**
+```text
+150
+```
+
+(10 + 20 + 30 + 40 + 50 = 150, confirmed.)
+
+### Example 3: cdecl, a stack frame, and a real C/assembly boundary
+
+A real assembly function, callable from C exactly the way `025_isr128.asm` is callable from the CPU, but through the ordinary cdecl convention (Section 8) instead of the interrupt mechanism (Section 9) — plus a C driver that uses raw inline-asm syscalls instead of `printf`, so the whole program links with no C library at all, mirroring this book's own real, freestanding `-ffreestanding` build flags exactly.
+
+`appendix_demo.asm`:
+```nasm
+BITS 32
+
+section .text
+extern cmain
+global _start
+_start:
+    mov esp, stack_top
+    call cmain
+    mov eax, 1
+    xor ebx, ebx
+    int 0x80
+
+global factorial
+; int factorial(int n) -- real cdecl: the caller pushes n, eax holds n! on return
+factorial:
+    push ebp
+    mov ebp, esp
+    mov ecx, [ebp+8]     ; n, the one real cdecl argument
+    mov eax, 1            ; running product
+fact_loop:
+    cmp ecx, 1
+    jle fact_done
+    imul eax, ecx
+    dec ecx
+    jmp fact_loop
+fact_done:
+    mov esp, ebp
+    pop ebp
+    ret
+
+section .bss
+align 16
+stack_bottom:
+    resb 4096
+stack_top:
+```
+
+`cmain.c`:
+```c
+extern int factorial(int n);
+
+static void write_str(const char *s, unsigned int len) {
+    __asm__ volatile (
+        "mov $4, %%eax\n\t"
+        "mov $1, %%ebx\n\t"
+        "mov %0, %%ecx\n\t"
+        "mov %1, %%edx\n\t"
+        "int $0x80"
+        :
+        : "r" (s), "r" (len)
+        : "eax", "ebx", "ecx", "edx"
+    );
+}
+
+static void print_uint(unsigned int v) {
+    char digits[12];
+    int n = 0;
+    if (v == 0) {
+        digits[n++] = '0';
+    } else {
+        while (v > 0) {
+            digits[n++] = (char) ('0' + (v % 10));
+            v /= 10;
+        }
+    }
+    char out[12];
+    for (int i = 0; i < n; i++) {
+        out[i] = digits[n - 1 - i];
+    }
+    write_str(out, (unsigned) n);
+}
+
+void cmain(void) {
+    for (int i = 0; i <= 10; i++) {
+        print_uint((unsigned) i);
+        write_str("! = ", 4);
+        print_uint((unsigned) factorial(i));
+        write_str("\n", 1);
+    }
+}
+```
+
+`factorial()` takes its one real argument the cdecl way — read straight off the stack at `[ebp+8]` (`ebp+4` would be the saved return address `call` itself pushed; `ebp+0` is the saved caller's own `ebp`) — exactly the stack-frame shape Section 8 describes in the abstract, now doing real work. `cmain()` never knows or cares that `factorial` is assembly rather than C; cdecl is precisely the agreement that makes that invisible.
+
+```
+nasm -f elf32 appendix_demo.asm -o appendix_demo.o
+gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -c cmain.c -o cmain.o
+ld -m elf_i386 -o factorial_demo appendix_demo.o cmain.o -e _start
+./factorial_demo
+```
+
+**Real captured output:**
+```text
+0! = 1
+1! = 1
+2! = 2
+3! = 6
+4! = 24
+5! = 120
+6! = 720
+7! = 5040
+8! = 40320
+9! = 362880
+10! = 3628800
+```
+
+(The real link step above even reproduces this book's own familiar `ld` warning, `missing .note.GNU-stack section implies executable stack` — the exact same real, correctly-noticed-but-harmless-here warning Chapter 1's own build output already explains.)
+
+### Example 4: reading EFLAGS from C, the same way `046_idt.c` does
+
+Section 10's own `idt_install_gate()` reads `EFLAGS.IF` via inline asm before deciding whether to restore interrupts. This example reads a different real flag — CF, the Carry Flag — immediately after a real `add`, to show the exact same real mechanism catching unsigned overflow the instant it happens:
+
+```c
+#include <stdio.h>
+#include <stdint.h>
+
+/* Adds a and b, then reads EFLAGS immediately afterward via inline asm,
+ * to check the real Carry Flag (bit 0) the "add" instruction itself just
+ * set -- the same real flag a later "jc"/"jb" would branch on. */
+static int add_with_carry_check(uint32_t a, uint32_t b, uint32_t *out_sum) {
+    uint32_t sum = a;
+    unsigned long eflags;
+    __asm__ volatile (
+        "add %2, %0\n\t"
+        "pushf\n\t"
+        "pop %1"
+        : "+r" (sum), "=r" (eflags)
+        : "r" (b)
+    );
+    *out_sum = sum;
+    return (eflags & 1u) != 0;  /* bit 0 = CF */
+}
+
+int main(void) {
+    uint32_t sum;
+    int carry;
+
+    carry = add_with_carry_check(100, 200, &sum);
+    printf("100 + 200 = %u, carry = %d\n", sum, carry);
+
+    carry = add_with_carry_check(0xFFFFFFFFu, 1, &sum);
+    printf("0xFFFFFFFF + 1 = %u, carry = %d\n", sum, carry);
+
+    return 0;
+}
+```
+
+The `"+r" (sum)` constraint means "this operand is both read and written" — the real `add` instruction's own destination; `"=r" (eflags)` means "this operand is written only," populated by `pop`. Note this example compiles and runs as an ordinary, hosted 64-bit program (no `-m32`, since the point here is the inline-asm/EFLAGS mechanism, not the 32-bit ABI Examples 1-3 specifically demonstrate) — `pushf`/`pop` on this real host push and pop the full native width, but CF still lives at bit 0 regardless, the identical real bit this book's own `046_idt.c` reads at bit 9 for IF.
+
+```
+gcc -Wall -Wextra -o flags_demo flags_demo.c
+./flags_demo
+```
+
+**Real captured output:**
+```text
+100 + 200 = 300, carry = 0
+0xFFFFFFFF + 1 = 0, carry = 1
+```
+
+(`0xFFFFFFFF + 1` really does wrap to `0` in 32-bit unsigned arithmetic — Section 3's own real point, from Appendix C, made directly visible here — and the real hardware genuinely sets CF to say so.)
+
+### Example 5: this book's own real interrupt stub, in full
+
+Not a new example — this book's own real `046_dynisr.asm` (Chapter 46), reproduced here complete, annotated against every section above, as the one example this appendix cannot run standalone (it needs a real IDT entry installed by a real kernel first; Section 9 already explains why):
+
+```nasm
+BITS 32
+
+section .text
+extern dynisr_demo_handler
+global dynisr_demo
+dynisr_demo:
+    pusha
+    call dynisr_demo_handler
+    popa
+    iret
+```
+
+`extern dynisr_demo_handler` (Section 4): a C function, defined in `046_kmain.c`, this file only calls, never defines. `global dynisr_demo` (Section 4): exposes this stub's own label so `046_kmain.c` can take its address and hand it to `idt_install_gate()`. `pusha`/`popa` (Section 9): saves and restores all eight general-purpose registers by hand, because — unlike Example 3's own `call factorial`, an ordinary function call where the caller already knows to preserve what it needs — nothing running when a real interrupt fires ever got the chance to save anything itself. `call dynisr_demo_handler` (Section 8): an ordinary cdecl call, no different in kind from Example 3's own `call factorial` once execution actually reaches this line. `iret`, not `ret` (Section 9): pops the real `eflags`/`cs`/`eip` the CPU itself pushed before this stub's first instruction ever ran, resuming whatever was interrupted with no trace that anything happened.
+
+The real C side that installs and triggers it, from `046_kmain.c`:
+
+```c
+extern void dynisr_demo(void); /* 046_dynisr.asm */
+idt_install_gate(0x90, (uint32_t) dynisr_demo, 0x08, 0x8E);
+...
+__asm__ volatile ("int $0x90");
+```
+
+`idt_install_gate()` writes this stub's own address into IDT slot `0x90` (Section 11's own real worked example already covers exactly how `idt_set_gate()`-style logic does that byte by byte); `int $0x90` is inline asm (Section 10) for the single real instruction that makes the CPU jump there. This book's own real, captured Chapter 46 boot log confirms a real counter the handler increments goes from 0 to 1, across 3 consecutive identical boots — the real proof this exact mechanism works, already locked into that chapter's own page.
+
 ## Further reading
 
 This appendix deliberately covers only what a reader of this book's own code needs. For the real, complete, authoritative references:
