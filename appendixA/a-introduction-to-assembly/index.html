@@ -2244,6 +2244,78 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#12-five-complete-worked-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Five complete, worked examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="12. Five complete, worked examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-1-a-complete-program-start-to-finish" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 1: a complete program, start to finish
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-2-addressing-modes-and-manual-arithmetic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 2: addressing modes and manual arithmetic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-3-cdecl-a-stack-frame-and-a-real-cassembly-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 3: cdecl, a stack frame, and a real C/assembly boundary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-4-reading-eflags-from-c-the-same-way-046_idtc-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 4: reading EFLAGS from C, the same way 046_idt.c does
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-5-this-books-own-real-interrupt-stub-in-full" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 5: this book's own real interrupt stub, in full
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#further-reading" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2498,6 +2570,78 @@
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-five-complete-worked-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Five complete, worked examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="12. Five complete, worked examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-1-a-complete-program-start-to-finish" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 1: a complete program, start to finish
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-2-addressing-modes-and-manual-arithmetic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 2: addressing modes and manual arithmetic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-3-cdecl-a-stack-frame-and-a-real-cassembly-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 3: cdecl, a stack frame, and a real C/assembly boundary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-4-reading-eflags-from-c-the-same-way-046_idtc-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 4: reading EFLAGS from C, the same way 046_idt.c does
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-5-this-books-own-real-interrupt-stub-in-full" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example 5: this book's own real interrupt stub, in full
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2763,6 +2907,271 @@ NASM output is organized into <strong>sections</strong>, each of which the linke
 <a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="w">    </span><span class="nf">iret</span>
 </code></pre></div>
 <p>Reading it top to bottom, with everything above now in hand: <code>BITS 32</code> targets this book's own 32-bit protected-mode build. <code>extern dynisr_demo_handler</code> declares a C function, defined elsewhere (<code>046_kmain.c</code>), that this file will call. <code>global dynisr_demo</code> exposes this stub's own label to the linker, so <code>046_kmain.c</code> can take its address (<code>(uint32_t) dynisr_demo</code>) and hand it to <code>idt_install_gate()</code> as the real handler for a brand-new vector. <code>pusha</code> saves every general-purpose register by hand, because whatever was running when <code>int $0x90</code> fired had no chance to save anything itself. <code>call dynisr_demo_handler</code> is an ordinary cdecl call into C — by this point every x86 and C concept above has conspired to make this one line behave exactly like any other function call. <code>popa</code> restores every register <code>pusha</code> just saved, and <code>iret</code> — not <code>ret</code> — pops the CPU's own pushed <code>eflags</code>/<code>cs</code>/<code>eip</code> and resumes whatever was interrupted, with no trace that anything happened at all.</p>
+<h2 id="12-five-complete-worked-examples">12. Five complete, worked examples<a class="headerlink" href="#12-five-complete-worked-examples" title="Permanent link">&para;</a></h2>
+<p>Everything above is explained against short fragments. This section gives five complete, real programs — every one of the first four actually assembled, linked, and run (on a real x86-64 Linux host, using the real 32-bit instruction set and the real 32-bit Linux syscall ABI this book's own <code>015_isr128.asm</code>/<code>025_isr128.asm</code> already model from the kernel side) to confirm the real output shown is genuinely what each one produces, not a prediction. The fifth is this book's own real Chapter 46 code, reproduced and walked through in full.</p>
+<h3 id="example-1-a-complete-program-start-to-finish">Example 1: a complete program, start to finish<a class="headerlink" href="#example-1-a-complete-program-start-to-finish" title="Permanent link">&para;</a></h3>
+<p>The smallest possible real, standalone program — no C, no libc, nothing but this file and the two real Linux syscalls (<code>write</code>, <code>exit</code>) needed to print a message and stop cleanly:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">BITS</span><span class="w"> </span><span class="mi">32</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="k">section</span><span class="w"> </span><span class="nv">.data</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">    </span><span class="nf">msg</span><span class="w"> </span><span class="nv">db</span><span class="w"> </span><span class="s">"Hello from x86 assembly!"</span><span class="p">,</span><span class="w"> </span><span class="mh">0x0a</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">    </span><span class="no">msg_len</span><span class="w"> </span><span class="kd">equ</span><span class="w"> </span><span class="kc">$</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">msg</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="k">section</span><span class="w"> </span><span class="nv">.text</span>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="k">global</span><span class="w"> </span><span class="nv">_start</span>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="nl">_start:</span>
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">eax</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="w">          </span><span class="c1">; sys_write</span>
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">ebx</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w">          </span><span class="c1">; fd 1 = stdout</span>
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">ecx</span><span class="p">,</span><span class="w"> </span><span class="nv">msg</span>
+<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">edx</span><span class="p">,</span><span class="w"> </span><span class="nv">msg_len</span>
+<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a><span class="w">    </span><span class="nf">int</span><span class="w"> </span><span class="mh">0x80</span>
+<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a>
+<a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">eax</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w">          </span><span class="c1">; sys_exit</span>
+<a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">ebx</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span>
+<a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a><span class="w">    </span><span class="nf">int</span><span class="w"> </span><span class="mh">0x80</span>
+</code></pre></div>
+<p><code>$</code> is NASM's own real "current address" symbol, so <code>msg_len equ $ - msg</code> computes the real string's length at assemble time, without the programmer ever having to count characters by hand. <code>int 0x80</code> here is the exact same real instruction <code>025_isr128.asm</code>'s own stub exists to receive on the other side — the real Linux kernel's own syscall dispatcher reads <code>eax</code> for the syscall number and <code>ebx</code>/<code>ecx</code>/<code>edx</code> for the first three arguments, the identical real calling convention this book's own <code>isr128_handler()</code> implements for its own, much smaller, one-syscall kernel.</p>
+<p>Build and run exactly as this book's own <code>build.sh</code> builds every chapter's own kernel:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>nasm -f elf32 hello.asm -o hello.o
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>ld -m elf_i386 hello.o -o hello
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>./hello
+</code></pre></div>
+<p><strong>Real captured output:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>Hello from x86 assembly!
+</code></pre></div></p>
+<h3 id="example-2-addressing-modes-and-manual-arithmetic">Example 2: addressing modes and manual arithmetic<a class="headerlink" href="#example-2-addressing-modes-and-manual-arithmetic" title="Permanent link">&para;</a></h3>
+<p>Sums a real array using the full base+index+scale addressing mode (Section 5), then converts the result to a decimal string by hand — no <code>itoa</code>, no libc, just <code>div</code> and the digit-by-digit remainder trick every real integer-to-string routine is built from underneath:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">BITS</span><span class="w"> </span><span class="mi">32</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="k">section</span><span class="w"> </span><span class="nv">.data</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">    </span><span class="nf">numbers</span><span class="w"> </span><span class="nv">dd</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="mi">40</span><span class="p">,</span><span class="w"> </span><span class="mi">50</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">    </span><span class="no">count</span><span class="w">   </span><span class="kd">equ</span><span class="w"> </span><span class="mi">5</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">    </span><span class="nf">newline</span><span class="w"> </span><span class="nv">db</span><span class="w"> </span><span class="mh">0x0a</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="k">section</span><span class="w"> </span><span class="nv">.bss</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">    </span><span class="nf">digits</span><span class="w"> </span><span class="nv">resb</span><span class="w"> </span><span class="mi">12</span>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="k">section</span><span class="w"> </span><span class="nv">.text</span>
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="k">global</span><span class="w"> </span><span class="nv">_start</span>
+<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="nl">_start:</span>
+<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="w">    </span><span class="nf">xor</span><span class="w"> </span><span class="nb">eax</span><span class="p">,</span><span class="w"> </span><span class="nb">eax</span><span class="w">            </span><span class="c1">; eax = running sum</span>
+<a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a><span class="w">    </span><span class="nf">xor</span><span class="w"> </span><span class="nb">ecx</span><span class="p">,</span><span class="w"> </span><span class="nb">ecx</span><span class="w">            </span><span class="c1">; ecx = index</span>
+<a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a><span class="nl">sum_loop:</span>
+<a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a><span class="w">    </span><span class="nf">cmp</span><span class="w"> </span><span class="nb">ecx</span><span class="p">,</span><span class="w"> </span><span class="nv">count</span>
+<a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a><span class="w">    </span><span class="nf">jge</span><span class="w"> </span><span class="nv">sum_done</span>
+<a id="__codelineno-18-19" name="__codelineno-18-19" href="#__codelineno-18-19"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">edx</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="nv">numbers</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">ecx</span><span class="o">*</span><span class="mi">4</span><span class="p">]</span><span class="w">   </span><span class="c1">; base + index*scale addressing mode</span>
+<a id="__codelineno-18-20" name="__codelineno-18-20" href="#__codelineno-18-20"></a><span class="w">    </span><span class="nf">add</span><span class="w"> </span><span class="nb">eax</span><span class="p">,</span><span class="w"> </span><span class="nb">edx</span>
+<a id="__codelineno-18-21" name="__codelineno-18-21" href="#__codelineno-18-21"></a><span class="w">    </span><span class="nf">inc</span><span class="w"> </span><span class="nb">ecx</span>
+<a id="__codelineno-18-22" name="__codelineno-18-22" href="#__codelineno-18-22"></a><span class="w">    </span><span class="nf">jmp</span><span class="w"> </span><span class="nv">sum_loop</span>
+<a id="__codelineno-18-23" name="__codelineno-18-23" href="#__codelineno-18-23"></a><span class="nl">sum_done:</span>
+<a id="__codelineno-18-24" name="__codelineno-18-24" href="#__codelineno-18-24"></a><span class="w">    </span><span class="c1">; eax now holds the sum -- convert it to a decimal ASCII string</span>
+<a id="__codelineno-18-25" name="__codelineno-18-25" href="#__codelineno-18-25"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">edi</span><span class="p">,</span><span class="w"> </span><span class="nv">digits</span>
+<a id="__codelineno-18-26" name="__codelineno-18-26" href="#__codelineno-18-26"></a><span class="w">    </span><span class="nf">add</span><span class="w"> </span><span class="nb">edi</span><span class="p">,</span><span class="w"> </span><span class="mi">11</span>
+<a id="__codelineno-18-27" name="__codelineno-18-27" href="#__codelineno-18-27"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">ebx</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span>
+<a id="__codelineno-18-28" name="__codelineno-18-28" href="#__codelineno-18-28"></a><span class="nl">convert_loop:</span>
+<a id="__codelineno-18-29" name="__codelineno-18-29" href="#__codelineno-18-29"></a><span class="w">    </span><span class="nf">xor</span><span class="w"> </span><span class="nb">edx</span><span class="p">,</span><span class="w"> </span><span class="nb">edx</span>
+<a id="__codelineno-18-30" name="__codelineno-18-30" href="#__codelineno-18-30"></a><span class="w">    </span><span class="nf">div</span><span class="w"> </span><span class="nb">ebx</span><span class="w">                      </span><span class="c1">; eax = eax/10, edx = eax%10</span>
+<a id="__codelineno-18-31" name="__codelineno-18-31" href="#__codelineno-18-31"></a><span class="w">    </span><span class="nf">add</span><span class="w"> </span><span class="nb">dl</span><span class="p">,</span><span class="w"> </span><span class="s">'0'</span>
+<a id="__codelineno-18-32" name="__codelineno-18-32" href="#__codelineno-18-32"></a><span class="w">    </span><span class="nf">dec</span><span class="w"> </span><span class="nb">edi</span>
+<a id="__codelineno-18-33" name="__codelineno-18-33" href="#__codelineno-18-33"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="p">[</span><span class="nb">edi</span><span class="p">],</span><span class="w"> </span><span class="nb">dl</span>
+<a id="__codelineno-18-34" name="__codelineno-18-34" href="#__codelineno-18-34"></a><span class="w">    </span><span class="nf">test</span><span class="w"> </span><span class="nb">eax</span><span class="p">,</span><span class="w"> </span><span class="nb">eax</span>
+<a id="__codelineno-18-35" name="__codelineno-18-35" href="#__codelineno-18-35"></a><span class="w">    </span><span class="nf">jnz</span><span class="w"> </span><span class="nv">convert_loop</span>
+<a id="__codelineno-18-36" name="__codelineno-18-36" href="#__codelineno-18-36"></a>
+<a id="__codelineno-18-37" name="__codelineno-18-37" href="#__codelineno-18-37"></a><span class="w">    </span><span class="c1">; print the digits, from edi through the end of the buffer</span>
+<a id="__codelineno-18-38" name="__codelineno-18-38" href="#__codelineno-18-38"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">esi</span><span class="p">,</span><span class="w"> </span><span class="nb">edi</span>
+<a id="__codelineno-18-39" name="__codelineno-18-39" href="#__codelineno-18-39"></a><span class="w">    </span><span class="nf">lea</span><span class="w"> </span><span class="nb">edx</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="nv">digits</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">11</span><span class="p">]</span>
+<a id="__codelineno-18-40" name="__codelineno-18-40" href="#__codelineno-18-40"></a><span class="w">    </span><span class="nf">sub</span><span class="w"> </span><span class="nb">edx</span><span class="p">,</span><span class="w"> </span><span class="nb">edi</span><span class="w">                 </span><span class="c1">; edx = length</span>
+<a id="__codelineno-18-41" name="__codelineno-18-41" href="#__codelineno-18-41"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">eax</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span>
+<a id="__codelineno-18-42" name="__codelineno-18-42" href="#__codelineno-18-42"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">ebx</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span>
+<a id="__codelineno-18-43" name="__codelineno-18-43" href="#__codelineno-18-43"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">ecx</span><span class="p">,</span><span class="w"> </span><span class="nb">esi</span>
+<a id="__codelineno-18-44" name="__codelineno-18-44" href="#__codelineno-18-44"></a><span class="w">    </span><span class="nf">int</span><span class="w"> </span><span class="mh">0x80</span>
+<a id="__codelineno-18-45" name="__codelineno-18-45" href="#__codelineno-18-45"></a>
+<a id="__codelineno-18-46" name="__codelineno-18-46" href="#__codelineno-18-46"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">eax</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span>
+<a id="__codelineno-18-47" name="__codelineno-18-47" href="#__codelineno-18-47"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">ebx</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span>
+<a id="__codelineno-18-48" name="__codelineno-18-48" href="#__codelineno-18-48"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">ecx</span><span class="p">,</span><span class="w"> </span><span class="nv">newline</span>
+<a id="__codelineno-18-49" name="__codelineno-18-49" href="#__codelineno-18-49"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">edx</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span>
+<a id="__codelineno-18-50" name="__codelineno-18-50" href="#__codelineno-18-50"></a><span class="w">    </span><span class="nf">int</span><span class="w"> </span><span class="mh">0x80</span>
+<a id="__codelineno-18-51" name="__codelineno-18-51" href="#__codelineno-18-51"></a>
+<a id="__codelineno-18-52" name="__codelineno-18-52" href="#__codelineno-18-52"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">eax</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span>
+<a id="__codelineno-18-53" name="__codelineno-18-53" href="#__codelineno-18-53"></a><span class="w">    </span><span class="nf">xor</span><span class="w"> </span><span class="nb">ebx</span><span class="p">,</span><span class="w"> </span><span class="nb">ebx</span>
+<a id="__codelineno-18-54" name="__codelineno-18-54" href="#__codelineno-18-54"></a><span class="w">    </span><span class="nf">int</span><span class="w"> </span><span class="mh">0x80</span>
+</code></pre></div>
+<p><code>div ebx</code> is a real, single instruction dividing the 64-bit value in <code>edx:eax</code> by <code>ebx</code>, leaving the quotient in <code>eax</code> and the remainder in <code>edx</code> — real unsigned division, which is exactly why <code>xor edx, edx</code> has to run immediately before every single division: <code>div</code> reads <code>edx</code> as the real high half of its own dividend, and a stale nonzero value left over from the previous digit would silently corrupt the next one. The digits come out least-significant-first, so this routine builds the string backward from the end of its own buffer (<code>dec edi</code> before every store), rather than building it forward and reversing it afterward.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>nasm -f elf32 sumarray.asm -o sumarray.o
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>ld -m elf_i386 sumarray.o -o sumarray
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>./sumarray
+</code></pre></div>
+<p><strong>Real captured output:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>150
+</code></pre></div></p>
+<p>(10 + 20 + 30 + 40 + 50 = 150, confirmed.)</p>
+<h3 id="example-3-cdecl-a-stack-frame-and-a-real-cassembly-boundary">Example 3: cdecl, a stack frame, and a real C/assembly boundary<a class="headerlink" href="#example-3-cdecl-a-stack-frame-and-a-real-cassembly-boundary" title="Permanent link">&para;</a></h3>
+<p>A real assembly function, callable from C exactly the way <code>025_isr128.asm</code> is callable from the CPU, but through the ordinary cdecl convention (Section 8) instead of the interrupt mechanism (Section 9) — plus a C driver that uses raw inline-asm syscalls instead of <code>printf</code>, so the whole program links with no C library at all, mirroring this book's own real, freestanding <code>-ffreestanding</code> build flags exactly.</p>
+<p><code>appendix_demo.asm</code>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">BITS</span><span class="w"> </span><span class="mi">32</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="k">section</span><span class="w"> </span><span class="nv">.text</span>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="k">extern</span><span class="w"> </span><span class="nv">cmain</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="k">global</span><span class="w"> </span><span class="nv">_start</span>
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="nl">_start:</span>
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">esp</span><span class="p">,</span><span class="w"> </span><span class="nv">stack_top</span>
+<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="w">    </span><span class="nf">call</span><span class="w"> </span><span class="nv">cmain</span>
+<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">eax</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span>
+<a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a><span class="w">    </span><span class="nf">xor</span><span class="w"> </span><span class="nb">ebx</span><span class="p">,</span><span class="w"> </span><span class="nb">ebx</span>
+<a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a><span class="w">    </span><span class="nf">int</span><span class="w"> </span><span class="mh">0x80</span>
+<a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a>
+<a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a><span class="k">global</span><span class="w"> </span><span class="nv">factorial</span>
+<a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a><span class="c1">; int factorial(int n) -- real cdecl: the caller pushes n, eax holds n! on return</span>
+<a id="__codelineno-21-15" name="__codelineno-21-15" href="#__codelineno-21-15"></a><span class="nl">factorial:</span>
+<a id="__codelineno-21-16" name="__codelineno-21-16" href="#__codelineno-21-16"></a><span class="w">    </span><span class="nf">push</span><span class="w"> </span><span class="nb">ebp</span>
+<a id="__codelineno-21-17" name="__codelineno-21-17" href="#__codelineno-21-17"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">ebp</span><span class="p">,</span><span class="w"> </span><span class="nb">esp</span>
+<a id="__codelineno-21-18" name="__codelineno-21-18" href="#__codelineno-21-18"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">ecx</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="nb">ebp</span><span class="o">+</span><span class="mi">8</span><span class="p">]</span><span class="w">     </span><span class="c1">; n, the one real cdecl argument</span>
+<a id="__codelineno-21-19" name="__codelineno-21-19" href="#__codelineno-21-19"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">eax</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w">            </span><span class="c1">; running product</span>
+<a id="__codelineno-21-20" name="__codelineno-21-20" href="#__codelineno-21-20"></a><span class="nl">fact_loop:</span>
+<a id="__codelineno-21-21" name="__codelineno-21-21" href="#__codelineno-21-21"></a><span class="w">    </span><span class="nf">cmp</span><span class="w"> </span><span class="nb">ecx</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span>
+<a id="__codelineno-21-22" name="__codelineno-21-22" href="#__codelineno-21-22"></a><span class="w">    </span><span class="nf">jle</span><span class="w"> </span><span class="nv">fact_done</span>
+<a id="__codelineno-21-23" name="__codelineno-21-23" href="#__codelineno-21-23"></a><span class="w">    </span><span class="nf">imul</span><span class="w"> </span><span class="nb">eax</span><span class="p">,</span><span class="w"> </span><span class="nb">ecx</span>
+<a id="__codelineno-21-24" name="__codelineno-21-24" href="#__codelineno-21-24"></a><span class="w">    </span><span class="nf">dec</span><span class="w"> </span><span class="nb">ecx</span>
+<a id="__codelineno-21-25" name="__codelineno-21-25" href="#__codelineno-21-25"></a><span class="w">    </span><span class="nf">jmp</span><span class="w"> </span><span class="nv">fact_loop</span>
+<a id="__codelineno-21-26" name="__codelineno-21-26" href="#__codelineno-21-26"></a><span class="nl">fact_done:</span>
+<a id="__codelineno-21-27" name="__codelineno-21-27" href="#__codelineno-21-27"></a><span class="w">    </span><span class="nf">mov</span><span class="w"> </span><span class="nb">esp</span><span class="p">,</span><span class="w"> </span><span class="nb">ebp</span>
+<a id="__codelineno-21-28" name="__codelineno-21-28" href="#__codelineno-21-28"></a><span class="w">    </span><span class="nf">pop</span><span class="w"> </span><span class="nb">ebp</span>
+<a id="__codelineno-21-29" name="__codelineno-21-29" href="#__codelineno-21-29"></a><span class="w">    </span><span class="nf">ret</span>
+<a id="__codelineno-21-30" name="__codelineno-21-30" href="#__codelineno-21-30"></a>
+<a id="__codelineno-21-31" name="__codelineno-21-31" href="#__codelineno-21-31"></a><span class="k">section</span><span class="w"> </span><span class="nv">.bss</span>
+<a id="__codelineno-21-32" name="__codelineno-21-32" href="#__codelineno-21-32"></a><span class="k">align</span><span class="w"> </span><span class="mi">16</span>
+<a id="__codelineno-21-33" name="__codelineno-21-33" href="#__codelineno-21-33"></a><span class="nl">stack_bottom:</span>
+<a id="__codelineno-21-34" name="__codelineno-21-34" href="#__codelineno-21-34"></a><span class="w">    </span><span class="kd">resb</span><span class="w"> </span><span class="mi">4096</span>
+<a id="__codelineno-21-35" name="__codelineno-21-35" href="#__codelineno-21-35"></a><span class="nl">stack_top:</span>
+</code></pre></div></p>
+<p><code>cmain.c</code>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="k">extern</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">factorial</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="p">);</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">write_str</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="w">        </span><span class="s">"mov $4, %%eax</span><span class="se">\n\t</span><span class="s">"</span>
+<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="w">        </span><span class="s">"mov $1, %%ebx</span><span class="se">\n\t</span><span class="s">"</span>
+<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="w">        </span><span class="s">"mov %0, %%ecx</span><span class="se">\n\t</span><span class="s">"</span>
+<a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="w">        </span><span class="s">"mov %1, %%edx</span><span class="se">\n\t</span><span class="s">"</span>
+<a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="w">        </span><span class="s">"int $0x80"</span>
+<a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="w">        </span><span class="o">:</span>
+<a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="w">        </span><span class="o">:</span><span class="w"> </span><span class="s">"r"</span><span class="w"> </span><span class="p">(</span><span class="n">s</span><span class="p">),</span><span class="w"> </span><span class="s">"r"</span><span class="w"> </span><span class="p">(</span><span class="n">len</span><span class="p">)</span>
+<a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a><span class="w">        </span><span class="o">:</span><span class="w"> </span><span class="s">"eax"</span><span class="p">,</span><span class="w"> </span><span class="s">"ebx"</span><span class="p">,</span><span class="w"> </span><span class="s">"ecx"</span><span class="p">,</span><span class="w"> </span><span class="s">"edx"</span>
+<a id="__codelineno-22-13" name="__codelineno-22-13" href="#__codelineno-22-13"></a><span class="w">    </span><span class="p">);</span>
+<a id="__codelineno-22-14" name="__codelineno-22-14" href="#__codelineno-22-14"></a><span class="p">}</span>
+<a id="__codelineno-22-15" name="__codelineno-22-15" href="#__codelineno-22-15"></a>
+<a id="__codelineno-22-16" name="__codelineno-22-16" href="#__codelineno-22-16"></a><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">print_uint</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-22-17" name="__codelineno-22-17" href="#__codelineno-22-17"></a><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">digits</span><span class="p">[</span><span class="mi">12</span><span class="p">];</span>
+<a id="__codelineno-22-18" name="__codelineno-22-18" href="#__codelineno-22-18"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-22-19" name="__codelineno-22-19" href="#__codelineno-22-19"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">v</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-22-20" name="__codelineno-22-20" href="#__codelineno-22-20"></a><span class="w">        </span><span class="n">digits</span><span class="p">[</span><span class="n">n</span><span class="o">++</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">'0'</span><span class="p">;</span>
+<a id="__codelineno-22-21" name="__codelineno-22-21" href="#__codelineno-22-21"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-22-22" name="__codelineno-22-22" href="#__codelineno-22-22"></a><span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">v</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-22-23" name="__codelineno-22-23" href="#__codelineno-22-23"></a><span class="w">            </span><span class="n">digits</span><span class="p">[</span><span class="n">n</span><span class="o">++</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="sc">'0'</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">v</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">10</span><span class="p">));</span>
+<a id="__codelineno-22-24" name="__codelineno-22-24" href="#__codelineno-22-24"></a><span class="w">            </span><span class="n">v</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<a id="__codelineno-22-25" name="__codelineno-22-25" href="#__codelineno-22-25"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-22-26" name="__codelineno-22-26" href="#__codelineno-22-26"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-22-27" name="__codelineno-22-27" href="#__codelineno-22-27"></a><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">out</span><span class="p">[</span><span class="mi">12</span><span class="p">];</span>
+<a id="__codelineno-22-28" name="__codelineno-22-28" href="#__codelineno-22-28"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-22-29" name="__codelineno-22-29" href="#__codelineno-22-29"></a><span class="w">        </span><span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">digits</span><span class="p">[</span><span class="n">n</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">i</span><span class="p">];</span>
+<a id="__codelineno-22-30" name="__codelineno-22-30" href="#__codelineno-22-30"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-22-31" name="__codelineno-22-31" href="#__codelineno-22-31"></a><span class="w">    </span><span class="n">write_str</span><span class="p">(</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">unsigned</span><span class="p">)</span><span class="w"> </span><span class="n">n</span><span class="p">);</span>
+<a id="__codelineno-22-32" name="__codelineno-22-32" href="#__codelineno-22-32"></a><span class="p">}</span>
+<a id="__codelineno-22-33" name="__codelineno-22-33" href="#__codelineno-22-33"></a>
+<a id="__codelineno-22-34" name="__codelineno-22-34" href="#__codelineno-22-34"></a><span class="kt">void</span><span class="w"> </span><span class="nf">cmain</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-22-35" name="__codelineno-22-35" href="#__codelineno-22-35"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-22-36" name="__codelineno-22-36" href="#__codelineno-22-36"></a><span class="w">        </span><span class="n">print_uint</span><span class="p">((</span><span class="kt">unsigned</span><span class="p">)</span><span class="w"> </span><span class="n">i</span><span class="p">);</span>
+<a id="__codelineno-22-37" name="__codelineno-22-37" href="#__codelineno-22-37"></a><span class="w">        </span><span class="n">write_str</span><span class="p">(</span><span class="s">"! = "</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+<a id="__codelineno-22-38" name="__codelineno-22-38" href="#__codelineno-22-38"></a><span class="w">        </span><span class="n">print_uint</span><span class="p">((</span><span class="kt">unsigned</span><span class="p">)</span><span class="w"> </span><span class="n">factorial</span><span class="p">(</span><span class="n">i</span><span class="p">));</span>
+<a id="__codelineno-22-39" name="__codelineno-22-39" href="#__codelineno-22-39"></a><span class="w">        </span><span class="n">write_str</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<a id="__codelineno-22-40" name="__codelineno-22-40" href="#__codelineno-22-40"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-22-41" name="__codelineno-22-41" href="#__codelineno-22-41"></a><span class="p">}</span>
+</code></pre></div></p>
+<p><code>factorial()</code> takes its one real argument the cdecl way — read straight off the stack at <code>[ebp+8]</code> (<code>ebp+4</code> would be the saved return address <code>call</code> itself pushed; <code>ebp+0</code> is the saved caller's own <code>ebp</code>) — exactly the stack-frame shape Section 8 describes in the abstract, now doing real work. <code>cmain()</code> never knows or cares that <code>factorial</code> is assembly rather than C; cdecl is precisely the agreement that makes that invisible.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>nasm -f elf32 appendix_demo.asm -o appendix_demo.o
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>gcc -m32 -ffreestanding -fno-stack-protector -fno-pic -c cmain.c -o cmain.o
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>ld -m elf_i386 -o factorial_demo appendix_demo.o cmain.o -e _start
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>./factorial_demo
+</code></pre></div>
+<p><strong>Real captured output:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>0! = 1
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>1! = 1
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>2! = 2
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>3! = 6
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>4! = 24
+<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a>5! = 120
+<a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a>6! = 720
+<a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a>7! = 5040
+<a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a>8! = 40320
+<a id="__codelineno-24-10" name="__codelineno-24-10" href="#__codelineno-24-10"></a>9! = 362880
+<a id="__codelineno-24-11" name="__codelineno-24-11" href="#__codelineno-24-11"></a>10! = 3628800
+</code></pre></div></p>
+<p>(The real link step above even reproduces this book's own familiar <code>ld</code> warning, <code>missing .note.GNU-stack section implies executable stack</code> — the exact same real, correctly-noticed-but-harmless-here warning Chapter 1's own build output already explains.)</p>
+<h3 id="example-4-reading-eflags-from-c-the-same-way-046_idtc-does">Example 4: reading EFLAGS from C, the same way <code>046_idt.c</code> does<a class="headerlink" href="#example-4-reading-eflags-from-c-the-same-way-046_idtc-does" title="Permanent link">&para;</a></h3>
+<p>Section 10's own <code>idt_install_gate()</code> reads <code>EFLAGS.IF</code> via inline asm before deciding whether to restore interrupts. This example reads a different real flag — CF, the Carry Flag — immediately after a real <code>add</code>, to show the exact same real mechanism catching unsigned overflow the instant it happens:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdint.h&gt;</span>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="cm">/* Adds a and b, then reads EFLAGS immediately afterward via inline asm,</span>
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="cm"> * to check the real Carry Flag (bit 0) the "add" instruction itself just</span>
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="cm"> * set -- the same real flag a later "jc"/"jb" would branch on. */</span>
+<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">add_with_carry_check</span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="o">*</span><span class="n">out_sum</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">;</span>
+<a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a><span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">eflags</span><span class="p">;</span>
+<a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a><span class="w">        </span><span class="s">"add %2, %0</span><span class="se">\n\t</span><span class="s">"</span>
+<a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a><span class="w">        </span><span class="s">"pushf</span><span class="se">\n\t</span><span class="s">"</span>
+<a id="__codelineno-25-13" name="__codelineno-25-13" href="#__codelineno-25-13"></a><span class="w">        </span><span class="s">"pop %1"</span>
+<a id="__codelineno-25-14" name="__codelineno-25-14" href="#__codelineno-25-14"></a><span class="w">        </span><span class="o">:</span><span class="w"> </span><span class="s">"+r"</span><span class="w"> </span><span class="p">(</span><span class="n">sum</span><span class="p">),</span><span class="w"> </span><span class="s">"=r"</span><span class="w"> </span><span class="p">(</span><span class="n">eflags</span><span class="p">)</span>
+<a id="__codelineno-25-15" name="__codelineno-25-15" href="#__codelineno-25-15"></a><span class="w">        </span><span class="o">:</span><span class="w"> </span><span class="s">"r"</span><span class="w"> </span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<a id="__codelineno-25-16" name="__codelineno-25-16" href="#__codelineno-25-16"></a><span class="w">    </span><span class="p">);</span>
+<a id="__codelineno-25-17" name="__codelineno-25-17" href="#__codelineno-25-17"></a><span class="w">    </span><span class="o">*</span><span class="n">out_sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sum</span><span class="p">;</span>
+<a id="__codelineno-25-18" name="__codelineno-25-18" href="#__codelineno-25-18"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">eflags</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mi">1u</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">  </span><span class="cm">/* bit 0 = CF */</span>
+<a id="__codelineno-25-19" name="__codelineno-25-19" href="#__codelineno-25-19"></a><span class="p">}</span>
+<a id="__codelineno-25-20" name="__codelineno-25-20" href="#__codelineno-25-20"></a>
+<a id="__codelineno-25-21" name="__codelineno-25-21" href="#__codelineno-25-21"></a><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-25-22" name="__codelineno-25-22" href="#__codelineno-25-22"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">sum</span><span class="p">;</span>
+<a id="__codelineno-25-23" name="__codelineno-25-23" href="#__codelineno-25-23"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">carry</span><span class="p">;</span>
+<a id="__codelineno-25-24" name="__codelineno-25-24" href="#__codelineno-25-24"></a>
+<a id="__codelineno-25-25" name="__codelineno-25-25" href="#__codelineno-25-25"></a><span class="w">    </span><span class="n">carry</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">add_with_carry_check</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">sum</span><span class="p">);</span>
+<a id="__codelineno-25-26" name="__codelineno-25-26" href="#__codelineno-25-26"></a><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">"100 + 200 = %u, carry = %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">sum</span><span class="p">,</span><span class="w"> </span><span class="n">carry</span><span class="p">);</span>
+<a id="__codelineno-25-27" name="__codelineno-25-27" href="#__codelineno-25-27"></a>
+<a id="__codelineno-25-28" name="__codelineno-25-28" href="#__codelineno-25-28"></a><span class="w">    </span><span class="n">carry</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">add_with_carry_check</span><span class="p">(</span><span class="mh">0xFFFFFFFFu</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">sum</span><span class="p">);</span>
+<a id="__codelineno-25-29" name="__codelineno-25-29" href="#__codelineno-25-29"></a><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">"0xFFFFFFFF + 1 = %u, carry = %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">sum</span><span class="p">,</span><span class="w"> </span><span class="n">carry</span><span class="p">);</span>
+<a id="__codelineno-25-30" name="__codelineno-25-30" href="#__codelineno-25-30"></a>
+<a id="__codelineno-25-31" name="__codelineno-25-31" href="#__codelineno-25-31"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-25-32" name="__codelineno-25-32" href="#__codelineno-25-32"></a><span class="p">}</span>
+</code></pre></div>
+<p>The <code>"+r" (sum)</code> constraint means "this operand is both read and written" — the real <code>add</code> instruction's own destination; <code>"=r" (eflags)</code> means "this operand is written only," populated by <code>pop</code>. Note this example compiles and runs as an ordinary, hosted 64-bit program (no <code>-m32</code>, since the point here is the inline-asm/EFLAGS mechanism, not the 32-bit ABI Examples 1-3 specifically demonstrate) — <code>pushf</code>/<code>pop</code> on this real host push and pop the full native width, but CF still lives at bit 0 regardless, the identical real bit this book's own <code>046_idt.c</code> reads at bit 9 for IF.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>gcc -Wall -Wextra -o flags_demo flags_demo.c
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>./flags_demo
+</code></pre></div>
+<p><strong>Real captured output:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>100 + 200 = 300, carry = 0
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>0xFFFFFFFF + 1 = 0, carry = 1
+</code></pre></div></p>
+<p>(<code>0xFFFFFFFF + 1</code> really does wrap to <code>0</code> in 32-bit unsigned arithmetic — Section 3's own real point, from Appendix C, made directly visible here — and the real hardware genuinely sets CF to say so.)</p>
+<h3 id="example-5-this-books-own-real-interrupt-stub-in-full">Example 5: this book's own real interrupt stub, in full<a class="headerlink" href="#example-5-this-books-own-real-interrupt-stub-in-full" title="Permanent link">&para;</a></h3>
+<p>Not a new example — this book's own real <code>046_dynisr.asm</code> (Chapter 46), reproduced here complete, annotated against every section above, as the one example this appendix cannot run standalone (it needs a real IDT entry installed by a real kernel first; Section 9 already explains why):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="k">BITS</span><span class="w"> </span><span class="mi">32</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="k">section</span><span class="w"> </span><span class="nv">.text</span>
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="k">extern</span><span class="w"> </span><span class="nv">dynisr_demo_handler</span>
+<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="k">global</span><span class="w"> </span><span class="nv">dynisr_demo</span>
+<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a><span class="nl">dynisr_demo:</span>
+<a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a><span class="w">    </span><span class="nf">pusha</span>
+<a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a><span class="w">    </span><span class="nf">call</span><span class="w"> </span><span class="nv">dynisr_demo_handler</span>
+<a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a><span class="w">    </span><span class="nf">popa</span>
+<a id="__codelineno-28-10" name="__codelineno-28-10" href="#__codelineno-28-10"></a><span class="w">    </span><span class="nf">iret</span>
+</code></pre></div>
+<p><code>extern dynisr_demo_handler</code> (Section 4): a C function, defined in <code>046_kmain.c</code>, this file only calls, never defines. <code>global dynisr_demo</code> (Section 4): exposes this stub's own label so <code>046_kmain.c</code> can take its address and hand it to <code>idt_install_gate()</code>. <code>pusha</code>/<code>popa</code> (Section 9): saves and restores all eight general-purpose registers by hand, because — unlike Example 3's own <code>call factorial</code>, an ordinary function call where the caller already knows to preserve what it needs — nothing running when a real interrupt fires ever got the chance to save anything itself. <code>call dynisr_demo_handler</code> (Section 8): an ordinary cdecl call, no different in kind from Example 3's own <code>call factorial</code> once execution actually reaches this line. <code>iret</code>, not <code>ret</code> (Section 9): pops the real <code>eflags</code>/<code>cs</code>/<code>eip</code> the CPU itself pushed before this stub's first instruction ever ran, resuming whatever was interrupted with no trace that anything happened.</p>
+<p>The real C side that installs and triggers it, from <code>046_kmain.c</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="k">extern</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">dynisr_demo</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span><span class="w"> </span><span class="cm">/* 046_dynisr.asm */</span>
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="n">idt_install_gate</span><span class="p">(</span><span class="mh">0x90</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="w"> </span><span class="n">dynisr_demo</span><span class="p">,</span><span class="w"> </span><span class="mh">0x08</span><span class="p">,</span><span class="w"> </span><span class="mh">0x8E</span><span class="p">);</span>
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="p">...</span>
+<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"int $0x90"</span><span class="p">);</span>
+</code></pre></div>
+<p><code>idt_install_gate()</code> writes this stub's own address into IDT slot <code>0x90</code> (Section 11's own real worked example already covers exactly how <code>idt_set_gate()</code>-style logic does that byte by byte); <code>int $0x90</code> is inline asm (Section 10) for the single real instruction that makes the CPU jump there. This book's own real, captured Chapter 46 boot log confirms a real counter the handler increments goes from 0 to 1, across 3 consecutive identical boots — the real proof this exact mechanism works, already locked into that chapter's own page.</p>
 <h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
 <p>This appendix deliberately covers only what a reader of this book's own code needs. For the real, complete, authoritative references:</p>
 <ul>
