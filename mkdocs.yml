@@ -113,6 +113,7 @@ nav:
       - "43. Betting Systems: Real Odds Formats and a Real Betfair Exchange API Shape": part43/43-betting-systems.md
       - "44. Car Rental: A Real OTA Vehicle Availability and Reservation Codec": part44/44-car-rental.md
       - "45. A Minimal IP Layer: Real IPv4 and a Real ICMP Echo (Ping)": part45/45-minimal-ip-layer.md
+      - "46. Dynamic IDT Gate Installation: Closing a Gap Chapter 26 Left Open": part46/46-dynamic-idt-gate-installation.md
 
 extra:
   social: []
