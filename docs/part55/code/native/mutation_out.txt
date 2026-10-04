@@ -1,2 +1,71 @@
 NOTE: this script deliberately breaks copies of the chapter's sources. 'caught' lines are EXPECTED: they show the tests can detect the mistake.
 baseline (nothing broken): all tests pass (expected)
+vote: granted to a candidate of an older term: caught by raft_test, simulator vs the Python node and simulator
+vote: a second vote in the same term is allowed: caught by raft_test, simulator vs the Python node and simulator, sweep
+vote: the log rule compares last term the wrong way: caught by raft_test, simulator vs the Python node and simulator, sweep
+vote: equal last terms need a strictly longer log: caught by raft_test, simulator vs the Python node and simulator
+vote: equal last terms accept any length: caught by raft_test, simulator vs the Python node and simulator, sweep
+vote: the vote is not recorded: caught by raft_test, simulator vs the Python node and simulator, sweep
+vote: a granted vote does not reset the election timer: caught by simulator vs the Python node and simulator
+candidate: the vote for itself is not recorded: caught by raft_test, simulator vs the Python node and simulator, sweep
+candidate: the term is not incremented: caught by raft_test, simulator vs the Python node and simulator, sweep
+candidate: its own vote is not counted: caught by raft_test, simulator vs the Python node and simulator
+candidate: it asks with its first log term instead of its last: caught by simulator vs the Python node and simulator
+leader: a minority of votes wins the election: caught by simulator vs the Python node and simulator, sweep
+leader: votes of other terms are counted: caught by simulator vs the Python node and simulator, sweep
+leader: refused votes are counted: caught by simulator vs the Python node and simulator, sweep
+leader: nextIndex starts at the end of its log, not past it: caught by simulator vs the Python node and simulator
+leader: no no-op is appended: caught by raft_test, simulator vs the Python node and simulator
+leader: the no-op carries the previous term: caught by raft_test, simulator vs the Python node and simulator, sweep
+append: a stale AppendEntries (older term) is accepted: caught by raft_test, simulator vs the Python node and simulator, sweep
+append: the heartbeat does not reset the election timer: caught by simulator vs the Python node and simulator
+append: the prev entry's term is not compared: caught by raft_test, simulator vs the Python node and simulator, sweep
+append: a prev index beyond the log is accepted: caught by simulator vs the Python node and simulator
+append: a conflicting entry is not deleted: caught by raft_test, simulator vs the Python node and simulator, sweep
+append: every overlapping entry is deleted, even a matching one: caught by raft_test, simulator vs the Python node and simulator, sweep
+append: a conflict keeps the conflicting entry: caught by raft_test, simulator vs the Python node and simulator, sweep
+append: the log is not marked dirty after an append: caught by simulator vs the Python node and simulator, sweep
+append: commitIndex takes leaderCommit even beyond the new entries: caught by raft_test, simulator vs the Python node and simulator, sweep
+append: commitIndex may move backwards: caught by raft_test, simulator vs the Python node and simulator, sweep
+append: the success reply reports the end of the log, not of the new entries: caught by simulator vs the Python node and simulator
+commit: a minority commits: caught by raft_test, simulator vs the Python node and simulator, sweep
+commit: entries of earlier terms are committed by counting replicas: caught by raft_test, simulator vs the Python node and simulator
+commit: a follower at exactly the index is not counted: caught by raft_test, simulator vs the Python node and simulator
+commit: the leader's own copy is not counted: caught by raft_test, simulator vs the Python node and simulator
+commit: the search starts below the end of the log: caught by raft_test, simulator vs the Python node and simulator
+reply: matchIndex may go down on a delayed success reply: caught by raft_test, simulator vs the Python node and simulator
+reply: nextIndex is not advanced after a success: caught by raft_test, simulator vs the Python node and simulator
+reply: a failed AppendEntries does not back up: caught by raft_test, simulator vs the Python node and simulator
+reply: it backs up to the beginning of the log: caught by raft_test, simulator vs the Python node and simulator
+reply: a failed reply is not answered with a resend: caught by raft_test, simulator vs the Python node and simulator
+reply: replies from an older term are acted on: caught by simulator vs the Python node and simulator
+terms: a higher term does not clear the vote: caught by simulator vs the Python node and simulator
+terms: a higher term is not saved: caught by simulator vs the Python node and simulator, sweep
+terms: a leader does not step down on a higher term: caught by raft_test, simulator vs the Python node and simulator
+timers: the heartbeat comes every 4 ticks: caught by raft_test, simulator vs the Python node and simulator
+timers: the election timeout is one tick longer: caught by raft_test, simulator vs the Python node and simulator
+timers: the random part of the timeout is ignored: caught by raft_test, simulator vs the Python node and simulator
+state machine: no-ops are counted: caught by raft_test
+state machine: the hash ignores the command: caught by raft_test
+state machine: entries are applied beyond the commit index: caught by raft_test
+propose: command 0 is accepted: caught by raft_test
+propose: a full log is not refused (buffer overrun): caught by raft_test
+propose: the new entry is not marked dirty: caught by raft_test, simulator vs the Python node and simulator
+propose: a follower may propose: caught by raft_test
+messages: an AppendEntries carries 5 entries (buffer overrun): caught by raft_test, simulator vs the Python node and simulator, sweep
+messages: the prev term is sent as 0: caught by raft_test, simulator vs the Python node and simulator
+messages: the leader's commit index is not sent: caught by raft_test, simulator vs the Python node and simulator
+restart: the log is not restored: caught by raft_test, simulator vs the Python node and simulator, sweep
+restart: the term is not restored: caught by raft_test, simulator vs the Python node and simulator, sweep
+simulator: the election-safety check is removed: caught by simulator vs the Python node and simulator
+simulator: the log-matching check is removed: caught by simulator vs the Python node and simulator
+simulator: the committed-entry comparison is removed: caught by simulator vs the Python node and simulator
+simulator: leader completeness is not checked: caught by simulator vs the Python node and simulator
+simulator: commit monotonicity is not checked: caught by simulator vs the Python node and simulator
+simulator: the disk is not saved after a delivery: caught by simulator vs the Python node and simulator
+simulator: partitions do not cut links: caught by simulator vs the Python node and simulator
+simulator: a restart starts from an empty disk: caught by simulator vs the Python node and simulator, sweep
+simulator: duplicates are never made: caught by simulator vs the Python node and simulator
+reference: the log rule is skipped for every vote even when no bug is switched on (the oracle itself broken): caught by simulator vs the Python node and simulator
+
+67 of 67 broken versions caught

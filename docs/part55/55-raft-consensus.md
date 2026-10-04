@@ -127,7 +127,7 @@ WAIT=500 ./capture.sh build
 
 All C is built with AddressSanitizer and UBSan from the same `055_raft.c` and `055_sim.c` the kernel links. Three tools:
 
-- `raft_test.c`: 44 checks that drive the node by hand: elections, the vote rules and the up-to-date comparison case by case, terms, the consistency check, conflicts and duplicates, `commitIndex` rules, the leader's `matchIndex` and backing up, **Figure 8** (not committed by counting until an entry of the leader's term is replicated) and **Figure 7** (six followers with six different logs converge on the leader's), persistence, proposals and the state machine.
+- `raft_test.c`: 45 checks that drive the node by hand: elections, the vote rules and the up-to-date comparison case by case, terms, the consistency check, conflicts and duplicates, `commitIndex` rules, the leader's `matchIndex` and backing up, **Figure 8** (not committed by counting until an entry of the leader's term is replicated) and **Figure 7** (six followers with six different logs converge on the leader's), persistence, proposals and the state machine.
 - `diff_raft.py` with `raft_cli.c`: the same seeds through the C and Python simulators, with the correct node and with each of **six deliberate bugs**, comparing all statistics and the trace hash.
 - `raft_sweep.c`: 20,000 seeds of the simulator against the correct node, every property checked after every tick.
 
@@ -171,7 +171,12 @@ All C is built with AddressSanitizer and UBSan from the same `055_raft.c` and `0
 --8<-- "docs/part55/code/native/mutation_out.txt"
 ```
 
-@@MUTATION@@
+**All 67 broken copies were caught** (44 by `raft_test`, 61 by the differential test against the Python node and simulator, 24 by the 400-seed sweep; many by several; one of the 67 is a mistake planted in the Python reference itself, and nine are mutants of the simulator's own safety checks and fault injection). The first run was **65 of 69**. Of the four survivors:
+
+- **One was a real gap in the tests.** Removing the election-safety check from the simulator went unnoticed, because the quick suite's bug-3 seeds (the only ones where that property is the first violated) stopped before seed 10,059. The differential test now always includes seeds 10,040 to 10,070.
+- **Three were equivalent mutants and were removed or corrected.** A reply's term set twice (once when the reply is built, once again at the end of the vote branch: the second assignment never changes it); `become_follower` called with a term that is never equal to the current one (so `>` and `>=` cannot differ); and a vote rule changed to `m->term >= current term`, which, because a higher term has already been adopted by then, is the same as `==`. The last one was my own mistake in writing the mutant; the *intended* mutant (`<=`, which grants a vote to a stale candidate) exposed a missing test, which is now `raft_test`'s check that a node that has not voted yet still refuses a candidate of an older term and records nothing.
+
+Property 5 (durability) is not mutated for the reason given above.
 
 ## What the first runs found
 
@@ -187,7 +192,7 @@ All C is built with AddressSanitizer and UBSan from the same `055_raft.c` and `0
 - **Storage is a model:** an atomic save after each step. Torn writes, lost writes and fsync ordering are Chapter 53's subject and are not combined with this chapter.
 - **The network is a lossy queue,** not TCP: no connections, no byte-level corruption, no clock skew (every node's tick is the same tick).
 - **Safety is checked, liveness is not proved:** with leader-killing crashes and partitions some runs never commit anything beyond the first no-op. Raft guarantees safety always and progress only when a majority can talk for long enough.
-- **Simulation is evidence, not proof.** Twenty thousand correct runs and a hundred and fifty deliberately broken copies caught are strong evidence; a proof would need a formal model (the Raft authors published a TLA+ specification) and was not attempted.
+- **Simulation is evidence, not proof.** Twenty thousand correct runs and 67 deliberately broken copies caught are strong evidence; a proof would need a formal model (the Raft authors published a TLA+ specification) and was not attempted.
 
 ## Chapter summary
 
