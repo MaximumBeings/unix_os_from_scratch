@@ -274,3 +274,18 @@ def s54(s):  # TLS 1.3: client and server, the handshake messages between them, 
     s.rect(290, 80, 220, 84, "none", s.acc, 2, 8, op=.9); s.text(400, 211, "boxed: encrypted with the handshake keys", 11, s.acc, bold=True)
     for k, t in enumerate(("Early", "Handshake", "Master")): s.rect(190 + k * 140, 224, 120, 30, s.dark, s.main, 2, 6); s.text(250 + k * 140, 244, t + " secret", 12, s.light, bold=True)
     s.path("M312,239 L328,239 m-7,-4 l7,4 l-7,4 M452,239 L468,239 m-7,-4 l7,4 l-7,4", stroke=s.main, sw=2); s.text(400, 278, "HKDF chain: each step mixes in the key share, then the transcript hash", 11, s.light, op=.9)
+
+
+def s55(s):  # Raft: a leader and four followers with their logs, a crash, a partition, and the seed that replays everything
+    xs = (120, 270, 420, 570, 700); names = ("S1", "S2", "S3 LEADER", "S4", "S5")
+    for k, x in enumerate(xs):
+        lead = k == 2; down = k == 4; s.rect(x - 55, 60, 110, 44, s.acc if lead else s.light, s.dark, 3, 8, op=(.35 if down else 1)); s.text(x, 87, names[k], 13, s.dark, bold=True)
+        for j in range(6 if k < 4 else 3):
+            c = s.main if j < 3 else s.acc; s.rect(x - 55 + j * 19, 118, 17, 18, c if j < (5 if k < 3 else 3) else "none", s.light, 1, 2, op=(.4 if down else .95))
+        if not lead and not down: s.path("M%d,100 C%d,150 %d,150 %d,138" % (420, 420, x, x), stroke=s.acc, sw=1.5, op=.0)
+    for x in (120, 270, 570): s.path("M420,104 L%d,60" % x if False else "M420,60 Q%d,20 %d,58" % ((420 + x) // 2, x), stroke=s.acc, sw=2)
+    s.text(420, 22, "AppendEntries", 12, s.acc, bold=True)
+    s.path("M648,48 L690,36 l-8,10 l14,-4 l-24,26", stroke=s.main, sw=3); s.text(700, 160, "crashed", 12, s.main, bold=True)
+    s.path("M495,50 L495,150", stroke=s.light, sw=3, op=.9); s.text(495, 172, "partition", 12, s.light, bold=True)
+    s.rect(130, 200, 540, 70, "#0d0818", s.main, 2, 10, op=.95); s.text(400, 228, "seed 4217 -> every drop, delay, crash and election, exactly", 14, s.light, bold=True)
+    s.text(400, 254, "checked every tick: one leader per term, logs match, commits never change", 12, s.acc, bold=True)

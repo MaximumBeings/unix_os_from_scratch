@@ -1,0 +1,13 @@
+-- 1. twelve seeds, compared line for line with the Python simulator
+  ok   all 12 lines (profile, statistics, trace hash of every message and every tick) are identical
+-- 2. final node states
+  ok   seed 4: the five nodes' role, term, log length, commit index, applied count and state machine hash equal the Python nodes'
+  ok   seed 43: the five nodes' role, term, log length, commit index, applied count and state machine hash equal the Python nodes'
+-- 3. the sweep of 120 seeds, re-run in Python
+  ok   the four per-profile lines (elections, commands proposed and acknowledged, crashes, messages delivered, violations) are identical; total violations by the correct node: 0
+-- 4. the two deliberate bugs
+  ok   bug 1: the Python search finds the same seed (2), violation (4), tick (238), node (1) and trace hash (db639458); the kernel's replay of the seed was identical
+  ok   bug 3: the Python search finds the same seed (10059), violation (1), tick (154), node (2) and trace hash (23448cbf); the kernel's replay of the seed was identical
+  ok   final tally: 132 seeds simulated, 0 violations by the correct node, 2 deliberate bugs found, 2 replays identical
+
+ALL CHECKS PASSED

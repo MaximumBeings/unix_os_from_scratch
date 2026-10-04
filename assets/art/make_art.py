@@ -5,7 +5,7 @@ import os, sys
 here = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, here)
 from lib import Svg
 import scenes1, scenes2
-S = {"hero": scenes2.hero, **{f"s{n:02d}": getattr(scenes1, f"s{n:02d}") for n in range(1, 24)}, **{f"s{n:02d}": getattr(scenes2, f"s{n:02d}") for n in range(24, 55)}, **{k: getattr(scenes2, k) for k in ("sA", "sB", "sC", "sD")}}
+S = {"hero": scenes2.hero, **{f"s{n:02d}": getattr(scenes1, f"s{n:02d}") for n in range(1, 24)}, **{f"s{n:02d}": getattr(scenes2, f"s{n:02d}") for n in range(24, 56)}, **{k: getattr(scenes2, k) for k in ("sA", "sB", "sC", "sD")}}
 # (palette, alt text) per chapter
 CH = {
  1: ("hw", "A power button, a bootloader and a CPU: booting a Multiboot2 kernel"), 2: ("screen", "A text-mode monitor with coloured character cells at address 0xB8000"),
@@ -24,6 +24,7 @@ CH = {
  37: ("media", "A video player and the segments of an adaptive stream"), 38: ("atm", "A cash machine with a PIN pad dispensing banknotes"), 39: ("atm", "A card terminal and an EMV chip card"),
  40: ("bank", "An invoice and a monthly billing calendar"), 41: ("travel", "An airplane on a route between two airports with competing fares"), 42: ("sport", "A match ticket with a barcode and a rotating code"),
  43: ("bet", "A betting odds board and casino chips"), 44: ("car", "A rental car and its key"), 45: ("net", "An IP header, an ICMP echo and ping ripples"), 46: ("irq", "Five numbered doors: gates installed in the interrupt descriptor table"),
+ 55: ("raft", "Five servers keeping the same log: a leader sending entries to followers, one server crashed, a dashed partition line, and a seed number that replays the whole run"),
  54: ("tls", "A client and a server exchanging a TLS 1.3 handshake, with a padlock over the encrypted messages and a chain of three secrets that become the traffic keys"),
  53: ("lsm", "A write-ahead log and an in-memory sorted table flushing down into layers of sorted table files, with a Bloom filter guarding a read and a crash arrow that recovery repairs"),
  52: ("payroll", "A pay stub with gross pay at the top and federal tax, Social Security and Medicare slices taken out, leaving net pay, beside a wage-base bar that fills and stops"),

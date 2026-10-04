@@ -1,0 +1,54 @@
+Unix OS from Scratch -- Chapter 55: kernel entry reached
+Multiboot2 magic confirmed in EAX: 0x36d76289
+Multiboot2 memory map: 7 real entries, 24 bytes each
+
+[... 3,616 lines of Chapters 8-54's own demos elided: this chapter's demo follows from its first line to its last ...]
+
+Starting this chapter's own Raft demo (a replicated log that survives crashes, partitions and lost messages, tested by deterministic simulation)...
+
+== Part 1. Twelve seeds, one line each (seed mod 4 picks the fault profile: 0 calm network, 1 loss/duplication/reordering, 2 partitions, 3 everything plus crashes of the leader)
+@@RAFT SEEDS BEGIN
+seed 0 n 3 viol 0 tick 0 node -1 sent 392 delivered 390 dropped 0 dups 0 elections 1 crashes 0 restarts 0 proposals 7 acked 7 saves 25 maxcommit 8 firstleader 14 trace 13fddc4f
+seed 1 n 3 viol 0 tick 0 node -1 sent 314 delivered 264 dropped 66 dups 23 elections 4 crashes 0 restarts 0 proposals 5 acked 5 saves 60 maxcommit 8 firstleader 25 trace 12329445
+seed 2 n 3 viol 0 tick 0 node -1 sent 384 delivered 347 dropped 0 dups 0 elections 3 crashes 0 restarts 0 proposals 5 acked 5 saves 40 maxcommit 8 firstleader 13 trace 711cc9ce
+seed 3 n 3 viol 0 tick 0 node -1 sent 163 delivered 106 dropped 17 dups 10 elections 5 crashes 11 restarts 9 proposals 3 acked 1 saves 45 maxcommit 5 firstleader 30 trace 987ce44d
+seed 4 n 5 viol 0 tick 0 node -1 sent 788 delivered 783 dropped 0 dups 0 elections 1 crashes 0 restarts 0 proposals 8 acked 8 saves 50 maxcommit 9 firstleader 13 trace 290af4c1
+seed 5 n 5 viol 0 tick 0 node -1 sent 766 delivered 693 dropped 125 dups 62 elections 1 crashes 0 restarts 0 proposals 5 acked 5 saves 46 maxcommit 6 firstleader 44 trace 0f6fb088
+seed 6 n 5 viol 0 tick 0 node -1 sent 793 delivered 663 dropped 0 dups 0 elections 4 crashes 0 restarts 0 proposals 2 acked 1 saves 69 maxcommit 6 firstleader 16 trace 98e08200
+seed 7 n 5 viol 0 tick 0 node -1 sent 343 delivered 217 dropped 33 dups 20 elections 4 crashes 12 restarts 7 proposals 0 acked 0 saves 50 maxcommit 3 firstleader 18 trace 41d16b1c
+seed 8 n 7 viol 0 tick 0 node -1 sent 1182 delivered 1172 dropped 0 dups 0 elections 1 crashes 0 restarts 0 proposals 1 acked 1 saves 21 maxcommit 2 firstleader 13 trace b1fa0fbc
+seed 9 n 7 viol 0 tick 0 node -1 sent 1203 delivered 1038 dropped 245 dups 101 elections 8 crashes 0 restarts 0 proposals 2 acked 1 saves 166 maxcommit 9 firstleader 17 trace d3fb26fd
+seed 10 n 7 viol 0 tick 0 node -1 sent 1159 delivered 1107 dropped 0 dups 0 elections 1 crashes 0 restarts 0 proposals 6 acked 6 saves 83 maxcommit 7 firstleader 63 trace a1fcfb58
+seed 11 n 7 viol 0 tick 0 node -1 sent 633 delivered 395 dropped 61 dups 31 elections 4 crashes 8 restarts 6 proposals 0 acked 0 saves 129 maxcommit 3 firstleader 84 trace 89df671c
+@@RAFT SEEDS END
+  the final state of the five nodes of seed 4 (a calm network): every node holds the same log up to its commit index, and the leader's no-op plus 8 client commands are replicated
+    node 0: up  , follower, term 1, log length 9, commit 9, applied 9, state machine: 8 commands, hash 2804678d
+    node 1: up  , follower, term 1, log length 9, commit 9, applied 9, state machine: 8 commands, hash 2804678d
+    node 2: up  , follower, term 1, log length 9, commit 9, applied 9, state machine: 8 commands, hash 2804678d
+    node 3: up  , follower, term 1, log length 9, commit 9, applied 9, state machine: 8 commands, hash 2804678d
+    node 4: up  , leader, term 1, log length 9, commit 9, applied 9, state machine: 8 commands, hash 2804678d
+  the final state of the five nodes of seed 43 (loss, partitions, crashes of the leader): 9 crashes, 8 restarts, 4 elections; the nodes that are up agree on every committed entry
+    node 0: up  , follower, term 13, log length 1, commit 0, applied 0, state machine: 0 commands, hash 811c9dc5
+    node 1: up  , leader, term 13, log length 6, commit 0, applied 0, state machine: 0 commands, hash 811c9dc5
+    node 2: up  , follower, term 13, log length 6, commit 0, applied 0, state machine: 0 commands, hash 811c9dc5
+    node 3: DOWN, candidate, term 4, log length 4, commit 4, applied 4, state machine: 2 commands, hash ed74208a
+    node 4: up  , candidate, term 14, log length 6, commit 0, applied 0, state machine: 0 commands, hash 811c9dc5
+
+== Part 2. A sweep of 120 seeds (30 of each fault profile, 3, 5 and 7 nodes), every safety property checked after every tick
+@@RAFT SWEEP BEGIN
+profile 0 (calm network): elections 30, client commands proposed 161, acknowledged 158, crashes 0, messages delivered 23215, violations 0
+profile 1 (loss and reordering): elections 143, client commands proposed 121, acknowledged 98, crashes 0, messages delivered 18928, violations 0
+profile 2 (partitions): elections 106, client commands proposed 147, acknowledged 116, crashes 0, messages delivered 19950, violations 0
+profile 3 (everything + leader crashes): elections 146, client commands proposed 53, acknowledged 34, crashes 228, messages delivered 10004, violations 0
+@@RAFT SWEEP END
+
+== Part 3. Two deliberate bugs, and the simulator finding them
+@@RAFT BUGS BEGIN
+bug 1 seed 2 ticks 300 violation 4 tick 238 node 1 trace db639458 replay_identical 1
+    -> leader completeness (a leader lacks a committed entry)
+bug 3 seed 10059 ticks 600 violation 1 tick 154 node 2 trace 23448cbf replay_identical 1
+    -> election safety (two leaders in one term)
+@@RAFT BUGS END
+  bug 1 is a vote granted without comparing logs: it is found within the first few seeds. bug 3 is a vote that a restart forgets: it needs a leader killed at the wrong moment, and appeared only in about 1 seed in 2,500 (the search started at seed 10,000, where an earlier offline search had found it).
+
+Chapter 55 Raft demo complete: 132 seeds simulated, 0 violations by the correct node, 2 deliberate bugs found, 2 replays identical
