@@ -2185,34 +2185,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../part47/47-hotels-and-tourist-attractions/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    47. Hotels and Tourist Attractions: A Real Hotel Availability and Reservation Codec
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -2580,6 +2552,7 @@
 
 
 <h1 id="3-a-real-gdt-and-a-kernel-printf">3. A Real GDT and a Kernel printf<a class="headerlink" href="#3-a-real-gdt-and-a-kernel-printf" title="Permanent link">&para;</a></h1>
+<p><img alt="A global descriptor table and a printf call" src="../../assets/art/ch-03.svg" style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" /></p>
 <p><strong>What you will understand:</strong> why a kernel needs to own its Global Descriptor Table rather than keep running on the transient one GRUB left behind, the exact byte layout of a segment descriptor and why this book's own flat-memory-model descriptors decode to the specific bytes <code>0x9A</code> and <code>0x92</code>, why reloading <code>CS</code> needs a far jump instead of an ordinary <code>mov</code>, and how this book's first genuinely reusable utility -- a real, variadic <code>kprintf</code> -- gets built on freestanding C's own <code>&lt;stdarg.h&gt;</code> with no C library underneath it.</p>
 <p><strong>What you need to know first:</strong> Chapters 1 and 2 (the boot chain, the serial driver, the VGA driver). No new hardware is introduced for its own sake this chapter -- the GDT and <code>kprintf</code> are both infrastructure later chapters will lean on.</p>
 <h2 id="why-this-is-a-new-part">Why this is a new Part<a class="headerlink" href="#why-this-is-a-new-part" title="Permanent link">&para;</a></h2>
@@ -2589,7 +2562,7 @@
 <h2 id="a-segment-descriptor-byte-by-byte">A segment descriptor, byte by byte<a class="headerlink" href="#a-segment-descriptor-byte-by-byte" title="Permanent link">&para;</a></h2>
 <p>Each GDT entry is 8 bytes, and the exact placement of every field inside those 8 bytes is real, fixed hardware layout -- quoted here from the OSDev Wiki's own worked encoding function rather than re-derived from guesswork:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>+-------------------------------------------------------------+
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>|  One 8-byte GDT entry (OSDev Wiki, "GDT Tutorial")             |
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>|  One 8-byte GDT entry (OSDev Wiki, &quot;GDT Tutorial&quot;)             |
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>|                                                                 |
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>|  byte 0-1   limit bits 0-15                                    |
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>|  byte 2-4   base bits 0-23 (split across three bytes)          |
@@ -2604,14 +2577,14 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="cp">#ifndef UNIX_OS_003_GDT_H</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="cp">#define UNIX_OS_003_GDT_H</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="cm">/* Installs this book's own Global Descriptor Table, replacing whatever</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="cm">/* Installs this book&#39;s own Global Descriptor Table, replacing whatever</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="cm"> * transient GDT GRUB left behind. See 003_gdt.c for why that matters. */</span>
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="kt">void</span><span class="w"> </span><span class="nf">gdt_init</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="cp">#endif</span>
 </code></pre></div>
 <h2 id="003_gdtc-three-descriptors-derived-rather-than-copied"><code>003_gdt.c</code>: three descriptors, derived rather than copied<a class="headerlink" href="#003_gdtc-three-descriptors-derived-rather-than-copied" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="cm">/* Chapter 3: this book's own Global Descriptor Table (GDT). GRUB already</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="cm">/* Chapter 3: this book&#39;s own Global Descriptor Table (GDT). GRUB already</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="cm"> * left the CPU in 32-bit protected mode with *some* valid GDT loaded --</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="cm"> * that is one of the real machine-state guarantees the Multiboot2 spec</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="cm"> * makes, and it is why every chapter so far has been able to run at all.</span>
@@ -2621,16 +2594,16 @@
 <a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="cm"> * differently. This chapter installs a GDT this kernel owns and fully</span>
 <a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="cm"> * understands, with exactly three descriptors: the mandatory null</span>
 <a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="cm"> * descriptor, one flat 4 GiB kernel code segment, and one flat 4 GiB</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="cm"> * kernel data segment -- a "flat memory model," where segmentation is</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="cm"> * kernel data segment -- a &quot;flat memory model,&quot; where segmentation is</span>
 <a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="cm"> * present (x86 protected mode cannot fully turn it off) but does no real</span>
 <a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="cm"> * work, because every segment covers the entire address space. */</span>
 <a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>
 <a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdint.h&gt;</span>
 <a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>
-<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"003_gdt.h"</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;003_gdt.h&quot;</span>
 <a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>
 <a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="cm">/* One 8-byte GDT entry, packed field-by-field exactly as the hardware</span>
-<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="cm"> * reads it (OSDev Wiki, "GDT Tutorial", encodeGdtEntry): limit bits</span>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="cm"> * reads it (OSDev Wiki, &quot;GDT Tutorial&quot;, encodeGdtEntry): limit bits</span>
 <a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="cm"> * 0-15, base bits 0-23 split across three bytes, one access byte, one</span>
 <a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="cm"> * byte whose upper nibble is flags (G/DB/L/AVL) and whose lower nibble</span>
 <a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="cm"> * is limit bits 16-19, then base bits 24-31. */</span>
@@ -2643,10 +2616,10 @@
 <a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a><span class="w">    </span><span class="kt">uint8_t</span><span class="w">  </span><span class="n">base_high</span><span class="p">;</span>
 <a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a><span class="p">}</span><span class="w"> </span><span class="n">__attribute__</span><span class="p">((</span><span class="n">packed</span><span class="p">));</span>
 <a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a>
-<a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a><span class="cm">/* The structure LGDT actually loads: a 16-bit limit (the GDT's size in</span>
+<a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a><span class="cm">/* The structure LGDT actually loads: a 16-bit limit (the GDT&#39;s size in</span>
 <a id="__codelineno-2-34" name="__codelineno-2-34" href="#__codelineno-2-34"></a><span class="cm"> * bytes, minus one) followed by a 32-bit linear base address -- 48 bits</span>
-<a id="__codelineno-2-35" name="__codelineno-2-35" href="#__codelineno-2-35"></a><span class="cm"> * total (OSDev Wiki, "GDT Tutorial": "gdtr DW 0 ; For limit storage /</span>
-<a id="__codelineno-2-36" name="__codelineno-2-36" href="#__codelineno-2-36"></a><span class="cm"> * DD 0 ; For base storage"). */</span>
+<a id="__codelineno-2-35" name="__codelineno-2-35" href="#__codelineno-2-35"></a><span class="cm"> * total (OSDev Wiki, &quot;GDT Tutorial&quot;: &quot;gdtr DW 0 ; For limit storage /</span>
+<a id="__codelineno-2-36" name="__codelineno-2-36" href="#__codelineno-2-36"></a><span class="cm"> * DD 0 ; For base storage&quot;). */</span>
 <a id="__codelineno-2-37" name="__codelineno-2-37" href="#__codelineno-2-37"></a><span class="k">struct</span><span class="w"> </span><span class="nc">gdt_ptr</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-2-38" name="__codelineno-2-38" href="#__codelineno-2-38"></a><span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">limit</span><span class="p">;</span>
 <a id="__codelineno-2-39" name="__codelineno-2-39" href="#__codelineno-2-39"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">base</span><span class="p">;</span>
@@ -2658,9 +2631,9 @@
 <a id="__codelineno-2-45" name="__codelineno-2-45" href="#__codelineno-2-45"></a>
 <a id="__codelineno-2-46" name="__codelineno-2-46" href="#__codelineno-2-46"></a><span class="cm">/* Implemented in 003_gdt_flush.asm: loads gdt_pointer with LGDT, then</span>
 <a id="__codelineno-2-47" name="__codelineno-2-47" href="#__codelineno-2-47"></a><span class="cm"> * reloads every segment register -- CS included, via a far jump, since</span>
-<a id="__codelineno-2-48" name="__codelineno-2-48" href="#__codelineno-2-48"></a><span class="cm"> * "changing the CS register requires code resembling a jump or call to</span>
-<a id="__codelineno-2-49" name="__codelineno-2-49" href="#__codelineno-2-49"></a><span class="cm"> * elsewhere, as this is the only way its value is meant to be changed"</span>
-<a id="__codelineno-2-50" name="__codelineno-2-50" href="#__codelineno-2-50"></a><span class="cm"> * (OSDev Wiki, "GDT Tutorial"). */</span>
+<a id="__codelineno-2-48" name="__codelineno-2-48" href="#__codelineno-2-48"></a><span class="cm"> * &quot;changing the CS register requires code resembling a jump or call to</span>
+<a id="__codelineno-2-49" name="__codelineno-2-49" href="#__codelineno-2-49"></a><span class="cm"> * elsewhere, as this is the only way its value is meant to be changed&quot;</span>
+<a id="__codelineno-2-50" name="__codelineno-2-50" href="#__codelineno-2-50"></a><span class="cm"> * (OSDev Wiki, &quot;GDT Tutorial&quot;). */</span>
 <a id="__codelineno-2-51" name="__codelineno-2-51" href="#__codelineno-2-51"></a><span class="k">extern</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">gdt_flush</span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">gdt_ptr_addr</span><span class="p">);</span>
 <a id="__codelineno-2-52" name="__codelineno-2-52" href="#__codelineno-2-52"></a>
 <a id="__codelineno-2-53" name="__codelineno-2-53" href="#__codelineno-2-53"></a><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">gdt_set_entry</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">index</span><span class="p">,</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">base</span><span class="p">,</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">limit</span><span class="p">,</span>
@@ -2679,37 +2652,37 @@
 <a id="__codelineno-2-66" name="__codelineno-2-66" href="#__codelineno-2-66"></a>
 <a id="__codelineno-2-67" name="__codelineno-2-67" href="#__codelineno-2-67"></a><span class="kt">void</span><span class="w"> </span><span class="nf">gdt_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-2-68" name="__codelineno-2-68" href="#__codelineno-2-68"></a><span class="w">    </span><span class="cm">/* Entry 0: the mandatory null descriptor. The CPU requires selector</span>
-<a id="__codelineno-2-69" name="__codelineno-2-69" href="#__codelineno-2-69"></a><span class="cm">     * 0 to be invalid, so segment registers can be zeroed to mean "no</span>
-<a id="__codelineno-2-70" name="__codelineno-2-70" href="#__codelineno-2-70"></a><span class="cm">     * segment" -- this entry's contents are never read as a real</span>
+<a id="__codelineno-2-69" name="__codelineno-2-69" href="#__codelineno-2-69"></a><span class="cm">     * 0 to be invalid, so segment registers can be zeroed to mean &quot;no</span>
+<a id="__codelineno-2-70" name="__codelineno-2-70" href="#__codelineno-2-70"></a><span class="cm">     * segment&quot; -- this entry&#39;s contents are never read as a real</span>
 <a id="__codelineno-2-71" name="__codelineno-2-71" href="#__codelineno-2-71"></a><span class="cm">     * segment. */</span>
 <a id="__codelineno-2-72" name="__codelineno-2-72" href="#__codelineno-2-72"></a><span class="w">    </span><span class="n">gdt_set_entry</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
 <a id="__codelineno-2-73" name="__codelineno-2-73" href="#__codelineno-2-73"></a>
-<a id="__codelineno-2-74" name="__codelineno-2-74" href="#__codelineno-2-74"></a><span class="w">    </span><span class="cm">/* Entry 1: kernel code, ring 0, flat 4 GiB. The access byte's bits,</span>
-<a id="__codelineno-2-75" name="__codelineno-2-75" href="#__codelineno-2-75"></a><span class="cm">     * cited from the OSDev Wiki's own access-byte table ("Global</span>
-<a id="__codelineno-2-76" name="__codelineno-2-76" href="#__codelineno-2-76"></a><span class="cm">     * Descriptor Table"):</span>
-<a id="__codelineno-2-77" name="__codelineno-2-77" href="#__codelineno-2-77"></a><span class="cm">     *   P  (bit 7) = 1  -- "Must be set (1) for any valid segment."</span>
-<a id="__codelineno-2-78" name="__codelineno-2-78" href="#__codelineno-2-78"></a><span class="cm">     *   DPL(6-5)   = 00 -- "0 = highest privilege (kernel)"</span>
-<a id="__codelineno-2-79" name="__codelineno-2-79" href="#__codelineno-2-79"></a><span class="cm">     *   S  (bit 4) = 1  -- "it defines a code or data segment"</span>
-<a id="__codelineno-2-80" name="__codelineno-2-80" href="#__codelineno-2-80"></a><span class="cm">     *   E  (bit 3) = 1  -- "it defines a code segment which can be</span>
-<a id="__codelineno-2-81" name="__codelineno-2-81" href="#__codelineno-2-81"></a><span class="cm">     *                       executed from"</span>
+<a id="__codelineno-2-74" name="__codelineno-2-74" href="#__codelineno-2-74"></a><span class="w">    </span><span class="cm">/* Entry 1: kernel code, ring 0, flat 4 GiB. The access byte&#39;s bits,</span>
+<a id="__codelineno-2-75" name="__codelineno-2-75" href="#__codelineno-2-75"></a><span class="cm">     * cited from the OSDev Wiki&#39;s own access-byte table (&quot;Global</span>
+<a id="__codelineno-2-76" name="__codelineno-2-76" href="#__codelineno-2-76"></a><span class="cm">     * Descriptor Table&quot;):</span>
+<a id="__codelineno-2-77" name="__codelineno-2-77" href="#__codelineno-2-77"></a><span class="cm">     *   P  (bit 7) = 1  -- &quot;Must be set (1) for any valid segment.&quot;</span>
+<a id="__codelineno-2-78" name="__codelineno-2-78" href="#__codelineno-2-78"></a><span class="cm">     *   DPL(6-5)   = 00 -- &quot;0 = highest privilege (kernel)&quot;</span>
+<a id="__codelineno-2-79" name="__codelineno-2-79" href="#__codelineno-2-79"></a><span class="cm">     *   S  (bit 4) = 1  -- &quot;it defines a code or data segment&quot;</span>
+<a id="__codelineno-2-80" name="__codelineno-2-80" href="#__codelineno-2-80"></a><span class="cm">     *   E  (bit 3) = 1  -- &quot;it defines a code segment which can be</span>
+<a id="__codelineno-2-81" name="__codelineno-2-81" href="#__codelineno-2-81"></a><span class="cm">     *                       executed from&quot;</span>
 <a id="__codelineno-2-82" name="__codelineno-2-82" href="#__codelineno-2-82"></a><span class="cm">     *   DC (bit 2) = 0  -- non-conforming: only ring 0 may execute it</span>
-<a id="__codelineno-2-83" name="__codelineno-2-83" href="#__codelineno-2-83"></a><span class="cm">     *   RW (bit 1) = 1  -- "read access is allowed" (code needs this to</span>
+<a id="__codelineno-2-83" name="__codelineno-2-83" href="#__codelineno-2-83"></a><span class="cm">     *   RW (bit 1) = 1  -- &quot;read access is allowed&quot; (code needs this to</span>
 <a id="__codelineno-2-84" name="__codelineno-2-84" href="#__codelineno-2-84"></a><span class="cm">     *                       let the CPU fetch literals stored in .text)</span>
 <a id="__codelineno-2-85" name="__codelineno-2-85" href="#__codelineno-2-85"></a><span class="cm">     *   A  (bit 0) = 0  -- accessed bit, cleared until the CPU sets it</span>
 <a id="__codelineno-2-86" name="__codelineno-2-86" href="#__codelineno-2-86"></a><span class="cm">     * packed high-to-low: 1 0 0 1 1 0 1 0 = 0x9A. */</span>
 <a id="__codelineno-2-87" name="__codelineno-2-87" href="#__codelineno-2-87"></a><span class="w">    </span><span class="n">gdt_set_entry</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mh">0xFFFFF</span><span class="p">,</span><span class="w"> </span><span class="mh">0x9A</span><span class="p">,</span><span class="w"> </span><span class="mh">0xC0</span><span class="p">);</span>
 <a id="__codelineno-2-88" name="__codelineno-2-88" href="#__codelineno-2-88"></a>
 <a id="__codelineno-2-89" name="__codelineno-2-89" href="#__codelineno-2-89"></a><span class="w">    </span><span class="cm">/* Entry 2: kernel data, ring 0, flat 4 GiB. Same P/DPL/S bits as</span>
-<a id="__codelineno-2-90" name="__codelineno-2-90" href="#__codelineno-2-90"></a><span class="cm">     * entry 1, but E (bit 3) = 0 -- "it defines a data segment" -- and</span>
+<a id="__codelineno-2-90" name="__codelineno-2-90" href="#__codelineno-2-90"></a><span class="cm">     * entry 1, but E (bit 3) = 0 -- &quot;it defines a data segment&quot; -- and</span>
 <a id="__codelineno-2-91" name="__codelineno-2-91" href="#__codelineno-2-91"></a><span class="cm">     * bit 1 becomes the writable bit (data needs write access for a</span>
 <a id="__codelineno-2-92" name="__codelineno-2-92" href="#__codelineno-2-92"></a><span class="cm">     * stack and globals to work at all): 1 0 0 1 0 0 1 0 = 0x92. */</span>
 <a id="__codelineno-2-93" name="__codelineno-2-93" href="#__codelineno-2-93"></a><span class="w">    </span><span class="n">gdt_set_entry</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mh">0xFFFFF</span><span class="p">,</span><span class="w"> </span><span class="mh">0x92</span><span class="p">,</span><span class="w"> </span><span class="mh">0xC0</span><span class="p">);</span>
 <a id="__codelineno-2-94" name="__codelineno-2-94" href="#__codelineno-2-94"></a>
 <a id="__codelineno-2-95" name="__codelineno-2-95" href="#__codelineno-2-95"></a><span class="w">    </span><span class="cm">/* Flags nibble (upper nibble of the granularity byte), cited from</span>
 <a id="__codelineno-2-96" name="__codelineno-2-96" href="#__codelineno-2-96"></a><span class="cm">     * the same access/flags reference:</span>
-<a id="__codelineno-2-97" name="__codelineno-2-97" href="#__codelineno-2-97"></a><span class="cm">     *   G  = 1 -- "the Limit is in 4 KiB blocks" (0xFFFFF limit units</span>
+<a id="__codelineno-2-97" name="__codelineno-2-97" href="#__codelineno-2-97"></a><span class="cm">     *   G  = 1 -- &quot;the Limit is in 4 KiB blocks&quot; (0xFFFFF limit units</span>
 <a id="__codelineno-2-98" name="__codelineno-2-98" href="#__codelineno-2-98"></a><span class="cm">     *              of 4 KiB covers the full 4 GiB address space)</span>
-<a id="__codelineno-2-99" name="__codelineno-2-99" href="#__codelineno-2-99"></a><span class="cm">     *   DB = 1 -- "it defines a 32-bit protected mode segment"</span>
+<a id="__codelineno-2-99" name="__codelineno-2-99" href="#__codelineno-2-99"></a><span class="cm">     *   DB = 1 -- &quot;it defines a 32-bit protected mode segment&quot;</span>
 <a id="__codelineno-2-100" name="__codelineno-2-100" href="#__codelineno-2-100"></a><span class="cm">     *   L  = 0 -- not a 64-bit long-mode code segment</span>
 <a id="__codelineno-2-101" name="__codelineno-2-101" href="#__codelineno-2-101"></a><span class="cm">     *   AVL= 0 -- unused by this kernel</span>
 <a id="__codelineno-2-102" name="__codelineno-2-102" href="#__codelineno-2-102"></a><span class="cm">     * packed as the upper nibble: 1100 = 0xC, shifted up 4 bits -&gt; 0xC0,</span>
@@ -2747,9 +2720,9 @@
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="c1">; descriptors at the same indices. This routine makes the switch real:</span>
 <a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1">; load the table, then explicitly reload every segment register,</span>
 <a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="c1">; including CS, which cannot be reloaded with a plain MOV (OSDev Wiki,</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="c1">; "GDT Tutorial": "changing the CS register requires code resembling a</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="c1">; &quot;GDT Tutorial&quot;: &quot;changing the CS register requires code resembling a</span>
 <a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="c1">; jump or call to elsewhere, as this is the only way its value is meant</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="c1">; to be changed").</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="c1">; to be changed&quot;).</span>
 <a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="k">BITS</span><span class="w"> </span><span class="mi">32</span>
 <a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>
 <a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="k">section</span><span class="w"> </span><span class="nv">.text</span>
@@ -2782,16 +2755,16 @@
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="cp">#define UNIX_OS_003_PRINTF_H</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="cm">/* A small, real printf-family function this kernel owns outright -- no</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="cm"> * libc, no hosted &lt;stdio.h&gt;, just this book's own formatting logic on</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="cm"> * libc, no hosted &lt;stdio.h&gt;, just this book&#39;s own formatting logic on</span>
 <a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="cm"> * top of the serial and VGA drivers already built. Supports %d, %u, %x,</span>
 <a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="cm"> * %c, %s, and a literal %%; nothing else (no width/precision/padding</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="cm"> * specifiers) -- enough for this book's own debug output going forward,</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="cm"> * specifiers) -- enough for this book&#39;s own debug output going forward,</span>
 <a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="cm"> * grown further only when a later chapter genuinely needs more. */</span>
 <a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="kt">void</span><span class="w"> </span><span class="nf">kprintf</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">fmt</span><span class="p">,</span><span class="w"> </span><span class="p">...);</span>
 <a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>
 <a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="cp">#endif</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="cm">/* Chapter 3: this kernel's own printf, built on top of two drivers this</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="cm">/* Chapter 3: this kernel&#39;s own printf, built on top of two drivers this</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="cm"> * book already has -- COM1 serial (Chapter 1) and the VGA framebuffer</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="cm"> * (Chapter 2) -- rather than on any C library. Freestanding C still</span>
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="cm"> * gives this file &lt;stdarg.h&gt; for real (it is a compiler-support header,</span>
@@ -2801,9 +2774,9 @@
 <a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>
 <a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdarg.h&gt;</span>
 <a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"003_printf.h"</span>
-<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"003_serial.h"</span>
-<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"003_vga.h"</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;003_printf.h&quot;</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;003_serial.h&quot;</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;003_vga.h&quot;</span>
 <a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>
 <a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="cm">/* Every character this file ever emits goes through here, to both real</span>
 <a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="cm"> * output devices this book has built so far -- so a single kprintf call</span>
@@ -2816,11 +2789,11 @@
 <a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>
 <a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">kprint_uint</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">base</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">uppercase</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">buf</span><span class="p">[</span><span class="mi">32</span><span class="p">];</span>
-<a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">digits</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uppercase</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">"0123456789ABCDEF"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"0123456789abcdef"</span><span class="p">;</span>
+<a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">digits</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uppercase</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;0123456789ABCDEF&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">&quot;0123456789abcdef&quot;</span><span class="p">;</span>
 <a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a>
 <a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a><span class="w">        </span><span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="o">++</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">'0'</span><span class="p">;</span>
+<a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a><span class="w">        </span><span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="o">++</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;0&#39;</span><span class="p">;</span>
 <a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-5-32" name="__codelineno-5-32" href="#__codelineno-5-32"></a><span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-5-33" name="__codelineno-5-33" href="#__codelineno-5-33"></a><span class="w">            </span><span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="o">++</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">digits</span><span class="p">[</span><span class="n">value</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">base</span><span class="p">];</span>
@@ -2836,7 +2809,7 @@
 <a id="__codelineno-5-43" name="__codelineno-5-43" href="#__codelineno-5-43"></a>
 <a id="__codelineno-5-44" name="__codelineno-5-44" href="#__codelineno-5-44"></a><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">kprint_int</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-5-45" name="__codelineno-5-45" href="#__codelineno-5-45"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-5-46" name="__codelineno-5-46" href="#__codelineno-5-46"></a><span class="w">        </span><span class="n">kputc</span><span class="p">(</span><span class="sc">'-'</span><span class="p">);</span>
+<a id="__codelineno-5-46" name="__codelineno-5-46" href="#__codelineno-5-46"></a><span class="w">        </span><span class="n">kputc</span><span class="p">(</span><span class="sc">&#39;-&#39;</span><span class="p">);</span>
 <a id="__codelineno-5-47" name="__codelineno-5-47" href="#__codelineno-5-47"></a><span class="w">        </span><span class="cm">/* Negate into an unsigned value before printing, so the most</span>
 <a id="__codelineno-5-48" name="__codelineno-5-48" href="#__codelineno-5-48"></a><span class="cm">         * negative int (whose magnitude has no positive int</span>
 <a id="__codelineno-5-49" name="__codelineno-5-49" href="#__codelineno-5-49"></a><span class="cm">         * representation) still prints correctly. */</span>
@@ -2851,40 +2824,40 @@
 <a id="__codelineno-5-58" name="__codelineno-5-58" href="#__codelineno-5-58"></a><span class="w">    </span><span class="n">va_start</span><span class="p">(</span><span class="n">args</span><span class="p">,</span><span class="w"> </span><span class="n">fmt</span><span class="p">);</span>
 <a id="__codelineno-5-59" name="__codelineno-5-59" href="#__codelineno-5-59"></a>
 <a id="__codelineno-5-60" name="__codelineno-5-60" href="#__codelineno-5-60"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fmt</span><span class="p">;</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">;</span><span class="w"> </span><span class="n">p</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-5-61" name="__codelineno-5-61" href="#__codelineno-5-61"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">p</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="sc">'%'</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-61" name="__codelineno-5-61" href="#__codelineno-5-61"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">p</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="sc">&#39;%&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-5-62" name="__codelineno-5-62" href="#__codelineno-5-62"></a><span class="w">            </span><span class="n">kputc</span><span class="p">(</span><span class="o">*</span><span class="n">p</span><span class="p">);</span>
 <a id="__codelineno-5-63" name="__codelineno-5-63" href="#__codelineno-5-63"></a><span class="w">            </span><span class="k">continue</span><span class="p">;</span>
 <a id="__codelineno-5-64" name="__codelineno-5-64" href="#__codelineno-5-64"></a><span class="w">        </span><span class="p">}</span>
 <a id="__codelineno-5-65" name="__codelineno-5-65" href="#__codelineno-5-65"></a><span class="w">        </span><span class="n">p</span><span class="o">++</span><span class="p">;</span>
 <a id="__codelineno-5-66" name="__codelineno-5-66" href="#__codelineno-5-66"></a><span class="w">        </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">p</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-5-67" name="__codelineno-5-67" href="#__codelineno-5-67"></a><span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="sc">'d'</span><span class="p">:</span>
+<a id="__codelineno-5-67" name="__codelineno-5-67" href="#__codelineno-5-67"></a><span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="sc">&#39;d&#39;</span><span class="p">:</span>
 <a id="__codelineno-5-68" name="__codelineno-5-68" href="#__codelineno-5-68"></a><span class="w">                </span><span class="n">kprint_int</span><span class="p">(</span><span class="n">va_arg</span><span class="p">(</span><span class="n">args</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="p">));</span>
 <a id="__codelineno-5-69" name="__codelineno-5-69" href="#__codelineno-5-69"></a><span class="w">                </span><span class="k">break</span><span class="p">;</span>
-<a id="__codelineno-5-70" name="__codelineno-5-70" href="#__codelineno-5-70"></a><span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="sc">'u'</span><span class="p">:</span>
+<a id="__codelineno-5-70" name="__codelineno-5-70" href="#__codelineno-5-70"></a><span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="sc">&#39;u&#39;</span><span class="p">:</span>
 <a id="__codelineno-5-71" name="__codelineno-5-71" href="#__codelineno-5-71"></a><span class="w">                </span><span class="n">kprint_uint</span><span class="p">(</span><span class="n">va_arg</span><span class="p">(</span><span class="n">args</span><span class="p">,</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="p">),</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
 <a id="__codelineno-5-72" name="__codelineno-5-72" href="#__codelineno-5-72"></a><span class="w">                </span><span class="k">break</span><span class="p">;</span>
-<a id="__codelineno-5-73" name="__codelineno-5-73" href="#__codelineno-5-73"></a><span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="sc">'x'</span><span class="p">:</span>
+<a id="__codelineno-5-73" name="__codelineno-5-73" href="#__codelineno-5-73"></a><span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="sc">&#39;x&#39;</span><span class="p">:</span>
 <a id="__codelineno-5-74" name="__codelineno-5-74" href="#__codelineno-5-74"></a><span class="w">                </span><span class="n">kprint_uint</span><span class="p">(</span><span class="n">va_arg</span><span class="p">(</span><span class="n">args</span><span class="p">,</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="p">),</span><span class="w"> </span><span class="mi">16</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
 <a id="__codelineno-5-75" name="__codelineno-5-75" href="#__codelineno-5-75"></a><span class="w">                </span><span class="k">break</span><span class="p">;</span>
-<a id="__codelineno-5-76" name="__codelineno-5-76" href="#__codelineno-5-76"></a><span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="sc">'c'</span><span class="p">:</span>
+<a id="__codelineno-5-76" name="__codelineno-5-76" href="#__codelineno-5-76"></a><span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="sc">&#39;c&#39;</span><span class="p">:</span>
 <a id="__codelineno-5-77" name="__codelineno-5-77" href="#__codelineno-5-77"></a><span class="w">                </span><span class="n">kputc</span><span class="p">((</span><span class="kt">char</span><span class="p">)</span><span class="w"> </span><span class="n">va_arg</span><span class="p">(</span><span class="n">args</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="p">));</span>
 <a id="__codelineno-5-78" name="__codelineno-5-78" href="#__codelineno-5-78"></a><span class="w">                </span><span class="k">break</span><span class="p">;</span>
-<a id="__codelineno-5-79" name="__codelineno-5-79" href="#__codelineno-5-79"></a><span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="sc">'s'</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-79" name="__codelineno-5-79" href="#__codelineno-5-79"></a><span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="sc">&#39;s&#39;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-5-80" name="__codelineno-5-80" href="#__codelineno-5-80"></a><span class="w">                </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">va_arg</span><span class="p">(</span><span class="n">args</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="p">);</span>
 <a id="__codelineno-5-81" name="__codelineno-5-81" href="#__codelineno-5-81"></a><span class="w">                </span><span class="k">for</span><span class="w"> </span><span class="p">(;</span><span class="w"> </span><span class="o">*</span><span class="n">s</span><span class="p">;</span><span class="w"> </span><span class="n">s</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="n">kputc</span><span class="p">(</span><span class="o">*</span><span class="n">s</span><span class="p">);</span>
 <a id="__codelineno-5-82" name="__codelineno-5-82" href="#__codelineno-5-82"></a><span class="w">                </span><span class="k">break</span><span class="p">;</span>
 <a id="__codelineno-5-83" name="__codelineno-5-83" href="#__codelineno-5-83"></a><span class="w">            </span><span class="p">}</span>
-<a id="__codelineno-5-84" name="__codelineno-5-84" href="#__codelineno-5-84"></a><span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="sc">'%'</span><span class="p">:</span>
-<a id="__codelineno-5-85" name="__codelineno-5-85" href="#__codelineno-5-85"></a><span class="w">                </span><span class="n">kputc</span><span class="p">(</span><span class="sc">'%'</span><span class="p">);</span>
+<a id="__codelineno-5-84" name="__codelineno-5-84" href="#__codelineno-5-84"></a><span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="sc">&#39;%&#39;</span><span class="p">:</span>
+<a id="__codelineno-5-85" name="__codelineno-5-85" href="#__codelineno-5-85"></a><span class="w">                </span><span class="n">kputc</span><span class="p">(</span><span class="sc">&#39;%&#39;</span><span class="p">);</span>
 <a id="__codelineno-5-86" name="__codelineno-5-86" href="#__codelineno-5-86"></a><span class="w">                </span><span class="k">break</span><span class="p">;</span>
-<a id="__codelineno-5-87" name="__codelineno-5-87" href="#__codelineno-5-87"></a><span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="sc">'\0'</span><span class="p">:</span>
-<a id="__codelineno-5-88" name="__codelineno-5-88" href="#__codelineno-5-88"></a><span class="w">                </span><span class="cm">/* A lone trailing '%' with nothing after it: step back</span>
-<a id="__codelineno-5-89" name="__codelineno-5-89" href="#__codelineno-5-89"></a><span class="cm">                 * so the for-loop's own p++ lands exactly on the</span>
-<a id="__codelineno-5-90" name="__codelineno-5-90" href="#__codelineno-5-90"></a><span class="cm">                 * string's real terminator, instead of reading past it. */</span>
+<a id="__codelineno-5-87" name="__codelineno-5-87" href="#__codelineno-5-87"></a><span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="sc">&#39;\0&#39;</span><span class="p">:</span>
+<a id="__codelineno-5-88" name="__codelineno-5-88" href="#__codelineno-5-88"></a><span class="w">                </span><span class="cm">/* A lone trailing &#39;%&#39; with nothing after it: step back</span>
+<a id="__codelineno-5-89" name="__codelineno-5-89" href="#__codelineno-5-89"></a><span class="cm">                 * so the for-loop&#39;s own p++ lands exactly on the</span>
+<a id="__codelineno-5-90" name="__codelineno-5-90" href="#__codelineno-5-90"></a><span class="cm">                 * string&#39;s real terminator, instead of reading past it. */</span>
 <a id="__codelineno-5-91" name="__codelineno-5-91" href="#__codelineno-5-91"></a><span class="w">                </span><span class="n">p</span><span class="o">--</span><span class="p">;</span>
 <a id="__codelineno-5-92" name="__codelineno-5-92" href="#__codelineno-5-92"></a><span class="w">                </span><span class="k">break</span><span class="p">;</span>
 <a id="__codelineno-5-93" name="__codelineno-5-93" href="#__codelineno-5-93"></a><span class="w">            </span><span class="k">default</span><span class="o">:</span>
-<a id="__codelineno-5-94" name="__codelineno-5-94" href="#__codelineno-5-94"></a><span class="w">                </span><span class="n">kputc</span><span class="p">(</span><span class="sc">'%'</span><span class="p">);</span>
+<a id="__codelineno-5-94" name="__codelineno-5-94" href="#__codelineno-5-94"></a><span class="w">                </span><span class="n">kputc</span><span class="p">(</span><span class="sc">&#39;%&#39;</span><span class="p">);</span>
 <a id="__codelineno-5-95" name="__codelineno-5-95" href="#__codelineno-5-95"></a><span class="w">                </span><span class="n">kputc</span><span class="p">(</span><span class="o">*</span><span class="n">p</span><span class="p">);</span>
 <a id="__codelineno-5-96" name="__codelineno-5-96" href="#__codelineno-5-96"></a><span class="w">                </span><span class="k">break</span><span class="p">;</span>
 <a id="__codelineno-5-97" name="__codelineno-5-97" href="#__codelineno-5-97"></a><span class="w">        </span><span class="p">}</span>
@@ -2896,20 +2869,20 @@
 <p><code>&lt;stdarg.h&gt;</code> is worth pausing on: this kernel has no libc, no <code>&lt;stdio.h&gt;</code>, none of the hosted standard library -- but <code>&lt;stdarg.h&gt;</code> is different. It is a small, compiler-support header (<code>va_list</code>/<code>va_start</code>/<code>va_arg</code>/<code>va_end</code> are really compiler builtins wearing a header's clothes), not part of the hosted runtime this book deliberately excludes, so a freestanding build can use it exactly like any hosted C program would.</p>
 <p>Every character <code>kprintf</code> ever emits funnels through one static <code>kputc</code>, which writes to both real output devices this book has built -- COM1 serial and the VGA framebuffer -- so a single call produces identical text in this chapter's exact, capturable serial log and on the real (emulated) screen at the same time. <code>kprint_uint</code>/<code>kprint_int</code> build decimal and hexadecimal output digit by digit, least-significant-digit first into a small stack buffer, then emit that buffer in reverse -- the standard shape for converting a binary integer to text without a library. The format loop itself supports five real conversions (<code>%d</code>, <code>%u</code>, <code>%x</code>, <code>%c</code>, <code>%s</code>) plus a literal <code>%%</code>, and one deliberate piece of defensive handling: a format string ending in a lone <code>%</code> steps the loop pointer back rather than reading one byte past the string's own null terminator.</p>
 <h2 id="003_kmainc-installing-the-gdt-then-printing-through-it"><code>003_kmain.c</code>: installing the GDT, then printing through it<a class="headerlink" href="#003_kmainc-installing-the-gdt-then-printing-through-it" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="cm">/* Chapter 3: kmain now installs this book's own GDT before doing</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="cm">/* Chapter 3: kmain now installs this book&#39;s own GDT before doing</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="cm"> * anything else, then proves it survived by continuing to run at all --</span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="cm"> * a bad GDT install does not print an error, it triple-faults the</span>
 <a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="cm"> * machine immediately. Everything after that uses kprintf instead of</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="cm"> * raw serial_puts/vga_puts calls, this chapter's own real formatted</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="cm"> * raw serial_puts/vga_puts calls, this chapter&#39;s own real formatted</span>
 <a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="cm"> * output running with no libc underneath it. Like Chapter 2, this</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="cm"> * kmain deliberately never exits: it falls through to 003_boot.asm's</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="cm"> * kmain deliberately never exits: it falls through to 003_boot.asm&#39;s</span>
 <a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="cm"> * own halt loop so a QEMU monitor session, connected from outside,</span>
 <a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="cm"> * still has a live machine to screendump. */</span>
 <a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"003_gdt.h"</span>
-<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"003_printf.h"</span>
-<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"003_serial.h"</span>
-<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"003_vga.h"</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;003_gdt.h&quot;</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;003_printf.h&quot;</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;003_serial.h&quot;</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;003_vga.h&quot;</span>
 <a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>
 <a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="kt">void</span><span class="w"> </span><span class="nf">kmain</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">    </span><span class="n">serial_init</span><span class="p">();</span>
@@ -2918,10 +2891,10 @@
 <a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>
 <a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a><span class="w">    </span><span class="n">gdt_init</span><span class="p">();</span>
 <a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a>
-<a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Unix OS from Scratch -- Chapter 3: kernel entry reached</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
-<a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"GDT loaded: 3 descriptors (null, kernel code 0x08, kernel data 0x10)</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
-<a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"kprintf self-test -- int: %d  negative: %d  hex: %x  char: %c  str: %s  percent: %%</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
-<a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a><span class="w">            </span><span class="mi">42</span><span class="p">,</span><span class="w"> </span><span class="mi">-7</span><span class="p">,</span><span class="w"> </span><span class="mh">0x1abc</span><span class="p">,</span><span class="w"> </span><span class="sc">'Z'</span><span class="p">,</span><span class="w"> </span><span class="s">"unix_os_from_scratch"</span><span class="p">);</span>
+<a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">&quot;Unix OS from Scratch -- Chapter 3: kernel entry reached</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">&quot;GDT loaded: 3 descriptors (null, kernel code 0x08, kernel data 0x10)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">&quot;kprintf self-test -- int: %d  negative: %d  hex: %x  char: %c  str: %s  percent: %%</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a><span class="w">            </span><span class="mi">42</span><span class="p">,</span><span class="w"> </span><span class="mi">-7</span><span class="p">,</span><span class="w"> </span><span class="mh">0x1abc</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;Z&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;unix_os_from_scratch&quot;</span><span class="p">);</span>
 <a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a><span class="p">}</span>
 </code></pre></div>
 <p><code>gdt_init()</code> runs before any <code>kprintf</code> call -- deliberately: everything printed afterward is running under this kernel's own code and data descriptors, not GRUB's, so reaching the first <code>kprintf</code> line at all is this chapter's own proof that the GDT install and the far jump both worked. Like Chapter 2's <code>kmain</code>, this one never calls <code>qemu_exit</code>: it falls through to <code>003_boot.asm</code>'s halt loop, keeping the machine alive so an external QEMU monitor session has time to take a real screenshot, the same technique Chapter 2 introduced.</p>

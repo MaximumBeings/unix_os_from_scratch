@@ -2174,34 +2174,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../part47/47-hotels-and-tourist-attractions/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    47. Hotels and Tourist Attractions: A Real Hotel Availability and Reservation Codec
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -2558,6 +2530,7 @@
 
 
 <h1 id="4-interrupts-the-idt-and-a-first-real-isr">4. Interrupts: The IDT and a First Real ISR<a class="headerlink" href="#4-interrupts-the-idt-and-a-first-real-isr" title="Permanent link">&para;</a></h1>
+<p><img alt="A bell ringing at a CPU: an interrupt reaching the interrupt descriptor table" src="../../assets/art/ch-04.svg" style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" /></p>
 <p><strong>What you will understand:</strong> why every chapter up to this one has been quietly running with interrupts disabled and no way to survive a CPU exception at all; the exact byte layout of an IDT gate and how it differs from Chapter 3's GDT entries; why an interrupt handler cannot be an ordinary C function and has to be entered and exited through real, hand-written assembly; and how this chapter proves its own handler actually works by deliberately causing the exact fault it is meant to catch.</p>
 <p><strong>What you need to know first:</strong> Chapter 3's GDT (an interrupt gate's selector field names one of its descriptors directly) and <code>kprintf</code>. No new hardware devices this chapter -- like Chapter 3, this is kernel infrastructure, not a driver.</p>
 <h2 id="what-has-been-true-silently-since-chapter-1">What has been true, silently, since Chapter 1<a class="headerlink" href="#what-has-been-true-silently-since-chapter-1" title="Permanent link">&para;</a></h2>
@@ -2565,8 +2538,8 @@
 <h2 id="an-idt-gate-byte-by-byte">An IDT gate, byte by byte<a class="headerlink" href="#an-idt-gate-byte-by-byte" title="Permanent link">&para;</a></h2>
 <p>Like Chapter 3's GDT entries, an Interrupt Descriptor Table gate is a fixed 8-byte hardware structure -- but a different one, quoted here from the OSDev Wiki's own struct definition rather than assumed to match the GDT's shape:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>+-------------------------------------------------------------+
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>|  One 8-byte IDT entry (OSDev Wiki, "Interrupt Descriptor       |
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>|  Table")                                                      |
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>|  One 8-byte IDT entry (OSDev Wiki, &quot;Interrupt Descriptor       |
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>|  Table&quot;)                                                      |
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>|                                                                 |
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>|  offset_1          uint16_t   handler address, bits 0-15       |
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>|  selector          uint16_t   a GDT (or LDT) code selector     |
@@ -2580,7 +2553,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="cp">#ifndef UNIX_OS_004_IDT_H</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="cp">#define UNIX_OS_004_IDT_H</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="cm">/* Installs this book's own Interrupt Descriptor Table and wires up a</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="cm">/* Installs this book&#39;s own Interrupt Descriptor Table and wires up a</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="cm"> * real handler for CPU exception vector 0, #DE (Divide Error). See</span>
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="cm"> * 004_idt.c for why an IDT is needed at all, and 004_isr0.asm for why</span>
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="cm"> * the handler cannot be written as an ordinary C function. */</span>
@@ -2589,8 +2562,8 @@
 <a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="cp">#endif</span>
 </code></pre></div>
 <h2 id="004_idtc-256-entries-one-of-them-real"><code>004_idt.c</code>: 256 entries, one of them real<a class="headerlink" href="#004_idtc-256-entries-one-of-them-real" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="cm">/* Chapter 4: this book's own Interrupt Descriptor Table (IDT). Chapter 1</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="cm"> * already made one thing about this kernel's machine state explicit:</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="cm">/* Chapter 4: this book&#39;s own Interrupt Descriptor Table (IDT). Chapter 1</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="cm"> * already made one thing about this kernel&#39;s machine state explicit:</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="cm"> * GRUB hands off with interrupts disabled. That has been quietly true</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="cm"> * every chapter since -- nothing before this one could possibly survive</span>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="cm"> * an interrupt or a CPU exception, because there was no table telling</span>
@@ -2598,17 +2571,17 @@
 <a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="cm"> * page fault later in this book: every one of those is the CPU looking</span>
 <a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="cm"> * up an entry in this exact table and jumping to whatever address it</span>
 <a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="cm"> * finds there. With no IDT installed, or an entry marked not-present,</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="cm"> * the CPU's response to a fault it cannot dispatch is a triple fault --</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="cm"> * the CPU&#39;s response to a fault it cannot dispatch is a triple fault --</span>
 <a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="cm"> * an immediate, silent reset, with no diagnostic of any kind. This</span>
 <a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="cm"> * chapter gives the CPU somewhere real to go instead, for exactly one</span>
 <a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="cm"> * vector: #DE, the Divide Error exception. */</span>
 <a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>
 <a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdint.h&gt;</span>
 <a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>
-<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"004_idt.h"</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;004_idt.h&quot;</span>
 <a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>
 <a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="cm">/* One 8-byte IDT entry, packed exactly as the hardware reads it (OSDev</span>
-<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="cm"> * Wiki, "Interrupt Descriptor Table"): the 32-bit handler address split</span>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="cm"> * Wiki, &quot;Interrupt Descriptor Table&quot;): the 32-bit handler address split</span>
 <a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="cm"> * into a low and high half, a GDT segment selector, one reserved byte,</span>
 <a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="cm"> * and one type-attributes byte. */</span>
 <a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="k">struct</span><span class="w"> </span><span class="nc">idt_entry</span><span class="w"> </span><span class="p">{</span>
@@ -2620,8 +2593,8 @@
 <a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a><span class="p">}</span><span class="w"> </span><span class="n">__attribute__</span><span class="p">((</span><span class="n">packed</span><span class="p">));</span>
 <a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a>
 <a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a><span class="cm">/* The structure LIDT loads -- the same 48-bit (16-bit limit, 32-bit</span>
-<a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a><span class="cm"> * base) shape as Chapter 3's own gdt_ptr, for the same reason: it is</span>
-<a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a><span class="cm"> * how every one of this CPU's descriptor-table registers is loaded. */</span>
+<a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a><span class="cm"> * base) shape as Chapter 3&#39;s own gdt_ptr, for the same reason: it is</span>
+<a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a><span class="cm"> * how every one of this CPU&#39;s descriptor-table registers is loaded. */</span>
 <a id="__codelineno-2-34" name="__codelineno-2-34" href="#__codelineno-2-34"></a><span class="k">struct</span><span class="w"> </span><span class="nc">idt_ptr</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-2-35" name="__codelineno-2-35" href="#__codelineno-2-35"></a><span class="w">    </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">limit</span><span class="p">;</span>
 <a id="__codelineno-2-36" name="__codelineno-2-36" href="#__codelineno-2-36"></a><span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">base</span><span class="p">;</span>
@@ -2637,7 +2610,7 @@
 <a id="__codelineno-2-46" name="__codelineno-2-46" href="#__codelineno-2-46"></a><span class="k">extern</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">isr0</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
 <a id="__codelineno-2-47" name="__codelineno-2-47" href="#__codelineno-2-47"></a>
 <a id="__codelineno-2-48" name="__codelineno-2-48" href="#__codelineno-2-48"></a><span class="cm">/* Implemented in 004_idt_flush.asm: LIDT, and nothing else -- unlike</span>
-<a id="__codelineno-2-49" name="__codelineno-2-49" href="#__codelineno-2-49"></a><span class="cm"> * Chapter 3's gdt_flush, no segment registers need reloading here, and</span>
+<a id="__codelineno-2-49" name="__codelineno-2-49" href="#__codelineno-2-49"></a><span class="cm"> * Chapter 3&#39;s gdt_flush, no segment registers need reloading here, and</span>
 <a id="__codelineno-2-50" name="__codelineno-2-50" href="#__codelineno-2-50"></a><span class="cm"> * no far jump either. CS is never affected by which IDT is loaded; it</span>
 <a id="__codelineno-2-51" name="__codelineno-2-51" href="#__codelineno-2-51"></a><span class="cm"> * is only consulted later, at the moment a real interrupt or exception</span>
 <a id="__codelineno-2-52" name="__codelineno-2-52" href="#__codelineno-2-52"></a><span class="cm"> * actually fires, to decide whether the CPU is allowed to take it. */</span>
@@ -2655,21 +2628,21 @@
 <a id="__codelineno-2-64" name="__codelineno-2-64" href="#__codelineno-2-64"></a><span class="w">    </span><span class="cm">/* Zero every one of the 256 possible vectors first. A zeroed entry</span>
 <a id="__codelineno-2-65" name="__codelineno-2-65" href="#__codelineno-2-65"></a><span class="cm">     * has its Present bit clear, which is exactly what this kernel</span>
 <a id="__codelineno-2-66" name="__codelineno-2-66" href="#__codelineno-2-66"></a><span class="cm">     * wants for every vector it has not written a real handler for:</span>
-<a id="__codelineno-2-67" name="__codelineno-2-67" href="#__codelineno-2-67"></a><span class="cm">     * an honest "not present" rather than a stale or garbage address</span>
+<a id="__codelineno-2-67" name="__codelineno-2-67" href="#__codelineno-2-67"></a><span class="cm">     * an honest &quot;not present&quot; rather than a stale or garbage address</span>
 <a id="__codelineno-2-68" name="__codelineno-2-68" href="#__codelineno-2-68"></a><span class="cm">     * the CPU might otherwise jump to. */</span>
 <a id="__codelineno-2-69" name="__codelineno-2-69" href="#__codelineno-2-69"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">IDT_ENTRY_COUNT</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-2-70" name="__codelineno-2-70" href="#__codelineno-2-70"></a><span class="w">        </span><span class="n">idt_set_gate</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
 <a id="__codelineno-2-71" name="__codelineno-2-71" href="#__codelineno-2-71"></a><span class="w">    </span><span class="p">}</span>
 <a id="__codelineno-2-72" name="__codelineno-2-72" href="#__codelineno-2-72"></a>
-<a id="__codelineno-2-73" name="__codelineno-2-73" href="#__codelineno-2-73"></a><span class="w">    </span><span class="cm">/* Vector 0: #DE, Divide Error -- "DIV and IDIV instructions," no</span>
-<a id="__codelineno-2-74" name="__codelineno-2-74" href="#__codelineno-2-74"></a><span class="cm">     * error code pushed (OSDev Wiki, "Interrupt Descriptor Table",</span>
-<a id="__codelineno-2-75" name="__codelineno-2-75" href="#__codelineno-2-75"></a><span class="cm">     * exception table). Selector 0x08 is this kernel's own kernel-code</span>
-<a id="__codelineno-2-76" name="__codelineno-2-76" href="#__codelineno-2-76"></a><span class="cm">     * descriptor from Chapter 3's GDT (index 1, 1 * 8 = 0x08) -- the</span>
+<a id="__codelineno-2-73" name="__codelineno-2-73" href="#__codelineno-2-73"></a><span class="w">    </span><span class="cm">/* Vector 0: #DE, Divide Error -- &quot;DIV and IDIV instructions,&quot; no</span>
+<a id="__codelineno-2-74" name="__codelineno-2-74" href="#__codelineno-2-74"></a><span class="cm">     * error code pushed (OSDev Wiki, &quot;Interrupt Descriptor Table&quot;,</span>
+<a id="__codelineno-2-75" name="__codelineno-2-75" href="#__codelineno-2-75"></a><span class="cm">     * exception table). Selector 0x08 is this kernel&#39;s own kernel-code</span>
+<a id="__codelineno-2-76" name="__codelineno-2-76" href="#__codelineno-2-76"></a><span class="cm">     * descriptor from Chapter 3&#39;s GDT (index 1, 1 * 8 = 0x08) -- the</span>
 <a id="__codelineno-2-77" name="__codelineno-2-77" href="#__codelineno-2-77"></a><span class="cm">     * segment the CPU switches to while running this handler. The</span>
 <a id="__codelineno-2-78" name="__codelineno-2-78" href="#__codelineno-2-78"></a><span class="cm">     * type-attributes byte is cited directly:</span>
-<a id="__codelineno-2-79" name="__codelineno-2-79" href="#__codelineno-2-79"></a><span class="cm">     *   "p=1, dpl=0b00, type=0b1110 =&gt; type_attributes=0b1000_1110=0x8E"</span>
+<a id="__codelineno-2-79" name="__codelineno-2-79" href="#__codelineno-2-79"></a><span class="cm">     *   &quot;p=1, dpl=0b00, type=0b1110 =&gt; type_attributes=0b1000_1110=0x8E&quot;</span>
 <a id="__codelineno-2-80" name="__codelineno-2-80" href="#__codelineno-2-80"></a><span class="cm">     * for a 32-bit interrupt gate at ring 0.</span>
-<a id="__codelineno-2-81" name="__codelineno-2-81" href="#__codelineno-2-81"></a><span class="cm">     * (OSDev Wiki, "Interrupt Descriptor Table":</span>
+<a id="__codelineno-2-81" name="__codelineno-2-81" href="#__codelineno-2-81"></a><span class="cm">     * (OSDev Wiki, &quot;Interrupt Descriptor Table&quot;:</span>
 <a id="__codelineno-2-82" name="__codelineno-2-82" href="#__codelineno-2-82"></a><span class="cm">     *  https://wiki.osdev.org/Interrupt_Descriptor_Table) */</span>
 <a id="__codelineno-2-83" name="__codelineno-2-83" href="#__codelineno-2-83"></a><span class="w">    </span><span class="n">idt_set_gate</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="w"> </span><span class="n">isr0</span><span class="p">,</span><span class="w"> </span><span class="mh">0x08</span><span class="p">,</span><span class="w"> </span><span class="mh">0x8E</span><span class="p">);</span>
 <a id="__codelineno-2-84" name="__codelineno-2-84" href="#__codelineno-2-84"></a>
@@ -2694,7 +2667,7 @@
 <p>That "No" matters directly to <code>004_isr0.asm</code> below: some exceptions push an extra 32-bit error code onto the stack before the handler runs, and some do not, and getting that wrong desynchronizes the stack in a way that corrupts the eventual <code>IRET</code>. #DE is one of the simple ones.</p>
 <h2 id="004_idt_flushasm-one-instruction-no-far-jump"><code>004_idt_flush.asm</code>: one instruction, no far jump<a class="headerlink" href="#004_idt_flushasm-one-instruction-no-far-jump" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">; Chapter 4: loading the IDT is a single real instruction, unlike</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1">; Chapter 3's GDT install -- LIDT takes effect immediately for the next</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1">; Chapter 3&#39;s GDT install -- LIDT takes effect immediately for the next</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1">; interrupt or exception the CPU takes, with no segment registers to</span>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1">; reload and no far jump required. CS is not involved in which IDT is</span>
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="c1">; loaded; it only matters later, at dispatch time, when the CPU checks</span>
@@ -2716,14 +2689,14 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">; Chapter 4: the real machine code the CPU jumps to on a #DE (Divide</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="c1">; Error) fault -- this cannot be an ordinary C function, for two real</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="c1">; reasons. First, the CPU does not call it with the normal cdecl</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1">; convention this book's C functions all assume (arguments on the</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1">; convention this book&#39;s C functions all assume (arguments on the</span>
 <a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="c1">; stack, a plain `ret` to return); it pushes its own fixed set of</span>
 <a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="c1">; values (EFLAGS, CS, EIP, and -- for some vectors, not this one --</span>
 <a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1">; an error code) and expects the handler to leave via IRET, a real</span>
 <a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="c1">; instruction with no C equivalent. Second, an ordinary C function is</span>
 <a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="c1">; free to clobber any general-purpose register it wants, because the</span>
 <a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="c1">; normal calling convention guarantees the caller already saved</span>
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="c1">; whatever it still needed -- but the "caller" here is the CPU itself,</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="c1">; whatever it still needed -- but the &quot;caller&quot; here is the CPU itself,</span>
 <a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="c1">; interrupting whatever this kernel was doing at an arbitrary</span>
 <a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="c1">; instruction, so every register genuinely has to be saved and</span>
 <a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="c1">; restored by hand.</span>
@@ -2737,8 +2710,8 @@
 <a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="w">    </span><span class="nf">call</span><span class="w"> </span><span class="nv">isr0_handler</span><span class="w">        </span><span class="c1">; ordinary cdecl call into real C</span>
 <a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="w">    </span><span class="nf">popa</span><span class="w">                     </span><span class="c1">; restore every register pusha just saved</span>
 <a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="w">    </span><span class="nf">iret</span><span class="w">                     </span><span class="c1">; #DE pushes no error code (OSDev Wiki,</span>
-<a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="w">                              </span><span class="c1">; "Interrupt Descriptor Table": vector 0</span>
-<a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="w">                              </span><span class="c1">; lists "No" under Error Code), so no</span>
+<a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="w">                              </span><span class="c1">; &quot;Interrupt Descriptor Table&quot;: vector 0</span>
+<a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="w">                              </span><span class="c1">; lists &quot;No&quot; under Error Code), so no</span>
 <a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="w">                              </span><span class="c1">; extra stack cleanup is needed before</span>
 <a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a><span class="w">                              </span><span class="c1">; this -- IRET pops EIP, CS, and EFLAGS</span>
 <a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a><span class="w">                              </span><span class="c1">; itself, exactly what the CPU pushed</span>
@@ -2748,7 +2721,7 @@
 <p><div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="cp">#ifndef UNIX_OS_004_ISR_HANDLERS_H</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="cp">#define UNIX_OS_004_ISR_HANDLERS_H</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="cm">/* The real C handler 004_isr0.asm's stub calls on a #DE fault. Nothing</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="cm">/* The real C handler 004_isr0.asm&#39;s stub calls on a #DE fault. Nothing</span>
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="cm"> * in C calls it directly -- only the assembly stub does -- so this</span>
 <a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="cm"> * declaration exists purely so 004_isr_handlers.c has a header to</span>
 <a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="cm"> * define against, the same one-module-one-header shape every other</span>
@@ -2757,7 +2730,7 @@
 <a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>
 <a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="cp">#endif</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="cm">/* Chapter 4: this book's first real exception handler. It does not try</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="cm">/* Chapter 4: this book&#39;s first real exception handler. It does not try</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="cm"> * to resume the instruction that faulted -- for a divide-by-zero, there</span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="cm"> * is nothing to fix and no sane value to hand back to the IDIV</span>
 <a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="cm"> * instruction that trapped, so returning via IRET would just fault</span>
@@ -2765,38 +2738,38 @@
 <a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="cm"> * halting is the honest thing to do until a later chapter gives this</span>
 <a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="cm"> * kernel a real reason and a real mechanism to recover instead. */</span>
 <a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"004_isr_handlers.h"</span>
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"004_printf.h"</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;004_isr_handlers.h&quot;</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;004_printf.h&quot;</span>
 <a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>
 <a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="kt">void</span><span class="w"> </span><span class="nf">isr0_handler</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">*** CPU EXCEPTION: Divide Error (vector 0, #DE) ***</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
-<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"A DIV or IDIV instruction attempted to divide by zero.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
-<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"This handler does not resume the faulting instruction --</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
-<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"halting.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">*** CPU EXCEPTION: Divide Error (vector 0, #DE) ***</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">&quot;A DIV or IDIV instruction attempted to divide by zero.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">&quot;This handler does not resume the faulting instruction --</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">&quot;halting.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>
-<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"cli"</span><span class="p">);</span>
+<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;cli&quot;</span><span class="p">);</span>
 <a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(;;)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="w">        </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"hlt"</span><span class="p">);</span>
+<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="w">        </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;hlt&quot;</span><span class="p">);</span>
 <a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a><span class="w">    </span><span class="p">}</span>
 <a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a><span class="p">}</span>
 </code></pre></div></p>
 <p><code>004_isr0.asm</code>'s own <code>popa</code>/<code>iret</code> sequence is written correctly and would genuinely resume the faulting code, if this handler ever reached them -- but it never does, on purpose. A divide-by-zero has no sane value to hand back to the <code>IDIV</code> instruction that trapped; returning via <code>IRET</code> would simply re-execute that same instruction and fault again, immediately, forever. Reporting the fault through <code>kprintf</code> and halting with <code>cli</code>/<code>hlt</code> is the honest response until a later chapter gives this kernel an actual reason -- and an actual mechanism -- to recover from a fault instead of stopping.</p>
 <h2 id="004_kmainc-proving-the-handler-works-by-causing-the-fault"><code>004_kmain.c</code>: proving the handler works by causing the fault<a class="headerlink" href="#004_kmainc-proving-the-handler-works-by-causing-the-fault" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="cm">/* Chapter 4: kmain installs the GDT (Chapter 3, unchanged) and now this</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="cm"> * chapter's own IDT, then deliberately triggers a real #DE exception --</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="cm"> * chapter&#39;s own IDT, then deliberately triggers a real #DE exception --</span>
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="cm"> * a runtime division by a volatile zero, not a compile-time constant</span>
 <a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="cm"> * the compiler could fold away or warn about, so the fault genuinely</span>
 <a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="cm"> * comes from the CPU executing an IDIV instruction at runtime. If the</span>
 <a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="cm"> * IDT and its one real gate are wired correctly, control lands in</span>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="cm"> * 004_isr0.asm's stub and then 004_isr_handlers.c's real handler,</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="cm"> * 004_isr0.asm&#39;s stub and then 004_isr_handlers.c&#39;s real handler,</span>
 <a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="cm"> * which prints and halts -- so the line right after the division is</span>
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="cm"> * this chapter's own proof that it should *never* print. */</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="cm"> * this chapter&#39;s own proof that it should *never* print. */</span>
 <a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>
-<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"004_gdt.h"</span>
-<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"004_idt.h"</span>
-<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"004_printf.h"</span>
-<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"004_serial.h"</span>
-<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"004_vga.h"</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;004_gdt.h&quot;</span>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;004_idt.h&quot;</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;004_printf.h&quot;</span>
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;004_serial.h&quot;</span>
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;004_vga.h&quot;</span>
 <a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>
 <a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="kt">void</span><span class="w"> </span><span class="nf">kmain</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="w">    </span><span class="n">serial_init</span><span class="p">();</span>
@@ -2806,15 +2779,15 @@
 <a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="w">    </span><span class="n">gdt_init</span><span class="p">();</span>
 <a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a><span class="w">    </span><span class="n">idt_init</span><span class="p">();</span>
 <a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a>
-<a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Unix OS from Scratch -- Chapter 4: kernel entry reached</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
-<a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"GDT loaded (Chapter 3); IDT loaded: 256 entries, 1 real gate (vector 0)</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
-<a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"Triggering a real divide-by-zero to prove the handler is live...</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">&quot;Unix OS from Scratch -- Chapter 4: kernel entry reached</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">&quot;GDT loaded (Chapter 3); IDT loaded: 256 entries, 1 real gate (vector 0)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">&quot;Triggering a real divide-by-zero to prove the handler is live...</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <a id="__codelineno-7-28" name="__codelineno-7-28" href="#__codelineno-7-28"></a>
 <a id="__codelineno-7-29" name="__codelineno-7-29" href="#__codelineno-7-29"></a><span class="w">    </span><span class="k">volatile</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">numerator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">42</span><span class="p">;</span>
 <a id="__codelineno-7-30" name="__codelineno-7-30" href="#__codelineno-7-30"></a><span class="w">    </span><span class="k">volatile</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">denominator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <a id="__codelineno-7-31" name="__codelineno-7-31" href="#__codelineno-7-31"></a><span class="w">    </span><span class="k">volatile</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">numerator</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">denominator</span><span class="p">;</span>
 <a id="__codelineno-7-32" name="__codelineno-7-32" href="#__codelineno-7-32"></a>
-<a id="__codelineno-7-33" name="__codelineno-7-33" href="#__codelineno-7-33"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">"THIS LINE SHOULD NEVER PRINT -- result was %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
+<a id="__codelineno-7-33" name="__codelineno-7-33" href="#__codelineno-7-33"></a><span class="w">    </span><span class="n">kprintf</span><span class="p">(</span><span class="s">&quot;THIS LINE SHOULD NEVER PRINT -- result was %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
 <a id="__codelineno-7-34" name="__codelineno-7-34" href="#__codelineno-7-34"></a><span class="p">}</span>
 </code></pre></div>
 <p>Both <code>numerator</code> and <code>denominator</code> are declared <code>volatile</code> for a specific, deliberate reason: without it, an optimizing compiler would be entitled to notice that <code>42 / 0</code> is undefined behavior at compile time and do essentially anything, including silently deleting the division and the line after it. <code>volatile</code> forces the compiler to treat both as genuinely unknown until runtime, so the resulting <code>IDIV</code> instruction is real, and dividing by a real, runtime zero is what actually raises <code>#DE</code> on real (emulated) hardware -- not a simulated fault, not a hand-called handler, the CPU's own fault-dispatch mechanism running for real. The comment on the last line is this chapter's own thesis statement: if the IDT, the gate, and the handler are all wired correctly, that <code>kprintf</code> call never executes at all.</p>

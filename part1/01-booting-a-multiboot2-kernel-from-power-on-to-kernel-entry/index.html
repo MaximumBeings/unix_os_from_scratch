@@ -2141,34 +2141,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../part47/47-hotels-and-tourist-attractions/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    47. Hotels and Tourist Attractions: A Real Hotel Availability and Reservation Codec
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -2492,6 +2464,7 @@
 
 
 <h1 id="1-booting-a-multiboot2-kernel-from-power-on-to-kernel-entry">1. Booting a Multiboot2 Kernel: From Power-On to Kernel Entry<a class="headerlink" href="#1-booting-a-multiboot2-kernel-from-power-on-to-kernel-entry" title="Permanent link">&para;</a></h1>
+<p><img alt="A power button, a bootloader and a CPU: booting a Multiboot2 kernel" src="../../assets/art/ch-01.svg" style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" /></p>
 <p><strong>What you will understand:</strong> what a real x86-64 machine actually does between the moment you press power and the moment any code you wrote begins running; why this book does not write its own bootloader, and what GRUB and the Multiboot2 standard do instead; the exact, real, spec-required shape of a Multiboot2 header (checked against GNU's own Multiboot2 Specification, quoted directly below rather than paraphrased from memory); and why a kernel's very first C function has to talk to raw hardware ports before it can print a single character, since there is no operating system underneath it to ask.</p>
 <p><strong>What you need to know first:</strong> working C (functions, pointers, the <code>static</code> keyword) and enough x86 assembly to read a short, heavily-commented file (you do not need to write assembly from scratch -- every instruction used here is explained where it appears). No prior OS-development experience is assumed.</p>
 <h2 id="what-booting-actually-means">What "booting" actually means<a class="headerlink" href="#what-booting-actually-means" title="Permanent link">&para;</a></h2>
@@ -2512,8 +2485,8 @@
 <a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>|        into 32-bit protected mode, and jumps to its entry point     |
 <a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>|      |                                                              |
 <a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>|  [3] Our _start (001_boot.asm)                                      |
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>|      - CPU is already in 32-bit protected mode (GRUB's job, not     |
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>|        ours -- real-mode setup and the mode switch are GRUB's own   |
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>|      - CPU is already in 32-bit protected mode (GRUB&#39;s job, not     |
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>|        ours -- real-mode setup and the mode switch are GRUB&#39;s own   |
 <a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>|        real, established work this book does not redo)              |
 <a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>|      - no stack yet -- first instruction sets esp                   |
 <a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>|      |                                                              |
@@ -2535,7 +2508,7 @@
 <p>(GNU Multiboot2 Specification, via the GNU GRUB manual: https://www.gnu.org/software/grub/manual/multiboot2/multiboot.html)</p>
 <p>Every one of those four requirements maps directly onto a field in <code>001_boot.asm</code> below, in the same order:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>+------------------------------------------------------------+
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>|  001_boot.asm's own Multiboot2 header, field by field        |
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>|  001_boot.asm&#39;s own Multiboot2 header, field by field        |
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>|                                                                |
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>|  offset 0   magic          0xE85250D6   (fixed, spec-defined) |
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>|  offset 4   architecture   0            (0 = i386 protected)  |
@@ -2554,7 +2527,7 @@
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1">; entry point every C function in this book ultimately runs under. GRUB</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="c1">; hands control to _start in 32-bit protected mode with no stack set up</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1">; and no guarantee the .bss segment has been zeroed by anything but us --</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="c1">; so this file's only two jobs are: point esp at a real stack, then call</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="c1">; so this file&#39;s only two jobs are: point esp at a real stack, then call</span>
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="c1">; into C.</span>
 <a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="k">BITS</span><span class="w"> </span><span class="mi">32</span>
 <a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
@@ -2629,24 +2602,24 @@
 </code></pre></div>
 <h2 id="001_kmainc-the-first-c-this-books-machine-has-ever-run"><code>001_kmain.c</code>: the first C this book's machine has ever run<a class="headerlink" href="#001_kmainc-the-first-c-this-books-machine-has-ever-run" title="Permanent link">&para;</a></h2>
 <p><code>kmain</code> has no <code>printf</code>, no <code>stdout</code>, nothing -- those are OS services, and step [4] in the very first diagram above <em>is</em> the OS being built. The only way to produce output right now is to talk to a real hardware device directly, through the x86 <code>in</code>/<code>out</code> instructions, which read and write a CPU I/O port rather than a memory address. This chapter uses the COM1 serial UART (I/O ports <code>0x3F8</code>-<code>0x3FF</code>) rather than the VGA text-mode framebuffer for one deliberate reason: QEMU's <code>-serial stdio</code> flag turns that UART's real output into plain text on this book's own terminal, which can be captured exactly and locked into this page -- no screenshot of a virtual monitor required, the same "genuinely run, exact output locked in" discipline this book's sibling series has followed throughout.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="cm">/* Chapter 1: our first freestanding "kernel". It writes to the COM1 serial</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="cm">/* Chapter 1: our first freestanding &quot;kernel&quot;. It writes to the COM1 serial</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="cm"> * port rather than the VGA text buffer so this book can lock its exact,</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="cm"> * real, captured text output into the page -- no screenshot of a virtual</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="cm"> * monitor needed, just QEMU's own -serial stdio flag. Everything above</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="cm"> * main() (the boot stub in 001_boot.asm and this file's own outb/inb pair)</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="cm"> * monitor needed, just QEMU&#39;s own -serial stdio flag. Everything above</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="cm"> * main() (the boot stub in 001_boot.asm and this file&#39;s own outb/inb pair)</span>
 <a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="cm"> * exists because, the instant GRUB hands control to _start, there is no</span>
 <a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="cm"> * C runtime, no stack the compiler can assume, and no OS underneath us to</span>
 <a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="cm"> * ask for I/O -- kmain() below is the first C function this machine has</span>
 <a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="cm"> * ever run that WE wrote, and serial_puts() is the first output any part</span>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="cm"> * of this book produces without an operating system's help. */</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="cm"> * of this book produces without an operating system&#39;s help. */</span>
 <a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>
 <a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">outb</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">port</span><span class="p">,</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"outb %0, %1"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"a"</span><span class="p">(</span><span class="n">val</span><span class="p">),</span><span class="w"> </span><span class="s">"Nd"</span><span class="p">(</span><span class="n">port</span><span class="p">));</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;outb %0, %1&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">&quot;a&quot;</span><span class="p">(</span><span class="n">val</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;Nd&quot;</span><span class="p">(</span><span class="n">port</span><span class="p">));</span>
 <a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="p">}</span>
 <a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>
 <a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="nf">inb</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">port</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span>
-<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"inb %1, %0"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"=a"</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"Nd"</span><span class="p">(</span><span class="n">port</span><span class="p">));</span>
+<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;inb %1, %0&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">&quot;=a&quot;</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">&quot;Nd&quot;</span><span class="p">(</span><span class="n">port</span><span class="p">));</span>
 <a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span>
 <a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a><span class="p">}</span>
 <a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>
@@ -2675,15 +2648,15 @@
 <a id="__codelineno-5-44" name="__codelineno-5-44" href="#__codelineno-5-44"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(;</span><span class="w"> </span><span class="o">*</span><span class="n">s</span><span class="p">;</span><span class="w"> </span><span class="n">s</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="n">serial_putc</span><span class="p">(</span><span class="o">*</span><span class="n">s</span><span class="p">);</span>
 <a id="__codelineno-5-45" name="__codelineno-5-45" href="#__codelineno-5-45"></a><span class="p">}</span>
 <a id="__codelineno-5-46" name="__codelineno-5-46" href="#__codelineno-5-46"></a>
-<a id="__codelineno-5-47" name="__codelineno-5-47" href="#__codelineno-5-47"></a><span class="cm">/* QEMU's isa-debug-exit device (real, standard OS-dev technique): a write</span>
+<a id="__codelineno-5-47" name="__codelineno-5-47" href="#__codelineno-5-47"></a><span class="cm">/* QEMU&#39;s isa-debug-exit device (real, standard OS-dev technique): a write</span>
 <a id="__codelineno-5-48" name="__codelineno-5-48" href="#__codelineno-5-48"></a><span class="cm"> * to I/O port 0xf4 makes QEMU itself exit with status (value &lt;&lt; 1) | 1,</span>
 <a id="__codelineno-5-49" name="__codelineno-5-49" href="#__codelineno-5-49"></a><span class="cm"> * instead of the kernel having to halt forever and an outside process</span>
 <a id="__codelineno-5-50" name="__codelineno-5-50" href="#__codelineno-5-50"></a><span class="cm"> * having to kill QEMU to get its output back. Without real hardware</span>
 <a id="__codelineno-5-51" name="__codelineno-5-51" href="#__codelineno-5-51"></a><span class="cm"> * behind this port, this instruction is meaningless outside QEMU -- a</span>
 <a id="__codelineno-5-52" name="__codelineno-5-52" href="#__codelineno-5-52"></a><span class="cm"> * real kernel bound for real hardware would never do this; it exists here</span>
-<a id="__codelineno-5-53" name="__codelineno-5-53" href="#__codelineno-5-53"></a><span class="cm"> * only so this chapter's own locked output ends cleanly and</span>
-<a id="__codelineno-5-54" name="__codelineno-5-54" href="#__codelineno-5-54"></a><span class="cm"> * deterministically, without a stray "killed by timeout" line that has</span>
-<a id="__codelineno-5-55" name="__codelineno-5-55" href="#__codelineno-5-55"></a><span class="cm"> * nothing to do with the kernel's own behavior. */</span>
+<a id="__codelineno-5-53" name="__codelineno-5-53" href="#__codelineno-5-53"></a><span class="cm"> * only so this chapter&#39;s own locked output ends cleanly and</span>
+<a id="__codelineno-5-54" name="__codelineno-5-54" href="#__codelineno-5-54"></a><span class="cm"> * deterministically, without a stray &quot;killed by timeout&quot; line that has</span>
+<a id="__codelineno-5-55" name="__codelineno-5-55" href="#__codelineno-5-55"></a><span class="cm"> * nothing to do with the kernel&#39;s own behavior. */</span>
 <a id="__codelineno-5-56" name="__codelineno-5-56" href="#__codelineno-5-56"></a><span class="cp">#define QEMU_DEBUG_EXIT_PORT 0xf4</span>
 <a id="__codelineno-5-57" name="__codelineno-5-57" href="#__codelineno-5-57"></a>
 <a id="__codelineno-5-58" name="__codelineno-5-58" href="#__codelineno-5-58"></a><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">qemu_exit</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">code</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -2692,8 +2665,8 @@
 <a id="__codelineno-5-61" name="__codelineno-5-61" href="#__codelineno-5-61"></a>
 <a id="__codelineno-5-62" name="__codelineno-5-62" href="#__codelineno-5-62"></a><span class="kt">void</span><span class="w"> </span><span class="nf">kmain</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-5-63" name="__codelineno-5-63" href="#__codelineno-5-63"></a><span class="w">    </span><span class="n">serial_init</span><span class="p">();</span>
-<a id="__codelineno-5-64" name="__codelineno-5-64" href="#__codelineno-5-64"></a><span class="w">    </span><span class="n">serial_puts</span><span class="p">(</span><span class="s">"Unix OS from Scratch -- Chapter 1: kernel entry reached</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
-<a id="__codelineno-5-65" name="__codelineno-5-65" href="#__codelineno-5-65"></a><span class="w">    </span><span class="n">serial_puts</span><span class="p">(</span><span class="s">"multiboot2 + nasm + freestanding gcc + ld + qemu pipeline: OK</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-5-64" name="__codelineno-5-64" href="#__codelineno-5-64"></a><span class="w">    </span><span class="n">serial_puts</span><span class="p">(</span><span class="s">&quot;Unix OS from Scratch -- Chapter 1: kernel entry reached</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<a id="__codelineno-5-65" name="__codelineno-5-65" href="#__codelineno-5-65"></a><span class="w">    </span><span class="n">serial_puts</span><span class="p">(</span><span class="s">&quot;multiboot2 + nasm + freestanding gcc + ld + qemu pipeline: OK</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <a id="__codelineno-5-66" name="__codelineno-5-66" href="#__codelineno-5-66"></a><span class="w">    </span><span class="n">qemu_exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
 <a id="__codelineno-5-67" name="__codelineno-5-67" href="#__codelineno-5-67"></a><span class="p">}</span>
 </code></pre></div>
@@ -2725,7 +2698,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>set timeout=0
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>set default=0
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>menuentry "Unix OS from Scratch -- Chapter 1" {
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>menuentry &quot;Unix OS from Scratch -- Chapter 1&quot; {
 <a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    multiboot2 /boot/kernel.bin
 <a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>    boot
 <a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>}

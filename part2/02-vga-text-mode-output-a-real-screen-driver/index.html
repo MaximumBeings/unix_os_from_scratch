@@ -2163,34 +2163,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../part47/47-hotels-and-tourist-attractions/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    47. Hotels and Tourist Attractions: A Real Hotel Availability and Reservation Codec
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -2536,6 +2508,7 @@
 
 
 <h1 id="2-vga-text-mode-output-a-real-screen-driver">2. VGA Text-Mode Output: A Real Screen Driver<a class="headerlink" href="#2-vga-text-mode-output-a-real-screen-driver" title="Permanent link">&para;</a></h1>
+<p><img alt="A text-mode monitor with coloured character cells at address 0xB8000" src="../../assets/art/ch-02.svg" style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" /></p>
 <p><strong>What you will understand:</strong> how to draw text directly onto a real (emulated) monitor with no BIOS and no OS underneath -- the VGA text-mode framebuffer at physical address <code>0xB8000</code>, its 2-byte-per-cell layout, and the one piece of VGA hardware that still needs real port I/O even though the screen itself does not: the blinking cursor. You will also see why this chapter's own kernel deliberately never exits, and how a real QEMU monitor session -- connected from outside the running machine -- is used to inspect that machine's memory and take a real screenshot while it is still alive.</p>
 <p><strong>What you need to know first:</strong> Chapter 1's boot chain and <code>kmain</code> (this chapter reuses both, unchanged in shape). No new x86 assembly is introduced here; everything new in this chapter is C and one memory-mapped hardware device.</p>
 <h2 id="why-this-is-a-new-part">Why this is a new Part<a class="headerlink" href="#why-this-is-a-new-part" title="Permanent link">&para;</a></h2>
@@ -2551,7 +2524,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Bit  7 6 5 4 3 2 1 0
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>     | | | | | | | |
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>     | | | | +-+-+-+-- foreground colour (0-15, but only 0-7 without bit 3)
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>     | | | +---------- foreground "bright" bit
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>     | | | +---------- foreground &quot;bright&quot; bit
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>     +-+-+------------- background colour (0-7)
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>     +----------------- background bright bit, OR enables blinking text
 </code></pre></div>
@@ -2566,8 +2539,8 @@
 </code></pre></div>
 <h2 id="002_vgah-this-books-first-header-file"><code>002_vga.h</code>: this book's first header file<a class="headerlink" href="#002_vgah-this-books-first-header-file" title="Permanent link">&para;</a></h2>
 <p>Every source file up to this point has been a single, self-contained <code>.c</code>/<code>.asm</code> file. This chapter introduces this book's first header, because <code>002_kmain.c</code> needs to call into the VGA driver without knowing how it works internally:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="cm">/* Chapter 2: the VGA text-mode driver's own public interface -- this</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="cm"> * book's first header file, so kmain.c can call into this driver</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="cm">/* Chapter 2: the VGA text-mode driver&#39;s own public interface -- this</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="cm"> * book&#39;s first header file, so kmain.c can call into this driver</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="cm"> * without redeclaring its enum or function signatures by hand. */</span>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="cp">#ifndef UNIX_OS_002_VGA_H</span>
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="cp">#define UNIX_OS_002_VGA_H</span>
@@ -2600,39 +2573,39 @@
 </code></pre></div>
 <p>The 16 named colours are VGA text mode's own real palette -- not an arbitrary choice this book made, but the fixed set of values the attribute byte's 4-bit colour nibbles can actually represent. <code>vga_init</code>, <code>vga_set_color</code>, <code>vga_putc</code>, and <code>vga_puts</code> are the driver's entire public surface; everything else in <code>002_vga.c</code> (the CRTC ports, the row/column bookkeeping, the scroll logic) stays behind this header, private to the driver.</p>
 <h2 id="002_vgac-the-driver-itself"><code>002_vga.c</code>: the driver itself<a class="headerlink" href="#002_vgac-the-driver-itself" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="cm">/* Chapter 2: a real VGA text-mode driver. Unlike Chapter 1's COM1 UART,</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="cm">/* Chapter 2: a real VGA text-mode driver. Unlike Chapter 1&#39;s COM1 UART,</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="cm"> * this hardware needs no port I/O to draw a character -- physical address</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="cm"> * 0xB8000 IS the screen, an 80x25 grid of 2-byte cells (a character byte</span>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="cm"> * and a colour attribute byte), writable exactly like any other memory</span>
 <a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="cm"> * this kernel can already reach directly (no paging exists yet, so</span>
 <a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="cm"> * physical and linear addresses are still the same thing). Moving the</span>
 <a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="cm"> * blinking hardware cursor is the one part of this driver that still</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="cm"> * needs real port I/O, through the VGA CRT controller's own index/data</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="cm"> * needs real port I/O, through the VGA CRT controller&#39;s own index/data</span>
 <a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="cm"> * port pair. */</span>
 <a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
 <a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stddef.h&gt;</span>
 <a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdint.h&gt;</span>
 <a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>
-<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"002_vga.h"</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;002_vga.h&quot;</span>
 <a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>
 <a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">outb</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">port</span><span class="p">,</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"outb %0, %1"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"a"</span><span class="p">(</span><span class="n">val</span><span class="p">),</span><span class="w"> </span><span class="s">"Nd"</span><span class="p">(</span><span class="n">port</span><span class="p">));</span>
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;outb %0, %1&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">&quot;a&quot;</span><span class="p">(</span><span class="n">val</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;Nd&quot;</span><span class="p">(</span><span class="n">port</span><span class="p">));</span>
 <a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="p">}</span>
 <a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>
 <a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="cp">#define VGA_WIDTH  80</span>
 <a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="cp">#define VGA_HEIGHT 25</span>
 <a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="cp">#define VGA_MEMORY ((uint16_t *) 0xB8000)</span>
 <a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>
-<a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="cm">/* Real, cited CRTC register ports (OSDev Wiki, "Text Mode Cursor"). */</span>
+<a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="cm">/* Real, cited CRTC register ports (OSDev Wiki, &quot;Text Mode Cursor&quot;). */</span>
 <a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="cp">#define VGA_CRTC_INDEX_PORT  0x3D4</span>
 <a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="cp">#define VGA_CRTC_DATA_PORT   0x3D5</span>
 <a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="cp">#define VGA_CRTC_CURSOR_HIGH 0x0E</span>
 <a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a><span class="cp">#define VGA_CRTC_CURSOR_LOW  0x0F</span>
 <a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a>
-<a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a><span class="cm">/* Real, cited attribute-byte layout (OSDev Wiki, "Text mode"): bits 0-2</span>
-<a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a><span class="cm"> * are the foreground colour, bit 3 is the foreground "bright" bit, bits</span>
+<a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a><span class="cm">/* Real, cited attribute-byte layout (OSDev Wiki, &quot;Text mode&quot;): bits 0-2</span>
+<a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a><span class="cm"> * are the foreground colour, bit 3 is the foreground &quot;bright&quot; bit, bits</span>
 <a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a><span class="cm"> * 4-6 are the background colour, bit 7 enables blink (mode-dependent) --</span>
-<a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a><span class="cm"> * i.e. the full 4-bit background nibble shifted up four bits, OR'd with</span>
+<a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a><span class="cm"> * i.e. the full 4-bit background nibble shifted up four bits, OR&#39;d with</span>
 <a id="__codelineno-4-34" name="__codelineno-4-34" href="#__codelineno-4-34"></a><span class="cm"> * the full 4-bit foreground nibble. */</span>
 <a id="__codelineno-4-35" name="__codelineno-4-35" href="#__codelineno-4-35"></a><span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="nf">vga_entry_color</span><span class="p">(</span><span class="k">enum</span><span class="w"> </span><span class="n">vga_color</span><span class="w"> </span><span class="n">fg</span><span class="p">,</span><span class="w"> </span><span class="k">enum</span><span class="w"> </span><span class="n">vga_color</span><span class="w"> </span><span class="n">bg</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-4-36" name="__codelineno-4-36" href="#__codelineno-4-36"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="kt">uint8_t</span><span class="p">)</span><span class="w"> </span><span class="n">fg</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="p">(</span><span class="kt">uint8_t</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="n">bg</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
@@ -2640,7 +2613,7 @@
 <a id="__codelineno-4-38" name="__codelineno-4-38" href="#__codelineno-4-38"></a>
 <a id="__codelineno-4-39" name="__codelineno-4-39" href="#__codelineno-4-39"></a><span class="cm">/* One VGA text-mode cell packed into 16 bits. Whether the character or</span>
 <a id="__codelineno-4-40" name="__codelineno-4-40" href="#__codelineno-4-40"></a><span class="cm"> * the colour byte lands at the LOWER of the two memory addresses is</span>
-<a id="__codelineno-4-41" name="__codelineno-4-41" href="#__codelineno-4-41"></a><span class="cm"> * exactly what this chapter's own worked example verifies directly</span>
+<a id="__codelineno-4-41" name="__codelineno-4-41" href="#__codelineno-4-41"></a><span class="cm"> * exactly what this chapter&#39;s own worked example verifies directly</span>
 <a id="__codelineno-4-42" name="__codelineno-4-42" href="#__codelineno-4-42"></a><span class="cm"> * against a real QEMU memory dump, rather than assuming it. */</span>
 <a id="__codelineno-4-43" name="__codelineno-4-43" href="#__codelineno-4-43"></a><span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="kt">uint16_t</span><span class="w"> </span><span class="nf">vga_entry</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">color</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-4-44" name="__codelineno-4-44" href="#__codelineno-4-44"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="kt">uint16_t</span><span class="p">)</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="p">(</span><span class="kt">uint16_t</span><span class="p">)</span><span class="w"> </span><span class="n">color</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">8</span><span class="p">;</span>
@@ -2673,7 +2646,7 @@
 <a id="__codelineno-4-71" name="__codelineno-4-71" href="#__codelineno-4-71"></a><span class="w">        </span><span class="p">}</span>
 <a id="__codelineno-4-72" name="__codelineno-4-72" href="#__codelineno-4-72"></a><span class="w">    </span><span class="p">}</span>
 <a id="__codelineno-4-73" name="__codelineno-4-73" href="#__codelineno-4-73"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">VGA_WIDTH</span><span class="p">;</span><span class="w"> </span><span class="n">x</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-4-74" name="__codelineno-4-74" href="#__codelineno-4-74"></a><span class="w">        </span><span class="n">vga_buffer</span><span class="p">[(</span><span class="n">VGA_HEIGHT</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">VGA_WIDTH</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vga_entry</span><span class="p">(</span><span class="sc">' '</span><span class="p">,</span><span class="w"> </span><span class="n">vga_color_attr</span><span class="p">);</span>
+<a id="__codelineno-4-74" name="__codelineno-4-74" href="#__codelineno-4-74"></a><span class="w">        </span><span class="n">vga_buffer</span><span class="p">[(</span><span class="n">VGA_HEIGHT</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">VGA_WIDTH</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vga_entry</span><span class="p">(</span><span class="sc">&#39; &#39;</span><span class="p">,</span><span class="w"> </span><span class="n">vga_color_attr</span><span class="p">);</span>
 <a id="__codelineno-4-75" name="__codelineno-4-75" href="#__codelineno-4-75"></a><span class="w">    </span><span class="p">}</span>
 <a id="__codelineno-4-76" name="__codelineno-4-76" href="#__codelineno-4-76"></a><span class="w">    </span><span class="n">vga_row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">VGA_HEIGHT</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
 <a id="__codelineno-4-77" name="__codelineno-4-77" href="#__codelineno-4-77"></a><span class="p">}</span>
@@ -2683,7 +2656,7 @@
 <a id="__codelineno-4-81" name="__codelineno-4-81" href="#__codelineno-4-81"></a><span class="w">    </span><span class="n">vga_color_attr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vga_entry_color</span><span class="p">(</span><span class="n">VGA_COLOR_LIGHT_GREY</span><span class="p">,</span><span class="w"> </span><span class="n">VGA_COLOR_BLACK</span><span class="p">);</span>
 <a id="__codelineno-4-82" name="__codelineno-4-82" href="#__codelineno-4-82"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">VGA_HEIGHT</span><span class="p">;</span><span class="w"> </span><span class="n">y</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-4-83" name="__codelineno-4-83" href="#__codelineno-4-83"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">VGA_WIDTH</span><span class="p">;</span><span class="w"> </span><span class="n">x</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-4-84" name="__codelineno-4-84" href="#__codelineno-4-84"></a><span class="w">            </span><span class="n">vga_buffer</span><span class="p">[</span><span class="n">y</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">VGA_WIDTH</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vga_entry</span><span class="p">(</span><span class="sc">' '</span><span class="p">,</span><span class="w"> </span><span class="n">vga_color_attr</span><span class="p">);</span>
+<a id="__codelineno-4-84" name="__codelineno-4-84" href="#__codelineno-4-84"></a><span class="w">            </span><span class="n">vga_buffer</span><span class="p">[</span><span class="n">y</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">VGA_WIDTH</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vga_entry</span><span class="p">(</span><span class="sc">&#39; &#39;</span><span class="p">,</span><span class="w"> </span><span class="n">vga_color_attr</span><span class="p">);</span>
 <a id="__codelineno-4-85" name="__codelineno-4-85" href="#__codelineno-4-85"></a><span class="w">        </span><span class="p">}</span>
 <a id="__codelineno-4-86" name="__codelineno-4-86" href="#__codelineno-4-86"></a><span class="w">    </span><span class="p">}</span>
 <a id="__codelineno-4-87" name="__codelineno-4-87" href="#__codelineno-4-87"></a><span class="w">    </span><span class="n">vga_row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
@@ -2696,7 +2669,7 @@
 <a id="__codelineno-4-94" name="__codelineno-4-94" href="#__codelineno-4-94"></a><span class="p">}</span>
 <a id="__codelineno-4-95" name="__codelineno-4-95" href="#__codelineno-4-95"></a>
 <a id="__codelineno-4-96" name="__codelineno-4-96" href="#__codelineno-4-96"></a><span class="kt">void</span><span class="w"> </span><span class="nf">vga_putc</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-4-97" name="__codelineno-4-97" href="#__codelineno-4-97"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">'\n'</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-97" name="__codelineno-4-97" href="#__codelineno-4-97"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">c</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-4-98" name="__codelineno-4-98" href="#__codelineno-4-98"></a><span class="w">        </span><span class="n">vga_col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <a id="__codelineno-4-99" name="__codelineno-4-99" href="#__codelineno-4-99"></a><span class="w">        </span><span class="n">vga_row</span><span class="o">++</span><span class="p">;</span>
 <a id="__codelineno-4-100" name="__codelineno-4-100" href="#__codelineno-4-100"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
@@ -2740,25 +2713,25 @@
 <h2 id="002_kmainc-two-real-output-devices-one-kernel"><code>002_kmain.c</code>: two real output devices, one kernel<a class="headerlink" href="#002_kmainc-two-real-output-devices-one-kernel" title="Permanent link">&para;</a></h2>
 <p>This chapter's <code>kmain</code> keeps Chapter 1's COM1 serial code, unchanged, alongside the new VGA driver:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="cm">/* Chapter 2: kmain now drives two real, independent output devices -- the</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="cm"> * COM1 UART from Chapter 1 (kept so this chapter's own locked output</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="cm"> * COM1 UART from Chapter 1 (kept so this chapter&#39;s own locked output</span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="cm"> * stays exact, capturable text) and the VGA text-mode framebuffer this</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="cm"> * chapter adds. Unlike Chapter 1, this kmain does not use QEMU's</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="cm"> * chapter adds. Unlike Chapter 1, this kmain does not use QEMU&#39;s</span>
 <a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="cm"> * isa-debug-exit device: it deliberately halts forever (falling through</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="cm"> * to 002_boot.asm's own cli/hlt/jmp .hang loop) so this chapter's own</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="cm"> * to 002_boot.asm&#39;s own cli/hlt/jmp .hang loop) so this chapter&#39;s own</span>
 <a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="cm"> * verification -- a real QEMU monitor session, connected from OUTSIDE</span>
 <a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="cm"> * the machine while it is still running -- has time to examine the VGA</span>
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="cm"> * framebuffer's actual memory contents before the monitor's own "quit"</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="cm"> * framebuffer&#39;s actual memory contents before the monitor&#39;s own &quot;quit&quot;</span>
 <a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="cm"> * command ends the machine itself. */</span>
 <a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>
-<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"002_vga.h"</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;002_vga.h&quot;</span>
 <a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>
 <a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">outb</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">port</span><span class="p">,</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">val</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"outb %0, %1"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"a"</span><span class="p">(</span><span class="n">val</span><span class="p">),</span><span class="w"> </span><span class="s">"Nd"</span><span class="p">(</span><span class="n">port</span><span class="p">));</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;outb %0, %1&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">&quot;a&quot;</span><span class="p">(</span><span class="n">val</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;Nd&quot;</span><span class="p">(</span><span class="n">port</span><span class="p">));</span>
 <a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="p">}</span>
 <a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>
 <a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="nf">inb</span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">short</span><span class="w"> </span><span class="n">port</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span>
-<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">"inb %1, %0"</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"=a"</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">"Nd"</span><span class="p">(</span><span class="n">port</span><span class="p">));</span>
+<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="w">    </span><span class="n">__asm__</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;inb %1, %0&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">&quot;=a&quot;</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">&quot;Nd&quot;</span><span class="p">(</span><span class="n">port</span><span class="p">));</span>
 <a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span>
 <a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a><span class="p">}</span>
 <a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a>
@@ -2789,15 +2762,15 @@
 <a id="__codelineno-6-48" name="__codelineno-6-48" href="#__codelineno-6-48"></a>
 <a id="__codelineno-6-49" name="__codelineno-6-49" href="#__codelineno-6-49"></a><span class="kt">void</span><span class="w"> </span><span class="nf">kmain</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-6-50" name="__codelineno-6-50" href="#__codelineno-6-50"></a><span class="w">    </span><span class="n">serial_init</span><span class="p">();</span>
-<a id="__codelineno-6-51" name="__codelineno-6-51" href="#__codelineno-6-51"></a><span class="w">    </span><span class="n">serial_puts</span><span class="p">(</span><span class="s">"Unix OS from Scratch -- Chapter 2: kernel entry reached</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-6-51" name="__codelineno-6-51" href="#__codelineno-6-51"></a><span class="w">    </span><span class="n">serial_puts</span><span class="p">(</span><span class="s">&quot;Unix OS from Scratch -- Chapter 2: kernel entry reached</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <a id="__codelineno-6-52" name="__codelineno-6-52" href="#__codelineno-6-52"></a>
 <a id="__codelineno-6-53" name="__codelineno-6-53" href="#__codelineno-6-53"></a><span class="w">    </span><span class="n">vga_init</span><span class="p">();</span>
 <a id="__codelineno-6-54" name="__codelineno-6-54" href="#__codelineno-6-54"></a><span class="w">    </span><span class="n">vga_set_color</span><span class="p">(</span><span class="n">VGA_COLOR_LIGHT_GREEN</span><span class="p">,</span><span class="w"> </span><span class="n">VGA_COLOR_BLACK</span><span class="p">);</span>
-<a id="__codelineno-6-55" name="__codelineno-6-55" href="#__codelineno-6-55"></a><span class="w">    </span><span class="n">vga_puts</span><span class="p">(</span><span class="s">"Unix OS from Scratch -- Chapter 2: a real VGA text-mode driver</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-6-55" name="__codelineno-6-55" href="#__codelineno-6-55"></a><span class="w">    </span><span class="n">vga_puts</span><span class="p">(</span><span class="s">&quot;Unix OS from Scratch -- Chapter 2: a real VGA text-mode driver</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <a id="__codelineno-6-56" name="__codelineno-6-56" href="#__codelineno-6-56"></a><span class="w">    </span><span class="n">vga_set_color</span><span class="p">(</span><span class="n">VGA_COLOR_LIGHT_GREY</span><span class="p">,</span><span class="w"> </span><span class="n">VGA_COLOR_BLACK</span><span class="p">);</span>
-<a id="__codelineno-6-57" name="__codelineno-6-57" href="#__codelineno-6-57"></a><span class="w">    </span><span class="n">vga_puts</span><span class="p">(</span><span class="s">"This line is printed in the default color.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-6-57" name="__codelineno-6-57" href="#__codelineno-6-57"></a><span class="w">    </span><span class="n">vga_puts</span><span class="p">(</span><span class="s">&quot;This line is printed in the default color.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <a id="__codelineno-6-58" name="__codelineno-6-58" href="#__codelineno-6-58"></a>
-<a id="__codelineno-6-59" name="__codelineno-6-59" href="#__codelineno-6-59"></a><span class="w">    </span><span class="n">serial_puts</span><span class="p">(</span><span class="s">"VGA driver ran; halting now for external memory inspection</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<a id="__codelineno-6-59" name="__codelineno-6-59" href="#__codelineno-6-59"></a><span class="w">    </span><span class="n">serial_puts</span><span class="p">(</span><span class="s">&quot;VGA driver ran; halting now for external memory inspection</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <a id="__codelineno-6-60" name="__codelineno-6-60" href="#__codelineno-6-60"></a><span class="p">}</span>
 </code></pre></div>
 <p>Two things are different from Chapter 1's <code>kmain</code>, both deliberate. First, the serial code is duplicated here rather than shared through a header -- Chapter 1's <code>kmain</code> and this chapter's <code>kmain</code> are two different translation units, and this book has not yet introduced a shared low-level utilities header; that refactor is left for whenever this book actually needs <code>serial_puts</code> from more than one place at once, rather than done speculatively now. Second, and more importantly: this <code>kmain</code> never calls <code>qemu_exit</code>. Chapter 1 called it deliberately, so its own locked output would end the instant the kernel finished. This chapter's real evidence is not a stream of text -- it is the <em>state of the screen</em> -- and that state has to still exist, in a still-running machine, for something outside the kernel to look at it. So <code>kmain</code> simply returns, falling through to <code>002_boot.asm</code>'s own <code>cli</code>/<code>hlt</code>/<code>jmp .hang</code> loop (unchanged from Chapter 1), and the machine halts forever, giving a QEMU monitor session connected from outside as much time as it needs to inspect memory and take a screenshot before anything shuts it down.</p>
@@ -2832,7 +2805,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>set timeout=0
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>set default=0
 <a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>menuentry "Unix OS from Scratch -- Chapter 2" {
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>menuentry &quot;Unix OS from Scratch -- Chapter 2&quot; {
 <a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    multiboot2 /boot/kernel.bin
 <a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>    boot
 <a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>}
@@ -2869,7 +2842,7 @@
 <a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>=== quit ===
 </code></pre></div>
 <p>That hex dump is this chapter's own real evidence for the byte-order question raised earlier. Decoding it programmatically -- taking every even-indexed byte as a character and every odd-indexed byte as an attribute -- produces:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>decoded characters : "Unix OS from Scratch -- Chapter "
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>decoded characters : &quot;Unix OS from Scratch -- Chapter &quot;
 <a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>decoded attributes  : 0x0a, every single byte
 </code></pre></div>
 <p><code>"Unix OS from Scratch -- Chapter "</code> is an exact, unbroken match for the start of this chapter's own <code>vga_puts("Unix OS from Scratch -- Chapter 2: a real VGA text-mode driver\n")</code> call -- confirming the character byte sits at the <strong>lower</strong> address of each cell, not the attribute byte. And <code>0x0a</code> is exactly <code>vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK)</code>: <code>VGA_COLOR_LIGHT_GREEN</code> is <code>10</code> (<code>0xA</code>) in this book's own <code>002_vga.h</code> enum, <code>VGA_COLOR_BLACK</code> is <code>0</code>, and <code>vga_entry_color</code> returns <code>fg | (bg &lt;&lt; 4)</code> -- <code>0xA | (0x0 &lt;&lt; 4) = 0x0A</code>. Both the byte order this chapter assumed and the specific colour this chapter's own <code>kmain</code> asked for are now confirmed against a real running machine, not merely asserted.</p>
