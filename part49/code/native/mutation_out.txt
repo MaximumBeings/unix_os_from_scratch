@@ -1,0 +1,59 @@
+NOTE: this script deliberately breaks copies of the chapter's sources. 'caught' lines are EXPECTED: they show the tests can detect the mistake.
+baseline (nothing broken): all tests pass (expected)
+amounts: three decimals accepted: caught by claims_test
+amounts: '12.5' read as 12.05 (the one-decimal case is not scaled): caught by claims_test, random claim sets vs the Python reference, fuzz property
+amounts: the minus sign is ignored: caught by claims_test, random claim sets vs the Python reference
+dates: every year divisible by 4 is a leap year: caught by claims_test
+ISA: the field-separator position of ISA06 is off by one: caught by claims_test, random claim sets vs the Python reference, invented claims vs the Python reference
+ISA: the component separator may equal the element separator: caught by claims_test
+envelope: SE01 is compared with one segment fewer: caught by claims_test, random claim sets vs the Python reference, invented claims vs the Python reference, fuzz property
+envelope: SE02 is never compared with ST02: caught by claims_test
+envelope: GE01 may be larger than the number of transaction sets: caught by claims_test
+envelope: IEA01 may be larger than the number of groups: caught by claims_test
+envelope: the control-number comparison with GS06 is never made: caught by claims_test
+envelope: IEA02 is never compared with ISA13: caught by claims_test
+lenient mode forgives everything, even when not asked to: caught by claims_test
+envelope: a GS inside a transaction set is accepted: caught by claims_test
+envelope: data after IEA is accepted: caught by claims_test
+segments: control characters inside a segment are accepted: caught by claims_test
+segments: one-letter identifiers are accepted: caught by claims_test
+NPI: the Luhn doubling starts at the wrong digit: caught by claims_test, random claim sets vs the Python reference, invented claims vs the Python reference
+NPI: the wrong card-issuer prefix (80841 instead of 80840): caught by claims_test, random claim sets vs the Python reference, invented claims vs the Python reference
+HL: a number larger than the next one is accepted: caught by claims_test
+HL: a subscriber's parent need not be the billing provider: caught by claims_test
+a dependent patient (HL level 23) is no longer refused: caught by claims_test
+balance: a claim total ABOVE the lines is accepted: caught by claims_test, fuzz property
+a zero claim total is accepted: caught by claims_test
+units: 1000 accepted: caught by claims_test
+a diagnosis pointer one past the last diagnosis is accepted: caught by claims_test
+LX numbering: a larger number is accepted: caught by claims_test
+an impossible date of service is accepted: caught by claims_test, random claim sets vs the Python reference
+the patient control number may have 39 characters: caught by claims_test
+SV103 need not be UN: caught by claims_test
+the member id buffer is declared larger than it is (overflows): caught by claims_test
+duplicates: the date of service is not compared: caught by random claim sets vs the Python reference
+duplicates: the charge is not compared: caught by random claim sets vs the Python reference
+an uncovered code is reported as CO-97 instead of CO-96: caught by claims_test, random claim sets vs the Python reference
+the allowed amount may exceed the charge: caught by claims_test, random claim sets vs the Python reference
+units do not multiply the fee: caught by claims_test, random claim sets vs the Python reference
+the co-pay applies to every office-visit line, not once per date: caught by random claim sets vs the Python reference
+the co-pay may exceed the allowed amount: caught by claims_test, random claim sets vs the Python reference
+the deductible may exceed what is left of the allowed amount: caught by claims_test, random claim sets vs the Python reference, invented claims vs the Python reference, fuzz property
+coinsurance is truncated instead of rounded half up: caught by claims_test, random claim sets vs the Python reference
+the out-of-pocket cap never cuts the co-pay: caught by claims_test, random claim sets vs the Python reference, fuzz property
+the out-of-pocket cap leaves one cent too much: caught by claims_test
+the out-of-pocket accumulator adds the deductible only: caught by claims_test, random claim sets vs the Python reference, invented claims vs the Python reference
+a claim whose lines are all denied is still 'processed as primary': caught by claims_test, random claim sets vs the Python reference
+835: a second CAS adjustment is written without the empty quantity element: caught by claims_test, random claim sets vs the Python reference, fuzz property
+835: BPR02 totals the patient share instead of the plan's payment: caught by claims_test, random claim sets vs the Python reference, fuzz property
+reconcile: service lines are never reported unbalanced: caught by claims_test, random claim sets vs the Python reference
+reconcile: claim-level adjustments are ignored in favour of the service lines: caught by random claim sets vs the Python reference
+reconcile: provider-level adjustments are added instead of subtracted: caught by claims_test
+reconcile: only every third PLB element is read as an amount: caught by claims_test
+reconcile: patient responsibility is counted from CO instead of PR adjustments: caught by claims_test, random claim sets vs the Python reference
+reconcile: the patient-responsibility check always passes: caught by claims_test, random claim sets vs the Python reference
+reconcile: a CAS before any CLP is silently ignored: caught by claims_test, random claim sets vs the Python reference
+reference: coinsurance rounds down (the oracle itself broken): caught by random claim sets vs the Python reference, invented claims vs the Python reference
+reference: 99215 is not an office-visit code (the oracle itself broken): caught by random claim sets vs the Python reference
+
+55 of 55 broken versions caught

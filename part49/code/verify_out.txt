@@ -1,0 +1,45 @@
+-- 1. the FAT16 volume the kernel wrote
+  ok   files on the disk: R101.835, R102.835, R103.835, R104.835, R105.835, R106.835
+-- 2. the six invented claims adjudicated again, in order, carrying the accumulators
+  ok   claim A (PCN-A001): the kernel's printed adjudication equals the independent adjudication (5 lines)
+  ok   claim B (PCN-B001): the kernel's printed adjudication equals the independent adjudication (4 lines)
+  ok   claim C (PCN-A001): the kernel's printed adjudication equals the independent adjudication (5 lines)
+  ok   claim D (PCN-D001): the kernel's printed adjudication equals the independent adjudication (4 lines)
+  ok   claim E (PCN-E001): the kernel's printed adjudication equals the independent adjudication (3 lines)
+  ok   claim F (PCN-F001): the kernel's printed adjudication equals the independent adjudication (3 lines)
+  ok   R101.835: the 835 file on the disk equals the 835 the Python builder produces from scratch (622 bytes)
+  ok   R101.835: the 835 the kernel printed equals the file on the disk
+  ok   R102.835: the 835 file on the disk equals the 835 the Python builder produces from scratch (562 bytes)
+  ok   R102.835: the 835 the kernel printed equals the file on the disk
+  ok   R103.835: the 835 file on the disk equals the 835 the Python builder produces from scratch (581 bytes)
+  ok   R103.835: the 835 the kernel printed equals the file on the disk
+  ok   R104.835: the 835 file on the disk equals the 835 the Python builder produces from scratch (567 bytes)
+  ok   R104.835: the 835 the kernel printed equals the file on the disk
+  ok   R105.835: the 835 file on the disk equals the 835 the Python builder produces from scratch (524 bytes)
+  ok   R105.835: the 835 the kernel printed equals the file on the disk
+  ok   R106.835: the 835 file on the disk equals the 835 the Python builder produces from scratch (481 bytes)
+  ok   R106.835: the 835 the kernel printed equals the file on the disk
+-- 3. every 835 on the disk reconciled by Python's own reconciler
+  ok   R101.835: bpr 0 clp_paid_sum 0 plb no balanced 1
+  ok   R102.835: bpr 0 clp_paid_sum 0 plb no balanced 1
+  ok   R103.835: bpr 0 clp_paid_sum 0 plb no balanced 1
+  ok   R104.835: bpr 76.8 clp_paid_sum 76.8 plb no balanced 1
+  ok   R105.835: bpr 13569.2 clp_paid_sum 13569.2 plb no balanced 1
+  ok   R106.835: bpr 88 clp_paid_sum 88 plb no balanced 1
+-- 4. the human-readable lines re-rendered from Python's numbers
+  ok   every printed claim summary, service line and year-to-date line equals the independent figures
+-- 5. every statement the kernel made about the real-format files, re-derived with this script's own code
+  ok   in all 6 sample 837 files the SE01 count really is wrong (the kernel's 'strict' column) -- counted 0 files where it was right
+  ok   in all six the first billing NPI really fails the check-digit test (1234567890), the kernel's 'lenient' verdict
+  ok   and 1234567893, the NPI used by the invented claims, passes it
+  ok   the real 835 reconciles (three denied lines, 915.39 charged, nothing paid, CAS CO-16 / CO-xx for every dollar): the kernel said so
+  ok   the real 835's own SE01 count is right, so the strict envelope check accepts it (unlike the 837 samples)
+-- 6. the attacks
+  ok   attack 1 (SE01 changed): refused for the SE01 count
+  ok   attack 2 (claim total $203.00): refused, the lines add to $202.00
+  ok   attack 3 (one NPI digit): refused by the check digit
+  ok   attack 4 (cut off at 700 bytes): refused as truncated
+  ok   attack 5 (CLP04 changed): the remittance is reported unbalanced
+  ok   final tally: 6 claims adjudicated, 6 files written and read back, 7 remittances reconciled (six built here plus the real one), 10 real-format files examined, 5 attacks
+
+ALL CHECKS PASSED

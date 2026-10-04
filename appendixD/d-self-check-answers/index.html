@@ -2049,6 +2049,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part49/49-health-care-claims-x12-837-835/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    49. Health-Care Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -3238,6 +3266,19 @@
 <p>Worked answer: 1 / 20,000 = 0.00005 = 0.5 basis points exactly. The engine rounds half away from zero on the exact fraction, so $1 gives 1 basis point and $-1 gives -1 basis point (rounding half up would give 0 for the negative case, and rounding half to even would give 0 for both). Two unit tests pin the two cases, and the mutant "truncate instead of rounding" and the mutant "lose the sign" are both caught by them.</p>
 <p><strong>5. Name two things the engine cannot detect, and say what would have to be added to detect each.</strong></p>
 <p>Worked answer: (a) a wrong <strong>prior-year</strong> balance sheet: only the current balance sheet is cross-checked, so a wrong prior-year figure flows into return on assets, return on equity and asset turnover unnoticed; detecting it means applying the same identity to the prior balance-sheet date. (b) a <strong>plausible but wrong income-statement figure</strong> (a digit flipped in net income gives a different, still-consistent filing): the engine checks accounting identities, not truth, and only gross profit has an identity to check against; detecting it needs a second source (the same figure in the filing's own cash-flow statement, or the figure as reported by a different tool or a later filing), which is cross-checking against another document, not more rules in this engine.</p>
+<hr />
+<h2 id="chapter-49-health-care-claims-x12-837-in-adjudication-x12-835-out-and-a-remittance-that-must-balance-to-the-cent">Chapter 49: Health-Care Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent<a class="headerlink" href="#chapter-49-health-care-claims-x12-837-in-adjudication-x12-835-out-and-a-remittance-that-must-balance-to-the-cent" title="Permanent link">&para;</a></h2>
+<p><em>(from <a href="../../part49/49-health-care-claims-x12-837-835/">49. Health-Care Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent</a>)</em></p>
+<p><strong>1. What is the NPI check digit, why does the claim reader test it before anything else, and what does passing it prove and not prove?</strong></p>
+<p>Worked answer: a National Provider Identifier is ten digits, the last of which is a Luhn checksum computed over the nine digits with the prefix <code>80840</code> prepended: from the right, every second digit is doubled (subtracting 9 from any result above 9) and the total must end in 0. <code>1234567893</code> passes; changing one digit anywhere (<code>1234567890</code>, <code>1234567894</code>) fails, because a Luhn checksum catches every single-digit error and most swaps of neighbouring digits. The reader tests it first because a mistyped provider id would send the money, and the remittance, to the wrong place; catching it costs ten additions. Passing proves only that the number is typed consistently; it does <strong>not</strong> prove the number belongs to a real, licensed provider, which needs a lookup in the NPI registry that this chapter does not do.</p>
+<p><strong>2. The open-source "valid" 837 sample fails the strict reader. Name the three things wrong with it, and say what the lenient flag forgives and what it does not.</strong></p>
+<p>Worked answer: (1) its <code>SE01</code> says 25 segments while the transaction set has 34, so the envelope's count check fails; (2) its billing provider's NPI is <code>1234567890</code>, which fails the check digit; (3) once those are dealt with, its diagnosis elements are not composites (<code>HI*BK*8901*...</code> instead of <code>HI*BK:8901*...</code>), its claim total of 500 does not equal its one line of 12.25, and a second billing-provider loop restarts the HL numbering at 1. The lenient flag forgives only the six <strong>count and control-number</strong> mismatches (<code>SE01</code>, <code>SE02</code>, <code>GE01</code>, <code>GE02</code>, <code>IEA01</code>, <code>IEA02</code>), recording them in <code>warn</code>; it does not forgive bad nesting, a damaged ISA, bad separators, a bad segment identifier or control characters, and it has no effect on the claim rules (NPI, balance, HL numbers), which are the claim reader's job.</p>
+<p><strong>3. Work out by hand: a plan with a $500.00 deductible (nothing met), a $25.00 co-pay and 20% coinsurance; an office visit (CPT 99213) is charged $150.00 and the fee schedule allows $88.00. What are the CO and PR amounts, and what does the plan pay?</strong></p>
+<p>Worked answer: the allowed amount is the smaller of the charge ($150.00) and the fee ($88.00), so $88.00, and the rest, $62.00, is a contractual write-off: <strong>CO-45 $62.00</strong>. The co-pay takes $25.00 of the allowed amount (<strong>PR-3 $25.00</strong>), leaving $63.00. The deductible has $500.00 left to satisfy, which is more than $63.00, so it takes all of it (<strong>PR-1 $63.00</strong>), leaving $0.00 for coinsurance (20% of nothing is nothing). The patient owes $25.00 + $63.00 = $88.00 and the plan pays $0.00. Check: $150.00 = $0.00 paid + $62.00 CO + $88.00 PR. This is claim A's first line in the chapter's output.</p>
+<p><strong>4. What is the difference between a CO and a PR adjustment, and why does the 835 keep them in separate <code>CAS</code> segments?</strong></p>
+<p>Worked answer: a <strong>CO</strong> (contractual obligation) adjustment is an amount the provider must write off and may not bill to the patient: the difference between the charge and the fee schedule (CO-45), a duplicate (CO-18), a non-covered service under the provider's contract (CO-96). A <strong>PR</strong> (patient responsibility) adjustment is an amount the patient owes: co-pay (PR-3), deductible (PR-1), coinsurance (PR-2). They are kept in separate <code>CAS</code> segments, each starting with its group code, because the billing office handles them completely differently: CO amounts are posted as write-offs and PR amounts are transferred to a patient statement. Mixing them in one segment would make it impossible to tell what may be billed. The remittance's <code>CLP05</code> (patient responsibility) is the sum of the PR amounts, which is why the reconciler checks it.</p>
+<p><strong>5. Why must <code>charge = paid + CO + PR</code> hold exactly on every line, how does the engine enforce it, and how do the reconciler's three balance checks catch a tampered remittance?</strong></p>
+<p>Worked answer: every dollar billed has to end up somewhere: paid by the plan, written off by the provider, or owed by the patient. If a line did not balance, money would be created or lost between the claim and the ledger. The engine enforces it <strong>by construction</strong> (the plan pays the allowed amount less the patient's share, and the write-off is the charge less the allowed amount, so the three always sum to the charge) and <strong>by check</strong> (<code>adj_verify()</code> re-sums every line, every claim total and the accumulators before returning, and returns an error code otherwise); the differential test and the fuzzer check it again from outside. The reconciler works on the <em>remittance</em>, which is only text: per service line, <code>SVC02 - SVC03</code> must equal the sum of that line's <code>CAS</code> amounts; per claim, <code>CLP03 - CLP04</code> must equal the claim's adjustments; for the whole file, <code>BPR02</code> must equal the sum of <code>CLP04</code> less provider-level adjustments. Changing any one amount (a paid amount, an adjustment, the payment) breaks at least one of the three, which is exactly what the chapter's fifth attack shows: changing <code>CLP04</code> from $0 to $5 makes the claim unbalanced and the payment no longer equal to the sum of the claims.</p>
 
 
 
