@@ -4,7 +4,7 @@ result: it shows the tests can detect that mistake. "NOT CAUGHT" would be a gap.
 import concurrent.futures, os, shutil, subprocess, sys, tempfile
 here = os.path.dirname(os.path.abspath(__file__)); code = os.path.join(here, "..")
 MUT = [
- ('055_raft.c', 'vote: granted to a candidate of an older term', 'if (m->term == r->d.term && (r->d.voted_for == -1 ||', 'if (m->term >= r->d.term && (r->d.voted_for == -1 ||'),
+ ('055_raft.c', 'vote: granted to a candidate of an older term', 'if (m->term == r->d.term && (r->d.voted_for == -1 ||', 'if (m->term <= r->d.term && (r->d.voted_for == -1 ||'),
  ('055_raft.c', 'vote: a second vote in the same term is allowed', '(r->d.voted_for == -1 || r->d.voted_for == m->from)) {\n            uint32_t lt', '(1)) {\n            uint32_t lt'),
  ('055_raft.c', 'vote: the log rule compares last term the wrong way', 'int up_to_date = m->last_term > lt ||', 'int up_to_date = m->last_term < lt ||'),
  ('055_raft.c', 'vote: equal last terms need a strictly longer log', '(m->last_term == lt && m->last_idx >= li);', '(m->last_term == lt && m->last_idx > li);'),
