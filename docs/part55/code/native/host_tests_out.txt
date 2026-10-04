@@ -1,0 +1,21 @@
+== 1. the node, driven by hand, including Figures 7 and 8 of the Raft paper ==
+== 1. elections ==
+== 2. terms ==
+== 3. replication: the consistency check, conflicts, commit ==
+== 4. the leader: matchIndex, commit, backing up ==
+== 5. Figure 8 of the Raft paper: an entry of an earlier term is never committed by counting replicas ==
+== 6. Figure 7 of the Raft paper: a leader brings six very different logs into line ==
+== 7. persistence, proposals, the state machine ==
+44 passed, 0 failed
+44 lines PASS
+
+== 2. C vs the independent Python node and simulator: the same seeds must give the same trace hash, with the correct node and with three deliberate bugs ==
+  the correct node: 400 seeds, 0 with a violation found, 0 differences
+  the correct node, 600-tick runs: 100 seeds, 0 with a violation found, 0 differences
+  bug 1 (a vote granted without checking the log): 200 seeds, 51 with a violation found, 0 differences
+  bug 2 (an old-term entry committed by counting replicas): 200 seeds, 0 with a violation found, 0 differences
+  bug 3 (a vote a restart forgets): 101 seeds, 1 with a violation found, 0 differences
+1001 seeds compared, 0 differences
+
+== 3. a long run of the simulator against the correct node: 20,000 seeds, every safety property checked after every tick ==
+20000 seeds (5000 per profile): 0 violations; 68332 elections, 79679 client commands proposed and 66843 acknowledged, 36089 crashes and 29137 restarts, 12044466 messages delivered, 977428 dropped, 426173 duplicated; the largest commit index reached was 21; 19231 runs committed something beyond the first no-op, 12 runs never elected a leader

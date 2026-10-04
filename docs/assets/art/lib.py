@@ -29,6 +29,7 @@ PALETTES = {   # (background top, background bottom, main, accent, light, dark)
     "payroll": ("#13200f", "#27471d", "#a3e635", "#fbbf24", "#f5fbe8", "#0a1207"),
     "lsm":     ("#0b1424", "#16304f", "#38bdf8", "#fbbf24", "#e8f4fb", "#060c16"),
     "tls":     ("#0d1b1a", "#12423c", "#2dd4bf", "#f472b6", "#e9fbf8", "#06100f"),
+    "raft":    ("#1a1030", "#33205c", "#a78bfa", "#34d399", "#f3eefe", "#0d0818"),
     "ref":     ("#1c1917", "#44403c", "#fbbf24", "#a3e635", "#faf5eb", "#0f0d0c"),
 }
 class Svg:

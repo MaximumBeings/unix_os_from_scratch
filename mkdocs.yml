@@ -122,6 +122,7 @@ nav:
       - "52. US Payroll Withholding: Federal Income Tax by the IRS Percentage Method, Social Security, Medicare, and a Whole Year of Pay Runs": part52/52-us-payroll-withholding.md
       - "53. A Log-Structured Merge-Tree Key-Value Store: Write-Ahead Log, Sorted Tables, Bloom Filters, Compaction, and a Crash at Every Byte": part53/53-lsm-key-value-store.md
       - "54. TLS 1.3 From Scratch: X25519, the HKDF Key Schedule, AES-GCM Records, and a Handshake Checked Against RFC 8448": part54/54-tls-1-3-from-scratch.md
+      - "55. Raft Consensus, Tested by Deterministic Simulation: Elections, a Replicated Log, and a Seed That Replays Every Failure": part55/55-raft-consensus.md
   - "Appendix -- Primers and Self-Check Answers":
       - "Appendix A. Introduction to x86 Assembly": appendixA/a-introduction-to-assembly.md
       - "Appendix B. Introduction to Unix": appendixB/b-introduction-to-unix.md

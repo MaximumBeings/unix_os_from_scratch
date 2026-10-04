@@ -1325,3 +1325,29 @@ Worked answer: X25519 with the point 0 (a low-order point) gives the all-zero sh
 **5. This client verifies the CertificateVerify signature but not the certificate chain. Describe one attack that passes every check in this chapter, and what the missing piece is.**
 
 Worked answer: an attacker who sits between the client and the real server generates their own RSA key and a self-signed certificate for the server's name, answers the handshake with it, and signs the CertificateVerify with their own key. Every check in this chapter passes (the signature matches the key in the certificate the attacker sent), and the client talks to the attacker. The missing piece is chain validation against trust anchors the client already holds (and a check that the certificate names the host the client meant to reach, is within its validity period, and has not been revoked): the step that turns "the sender holds the key in this certificate" into "the sender is who the client meant to reach".
+
+---
+
+## Chapter 55: Raft Consensus, Tested by Deterministic Simulation
+
+*(from [55. Raft Consensus](../part55/55-raft-consensus.md))*
+
+**1. Why must a node save its vote to disk before it replies to a RequestVote, and what exactly goes wrong (and in which property) if a restart forgets it?**
+
+Worked answer: a vote is a promise made to the candidate: "I will not vote for anyone else in this term". The candidate counts the reply toward its majority. If the voter crashes and restarts with the vote forgotten, it can vote again in the same term for a different candidate, and both candidates can then assemble a majority, because the two majorities share that one node. Two leaders in one term is a violation of election safety (property 1), and they can then commit different entries at the same index. The chapter's bug 3 does exactly this and the simulator reports property 1 on seed 10,059.
+
+**2. A candidate has a longer log than a voter but its last entry is from an older term. Does the voter grant its vote, and why does Raft compare the last *term* before the length?**
+
+Worked answer: no. The voter compares last log terms first; the candidate's is older, so the candidate's log is less up to date and the vote is refused regardless of length. Length alone proves nothing: a long log can be full of uncommitted entries from a deposed leader, while a shorter log with a later term may hold an entry that a majority has already committed. Comparing the term first guarantees that anyone elected holds every committed entry (leader completeness), because a committed entry is on a majority and so on at least one of the voters the candidate needs.
+
+**3. Figure 8: why is it unsafe for a leader to commit an entry from an earlier term as soon as a majority holds it, and what does the leader do instead?**
+
+Worked answer: because a majority-held entry of an old term can still be overwritten. In the figure, a term-4 leader has replicated an entry from term 2 onto three of five servers; if it crashes, a server that holds a term-3 entry at that index can still win an election (its last term is higher than 2) and overwrite the term-2 entry on the others, so an entry the old leader had treated as committed disappears. The leader therefore commits only entries of its own term by counting replicas; once such an entry is on a majority, every earlier entry before it is committed indirectly, because no server lacking it can win an election. This is why a new leader appends a no-op: it gives it a current-term entry to commit at once. The chapter's Figure 8 test checks that commitIndex stays 0 with the old entry on four of five servers, and moves to 3 only when the leader's own term-4 entry reaches a majority.
+
+**4. A delayed AppendEntries carries `leaderCommit` 7 but only entries up to index 5, and arrives after the follower already has commit index 6. What should the follower's commit index be, and why did the paper's wording hide this?**
+
+Worked answer: it should stay 6. The follower may only commit what it is sure matches the leader's log, so the candidate value is min(leaderCommit, index of the last new entry) = min(7, 5) = 5, but a commit index never decreases, so the node keeps 6. The paper's rule ("if leaderCommit > commitIndex, set commitIndex = min(leaderCommit, index of last new entry)") reads as though the guard is on leaderCommit, but the min can be lower than the current commit index when messages are reordered, which moves it backwards. This node's first version had that bug; the simulator, with message reordering, flagged a monotonicity violation within the first 2,000 seeds.
+
+**5. The simulator found bug 1 on the third seed but never found bug 2 in 20,000. What does that say about what a random simulator can and cannot replace?**
+
+Worked answer: a simulator finds the failures its random schedule reaches. Bug 1 (a vote without the log check) breaks safety whenever any leader change happens with unequal logs, which a lossy network produces constantly. Bug 2 (committing old-term entries by counting) needs a specific interleaving: an old entry replicated to a majority without the new leader's no-op, followed by the leader's crash and an election won by a server with a later-term entry; the no-op normally travels with the old entry and masks it, so the random runs almost never produced it. A hand-built scenario (Figure 8) reaches it directly. Simulation and hand-built adversarial scenarios complement each other; neither replaces a proof.
