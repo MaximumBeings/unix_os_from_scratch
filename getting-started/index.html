@@ -2235,6 +2235,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../part48/48-sec-edgar-financial-ratios/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    48. SEC EDGAR Filings and Financial Ratios: Reading XBRL Inside a Kernel, and Refusing Filings That Do Not Add Up
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2806,7 +2834,7 @@
 <li><strong>Link</strong> all the objects with <code>ld -m elf_i386 -T NNN_linker.ld -o kernel.bin ...</code>.</li>
 <li><strong>Pack</strong> with <code>grub-mkrescue</code> and <strong>boot</strong> with <code>qemu-system-x86_64</code> as in Steps 4e and 5.</li>
 </ol>
-<p>Chapters 46, 47 and 48 ship these steps as scripts in their <code>code</code> directory. Using Chapter 47 as the example:</p>
+<p>Chapters 47 and 48 ship these steps as scripts in their <code>code</code> directory (earlier chapters show their commands on the page). Using Chapter 47 as the example:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nb">cd</span><span class="w"> </span>docs/part47/code
 <a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>./build.sh<span class="w"> </span><span class="m">047</span><span class="w">        </span><span class="c1"># assembles, compiles, links, checks Multiboot2, writes build/os.iso</span>
 <a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>./run.sh<span class="w">              </span><span class="c1"># boots build/os.iso with a fresh 8 MiB disk and a network card; Ctrl+C to stop</span>
@@ -2900,7 +2928,7 @@
 <tr>
 <td>The prompt never comes back</td>
 <td>the kernel is idle by design, or a chapter's demo is still running</td>
-<td><code>Ctrl+C</code>; prefix the command with <code>timeout 30</code> (or longer for Chapters 46-48)</td>
+<td><code>Ctrl+C</code>; prefix the command with <code>timeout 30</code> (or longer for Chapters 46-48, whose demos run longer)</td>
 </tr>
 <tr>
 <td><code>Permission denied</code> running <code>./build.sh</code></td>

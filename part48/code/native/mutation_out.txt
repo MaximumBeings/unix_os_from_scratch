@@ -1,0 +1,55 @@
+NOTE: this script deliberately breaks copies of the chapter's sources. 'caught' lines are EXPECTED: they show the tests can detect the mistake.
+baseline (nothing broken): all tests pass (expected)
+udivmod: the remainder test is off by one (r > d instead of r >= d): caught by xbrl_test, six real filings (aapl,ko,nvda,msft,xom,jpm), random-filing differential test
+dates: month 13 accepted: caught by xbrl_test
+dates: every year divisible by 4 is a leap year (1900 too): caught by xbrl_test
+numbers: five decimal places accepted: caught by xbrl_test
+numbers: the minus sign is ignored: caught by xbrl_test, random-filing differential test
+contexts: a <segment> no longer marks a context as dimensional: caught by xbrl_test, six real filings (ko,msft,xom), random-filing differential test
+units: any currency counts as US dollars: caught by xbrl_test, random-filing differential test
+units: the unprefixed measure 'shares' is not recognised: caught by xbrl_test, six real filings (aapl,ko,nvda,msft,xom,jpm), random-filing differential test
+facts: dollars with cents are kept (and truncated): caught by xbrl_test, random-filing differential test
+contexts: a duplicated context id is accepted: caught by xbrl_test, random-filing differential test
+facts: xsi:nil is ignored: caught by xbrl_test
+structure: a closing tag need not match the open one: caught by xbrl_test
+structure: an unclosed root element is accepted: caught by xbrl_test
+limits: the nesting limit is off by one (writes past the stack array): caught by xbrl_test
+limits: the fact table limit is off by one (writes past the table): caught by xbrl_test
+references: a fact naming an unknown context is attached to the first context: caught by xbrl_test
+dei: a dei fact inside a dimensional context may supply the period end: caught by xbrl_test, six real filings (aapl,ko,nvda,msft,xom,jpm), random-filing differential test
+namespaces: the us-gaap prefix is never registered: caught by xbrl_test, six real filings (aapl,ko,nvda,msft,xom,jpm), random-filing differential test
+period: fiscal-year window starts at 351 days instead of 350 (balance-sheet date): caught by xbrl_test, random-filing differential test
+period: fiscal-year window ends at 381 days: caught by xbrl_test, random-filing differential test
+period: the EARLIEST candidate prior date is used, not the latest: caught by xbrl_test, random-filing differential test
+period: a balance-sheet date on or before the period end counts as current: caught by xbrl_test, random-filing differential test
+duplicates: equal values are flagged as conflicts instead of different ones: caught by xbrl_test, six real filings (aapl,ko,nvda,msft,xom,jpm), random-filing differential test
+duplicates: dimensional facts take part in the conflict test: caught by xbrl_test
+derived liabilities subtract the parent's equity, not equity including non-controlling interest: caught by xbrl_test, six real filings (ko), random-filing differential test
+rounding: truncates instead of rounding half away from zero: caught by xbrl_test, six real filings (aapl,ko,nvda,msft,xom,jpm), random-filing differential test
+rounding: the sign of a negative ratio is lost: caught by xbrl_test, random-filing differential test
+return on equity uses the current equity twice instead of the average: caught by xbrl_test, six real filings (aapl,ko,nvda,msft,xom,jpm), random-filing differential test
+free cash flow is capex minus operating cash flow: caught by xbrl_test, six real filings (aapl,ko,nvda,msft,xom), random-filing differential test
+a conflicting duplicate no longer rejects the filing: caught by xbrl_test, random-filing differential test
+a balance sheet that does not balance no longer rejects the filing: caught by xbrl_test, random-filing differential test
+quick ratio leaves out the short-term investments: caught by xbrl_test, six real filings (aapl,msft), random-filing differential test
+revenue fallback order swapped (Revenues before the contract-revenue concept): caught by xbrl_test, random-filing differential test
+a zero denominator is no longer 'not positive': caught by xbrl_test, random-filing differential test
+gross profit is always derived, even when the filing reports it: caught by xbrl_test, random-filing differential test
+the overflow guard compares with 2^63 instead of 2^62: caught by xbrl_test
+format: percentages lose the zero padding of the cents (0.05% shown as 0.5%): caught by xbrl_test
+format: thousands separators every four digits: caught by xbrl_test
+date: the year bound check is removed (writes past the 11-byte buffer): caught by xbrl_test
+slimmer: the dei facts (period end, name) are not kept: caught by fetcher tests, slimmer reproduces embedded filings (aapl,ko,jpm)
+slimmer: contexts the facts do not use are kept too: caught by fetcher tests, slimmer reproduces embedded filings (aapl,ko,jpm)
+slimmer: GrossProfit is no longer kept: caught by fetcher tests, slimmer reproduces embedded filings (aapl,ko)
+fetcher: any User-Agent is accepted (no contact address required): caught by fetcher tests
+fetcher: 429 (too many requests) is not retried: caught by fetcher tests
+fetcher: a 404 is retried like a server error: caught by fetcher tests
+fetcher: five attempts instead of four: caught by fetcher tests
+fetcher: the rate limiter allows 11 requests per second: caught by fetcher tests
+fetcher: it takes the first instance document when a filing has two: caught by fetcher tests
+fetcher: a document with no financial facts is accepted: caught by fetcher tests
+reference: rounds down (the oracle itself broken, the differential tests must notice): caught by six real filings (aapl,ko,nvda,msft,xom,jpm), random-filing differential test
+reference: fiscal-year window too short (the oracle itself broken): caught by random-filing differential test
+
+51 of 51 broken versions caught
