@@ -1,5 +1,7 @@
 # 41. Flight Ticket Aggregation: A Real OTA Multi-Carrier Fare Search
 
+![An airplane on a route between two airports with competing fares](../assets/art/ch-41.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** the real classic GDS-era XML pair a flight aggregator's own search actually speaks underneath -- `OTA_AirLowFareSearchRQ`/`RS`, OpenTravel Alliance's own real request/response shape, cited directly from OpenTravel's own real schema files and a real official example instance document (`041_ota.h`/`041_ota.c`) -- and the real, general (not any one aggregator's proprietary) logic for ranking several airlines' own competing offers by price, or by stops with price as a tie-breaker (`041_aggregator.h`/`041_aggregator.c`).
 
 **What you need to know first:** Chapter 37's own plain, unencrypted hardware-loopback transport pattern (`stream_send_and_receive()`), reused here unchanged, since this chapter is a search chapter, not a payment chapter.

@@ -1,5 +1,7 @@
 # 18. Loading a Real ELF Binary: Parsing Program Headers and Mapping PT_LOAD Segments
 
+![An ELF file whose segments are loaded into memory](../assets/art/ch-18.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** why baking a process's code into the kernel image itself, as Chapter 17 did, is not what a real operating system does; how a GRUB Multiboot2 boot module differs from the kernel image GRUB also loads, and how to find one in the boot information structure; how to validate and parse a real ELF32 executable header and program header table, byte for byte, before trusting a single byte of it; how to map a file's own `PT_LOAD` segments into a process's own private address space at the addresses the FILE itself chooses, not a constant the kernel's own source picked; and a real, hard-won lesson about physical memory management -- why a GRUB module's own physical memory has to be reserved in the physical memory allocator before that allocator can safely hand out a single frame to anything else, and exactly what happens, in this book's own real testing, when it isn't.
 
 **What you need to know first:** Chapter 17's own per-process address spaces (`018_paging.h`/`018_paging.c`'s `paging_new_address_space()`, `paging_map_page_in()`, `paging_translate_in()`) and its scheduler-level process support (`018_task.h`/`018_task.c`); Chapter 7's own physical memory manager (`018_pmm.h`/`018_pmm.c`) and Multiboot2 memory-map parsing (`018_multiboot.h`/`018_multiboot.c`).

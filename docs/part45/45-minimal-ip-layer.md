@@ -1,5 +1,7 @@
 # 45. A Minimal IP Layer: Real IPv4 and a Real ICMP Echo (Ping)
 
+![An IP header, an ICMP echo and ping ripples](../assets/art/ch-45.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** a real, minimal IPv4 header codec (RFC 791) and the real RFC 1071 Internet checksum algorithm (`045_ip.h`/`045_ip.c`), cited from lwIP -- a real, widely-deployed open-source embedded TCP/IP stack; and a real ICMPv4 Echo Request/Reply ("ping") built on top of it (`045_icmp.h`/`045_icmp.c`), genuinely exchanged with QEMU's own real `slirp` user-mode network stack.
 
 **What you need to know first:** Chapters 27-28's own real Ethernet/ARP work (this chapter's own direct continuation, one real protocol layer up) and Chapter 29's own real ARP cache (`arp_resolve()`, reused here to find a real destination MAC before this chapter ever builds an IP packet).

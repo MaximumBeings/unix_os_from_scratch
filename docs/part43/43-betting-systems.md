@@ -1,5 +1,7 @@
 # 43. Betting Systems: Real Odds Formats and a Real Betfair Exchange API Shape
 
+![A betting odds board and casino chips](../assets/art/ch-43.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** the real mathematics converting between the three real odds formats bookmakers around the world actually use -- decimal, fractional, and American/moneyline -- implemented entirely in this book's own integer-only fixed-point arithmetic (`043_odds.h`/`043_odds.c`); and the real Betfair Exchange API's own `listMarketBook`/`placeOrders` JSON-RPC shapes, cited directly from Betfair's own official sample-code repository, built and parsed by this chapter's own fixed, restricted-subset codec (`043_betfair.h`/`043_betfair.c`).
 
 **What you need to know first:** Chapters 41-42's own aggregator pattern (this chapter's own direct continuation, comparing several fictional sources' own prices for the same thing) and Chapter 30's AES-128-CBC + HMAC-SHA256 encrypt-then-MAC construction, reused again this chapter.

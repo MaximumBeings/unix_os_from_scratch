@@ -1,5 +1,7 @@
 # 35. A Micro-Investing / Robo-Advisor App: Round-Up Investing, Real FIX 4.4 Orders
 
+![A rising investment chart and a rounded-up purchase](../assets/art/ch-35.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** how "round-up" micro-investing turns everyday spare change into an investable pool, and how a real risk-questionnaire score maps to one of three real, standard risk bands, each with its own target allocation across a handful of funds -- computed entirely in integer cents and integer fixed-point milli-shares (`035_investing.h`/`035_investing.c`); how a real FIX (Financial Information eXchange) message is laid out -- the actual tag=value protocol electronic trading systems use to send orders and receive fills -- built and parsed from scratch against a real, unmodified open-source FIX engine's own data dictionary (`035_fix.h`/`035_fix.c`); and a real, reproducible kernel bug this chapter's own growth exposed in code unchanged since Chapter 7 -- the Multiboot2 information structure itself was never reserved in this kernel's own physical memory allocator, only the boot module it describes was.
 
 **What you need to know first:** Chapter 30's AES-128, HMAC-SHA256, and the `fedwire_pkcs7_pad()`/`fedwire_pkcs7_unpad()` helpers (carried forward here as `035_aes.*`, `035_hmac.*`, `035_fedwire.*`), and Chapter 34's insurance comparison, whose two-role demo pattern and frame-sealing helpers this chapter's own demo mirrors.

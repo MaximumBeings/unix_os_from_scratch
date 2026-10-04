@@ -1,5 +1,7 @@
 # 28. Address Resolution Protocol: A Real ARP Request/Reply Over a Real Wire
 
+![A broadcast asking who has an IP address: ARP](../assets/art/ch-28.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** how to build the next real protocol layer directly on top of raw Ethernet frames -- a real ARP client that broadcasts a real request and parses a real reply -- entirely from two primary standards sources, with a real gap neither source fills closed by a third, authoritative one; why every earlier RTL8139 chapter's own real hardware loopback mode had to come off for this chapter's own demo to work at all, and how this driver does that safely against an already-running real device; and how this chapter's own independent verification reaches past this kernel's own self-report a new way -- reading the real received reply's own raw bytes directly out of physical memory, outside this kernel's own code entirely, the same real technique Chapter 25 first used.
 
 **What you need to know first:** Chapters 25-27's own real, working RTL8139 driver -- device bring-up, the real DMA buffers, the real interrupt-driven `hlt` wait, and Chapter 27's own real multi-frame send/receive -- all unchanged and still run first, entirely in real hardware loopback mode, so Chapter 27's own real proof stands exactly as it was; and Chapter 24's own real PCI bus enumeration, which is how this exact device was ever found in the first place.

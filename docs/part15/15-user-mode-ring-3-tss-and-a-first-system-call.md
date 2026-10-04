@@ -1,5 +1,7 @@
 # 15. User Mode: Ring 3, a TSS, and a First System Call
 
+![Concentric protection rings and a system call](../assets/art/ch-15.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** why running everything at ring 0 (as this kernel has since Chapter 1) means there is no real boundary between "this kernel" and "code it runs," what a Task State Segment is actually for in a kernel that never uses the CPU's own hardware task-switching, the real x86 stack layout an `iret` needs to change privilege level, why ring-3 code needs a system call to do anything useful at all, and how to prove -- with a real captured CPU fault, not an assertion -- that a privilege transition genuinely happened.
 
 **What you need to know first:** Chapter 8's paging (`015_paging.h`/`015_paging.c`, this chapter's own `PAGE_USER` bit builds directly on it), Chapter 4-10's IDT/ISR machinery (this chapter adds two more real gates to it), and Chapter 5's GDT (`015_gdt.c`, extended this chapter from three descriptors to six). Still no separate address space per task -- ring 3 in this chapter still shares this kernel's one identity-mapped page directory, just with two specific pages marked accessible to it.

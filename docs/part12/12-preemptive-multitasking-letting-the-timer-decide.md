@@ -1,5 +1,7 @@
 # 12. Preemptive Multitasking: Letting the Timer Decide
 
+![A timer interrupt switching round-robin between four tasks](../assets/art/ch-12.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** why Chapter 11's cooperative scheduler only ever switched tasks when a task chose to call `task_yield()`, what has to change to let the real PIT timer force that decision instead, why a real timer-driven switch surfaces a CPU-state subtlety Chapter 11's own design never had to face -- the interrupt flag, IF -- and how to independently verify a preemptive scheduler's own real switch count from nothing but real tick counts, even though the exact tick count itself is not perfectly reproducible run to run.
 
 **What you need to know first:** Chapter 11's whole task-switching design (`switch_task`, `task_create`, `task_yield`, `task_exit`, the TCB) -- this chapter changes remarkably little of it -- and Chapter 6's PIT-driven `irq0_handler`, which is where this chapter's one real new call site lives. Still Part 6.

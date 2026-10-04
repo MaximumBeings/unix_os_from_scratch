@@ -1,5 +1,7 @@
 # 40. Billing & Payment Systems: A Real Subscription Billing Engine
 
+![An invoice and a monthly billing calendar](../assets/art/ch-40.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** the two real-shaped mechanisms a subscription billing engine actually runs -- real proration (charging or crediting the price difference for a mid-cycle plan change, scaled by the fraction of the billing cycle remaining) and a real dunning schedule (retrying a failed recurring charge on a cited, real, published cadence before giving up) -- plus a real e-invoicing document format: OASIS's own UBL (Universal Business Language) 2.1 Invoice XML, read directly out of OASIS's own official example documents (`040_ubl.h`/`040_ubl.c`, `040_billing.h`/`040_billing.c`).
 
 **What you need to know first:** Chapter 33's own ISO 8583 codec (reused unchanged for the recurring charge attempts themselves) and Chapter 30's AES-128-CBC + HMAC-SHA256 encrypt-then-MAC construction.

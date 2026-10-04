@@ -1,5 +1,7 @@
 # Appendix B. Introduction to Unix
 
+![A Unix terminal with a pipeline and a build command](../assets/art/appx-b.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 This book is called "Unix OS from Scratch," and almost every chapter builds some piece of what "Unix" actually means as a concrete, running system — processes, files, system calls, a shell-reachable filesystem — without ever pausing to lay out what Unix *is*, where it came from, or why its own ideas turned out to be worth rebuilding four decades later. This appendix is that pause.
 
 ## 1. Where Unix came from

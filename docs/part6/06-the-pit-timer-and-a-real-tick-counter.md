@@ -1,5 +1,7 @@
 # 6. The PIT Timer and a Real Tick Counter
 
+![A clock and a train of timer ticks](../assets/art/ch-06.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** how the 8253/8254 Programmable Interval Timer (PIT) turns a fixed 1.193182 MHz crystal into an interrupt at any rate this kernel chooses, how to program it safely alongside an IRQ line (IRQ1, the keyboard) this kernel already trusts, why unmasking a second IRQ line is not just "do it again" but a real ordering problem, and how this chapter proves the timer is genuinely hardware-driven by measuring real wall-clock time against the tick count it produces.
 
 **What you need to know first:** Chapter 5's PIC remap/mask/unmask sequence and its IRQ1 stub-and-handler shape (this chapter's IRQ0 path is structurally the same). This is the first chapter to have two real hardware interrupt sources active at once.

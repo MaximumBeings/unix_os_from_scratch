@@ -1,5 +1,7 @@
 # 4. Interrupts: The IDT and a First Real ISR
 
+![A bell ringing at a CPU: an interrupt reaching the interrupt descriptor table](../assets/art/ch-04.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** why every chapter up to this one has been quietly running with interrupts disabled and no way to survive a CPU exception at all; the exact byte layout of an IDT gate and how it differs from Chapter 3's GDT entries; why an interrupt handler cannot be an ordinary C function and has to be entered and exited through real, hand-written assembly; and how this chapter proves its own handler actually works by deliberately causing the exact fault it is meant to catch.
 
 **What you need to know first:** Chapter 3's GDT (an interrupt gate's selector field names one of its descriptors directly) and `kprintf`. No new hardware devices this chapter -- like Chapter 3, this is kernel infrastructure, not a driver.

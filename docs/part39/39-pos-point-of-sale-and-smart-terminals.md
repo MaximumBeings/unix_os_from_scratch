@@ -1,5 +1,7 @@
 # 39. POS (Point-of-Sale) and Smart Terminals: A Real EMV Contact Chip Transaction
 
+![A card terminal and an EMV chip card](../assets/art/ch-39.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** the real mechanism a chip-and-PIN transaction actually runs, not just another card-network message: real BER-TLV (Basic Encoding Rules, Tag-Length-Value) framing (`039_tlv.h`/`039_tlv.c`), the real EMV tag dictionary and GENERATE AC command/response shape a chip and terminal exchange, plus a real Terminal Verification Results-driven decision about whether a transaction can be approved offline or must go online (`039_emv.h`/`039_emv.c`); and a real security *principle* -- a PIN pad's own isolation boundary, enforced here at the API level rather than by separate hardware (`039_pinpad.h`/`039_pinpad.c`). Also: a real bug this chapter's own outside verification is what actually caught, after a clean native test and three clean boots both missed it.
 
 **What you need to know first:** Chapter 38's own ISO 8583 codec and real ISO 9564-1 Format 0 PIN block (`pinblock_build_format0()`, reused unchanged) and Chapter 30's AES-128-CBC + HMAC-SHA256 encrypt-then-MAC construction, reused again this chapter.

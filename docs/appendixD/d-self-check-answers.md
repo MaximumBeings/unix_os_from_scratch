@@ -1,5 +1,7 @@
 # Appendix D. Self-Check Answers
 
+![Check marks beside question and answer boxes](../assets/art/appx-d.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 Every chapter in this book ends with a short "Self-check questions" section -- a handful of questions testing whether the chapter's own real content actually landed, each one followed by its own worked answer. This appendix collects every one of those sections, from all 46 chapters, into one place, exactly as each chapter's own page states them -- nothing paraphrased, nothing re-answered. If you want the full surrounding context a question refers to (a specific citation, a specific captured output), the link under each chapter's own heading goes straight back to that chapter's own page.
 
 ## Chapter 1: Booting a Multiboot2 Kernel: From Power-On to Kernel Entry

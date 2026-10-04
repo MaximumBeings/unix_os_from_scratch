@@ -1,5 +1,7 @@
 # 38. An ATM System: Real ISO 8583 Withdrawals, a Real ISO 9564-1 PIN Block, and Cash-Dispense Sequencing
 
+![A cash machine with a PIN pad dispensing banknotes](../assets/art/ch-38.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** how a real ATM's own card-network message actually carries a customer's PIN -- not in the clear, but folded into a real ISO 9564-1 "Format 0" PIN block, XORed together from the PIN and the card's own PAN before being hex-encoded onto the wire (`038_pinblock.h`/`038_pinblock.c`); how that block rides inside a real ISO 8583 `0200`/`0210` "Financial Transaction Request/Response" pair, extended this chapter with two new data elements, DE 52 (PIN Data) and DE 54 (Additional Amounts) (`038_iso8583.h`/`038_iso8583.c`); and this book's own invented, but structurally real, cash-dispense denomination breakdown a physical bill dispenser has to run once a withdrawal is approved (`038_atm.h`/`038_atm.c`). Also: a real, previously invisible bug this chapter's own booting is what finally exposed, in code carried unchanged since Chapter 7.
 
 **What you need to know first:** Chapter 33's own ISO 8583 codec and Luhn check (`iso8583_luhn_valid()`, still used here unchanged) and Chapter 30's AES-128-CBC + HMAC-SHA256 encrypt-then-MAC construction, reused again this chapter over the same RTL8139 hardware loopback path.

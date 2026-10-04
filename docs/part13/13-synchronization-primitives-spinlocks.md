@@ -1,5 +1,7 @@
 # 13. Synchronization Primitives: Spinlocks
 
+![A padlock and a spinning arrow: a spinlock](../assets/art/ch-13.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** why Chapter 12's own preemptive scheduler makes Chapter 9's `kmalloc()`/`kfree()` unsafe in a way cooperative scheduling never exposed, why this specific single-CPU kernel does not need the atomic test-and-set instructions the OSDev Wiki's own spinlock pages are built around, how to build a real `cli`/`sti`-based spinlock that saves and restores the caller's own EFLAGS instead, and how to catch a real free-list race condition happening live in QEMU -- not merely assert that one is possible -- before fixing it.
 
 **What you need to know first:** Chapter 9's free-list `kmalloc()`/`kfree()` (`013_kheap.c`, unchanged in its core algorithm since then) and Chapter 12's preemptive scheduler (`013_task.c`, `013_pit.c`'s `irq0_handler`) -- this chapter does not change either of those designs, it protects the first one from the second. Still Part 6.

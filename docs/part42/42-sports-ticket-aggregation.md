@@ -1,5 +1,7 @@
 # 42. Sports Ticket Aggregation: A Real GS1 Ticket Identifier and a Rotating Anti-Fraud Barcode
 
+![A match ticket with a barcode and a rotating code](../assets/art/ch-42.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** the real GS1 GDTI (Global Document Type Identifier) that identifies a specific event ticket, cited directly from GS1 AISBL's own official open-source repository and reproduced against its own real published test vectors (`042_gs1.h`/`042_gs1.c`); the real *property* -- not the real, undisclosed algorithm -- behind Ticketmaster's own publicly-described "SafeTix" rotating barcode, rebuilt here from primitives this kernel already has (`042_barcode.h`/`042_barcode.c`); and this book's own general best-seat/cheapest ranking over several marketplaces' own competing listings (`042_marketplace.h`/`042_marketplace.c`).
 
 **What you need to know first:** Chapter 41's own multi-carrier aggregation pattern (this chapter's own direct continuation, for a different real domain) and Chapter 30's AES-128-CBC + HMAC-SHA256 encrypt-then-MAC construction, reused again this chapter.

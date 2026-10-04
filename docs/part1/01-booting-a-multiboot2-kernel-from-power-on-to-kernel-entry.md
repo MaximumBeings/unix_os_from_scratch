@@ -1,5 +1,7 @@
 # 1. Booting a Multiboot2 Kernel: From Power-On to Kernel Entry
 
+![A power button, a bootloader and a CPU: booting a Multiboot2 kernel](../assets/art/ch-01.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** what a real x86-64 machine actually does between the moment you press power and the moment any code you wrote begins running; why this book does not write its own bootloader, and what GRUB and the Multiboot2 standard do instead; the exact, real, spec-required shape of a Multiboot2 header (checked against GNU's own Multiboot2 Specification, quoted directly below rather than paraphrased from memory); and why a kernel's very first C function has to talk to raw hardware ports before it can print a single character, since there is no operating system underneath it to ask.
 
 **What you need to know first:** working C (functions, pointers, the `static` keyword) and enough x86 assembly to read a short, heavily-commented file (you do not need to write assembly from scratch -- every instruction used here is explained where it appears). No prior OS-development experience is assumed.

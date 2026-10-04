@@ -1,5 +1,7 @@
 # Appendix A. Introduction to x86 Assembly
 
+![x86 registers, assembly instructions and the machine code they become](../assets/art/appx-a.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 This appendix exists because the book you just read assumes you already know how to read a file like `001_boot.asm`. If you don't yet, this is where that gets fixed. It is a self-contained primer on x86 assembly language — specifically the 32-bit "protected mode" dialect this book's own kernel is written in, assembled with NASM — covering enough of the real architecture that you could, after reading it, open any `.asm` file in this book's own `docs/partNN/code/` directories and understand exactly what it does and why it has to be written that way.
 
 It is not a complete reference to the x86 instruction set, which runs to thousands of pages across Intel's and AMD's own official manuals. It is everything an ordinary systems programmer actually uses in practice, explained from first principles, with real examples pulled directly from this book's own code wherever one illustrates the point better than an invented snippet would.

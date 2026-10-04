@@ -1,5 +1,7 @@
 # 7. Physical Memory: the Multiboot2 Memory Map and a Real Frame Allocator
 
+![A grid of 4 KiB physical memory frames, some used](../assets/art/ch-07.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** why a kernel cannot know how much RAM exists without being told, what GRUB actually leaves behind in EAX/EBX at kernel entry and why that only stays valid for a few instructions, the real Multiboot2 boot-information and memory-map tag layouts field-for-field, and how to turn that real data into a working physical frame allocator -- this kernel's first allocator of any kind.
 
 **What you need to know first:** Chapter 1's boot handoff (this chapter reads two machine-state values Chapter 1 never touched) and Chapter 3's `kprintf` (extended this chapter for a real, motivated reason). A new Part starts here, since discovering and managing physical memory is a different concern from either booting or handling interrupts.

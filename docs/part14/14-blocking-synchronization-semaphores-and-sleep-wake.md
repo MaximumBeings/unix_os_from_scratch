@@ -1,5 +1,7 @@
 # 14. Blocking Synchronization: Semaphores and Sleep/Wake
 
+![A semaphore flag and sleeping tasks in a wait queue](../assets/art/ch-14.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** why Chapter 13's spinlock is the wrong tool for waiting on something that might not be ready for a real, unpredictable stretch of time, what a semaphore is and how its wait/signal operations differ from a spinlock's busy-check, the classic "lost wakeup" race a naive blocking implementation falls into and how this chapter's own semaphore avoids it, and how to verify a real bounded-buffer producer/consumer using nothing but its own real, captured serial output.
 
 **What you need to know first:** Chapter 13's spinlock (`014_spinlock.h`/`014_spinlock.c`, unchanged) and Chapter 12's scheduler (`task_yield`, `task_tick`, the round-robin scan) -- this chapter builds a new primitive on top of both rather than changing either's own core logic. Still Part 6.

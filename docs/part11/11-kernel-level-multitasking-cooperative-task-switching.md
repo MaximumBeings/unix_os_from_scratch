@@ -1,5 +1,7 @@
 # 11. Kernel-Level Multitasking: Cooperative Task Switching
 
+![Four tasks passing control to each other with yield](../assets/art/ch-11.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** what a real context switch actually has to save and restore on i686 -- and, just as important, what cdecl already lets it skip -- how a brand-new task's stack has to be pre-built by hand so the very first switch into it works with no special-case code, the real difference between a *cooperative* scheduler (this chapter) and a preemptive one (not yet -- no timer drives this), and how to count real context switches independently and match the kernel's own number exactly.
 
 **What you need to know first:** Chapter 9's `kmalloc`/`kfree` (this chapter's only source of memory for a new task's stack), and the plain cdecl calling convention this book's C code has used since Chapter 3 (this chapter leans on it directly, not just as background). This chapter opens Part 6 -- everything through Chapter 10 was one single flow of control; this is the first chapter where more than one genuinely exists at once.

@@ -1,5 +1,7 @@
 # 9. A Kernel Heap: Real Dynamic Memory with `kmalloc`/`kfree`
 
+![A heap of used and free blocks with kmalloc and kfree](../assets/art/ch-09.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** why fixed 4 KiB frames and one-off page mappings are not enough for real kernel data structures, the free-list allocator technique the OSDev Wiki itself describes (hidden headers, a sorted list of free zones, splitting and coalescing), and how to build a working `kmalloc`/`kfree` entirely out of this book's own existing machinery -- Chapter 7's physical frames and Chapter 8's page mapping -- rather than a new, separate memory source.
 
 **What you need to know first:** Chapter 7's `pmm_alloc_frame()` (every byte this chapter's heap ever manages traces back to a frame from there) and Chapter 8's `paging_map_page()` (every one of those frames reaches the heap's own virtual address range through it). This chapter stays in Part 5, since a dynamic allocator is still fundamentally about managing this machine's real memory -- the third and, for now, final layer above the physical frames Chapter 7 first exposed.

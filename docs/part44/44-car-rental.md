@@ -1,5 +1,7 @@
 # 44. Car Rental: A Real OTA Vehicle Availability and Reservation Codec
 
+![A rental car and its key](../assets/art/ch-44.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** a real OpenTravel Alliance vehicle-rental schema -- `OTA_VehAvailRateRQ`/`RS` and `OTA_VehResRQ`/`RS` -- cited directly from XML Travelgate's own public technical documentation repository and its own complete, real `car.xsd` schema file (`044_veh.h`/`044_veh.c`); and this book's own general cheapest/best-class ranking over several fictional vendors' own competing offers (`044_rental.h`/`044_rental.c`).
 
 **What you need to know first:** Chapters 41-43's own aggregator pattern (this chapter's own direct continuation, comparing several fictional sources' own prices for the same thing) and Chapter 30's AES-128-CBC + HMAC-SHA256 encrypt-then-MAC construction, reused again this chapter.

@@ -1,5 +1,7 @@
 # 3. A Real GDT and a Kernel printf
 
+![A global descriptor table and a printf call](../assets/art/ch-03.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** why a kernel needs to own its Global Descriptor Table rather than keep running on the transient one GRUB left behind, the exact byte layout of a segment descriptor and why this book's own flat-memory-model descriptors decode to the specific bytes `0x9A` and `0x92`, why reloading `CS` needs a far jump instead of an ordinary `mov`, and how this book's first genuinely reusable utility -- a real, variadic `kprintf` -- gets built on freestanding C's own `<stdarg.h>` with no C library underneath it.
 
 **What you need to know first:** Chapters 1 and 2 (the boot chain, the serial driver, the VGA driver). No new hardware is introduced for its own sake this chapter -- the GDT and `kprintf` are both infrastructure later chapters will lean on.

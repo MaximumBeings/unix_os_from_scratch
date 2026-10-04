@@ -1,5 +1,7 @@
 # 5. PS/2 Keyboard Input, via a Real Hardware IRQ
 
+![A keyboard sending scancodes over IRQ 1](../assets/art/ch-05.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** why the two 8259 PICs have to be reconfigured before this kernel can safely accept a single hardware interrupt, why the default PIC wiring is actively hostile to a protected-mode kernel rather than just inconvenient, how a real keyboard interrupt turns a physical keypress into a byte this kernel can read, and how this chapter proves all of that by injecting real keystrokes into a running (emulated) machine from outside it and reading real typed text back out.
 
 **What you need to know first:** Chapter 4's IDT and ISR stub pattern (this chapter's own keyboard handler follows the identical shape) and Chapter 3's `kprintf`. This is the first chapter in this book to enable interrupts globally.

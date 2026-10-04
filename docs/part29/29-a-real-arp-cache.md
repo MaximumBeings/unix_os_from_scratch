@@ -1,5 +1,7 @@
 # 29. A Real ARP Cache: Completing RFC 826's Own Merge_flag Logic
 
+![An ARP cache table of IP and MAC addresses](../assets/art/ch-29.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** how to complete the real translation-table logic RFC 826 itself describes but deliberately leaves half-finished -- a real fixed-size ARP cache that updates an existing entry or adds a new one on every real reply, cited directly from RFC 826's own "Packet Reception" algorithm; how to fill a real gap RFC 826 itself admits is "outside the scope of this protocol" -- real entry aging and timeout -- from a second real, authoritative source (RFC 1122) that states an actual requirement level for it; a real, engineering design choice (least-recently-used eviction) made where neither cited source mandates one; and a real, reproducible hang this chapter's own testing found and fixed, in code two earlier chapters had already shipped and verified, the moment this chapter's own new demo did something neither of them ever needed to do -- send more than one real ARP request in the same boot.
 
 **What you need to know first:** Chapter 28's own real, minimal ARP client -- `arp_send_request()`/`arp_receive_reply()`, a real request/reply round trip with no cache and no memory of past resolutions -- and Chapters 25-27's own real RTL8139 driver underneath it, including Chapter 27's own real round-robin transmit (`rtl8139_send_queue()`), which this chapter ends up needing for a reason Chapter 28 never had to face.

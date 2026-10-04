@@ -1,5 +1,7 @@
 # 10. Page Fault Handling: A Real ISR14
 
+![A warning triangle and the page-fault exception](../assets/art/ch-10.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** why turning paging on in Chapter 8 quietly left one real gap open -- no handler for the exception paging itself can raise -- the real #PF error-code bit layout and CR2 register cited from source, why an exception that pushes an error code needs an assembly stub genuinely different from Chapter 4's #DE stub, and how to prove a page fault handler actually works by triggering a real one on purpose rather than trusting it would fire correctly if it ever needed to.
 
 **What you need to know first:** Chapter 4's `isr0_handler` (the shape every exception handler in this book follows: report honestly, halt, do not try to resume), Chapter 8's paging (the mechanism that can raise this exception at all), and Chapter 9's heap (whose completion made this the last real gap left open in this book's memory story). This chapter stays in Part 5, closing out the memory subsystem this Part has been building since Chapter 7.

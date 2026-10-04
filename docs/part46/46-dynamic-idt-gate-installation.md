@@ -1,5 +1,7 @@
 # 46. Dynamic IDT Gate Installation: Closing a Gap Chapter 26 Left Open
 
+![Five numbered doors: gates installed in the interrupt descriptor table](../assets/art/ch-46.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** a real mechanism for installing (and removing) an Interrupt Descriptor Table gate at runtime, after boot, rather than only once at compile time (`046_idt.h`/`046_idt.c`); and this chapter's own real fix to the exact architectural gap Chapter 26's own top-of-file comment named and explicitly left open -- `046_rtl8139.c` now discovers its own real IRQ and installs its own real IDT gate dynamically, rather than only ever verifying a fixed, hardcoded vector.
 
 **What you need to know first:** Chapter 4's own original IDT setup and Chapter 26's own real interrupt-driven RTL8139 work, whose own top-of-file comment first named this exact gap: "there is no mechanism anywhere in this book (yet) for installing a NEW gate at runtime once a driver discovers which real IRQ line its device actually landed on."

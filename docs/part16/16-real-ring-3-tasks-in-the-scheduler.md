@@ -1,5 +1,7 @@
 # 16. Real Ring-3 Tasks in the Scheduler: sys_yield, sys_exit, Multiple User Tasks
 
+![Several ring-3 user tasks around the kernel](../assets/art/ch-16.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** how a task that runs at CPL 3 can become a genuine, first-class participant of a scheduler that already exists, rather than a one-off demo wired up by hand; why each ring-3 task needs its own dedicated kernel stack, and why the TSS's ESP0 field has to be updated on every single switch into one; and how two new system calls -- SYS_YIELD and SYS_EXIT -- turn out to need no new scheduler logic at all, because they are just ring-0 wrappers around functions this book has had since Chapter 11/12.
 
 **What you need to know first:** Chapter 11-12's own cooperative-then-preemptive scheduler (`016_task.h`/`016_task.c`, `016_switch.asm`, unchanged in its core mechanics), and Chapter 15's own first real privilege boundary (`016_tss.h`/`016_tss.c`, `016_gdt.c`, `016_usermode.asm`, `016_isr128.asm`/`016_syscall.h`'s `INT 0x80` syscall gate) -- this chapter does not rebuild any of that, it wires it together.

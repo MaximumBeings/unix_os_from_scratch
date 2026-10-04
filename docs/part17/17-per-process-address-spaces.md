@@ -1,5 +1,7 @@
 # 17. Per-Process Address Spaces: One Page Directory Per Task
 
+![Three processes, each with its own page directory](../assets/art/ch-17.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** why sharing one page directory across every ring-3 task, as Chapter 16 did, is not yet real process isolation, even though the CPU genuinely enforces CPL 3; how to give each task its own private page directory that still shares the kernel's own mappings, without re-copying anything the kernel already owns; why a function has to be physically copied, not merely mapped, before it can safely run at a different virtual address than the one it was compiled for; and how to prove, from ring 0, that two different processes' identical virtual addresses really do resolve to different physical memory.
 
 **What you need to know first:** Chapter 16's own scheduler (`017_task.h`/`017_task.c`, unchanged in its core round-robin mechanics) and its real ring-3 task support (TSS.ESP0 reloading on every switch, `017_syscall.h`'s `SYS_YIELD`/`SYS_EXIT`); Chapter 8's own paging code (`017_paging.h`/`017_paging.c`), which until this chapter built and used exactly one page directory for the entire life of this kernel.

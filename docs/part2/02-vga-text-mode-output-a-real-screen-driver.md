@@ -1,5 +1,7 @@
 # 2. VGA Text-Mode Output: A Real Screen Driver
 
+![A text-mode monitor with coloured character cells at address 0xB8000](../assets/art/ch-02.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** how to draw text directly onto a real (emulated) monitor with no BIOS and no OS underneath -- the VGA text-mode framebuffer at physical address `0xB8000`, its 2-byte-per-cell layout, and the one piece of VGA hardware that still needs real port I/O even though the screen itself does not: the blinking cursor. You will also see why this chapter's own kernel deliberately never exits, and how a real QEMU monitor session -- connected from outside the running machine -- is used to inspect that machine's memory and take a real screenshot while it is still alive.
 
 **What you need to know first:** Chapter 1's boot chain and `kmain` (this chapter reuses both, unchanged in shape). No new x86 assembly is introduced here; everything new in this chapter is C and one memory-mapped hardware device.

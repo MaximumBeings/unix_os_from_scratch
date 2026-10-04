@@ -1,5 +1,7 @@
 # 8. Paging: Enabling Virtual Memory
 
+![Virtual pages mapped to physical frames through a page directory](../assets/art/ch-08.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 **What you will understand:** why a flat physical address space stops being enough the moment a kernel wants to give processes their own private memory, the real 32-bit (non-PAE) x86 page directory/page table layout field-for-field, how to build and install page tables using this book's own physical memory manager rather than static arrays, how `CR3` and `CR0`'s `PG` bit actually switch translation on, and how to prove -- not just claim -- that the CPU is genuinely translating addresses rather than passing them through unchanged.
 
 **What you need to know first:** Chapter 7's physical memory manager (`pmm_alloc_frame`/`pmm_free_frame`), whose frames this chapter's page tables are built out of directly, and the Multiboot2 memory map that seeds it. This chapter stays inside Chapter 7's own Part, since paging is still fundamentally about managing this machine's real memory -- just at a new layer above the physical frames Chapter 7 already tracks.

@@ -1,5 +1,7 @@
 # Appendix C. Introduction to C
 
+![C source code between large curly braces](../assets/art/appx-c.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 Nearly every line of this book's own kernel — everything except the small handful of files Appendix A already covered — is C. This appendix is a comprehensive, standalone introduction to the language itself, and, in its final sections, to the specific, narrower dialect of C a **freestanding** kernel like this one's actually gets to use: no standard library, no heap until the kernel builds its own (Chapter 9), no operating system underneath to lean on, because this code *is* the operating system.
 
 ## 1. What C is, and isn't
