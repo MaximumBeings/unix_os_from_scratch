@@ -1,0 +1,63 @@
+Unix OS from Scratch -- Chapter 53: kernel entry reached
+Multiboot2 magic confirmed in EAX: 0x36d76289
+Multiboot2 memory map: 7 real entries, 24 bytes each
+
+[... 2,553 lines of Chapters 8-52's own demos elided: this chapter's demo follows from its first line to its last; 828 FAT16 driver log lines (one per file operation) are elided from it ...]
+
+Starting this chapter's own LSM demo (a key-value store: write-ahead log, memtable, sorted tables, Bloom filters, compaction)...
+A fresh FAT16 volume was formatted to hold the store's files.
+lsm_open on the empty volume: ok
+
+== Part 1. A warehouse's stock list: the script, one result line per command (the FAT16 driver's own log lines are shown above the block, not inside it)
+@@KV DEMO BEGIN
+put sku:1000 ok
+put sku:1001 ok
+put sku:1002 ok
+put sku:1003 ok
+put sku:1004 ok
+put sku:1005 ok
+put sku:1006 ok
+put sku:1007 ok
+put sku:1008 ok
+put sku:1009 ok
+put sku:1010 ok
+put sku:1011 ok
+put sku:1012 ok
+put sku:1013 ok
+[... 110 more result lines elided: the page's verification section compares ALL of them ...]
+put sku:1091 ok
+put sku:1092 ok
+put sku:1093 ok
+put sku:1094 ok
+get sku:1080 found 6761736b65742d61616161616161616161616161613a7174793d313830
+get sku:1010 none
+get sku:1070 found 76616c76652d616161616161616161616161613a7174793d323130
+digest c27c08bbe31cd307c6bfa1558c4f780d5bf86a69d142de6760e2a8ddb001a061 87
+stats puts 105 deletes 8 flushes 4 compactions 1 gets 11 bloom_skips 1 range_skips 6 block_reads 3 tables 1 mem 25
+
+@@KV DEMO END
+
+== Part 2. The files the store left on the real FAT16 disk (the manifest slots, the tables, the log)
+fat16_list_root:
+  T00005.SST  2706 bytes  (first cluster 2)
+  WAL  1151 bytes  (first cluster 3)
+  MANI1  27 bytes  (first cluster 8)
+  MANI0  42 bytes  (first cluster 4)
+  (4 entr(ies) total)
+
+== Part 3. A real recovery on the real disk: two more puts, the log cut in the middle of the second record, an orphan table planted
+  the log holds 52 bytes (two records of 26); cutting 5 bytes tears the second
+  planted the orphan T00007.SST (the id the next flush would use)
+  recovery: open ok, replayed 1 log records, cut 21 torn bytes, deleted 1 orphan files
+  crash:a (its record was whole): FOUND; crash:b (its record was torn, never acknowledged as durable): absent, as it must be
+  digest before the two puts: c27c08bbe31cd307c6bfa1558c4f780d5bf86a69d142de6760e2a8ddb001a061 (87 keys)
+  digest after recovery:      d761354090dc78effed786b46d49930a1aaefb8069cef30ed1510a53bc899a41 (88 keys: the old keys plus crash:a)
+  the torn log was emptied by flushing what was replayed: tables now 3, memtable 0 entries
+@@KV FINAL d761354090dc78effed786b46d49930a1aaefb8069cef30ed1510a53bc899a41 88
+
+== Part 4. The crash sweep inside the kernel (RAM file system, crash at every 7th unit of cost)
+  workload: 40 operations (34 puts and deletes), total cost 2473 units (bytes written plus one per operation), 5 flushes, 1 compactions
+  example: crash at cost 189 after 5 acknowledged operations: recovered the acknowledged state PLUS the operation in flight (replayed 6 log records, cut 0 torn bytes, deleted 0 orphan files)
+  354 crash points: 353 recovered to the acknowledged state, 1 to the acknowledged state plus the operation in flight, 0 failures; 142 had a torn log tail cut, 203 had orphan files deleted
+
+Chapter 53 LSM demo complete: 133 scripted commands, 1 disk recoveries, 354 crash points swept, 0 failures

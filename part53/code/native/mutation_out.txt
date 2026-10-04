@@ -1,0 +1,80 @@
+NOTE: this script deliberately breaks copies of the chapter's sources. 'caught' lines are EXPECTED: they show the tests can detect the mistake.
+baseline (nothing broken): all tests pass (expected)
+CRC: wrong polynomial: caught by lsm_test, random scripts vs the Python store
+CRC: final inversion missing: caught by lsm_test, random scripts vs the Python store
+Bloom: only 3 probes: caught by lsm_test, random scripts vs the Python store, fuzz
+Bloom: the lookup uses 3 probes while the filter was built with 4 (never a false negative, but different): caught by lsm_test, random scripts vs the Python store
+Bloom: 8 bits per key: caught by lsm_test, random scripts vs the Python store
+Bloom: the filter is never consulted: caught by lsm_test, random scripts vs the Python store
+range check: the minimum key is exclusive: caught by lsm_test, random scripts vs the Python store, fuzz
+range check: the maximum key is exclusive: caught by lsm_test, random scripts vs the Python store, fuzz
+key order: a shorter key sorts after a longer one with the same prefix: caught by lsm_test, random scripts vs the Python store, fuzz
+key order: bytes compared as signed: caught by random scripts vs the Python store, fuzz
+table: sparse index every 4 entries in the reader but 8 in the writer: caught by lsm_test, random scripts vs the Python store, crash test, fuzz
+table: the index is not checked against the entries: caught by lsm_test
+table: keys need not be strictly ascending: caught by lsm_test
+table: the footer CRC is not checked: caught by lsm_test, fuzz
+table: the CRC covers everything except the last byte before it: caught by lsm_test, random scripts vs the Python store, crash test, fuzz
+table: an empty table is accepted: caught by lsm_test
+table: 401 entries accepted: caught by lsm_test
+table: the builder allows 401 entries: caught by lsm_test
+table: sequence range not checked: caught by lsm_test
+entry: a 25-byte key is accepted: caught by lsm_test
+entry: a tombstone with a value is accepted: caught by lsm_test
+entry: the value length is 8 bits: caught by lsm_test
+manifest: the CRC is not checked: caught by lsm_test
+manifest: the OLDER generation wins: caught by lsm_test, random scripts vs the Python store, crash test, fuzz
+manifest: slot chosen by the old generation (overwrites the slot in use): caught by random scripts vs the Python store
+manifest: flushed_seq not recorded on a flush: caught by lsm_test, random scripts vs the Python store
+manifest: next_id not advanced on a flush: caught by lsm_test, random scripts vs the Python store, crash test, fuzz
+manifest: a flush forgets the old tables: caught by lsm_test, random scripts vs the Python store, crash test, fuzz
+manifest: a level-1 table in the middle of the list is accepted: caught by lsm_test (did not build), the store (did not build)
+manifest: a table id of 0 is accepted: caught by lsm_test
+manifest: a table id at or above next_id is accepted: caught by lsm_test
+flush: the table is written AFTER the manifest names it: caught by random scripts vs the Python store, crash test
+flush: the log is emptied BEFORE the table and manifest are written: caught by random scripts vs the Python store, crash test
+flush: the log is not emptied: caught by lsm_test, random scripts vs the Python store, crash test, fuzz
+flush: the new table goes to the END of the list (oldest position): caught by lsm_test, random scripts vs the Python store, crash test, fuzz
+flush: the sequence floor is not advanced in memory: caught by random scripts vs the Python store
+flush: 12 tables are not refused: caught by lsm_test
+compaction trigger: 5 level-0 tables instead of 4: caught by lsm_test, random scripts vs the Python store
+compaction: the older value wins: caught by lsm_test, random scripts vs the Python store, crash test, fuzz
+compaction: tombstones are kept: caught by lsm_test, random scripts vs the Python store
+compaction: the old tables are not deleted: caught by lsm_test, random scripts vs the Python store, fuzz
+compaction: the old tables are deleted BEFORE the manifest is written: caught by crash test
+compaction: flushed_seq reset to 0 in the manifest: caught by random scripts vs the Python store
+compaction: a single level-1 table is compacted again: caught by random scripts vs the Python store
+compaction: an empty result is not handled (the old tables stay listed): caught by lsm_test
+compaction: the level of the output is 0: caught by lsm_test, random scripts vs the Python store
+write path: memtable limit 1025 bytes: caught by lsm_test
+write path: memtable entry limit not enforced: caught by lsm_test
+write path: log limit not enforced: caught by lsm_test
+write path: the log limit is off by one: caught by lsm_test
+write path: overwriting a key is counted as a new entry in the byte budget: caught by random scripts vs the Python store
+write path: the record's CRC omits the length field: caught by lsm_test, random scripts vs the Python store, crash test, fuzz
+write path: the sequence number is not logged in the record (always 1): caught by lsm_test, random scripts vs the Python store, crash test, fuzz
+write path: a 101-byte value is accepted: caught by lsm_test
+write path: an empty key is accepted: caught by lsm_test, fuzz
+write path: a delete logs the tombstone flag as 0: caught by random scripts vs the Python store, crash test, fuzz
+write path: after an I/O error the store keeps accepting writes: caught by random scripts vs the Python store
+read path: a tombstone in a table is skipped, so the older value reappears: caught by lsm_test, random scripts vs the Python store, fuzz
+read path: only the first index block is searched: caught by lsm_test, random scripts vs the Python store, fuzz
+read path: the block end is the data end (reads too much, still right) -> index of the NEXT block used as start: caught by lsm_test, random scripts vs the Python store, fuzz
+read path: the value is truncated by one byte: caught by lsm_test, random scripts vs the Python store, fuzz
+digest: tombstones are hashed as empty values: caught by lsm_test, random scripts vs the Python store, crash test, fuzz
+digest: the memtable is left out: caught by lsm_test, random scripts vs the Python store, crash test, fuzz
+recovery: records at or below the flushed sequence are replayed again: caught by lsm_test
+recovery: the sequence number is not restored from the log: caught by lsm_test, random scripts vs the Python store, crash test
+recovery: the first record's CRC is not checked: caught by fuzz
+recovery: a record with a bad CRC is skipped instead of ending the replay: caught by lsm_test, fuzz
+recovery: a non-increasing sequence number is accepted: caught by lsm_test
+recovery: a torn tail is not treated as torn (the log is left as is): caught by lsm_test, random scripts vs the Python store, crash test
+recovery: the torn log is cut IN PLACE (rewritten with its valid prefix) instead of flushed: caught by lsm_test, random scripts vs the Python store, crash test
+recovery: orphan tables are not deleted: caught by lsm_test, random scripts vs the Python store
+recovery: the table that is still listed is deleted as an orphan: caught by lsm_test, random scripts vs the Python store, crash test, fuzz
+recovery: the next table id is not checked for orphans: caught by lsm_test, random scripts vs the Python store
+recovery: a corrupt listed table is ignored instead of refused: caught by lsm_test, fuzz
+recovery: a missing listed table is ignored: caught by lsm_test
+reference: ties in the merge go to the oldest table (the oracle itself broken): caught by random scripts vs the Python store
+
+76 of 76 broken versions caught

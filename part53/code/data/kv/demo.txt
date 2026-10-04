@@ -1,0 +1,133 @@
+put sku:1000 bolt-aaaaaa:qty=20
+put sku:1001 nut-bbbbbbb:qty=57
+put sku:1002 washer-cccccccc:qty=94
+put sku:1003 screw-ddddddddd:qty=131
+put sku:1004 bracket-eeeeeeeeee:qty=168
+put sku:1005 hinge-fffffffffff:qty=205
+put sku:1006 latch-gggggggggggg:qty=242
+put sku:1007 spring-hhhhhhhhhhhhh:qty=279
+put sku:1008 gasket-iiiiiiiiiiiiii:qty=316
+put sku:1009 bearing-jjjjjj:qty=353
+put sku:1010 valve-aaaaaaa:qty=390
+put sku:1011 clamp-bbbbbbbb:qty=27
+put sku:1012 bolt-ccccccccc:qty=64
+put sku:1013 nut-dddddddddd:qty=101
+put sku:1014 washer-eeeeeeeeeee:qty=138
+put sku:1015 screw-ffffffffffff:qty=175
+put sku:1016 bracket-ggggggggggggg:qty=212
+put sku:1017 hinge-hhhhhhhhhhhhhh:qty=249
+put sku:1018 latch-iiiiii:qty=286
+put sku:1019 spring-jjjjjjj:qty=323
+put sku:1020 gasket-aaaaaaaa:qty=360
+put sku:1021 bearing-bbbbbbbbb:qty=397
+put sku:1022 valve-cccccccccc:qty=34
+put sku:1023 clamp-ddddddddddd:qty=71
+put sku:1024 bolt-eeeeeeeeeeee:qty=108
+put sku:1025 nut-fffffffffffff:qty=145
+put sku:1026 washer-gggggggggggggg:qty=182
+put sku:1027 screw-hhhhhh:qty=219
+put sku:1028 bracket-iiiiiii:qty=256
+put sku:1029 hinge-jjjjjjjj:qty=293
+put sku:1030 latch-aaaaaaaaa:qty=330
+put sku:1031 spring-bbbbbbbbbb:qty=367
+put sku:1032 gasket-ccccccccccc:qty=404
+put sku:1033 bearing-dddddddddddd:qty=41
+put sku:1034 valve-eeeeeeeeeeeee:qty=78
+put sku:1035 clamp-ffffffffffffff:qty=115
+put sku:1036 bolt-gggggg:qty=152
+put sku:1037 nut-hhhhhhh:qty=189
+put sku:1038 washer-iiiiiiii:qty=226
+put sku:1039 screw-jjjjjjjjj:qty=263
+put sku:1040 bracket-aaaaaaaaaa:qty=300
+put sku:1041 hinge-bbbbbbbbbbb:qty=337
+put sku:1042 latch-cccccccccccc:qty=374
+put sku:1043 spring-ddddddddddddd:qty=411
+put sku:1044 gasket-eeeeeeeeeeeeee:qty=48
+put sku:1045 bearing-ffffff:qty=85
+put sku:1046 valve-ggggggg:qty=122
+put sku:1047 clamp-hhhhhhhh:qty=159
+put sku:1048 bolt-iiiiiiiii:qty=196
+put sku:1049 nut-jjjjjjjjjj:qty=233
+put sku:1050 washer-aaaaaaaaaaa:qty=270
+put sku:1051 screw-bbbbbbbbbbbb:qty=307
+put sku:1052 bracket-ccccccccccccc:qty=344
+put sku:1053 hinge-dddddddddddddd:qty=381
+put sku:1054 latch-eeeeee:qty=418
+put sku:1055 spring-fffffff:qty=55
+put sku:1056 gasket-gggggggg:qty=92
+put sku:1057 bearing-hhhhhhhhh:qty=129
+put sku:1058 valve-iiiiiiiiii:qty=166
+put sku:1059 clamp-jjjjjjjjjjj:qty=203
+put sku:1060 bolt-aaaaaaaaaaaa:qty=240
+put sku:1061 nut-bbbbbbbbbbbbb:qty=277
+put sku:1062 washer-cccccccccccccc:qty=314
+put sku:1063 screw-dddddd:qty=351
+put sku:1064 bracket-eeeeeee:qty=388
+put sku:1065 hinge-ffffffff:qty=25
+put sku:1066 latch-ggggggggg:qty=62
+put sku:1067 spring-hhhhhhhhhh:qty=99
+put sku:1068 gasket-iiiiiiiiiii:qty=136
+put sku:1069 bearing-jjjjjjjjjjjj:qty=173
+digest
+stats
+get sku:1003
+get sku:1017
+get sku:1042
+get sku:1069
+get sku:9999
+get sku:0001
+stats
+put sku:1000 nut-bbbbbbb:qty=57
+put sku:1007 gasket-iiiiiiiiiiiiii:qty=316
+put sku:1014 screw-ffffffffffff:qty=175
+put sku:1021 valve-cccccccccc:qty=34
+put sku:1028 hinge-jjjjjjjj:qty=293
+put sku:1035 bolt-gggggg:qty=152
+put sku:1042 spring-ddddddddddddd:qty=411
+put sku:1049 washer-aaaaaaaaaaa:qty=270
+put sku:1056 bearing-hhhhhhhhh:qty=129
+put sku:1063 bracket-eeeeeee:qty=388
+del sku:1005
+del sku:1006
+del sku:1007
+del sku:1008
+del sku:1009
+del sku:1010
+del sku:1011
+del sku:1012
+get sku:1005
+get sku:1007
+flush
+digest
+compact
+stats
+put sku:1070 valve-aaaaaaaaaaaaa:qty=210
+put sku:1071 clamp-bbbbbbbbbbbbbb:qty=247
+put sku:1072 bolt-cccccc:qty=284
+put sku:1073 nut-ddddddd:qty=321
+put sku:1074 washer-eeeeeeee:qty=358
+put sku:1075 screw-fffffffff:qty=395
+put sku:1076 bracket-gggggggggg:qty=32
+put sku:1077 hinge-hhhhhhhhhhh:qty=69
+put sku:1078 latch-iiiiiiiiiiii:qty=106
+put sku:1079 spring-jjjjjjjjjjjjj:qty=143
+put sku:1080 gasket-aaaaaaaaaaaaaa:qty=180
+put sku:1081 bearing-bbbbbb:qty=217
+put sku:1082 valve-ccccccc:qty=254
+put sku:1083 clamp-dddddddd:qty=291
+put sku:1084 bolt-eeeeeeeee:qty=328
+put sku:1085 nut-ffffffffff:qty=365
+put sku:1086 washer-ggggggggggg:qty=402
+put sku:1087 screw-hhhhhhhhhhhh:qty=39
+put sku:1088 bracket-iiiiiiiiiiiii:qty=76
+put sku:1089 hinge-jjjjjjjjjjjjjj:qty=113
+put sku:1090 latch-aaaaaa:qty=150
+put sku:1091 spring-bbbbbbb:qty=187
+put sku:1092 gasket-cccccccc:qty=224
+put sku:1093 bearing-ddddddddd:qty=261
+put sku:1094 valve-eeeeeeeeee:qty=298
+get sku:1080
+get sku:1010
+get sku:1070
+digest
+stats

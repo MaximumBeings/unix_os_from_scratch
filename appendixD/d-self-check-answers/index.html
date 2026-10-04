@@ -2161,6 +2161,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part53/53-lsm-key-value-store/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    53. A Log-Structured Merge-Tree Key-Value Store: Write-Ahead Log, Sorted Tables, Bloom Filters, Compaction, and a Crash at Every Byte
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -3402,6 +3430,19 @@
 <p>Worked answer: the year-to-date Medicare wages. The period's Additional Medicare is 0.9% of (wages above $200,000 after this period) minus (wages above $200,000 before it). In employee 5's period 22 the before-figure is 0 and the after-figure is $5,700, so $51.30 is withheld; from period 23 the before-figure is already above the threshold, so the whole $9,350 bears 0.9% ($84.15).</p>
 <p><strong>5. All 55 mutants were caught, yet the tables could still be wrong. Why can no test in this chapter detect a wrong bracket limit that both implementations share, and what outside evidence would?</strong></p>
 <p>Worked answer: the Python reference and the C engine were both given the same table values, so a wrong value is wrong in both and they agree; the hand-worked tests use the same tables too. The tests prove the arithmetic and the year-long behaviour, not the law. Outside evidence is needed: the IRS's own Publication 15-T, or its published worked examples and the output of a certified payroll system, checked against the engine for the same inputs.</p>
+<hr />
+<h2 id="chapter-53-a-log-structured-merge-tree-key-value-store">Chapter 53: A Log-Structured Merge-Tree Key-Value Store<a class="headerlink" href="#chapter-53-a-log-structured-merge-tree-key-value-store" title="Permanent link">&para;</a></h2>
+<p><em>(from <a href="../../part53/53-lsm-key-value-store/">53. A Log-Structured Merge-Tree Key-Value Store</a>)</em></p>
+<p><strong>1. Why does <code>put</code> flush <em>before</em> it appends the log record rather than after inserting in the memtable?</strong></p>
+<p>Worked answer: if the flush came after the append, a flush that fails (or a crash during it) would leave a write whose log record is durable but which <code>put</code> reports as failed, or would make the write's fate depend on the flush. Flushing first means a failed flush changes nothing logical (the memtable's contents are still logged and still in memory) and the new operation has not started; only after the flush has succeeded is the record appended, and only after the append succeeds is the write acknowledged. The contract then needs just two outcomes: the operation is in the log or it is not.</p>
+<p><strong>2. The manifest has two slots and the writer always overwrites the older one. What would go wrong with a single <code>MANIFEST</code> file written in place, and what would go wrong with write-to-temp-then-rename on a file system that cannot rename?</strong></p>
+<p>Worked answer: in place, a crash in the middle of the write leaves a torn manifest, and the store loses the list of its tables (the previous good copy has been destroyed). Write-to-temp-then-rename is the usual fix, but this volume's FAT16 driver has no rename; faking it with delete-then-create has a window with no manifest at all. Two slots, each with a generation number and a CRC, give atomic replacement without rename: the older slot is the only one ever overwritten, so the newer one is always intact, and open picks the highest valid generation.</p>
+<p><strong>3. Why does recovery flush a torn log's replayed records instead of rewriting the log with just its valid prefix?</strong></p>
+<p>Worked answer: the log cannot be appended to after garbage (a later record would be hidden behind the torn one), so it must be reset. Rewriting the valid prefix in place is itself a write that a crash can tear: if it keeps only the first k bytes of the prefix, records that were already acknowledged are lost. Flushing the replayed records writes them to a table and the manifest first (each step is crash-safe), and only then empties the log; if a crash interrupts it, the original log is still intact and recovery simply runs again.</p>
+<p><strong>4. A compaction drops tombstones. Why is that safe at the bottom level but would not be if an older table still existed?</strong></p>
+<p>Worked answer: a tombstone exists to hide older values of the key in older tables. In this store a compaction merges <em>every</em> table into one, so no older table is left for the tombstone to hide, and dropping it (together with the value it covered) is correct. If an older table were left out of the merge, dropping the tombstone would let that table's value reappear, "resurrecting" a deleted key. That is exactly the mutant in the chapter's list that skips tombstones in table reads.</p>
+<p><strong>5. The kernel sweep shows only 1 of 354 crash points landing on "the acknowledged state plus the operation in flight". Why so few, and why is it still correct that the contract allows both?</strong></p>
+<p>Worked answer: an operation costs its bytes plus one unit; it becomes durable when its last data byte is written but is acknowledged only after the final unit. The only crash points that leave the whole record written but unacknowledged are the single unit between those two moments, once per logged operation, and the sweep samples every 7th unit. At every other point the record is either absent or torn (cut off at recovery), so the state equals the acknowledged one. The contract must still allow both because the writer cannot know, after a crash, whether the last byte reached the disk.</p>
 
 
 

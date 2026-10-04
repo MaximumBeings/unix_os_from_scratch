@@ -1,0 +1,20 @@
+-- 1. the FAT16 volume the kernel left
+  ok   files on the disk: MANI0 (32 bytes), MANI1 (37 bytes), T00005.SST (2706 bytes), T00006.SST (1129 bytes), T00007.SST (84 bytes)
+-- 2. the scripted workload: the whole result text, kernel vs the Python store
+  ok   the kernel's block (133 lines: every result code, every value read, both digests and the statistics) equals the Python store's, line for line
+-- 3. the real-disk recovery, replayed in Python, and every file compared
+  ok   recovery on the disk: kernel 'recovery: open ok, replayed 1 log records, cut 21 torn bytes, deleted 1 orphan files' = Python 'recovery: open ok, replayed 1 log records, cut 21 torn bytes, deleted 1 orphan files'
+  ok   the same files exist on the disk and in the Python store's file system: MANI0, MANI1, T00005.SST, T00006.SST, T00007.SST
+  ok   MANI0: 32 bytes, identical to the Python store's file byte for byte
+  ok   MANI1: 37 bytes, identical to the Python store's file byte for byte
+  ok   T00005.SST: 2706 bytes, identical to the Python store's file byte for byte
+  ok   T00006.SST: 1129 bytes, identical to the Python store's file byte for byte
+  ok   T00007.SST: 84 bytes, identical to the Python store's file byte for byte
+-- 4. the files opened FROM THE DISK by the Python store
+  ok   opened by Python straight from the disk image: digest d761354090dc78ef... over 88 keys = the kernel's
+-- 5. the crash sweep, re-run in Python
+  ok   the workload: 34 puts and deletes, cost 2473, 5 flushes, 1 compactions: same in the kernel and in Python
+  ok   354 crash points: 353 recovered to the acknowledged state, 1 to the state including the operation in flight, 0 failures, 142 torn log tails, 203 orphan deletions: every figure equal
+  ok   final tally: 133 scripted commands, 1 disk recovery, 354 crash points swept, 0 failures
+
+ALL CHECKS PASSED

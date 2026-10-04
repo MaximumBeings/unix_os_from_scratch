@@ -1,0 +1,45 @@
+== 1. the store, worked by hand ==
+== 1. CRC-32 and the exact bytes of the WAL ==
+== 2. the exact bytes of a table ==
+== 3. reads, overwrites, deletes ==
+== 4. when the memtable and the log flush ==
+== 5. Bloom filters and key ranges ==
+     (measured: 10 false positives in 1000 probes)
+== 6. refusals ==
+== 7. recovery ==
+== 8. the digest ==
+== 9. the table size limit ==
+== 10. memtable and log limits at the exact boundary ==
+== 11. table and store limits at the exact boundary ==
+== 12. a compaction that leaves nothing ==
+== 13. crafted files whose checksums are VALID (so only the structural checks can catch them) ==
+72 passed, 0 failed
+72 lines PASS
+
+== 2. 60 random scripts with crashes at random bytes: C vs the independent Python store, every result and every byte of every file ==
+  ... with a torn log tail cut: 58
+  ... with orphan files deleted: 221
+  commands: 33269
+  compactions: 911
+  crash recoveries: 377
+  flushes: 1090
+  reads of a missing or deleted key: 880
+  reads that found a value: 1723
+  scripts: 60
+  writes refused after the crash: 5140
+60 scripts, 0 differences
+
+== 3. the crash test: a crash at EVERY byte of a 120-operation workload, and again at every byte of recovery for every 40th ==
+workload: 120 operations (107 puts/deletes), cost 13638 units, 7 flushes, 4 compactions; crash points tried: every 1-th of 0..13638
+13639 crash points: 13544 recovered to the state after the acknowledged operations, 95 to the state including the one in flight, 0 failures
+  of them 4511 had a torn log tail cut, 8899 had orphan table files deleted
+65162 second crashes during recovery, 0 failures
+
+== 4. a second workload (seed 21, 300 operations, every 11th byte; every 3rd of those also crashed during recovery) ==
+workload: 300 operations (263 puts/deletes), cost 33536 units, 27 flushes, 9 compactions; crash points tried: every 11-th of 0..33536
+3049 crash points: 3030 recovered to the state after the acknowledged operations, 19 to the state including the one in flight, 0 failures
+  of them 902 had a torn log tail cut, 2095 had orphan table files deleted
+171375 second crashes during recovery, 0 failures
+
+== 5. random operations against a model, with byte flips ==
+36000 random calls in 12 runs (675 refused as intended); 372 reopens; 97 table byte flips (97 detected); 69 log byte flips (69 recovered to a state the model really had); failures: 0
