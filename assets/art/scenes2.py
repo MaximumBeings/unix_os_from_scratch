@@ -126,3 +126,15 @@ def sC(s):  # appendix C: C code
 def sD(s):  # appendix D: answers
     for k in range(3): y = 60 + k * 68; s.circ(130, y + 22, 24, s.acc, s.dark, 3); s.path(f"M{118},{y + 22} l9,10 l16,-20", stroke=s.dark, sw=6); s.rect(180, y, 440, 44, s.dark, s.main, 2, 6); s.line(196, y + 22, 560 - k * 50, y + 22, s.light, 3, op=.6)
     s.text(400, 275, "Q  →  A", 20, s.main, bold=True)
+def hero(s):  # landing page: the whole stack, from silicon up to the applied chapters
+    s.rect(60, 232, 680, 42, s.dark, s.main, 3, 6); s.text(400, 260, "hardware: CPU · RAM · disk · network card", 16, s.main)
+    s.chip(90, 162, 56, "CPU"); s.rect(166, 168, 60, 44, "#0e3b2e", s.light, 2); s.text(196, 195, "RAM", 13, s.light); s.circ(262, 190, 24, "#1b1f27", s.light, 3); s.circ(262, 190, 5, s.light); s.rect(306, 170, 66, 40, "#0e3b2e", s.acc, 2); s.text(339, 195, "NIC", 13, s.acc, bold=True)
+    s.rect(60, 112, 330, 42, s.main, s.dark, 3, 6); s.text(225, 139, "KERNEL: paging · tasks · FAT16 · TCP/IP", 12, s.dark, bold=True)
+    s.rect(60, 58, 330, 40, s.acc, s.dark, 3, 6); s.text(225, 84, "boot: GRUB -> _start -> kmain", 13, s.dark, bold=True)
+    s.bank(470, 40, .62); s.rect(580, 52, 64, 100, s.dark, s.light, 2, 6); s.rect(588, 62, 48, 26, "#06222f", s.main, 1.5, 2); s.text(612, 80, "ATM", 11, s.acc, bold=True)
+    for r in range(3):
+        for c in range(3): s.rect(590 + c * 15, 96 + r * 14, 12, 10, s.light, None, 0, 2)
+    s.path("M672,70 a42,34 0 0 1 84,0 z", s.acc, s.dark, 2); s.line(714, 70, 714, 112, s.light, 3)
+    s.poly([(500, 190), (480, 205), (500, 200), (520, 205)], s.light, s.dark, 2); s.line(500, 176, 500, 214, s.light, 6); s.line(482, 192, 518, 192, s.light, 6)
+    s.packet(540, 176, 100, 34, "IP", s.main); s.coin(690, 195, 20); s.arrow(400, 135, 460, 135, s.light, 3); s.arrow(400, 200, 470, 200, s.light, 2)
+    s.text(400, 30, "Unix OS from Scratch", 22, s.light, bold=True)

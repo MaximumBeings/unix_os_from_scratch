@@ -18,4 +18,13 @@ for md in sorted(glob.glob(os.path.join(root, "part*", "*.md"))):
     m = re.match(r"(\d+)-", os.path.basename(md))
     if m: n += add(md, f"ch-{int(m.group(1)):02d}")
 for L in "abcd": n += add(glob.glob(os.path.join(root, "appendix" + L.upper(), "*.md"))[0], "appx-" + L)
+# the landing page and Getting Started sit directly under docs/, so their relative path has no "../"
+for md, name in ((os.path.join(root, "index.md"), "hero"), (os.path.join(root, "getting-started.md"), "start")):
+    text = open(md, newline="").read(); svg = os.path.join(root, "assets", "art", name + ".svg"); a = alt(svg)
+    if "assets/art/" in text:
+        new = re.sub(r"!\[[^\]]*\]\(([./]*assets/art/" + name + r"\.svg)\)", lambda m: f"![{a}]({m.group(1)})", text)
+        if new != text: open(md, "w", newline="").write(new)
+        continue
+    lines = text.split("\n"); i = next(k for k, l in enumerate(lines) if l.startswith("# "))
+    lines[i + 1:i + 1] = ["", f"![{a}](assets/art/{name}.svg){STYLE}"]; open(md, "w", newline="").write("\n".join(lines)); n += 1
 print("added to", n, "pages")

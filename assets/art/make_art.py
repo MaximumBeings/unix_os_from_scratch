@@ -5,7 +5,7 @@ import os, sys
 here = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, here)
 from lib import Svg
 import scenes1, scenes2
-S = {**{f"s{n:02d}": getattr(scenes1, f"s{n:02d}") for n in range(1, 24)}, **{f"s{n:02d}": getattr(scenes2, f"s{n:02d}") for n in range(24, 47)}, **{k: getattr(scenes2, k) for k in ("sA", "sB", "sC", "sD")}}
+S = {"hero": scenes2.hero, **{f"s{n:02d}": getattr(scenes1, f"s{n:02d}") for n in range(1, 24)}, **{f"s{n:02d}": getattr(scenes2, f"s{n:02d}") for n in range(24, 47)}, **{k: getattr(scenes2, k) for k in ("sA", "sB", "sC", "sD")}}
 # (palette, alt text) per chapter
 CH = {
  1: ("hw", "A power button, a bootloader and a CPU: booting a Multiboot2 kernel"), 2: ("screen", "A text-mode monitor with coloured character cells at address 0xB8000"),
@@ -28,6 +28,9 @@ CH = {
 APPX = {"a": ("ref", "sA", "x86 registers, assembly instructions and the machine code they become"), "b": ("ref", "sB", "A Unix terminal with a pipeline and a build command"),
         "c": ("ref", "sC", "C source code between large curly braces"), "d": ("ref", "sD", "Check marks beside question and answer boxes")}
 n = 0
+for name, pal, fn, alt in (("hero", "hw", "hero", "A layered stack from hardware and boot code through the kernel up to a bank, an ATM, an umbrella and an airplane: a kernel built from nothing, and the applications on it"),
+                           ("start", "ref", "sB", "A terminal with a build command: getting started")):
+    s = Svg(pal, alt); S[fn](s); open(os.path.join(here, name + ".svg"), "w").write(s.svg()); n += 1
 for k, (pal, alt) in CH.items():
     s = Svg(pal, alt); S[f"s{k:02d}"](s); open(os.path.join(here, f"ch-{k:02d}.svg"), "w").write(s.svg()); n += 1
 for L, (pal, fn, alt) in APPX.items():
