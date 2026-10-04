@@ -1,0 +1,60 @@
+Unix OS from Scratch -- Chapter 52: kernel entry reached
+Multiboot2 magic confirmed in EAX: 0x36d76289
+Multiboot2 memory map: 7 real entries, 24 bytes each
+
+[... 2,554 lines of Chapters 8-51's own demos elided: this chapter's demo follows from its first line to its last ...]
+
+Starting this chapter's own payroll demo (federal income tax and FICA for an invented company's year of pay)...
+fat16_format: writing real boot sector/BPB to LBA 0...
+fat16_format: zeroing 128 real FAT sectors (2 copies)...
+fat16_format: zeroing 32 real root directory sectors...
+fat16_format: done -- real FAT16 volume written to disk
+fat16_init: real volume "UNIXOSFAT16" -- 512 bytes/sector, 1 sector(s)/cluster, 2 FAT(s) * 64 sectors, root dir 32 sectors (first at LBA 129), data starts LBA 161, 16223 usable clusters
+A fresh FAT16 volume was formatted to hold the payroll register.
+These tables are the 2025 percentage-method rules as the author read them; they were NOT checked against the IRS's own publication. Nothing here is tax advice.
+
+== Part 1. Key pay periods (amounts in dollars; FIT = federal income tax withheld, SS = Social Security, MED = Medicare, ADD = Additional Medicare)
+  employee 1 period 1: gross $2,000.00  FIT $161.60  SS $124.00  MED $29.00  ADD $0.00  -> net $1,685.40   (year-to-date SS wages $2,000.00)
+  employee 2 period 1: gross $8,000.00  FIT $208.92  SS $480.50  MED $112.38  ADD $0.00  -> net $6,548.20   (year-to-date SS wages $7,750.00)
+  employee 3 period 1: gross $1,000.00  FIT $28.08  SS $62.00  MED $14.50  ADD $0.00  -> net $895.42   (year-to-date SS wages $1,000.00)
+  employee 4 period 1: gross $3,500.00  FIT $573.98  SS $217.00  MED $50.75  ADD $0.00  -> net $2,483.27   (year-to-date SS wages $3,500.00)
+  employee 5 period 1: gross $9,500.00  FIT $1,742.79  SS $579.70  MED $135.58  ADD $0.00  -> net $6,321.93   (year-to-date SS wages $9,350.00)
+  employee 5 period 19: gross $9,500.00  FIT $1,742.79  SS $483.60  MED $135.58  ADD $0.00  -> net $6,418.03   (year-to-date SS wages $176,100.00)
+  employee 5 period 22: gross $9,500.00  FIT $1,742.79  SS $0.00  MED $135.58  ADD $51.30  -> net $6,850.33   (year-to-date SS wages $176,100.00)
+  employee 5 period 23: gross $9,500.00  FIT $1,742.79  SS $0.00  MED $135.58  ADD $84.15  -> net $6,817.48   (year-to-date SS wages $176,100.00)
+  employee 5 period 24: gross $9,500.00  FIT $1,742.79  SS $0.00  MED $135.58  ADD $84.15  -> net $6,817.48   (year-to-date SS wages $176,100.00)
+  employee 5 period 25: gross $9,500.00  FIT $1,742.79  SS $0.00  MED $135.58  ADD $84.15  -> net $6,817.48   (year-to-date SS wages $176,100.00)
+  employee 6 period 1: gross $500.00  FIT $0.00  SS $31.00  MED $7.25  ADD $0.00  -> net $461.75   (year-to-date SS wages $500.00)
+
+== Part 2. The year, per employee (sums of every pay period)
+  employee 1 (26 pay periods): gross $52,000.00, income tax $4,201.60, Social Security $3,224.00, Medicare $754.00, Additional Medicare $0.00, 401(k)+Section 125 $0.00, net $43,820.40; employer's FICA $3,224.00 + $754.00
+  employee 2 (12 pay periods): gross $96,000.00, income tax $2,507.04, Social Security $5,766.00, Medicare $1,348.56, Additional Medicare $0.00, 401(k)+Section 125 $7,800.00, net $78,578.40; employer's FICA $5,766.00 + $1,348.56
+  employee 3 (52 pay periods): gross $52,000.00, income tax $1,460.16, Social Security $3,224.00, Medicare $754.00, Additional Medicare $0.00, 401(k)+Section 125 $0.00, net $46,561.84; employer's FICA $3,224.00 + $754.00
+  employee 4 (24 pay periods): gross $84,000.00, income tax $13,775.52, Social Security $5,208.00, Medicare $1,218.00, Additional Medicare $0.00, 401(k)+Section 125 $4,200.00, net $59,598.48; employer's FICA $5,208.00 + $1,218.00
+  employee 5 (26 pay periods): gross $247,000.00, income tax $45,312.54, Social Security $10,918.20, Medicare $3,525.08, Additional Medicare $387.90, 401(k)+Section 125 $18,720.00, net $168,136.28; employer's FICA $10,918.20 + $3,525.08
+  employee 6 (26 pay periods): gross $13,000.00, income tax $0.00, Social Security $806.00, Medicare $188.50, Additional Medicare $0.00, 401(k)+Section 125 $0.00, net $12,005.50; employer's FICA $806.00 + $188.50
+  employee 5's Social Security total is exactly the maximum, 6.2% of the $176,100.00 wage base = $10,918.20: YES
+
+== Part 3. The register: 166 lines, written to the FAT16 disk as PAYROLL.REG, read back, and every line audited from its own numbers
+@@PAY REGISTER BEGIN
+pay 1 1 ok 200000 200000 16160 12400 2900 0 168540 12400 2900 | ytd 200000 12400 200000
+pay 2 1 ok 200000 200000 16160 12400 2900 0 168540 12400 2900 | ytd 400000 24800 400000
+pay 3 1 ok 200000 200000 16160 12400 2900 0 168540 12400 2900 | ytd 600000 37200 600000
+pay 4 1 ok 200000 200000 16160 12400 2900 0 168540 12400 2900 | ytd 800000 49600 800000
+[... 162 more register lines elided ...]
+@@PAY REGISTER END
+fat16_create_file: "PAYROLL.REG" -- 14803 bytes, 29 cluster(s), first cluster 2
+fat16_read_file: "PAYROLL.REG" -- 14803 bytes read
+  PAYROLL.REG: 14803 bytes, read back identical: YES
+  audited 166 lines: 166 consistent, 0 not
+
+== Part 4. Five refused inputs (each must be refused, with the reason, and change nothing) and one tampered register line
+  filing status 3: filing status is not S, MFJ or HOH
+  7 pay periods a year: pay periods per year must be 52, 26, 24 or 12
+  a negative gross pay of -$1.00: an amount is negative or above $1,000,000,000
+  a 401(k) deferral of $2,500 on gross pay of $2,000: deductions exceed gross pay
+  a gross pay of $1,000,000,001: an amount is negative or above $1,000,000,000
+  the year-to-date after all five refusals is unchanged: YES
+  the first register line with the last digit of its net pay changed (0 -> 1): net $1,685.41, but gross minus every withholding is $1,685.40 -> TAMPERING DETECTED
+
+Chapter 52 payroll demo complete: 166 pay periods computed, 0 refused, 166 register lines audited, 6 attacks detected

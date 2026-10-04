@@ -1,0 +1,59 @@
+NOTE: this script deliberately breaks copies of the chapter's sources. 'caught' lines are EXPECTED: they show the tests can detect the mistake.
+baseline (nothing broken): all tests pass (expected)
+rounding: half rounds down instead of up: caught by pay_test, random companies vs the Python reference
+rounding: truncation instead of rounding: caught by pay_test, random companies vs the Python reference
+an unknown filing status 3 is accepted: caught by pay_test, random companies vs the Python reference
+7 pay periods a year is accepted: caught by pay_test, random companies vs the Python reference
+12 pay periods is refused: caught by pay_test, random companies vs the Python reference
+single: first bracket limit is $11,925 -> $11,926: caught by pay_test, random companies vs the Python reference
+single: 37% bracket starts at the wrong figure: caught by pay_test, random companies vs the Python reference
+MFJ: second limit wrong: caught by random companies vs the Python reference
+MFJ: 35% limit wrong: caught by random companies vs the Python reference
+HOH: first limit wrong: caught by pay_test, random companies vs the Python reference
+HOH: 24% limit wrong: caught by random companies vs the Python reference
+rate: the 22% bracket taxed at 23%: caught by pay_test, random companies vs the Python reference
+rate: top bracket 37% taxed at 35%: caught by pay_test, random companies vs the Python reference
+standard deduction: single $15,000 -> $14,600: caught by pay_test, random companies vs the Python reference
+standard deduction: MFJ halved wrongly: caught by pay_test, random companies vs the Python reference
+standard deduction: HOH wrong: caught by pay_test, random companies vs the Python reference
+bracket arithmetic: the tax on a bracket uses the next rate: caught by pay_test, random companies vs the Python reference
+Step 2 box: standard deduction not halved: caught by pay_test, random companies vs the Python reference
+Step 2 box: bracket limits not halved: caught by pay_test, random companies vs the Python reference
+annualization uses 52 periods always: caught by pay_test, random companies vs the Python reference
+annual tax divided by 52 not the real periods: caught by pay_test, random companies vs the Python reference
+other income is subtracted: caught by pay_test, random companies vs the Python reference
+deductions (Step 4b) are added: caught by pay_test, random companies vs the Python reference
+credits are ignored: caught by pay_test, random companies vs the Python reference
+a credit can drive the tax negative: caught by pay_test, random companies vs the Python reference, fuzz
+extra withholding is not added: caught by pay_test, random companies vs the Python reference, fuzz
+401(k) is not taken out of income-tax wages: caught by pay_test, random companies vs the Python reference
+Section 125 is not taken out of income-tax wages: caught by pay_test, random companies vs the Python reference
+401(k) wrongly reduces FICA wages: caught by pay_test, random companies vs the Python reference
+Section 125 does not reduce FICA wages: caught by pay_test, random companies vs the Python reference
+Social Security rate 6.2% -> 6.0%: caught by pay_test, random companies vs the Python reference
+wage base $176,100 -> $168,600: caught by pay_test, random companies vs the Python reference
+wage base cap ignored (room not limited): caught by pay_test, random companies vs the Python reference, fuzz
+the maximum-tax cap is not applied: caught by pay_test, random companies vs the Python reference, fuzz
+Social Security wages in the year-to-date count uncapped wages: caught by pay_test, random companies vs the Python reference, fuzz
+Social Security rounding is done on the year not the period (tax_room off by one): caught by pay_test, random companies vs the Python reference
+Medicare rate 1.45% -> 1.5%: caught by pay_test, random companies vs the Python reference
+Additional Medicare threshold $200,000 -> $250,000: caught by pay_test, random companies vs the Python reference, fuzz
+Additional Medicare rate 0.9% -> 1.45%: caught by pay_test, random companies vs the Python reference, fuzz
+Additional Medicare charged on the whole period once over: caught by pay_test, random companies vs the Python reference, fuzz
+Additional Medicare ignores earlier wages (before=0): caught by pay_test, random companies vs the Python reference, fuzz
+the employer also pays Additional Medicare (er_med includes it): caught by pay_test, random companies vs the Python reference, fuzz
+employer's Social Security share differs: caught by pay_test, random companies vs the Python reference, fuzz
+net pay forgets the 401(k): caught by pay_test, random companies vs the Python reference
+net pay forgets Additional Medicare: caught by pay_test, random companies vs the Python reference
+deductions equal to gross are refused: caught by pay_test, random companies vs the Python reference
+a negative amount is accepted: caught by pay_test, random companies vs the Python reference
+an amount of exactly the maximum is refused: caught by pay_test, random companies vs the Python reference
+the loop over amounts skips extra withholding (index 3): caught by pay_test
+the loop over amounts skips the section 125 amount (index 6): caught by pay_test
+a negative year-to-date is accepted: caught by pay_test
+a refused withholding still updates the year-to-date: caught by random companies vs the Python reference, fuzz
+the year-to-date Medicare wages are not advanced: caught by pay_test, random companies vs the Python reference, fuzz
+pay_check: a negative net is allowed: caught by pay_test, random companies vs the Python reference
+reference: Additional Medicare threshold wrong (the oracle itself broken): caught by random companies vs the Python reference
+
+55 of 55 broken versions caught

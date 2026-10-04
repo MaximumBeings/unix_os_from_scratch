@@ -1,0 +1,24 @@
+-- 1. the FAT16 volume the kernel wrote
+  ok   files on the disk: PAYROLL.REG (14803 bytes)
+-- 2. the whole year, kernel vs the Python reference
+  ok   the kernel's register block (166 lines, every cent of every withholding and the year-to-date) equals the Python reference's, line for line
+  ok   PAYROLL.REG on the disk equals the Python reference's output, byte for byte
+-- 3. the year totals, re-added from the register
+  ok   employee 1: 26 periods, income tax $4,201.60, SS $3,224.00, Medicare $754.00, Additional Medicare $0.00, net $43,820.40
+  ok   employee 2: 12 periods, income tax $2,507.04, SS $5,766.00, Medicare $1,348.56, Additional Medicare $0.00, net $78,578.40
+  ok   employee 3: 52 periods, income tax $1,460.16, SS $3,224.00, Medicare $754.00, Additional Medicare $0.00, net $46,561.84
+  ok   employee 4: 24 periods, income tax $13,775.52, SS $5,208.00, Medicare $1,218.00, Additional Medicare $0.00, net $59,598.48
+  ok   employee 5: 26 periods, income tax $45,312.54, SS $10,918.20, Medicare $3,525.08, Additional Medicare $387.90, net $168,136.28
+  ok   employee 6: 26 periods, income tax $0.00, SS $806.00, Medicare $188.50, Additional Medicare $0.00, net $12,005.50
+-- 4. the Social Security cap
+  ok   employee 5's Social Security total is 1091820 cents = 6.2% of $176,100 = 1091820
+  ok   no employee's Social Security exceeds the cap
+-- 5. the refusals, the tampered line and the tally
+  ok   refusal printed: filing status is not S, MFJ or HOH
+  ok   refusal printed: pay periods per year must be 52, 26, 24 or 12
+  ok   refusal printed: an amount is negative or above
+  ok   refusal printed: deductions exceed gross pay
+  ok   first line: net $1,685.40 equals gross minus withholdings; the kernel caught net $1,685.41
+  ok   final tally: 166 pay periods computed, 0 refused, 166 lines audited, 6 attacks detected
+
+ALL CHECKS PASSED

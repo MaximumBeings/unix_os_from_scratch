@@ -232,3 +232,16 @@ def s51(s):  # limit order book: bids stacked green on the left, asks red on the
     for k, (t, c) in enumerate((("A  add order", s.main), ("E  executed", s.acc), ("X  reduce", s.light), ("D  delete", s.light), ("U  replace", s.light))):
         s.text(596, 116 + k * 28, t, 13, c, "start", bold=True)
     s.text(675, 276, "rebuild the book from it", 11, s.light, op=.85)
+
+
+def s52(s):  # a pay stub: gross at the top, withholdings carved out, net at the bottom; a Social Security wage-base bar that fills and stops
+    s.rect(70, 36, 330, 250, s.light, s.dark, 3, 10); s.text(235, 62, "PAY STUB", 15, s.dark, bold=True)
+    rows = (("Gross pay", "2,000.00", s.dark), ("Federal income tax", "- 161.60", s.acc), ("Social Security 6.2%", "- 124.00", s.acc), ("Medicare 1.45%", "- 29.00", s.acc))
+    for k, (a, b, c) in enumerate(rows):
+        y = 94 + k * 30; s.text(88, y, a, 13, c, "start", bold=True); s.text(384, y, b, 13, c, "end", bold=True)
+    s.path("M86,198 L384,198", stroke=s.dark, sw=2); s.rect(86, 214, 298, 50, s.main, s.dark, 3, 8); s.text(100, 246, "NET PAY", 15, s.dark, "start", bold=True); s.text(370, 246, "1,685.40", 17, s.dark, "end", bold=True)
+    s.text(600, 52, "Social Security wage base", 13, s.light, bold=True); s.rect(450, 74, 300, 34, "#0a1207", s.light, 2, 6)
+    s.rect(450, 74, 240, 34, s.main, s.dark, 2, 6); s.path("M690,64 L690,120", stroke=s.acc, sw=3); s.text(690, 140, "$176,100: tax stops here", 12, s.acc, bold=True)
+    for k, (a, c) in enumerate((("period 1-22: 6.2% each pay", s.main), ("period 23: only the last dollars", s.light), ("period 24+: Social Security $0", s.acc))):
+        s.text(450, 190 + k * 26, a, 12, c, "start", bold=True)
+    s.text(600, 280, "Additional Medicare 0.9% above $200,000", 11, s.light, op=.9)

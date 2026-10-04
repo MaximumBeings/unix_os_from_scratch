@@ -1,0 +1,35 @@
+== 1. the engine, worked by hand ==
+== 1. the bracket schedule alone ==
+
+== 2. one pay period, worked by hand ==
+
+== 3. pre-tax deductions: 401(k) leaves FICA wages alone, Section 125 reduces both ==
+
+== 4. rounding: one rule, half up, once per quantity ==
+
+== 5. the Social Security wage base, across pay periods ==
+
+== 6. Additional Medicare: 0.9% of Medicare wages above $200,000, employee only ==
+
+== 7. refusals change nothing ==
+
+== 8. a whole year, single, biweekly $8,000: the cap and the threshold arrive in the right pay periods ==
+
+42 passed, 0 failed
+42 lines PASS
+
+== 2. 60 random companies: C vs the independent Python reference, every cent ==
+  ... accepted: 4062
+  ... past the Social Security wage base: 2197
+  ... refused (amount): 276
+  ... refused (deduct): 466
+  ... refused (periods): 20
+  ... refused (status): 72
+  ... refused (unknown): 87
+  ... with Additional Medicare: 2238
+  companies: 60
+  pay lines: 4983
+60 companies, 0 differences
+
+== 3. random pay periods (ordinary and extreme values), invariants after every call ==
+85080 random pay periods in 3000 years (79517 accepted, 5563 refused); failures: 0
