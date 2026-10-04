@@ -175,3 +175,26 @@ def s48(s):  # SEC EDGAR: a 10-K filing, its XBRL tags, and the ratios computed 
     for k, (t, w) in enumerate((("current 0.99x", 118), ("gross 44.13%", 112), ("net 25.31%", 100), ("ROE 171.95%", 124))):
         y = 62 + k * 52; s.rect(650, y, w, 30, s.acc if k == 1 else s.main, s.dark, 2, 6, op=.95); s.text(658, y + 20, t, 12, s.dark, "start", bold=True)
 
+def s49(s):  # health-care claims: an 837 claim form in, an adjudication ledger in the middle, an 835 remittance out
+    # the claim (837): a form with a cross and the segments that matter
+    s.poly([(36, 56), (170, 56), (196, 82), (196, 280), (36, 280)], s.light, s.dark, 3); s.poly([(170, 56), (170, 82), (196, 82)], s.main, s.dark, 2)
+    s.rect(52, 74, 30, 30, s.acc, s.dark, 2, 4); s.rect(62, 79, 10, 20, s.light, None, 0, 2); s.rect(57, 84, 20, 10, s.light, None, 0, 2)
+    s.text(138, 94, "837P CLAIM", 13, s.dark, bold=True)
+    for k, t in enumerate(("CLM*PCN-A001*202", "SV1*HC:99213*150", "SV1*HC:85025*40", "SV1*HC:36415*12")):
+        s.text(52, 134 + k * 24, t, 11, s.dark, "start")
+    for k in range(4): s.rect(52, 236 + k * 10, 120 - (k % 2) * 30, 5, s.main, None, 0, 2, op=.7)
+    s.text(116, 294, "ASC X12N 5010", 11, s.light, op=.85)
+    # the adjudication in the middle: allowed amount split into plan, patient and write-off
+    s.path("M200,170 q18,-8 36,0", stroke=s.acc, sw=4); s.poly([(236, 163), (248, 170), (236, 177)], s.acc)
+    s.rect(256, 70, 250, 210, "#041717", s.main, 2, 10, op=.95); s.text(381, 96, "ADJUDICATE", 14, s.light, bold=True)
+    rows = (("charged", "$150.00", s.light), ("CO-45 fee schedule", "$62.00", s.main), ("PR-3 co-pay", "$25.00", s.acc), ("PR-1 deductible", "$63.00", s.acc), ("plan pays", "$0.00", s.light))
+    for k, (a, b, c) in enumerate(rows):
+        y = 126 + k * 24; s.text(272, y, a, 12, c, "start"); s.text(490, y, b, 12, c, "end", bold=True)
+    s.line(270, 236, 492, 236, s.light, 1, op=.6); s.text(272, 262, "150 = plan 0 + patient 88 + CO 62", 11, s.main, "start", bold=True)
+    s.path("M506,170 q18,-8 36,0", stroke=s.acc, sw=4); s.poly([(542, 163), (554, 170), (542, 177)], s.acc)
+    # the remittance (835)
+    s.poly([(560, 56), (694, 56), (720, 82), (720, 280), (560, 280)], s.light, s.dark, 3); s.poly([(694, 56), (694, 82), (720, 82)], s.main, s.dark, 2)
+    s.text(640, 98, "835 REMITTANCE", 13, s.dark, bold=True)
+    for k, t in enumerate(("CLP*PCN-A001*1*202", "SVC*HC:99213*150*0", "CAS*CO*45*62", "CAS*PR*3*25**1*63", "BALANCED")):
+        s.text(574, 134 + k * 24, t, 10, s.dark if k < 4 else s.acc, "start", bold=(k == 4))
+    s.circ(690, 254, 18, s.acc, s.dark, 3); s.path("M680,254 l7,8 l13,-16", stroke=s.dark, sw=4)
