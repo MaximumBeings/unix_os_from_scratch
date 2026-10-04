@@ -1141,3 +1141,29 @@ Worked answer: the maxima are equal, so the earlier bidder, A, leads, and the pr
 **5. Six deliberately broken copies of the code survived the first version of the tests. Why is that more useful than if they had all been caught, and what did "release pays the full total and no fee" teach in particular?**
 
 Worked answer: each survivor pointed at a specific property no test had checked, so each led to a new test that now guards against a whole class of mistakes, not just the one mutant. "Release pays the full total and no fee" is the instructive case: every conservation invariant still held -- the money merely went to the seller instead of being split between seller and platform -- so an invariant checker that only asks "does the ledger sum to zero, is escrow right, is anything negative" could never see it. Conservation is necessary, not sufficient; the test that catches it checks that each release moves *exactly* the fee and the seller's share, to the cent.
+
+---
+
+## Chapter 48: SEC EDGAR Filings and Financial Ratios: Reading XBRL Inside a Kernel, and Refusing Filings That Do Not Add Up
+
+*(from [48. SEC EDGAR Filings and Financial Ratios: Reading XBRL Inside a Kernel, and Refusing Filings That Do Not Add Up](../part48/48-sec-edgar-financial-ratios.md))*
+
+**1. Why does the engine read a unit's `<measure>` instead of trusting the unit's id, and what went wrong in the first attempt?**
+
+Worked answer: the id of a unit is the filer's own label and means nothing to the standard: Apple names its dollar unit `usd`, Microsoft names it `U_USD`, and Microsoft's dollars-per-share unit is `U_UnitedStatesOfAmericaDollarsShare`. The first reference recognised units by the id `usd` and so found no dollar facts at all in Microsoft's filing. What defines a unit is its `<measure>`: `iso4217:USD` for dollars, or a `divide` of `iso4217:USD` by shares for dollars per share (and Apple writes the shares measure as bare `shares` where other filers write `xbrli:shares`, so both are accepted). A fact whose unit is anything else (euros, barrels, a unit that is never defined) is dropped and counted, not guessed at.
+
+**2. A filing's balance sheet does not balance by one dollar. What does the engine print, and why not compute the ratios anyway and flag them?**
+
+Worked answer: it prints `check_assets_eq_liab_plus_equity: FAIL` and the verdict REJECTED, and no ratio at all. A ratio printed next to a warning gets copied without the warning; a filing in which assets do not equal liabilities plus equity has at least one wrong or misread number, and the engine cannot know which, so every ratio built on any balance-sheet figure is suspect. The kernel's first attack changes one digit of Apple's total assets (352,583,000,000 to 352,583,000,001) and shows exactly this. The second check (liabilities plus equity against the total) is only reported, never rejects, because redeemable non-controlling interests legitimately sit outside both.
+
+**3. Why is JPMorgan's current ratio "n/a" rather than 0.00x or an estimate, and which of its ratios do apply?**
+
+Worked answer: a bank's balance sheet is not classified into current and non-current, so JPMorgan's filing has no `AssetsCurrent` or `LiabilitiesCurrent` fact; the ratio has no meaning there, and 0.00x would assert something false (that the bank has no current assets). The engine prints "n/a (missing input)". Gross margin, operating margin, interest coverage and free cash flow are n/a for related reasons (no cost of goods, interest is the raw material of the business, no capital-spending fact in the form the engine reads). What applies is the leverage and profit picture: liabilities are 10.82 times equity (an equity multiplier of 11.82x), net margin is 31.34%, and the return on assets is 1.31% where Apple's is 27.50%, which is what a highly leveraged business looks like.
+
+**4. Work out by hand: net income $1, revenue $20,000. What is the net margin in basis points, and what is it for net income $-1?**
+
+Worked answer: 1 / 20,000 = 0.00005 = 0.5 basis points exactly. The engine rounds half away from zero on the exact fraction, so $1 gives 1 basis point and $-1 gives -1 basis point (rounding half up would give 0 for the negative case, and rounding half to even would give 0 for both). Two unit tests pin the two cases, and the mutant "truncate instead of rounding" and the mutant "lose the sign" are both caught by them.
+
+**5. Name two things the engine cannot detect, and say what would have to be added to detect each.**
+
+Worked answer: (a) a wrong **prior-year** balance sheet: only the current balance sheet is cross-checked, so a wrong prior-year figure flows into return on assets, return on equity and asset turnover unnoticed; detecting it means applying the same identity to the prior balance-sheet date. (b) a **plausible but wrong income-statement figure** (a digit flipped in net income gives a different, still-consistent filing): the engine checks accounting identities, not truth, and only gross profit has an identity to check against; detecting it needs a second source (the same figure in the filing's own cash-flow statement, or the figure as reported by a different tool or a later filing), which is cross-checking against another document, not more rules in this engine.

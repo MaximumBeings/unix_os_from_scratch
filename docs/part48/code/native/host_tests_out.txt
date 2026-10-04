@@ -1,0 +1,60 @@
+== 1. the XBRL reader and the ratio engine: arithmetic, parsers, hand-computed answers, malformed documents ==
+== 1. 64-bit arithmetic against 128-bit reference (no libgcc in the kernel, so division is ours) ==
+
+== 2. dates and numbers ==
+
+== 3. hand-computed answers, one rule at a time ==
+
+== 3b. the formatting helpers the kernel's printout uses ==
+
+== 4. malformed documents: an error code, never a crash, never a silent partial result ==
+
+106 passed, 0 failed
+106 lines PASS
+
+== 2. the six real filings: C engine (the kernel's own source files) vs the independent Python reference, price $100.00 ==
+aapl: C output and Python output IDENTICAL (22 lines)
+ko: C output and Python output IDENTICAL (22 lines)
+nvda: C output and Python output IDENTICAL (22 lines)
+msft: C output and Python output IDENTICAL (22 lines)
+xom: C output and Python output IDENTICAL (22 lines)
+jpm: C output and Python output IDENTICAL (22 lines)
+
+== 3. 3000 random valid filings (gen_docs.py): C engine vs independent Python reference ==
+  ACCEPTED: 2354
+  NA because denominator not positive: 282
+  NA because of overflow: 14
+  NA values (all reasons): 19577
+  REJECTED: 497
+  both refuse the document (no period end, or a duplicated id): 149
+  documents: 3000
+  gross-profit identity FAIL (reported, not rejected): 427
+  rejected: balance sheet does not balance: 330
+  rejected: conflicting duplicate: 182
+  values compared: 20441
+3000 documents, 0 differences
+
+== 4. the EDGAR fetcher against a local server speaking the SEC's JSON shapes ==
+PASS pipeline: ticker -> CIK -> latest 10-K -> instance document -> slim file
+PASS every request carried the User-Agent with the contact address
+PASS exactly 4 requests (tickers, submissions, index, document): no wasted calls
+PASS the file the fetcher wrote is byte-identical to the slim file embedded in the kernel
+PASS User-Agent '' refused (no contact address)
+PASS User-Agent 'Mozilla/5.0' refused (no contact address)
+PASS User-Agent 'justaname' refused (no contact address)
+PASS unknown ticker -> clear error
+PASS no filing of that form -> clear error
+PASS two 429 answers then success: retried with backoff 1s, 2s
+PASS endless 503 -> gives up after exactly 4 attempts (3 sleeps 1,2,4)
+PASS 404 is NOT retried (one attempt, no sleep)
+PASS an HTML error page where JSON was expected is reported, not parsed
+PASS two *_htm.xml files in one filing -> refuses to guess
+PASS an instance document with no financial-statement facts is refused (never slimmed into an empty file)
+PASS rate limiter: 35 back-to-back requests, at most 10 in any one second (limit 10), finished at t=3.00s
+
+16 checks passed, 0 failed
+
+== 5. damaged filings: 5,000 mutations of each of the six real filings, sanitizers on ==
+30000 mutants of 6 real filings; parse results: [ok 5058] [malformed XML 20072] [truncated 4249] [bad date 361] [id too long 158] [not XBRL 2] [duplicate id 100]
+analysed 5058 parsed mutants: 5019 ACCEPTED, 32 REJECTED, 7 refused (no period end / bad date)
+truncations accepted as complete: 0   non-deterministic parses: 0

@@ -22,6 +22,7 @@ PALETTES = {   # (background top, background bottom, main, accent, light, dark)
     "bet":     ("#2a0f0f", "#6b1f1f", "#f87171", "#fcd34d", "#ffecec", "#160707"),
     "car":     ("#1f2937", "#475569", "#38bdf8", "#f97316", "#f1f5f9", "#0f141b"),
     "auction": ("#2a1608", "#6b3a0f", "#fbbf24", "#60a5fa", "#fff3dc", "#170c04"),
+    "edgar":   ("#0a1a2f", "#1d3b63", "#7dd3fc", "#fbbf24", "#eaf4ff", "#050d18"),
     "ref":     ("#1c1917", "#44403c", "#fbbf24", "#a3e635", "#faf5eb", "#0f0d0c"),
 }
 class Svg:

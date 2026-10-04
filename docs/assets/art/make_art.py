@@ -5,7 +5,7 @@ import os, sys
 here = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, here)
 from lib import Svg
 import scenes1, scenes2
-S = {"hero": scenes2.hero, **{f"s{n:02d}": getattr(scenes1, f"s{n:02d}") for n in range(1, 24)}, **{f"s{n:02d}": getattr(scenes2, f"s{n:02d}") for n in range(24, 48)}, **{k: getattr(scenes2, k) for k in ("sA", "sB", "sC", "sD")}}
+S = {"hero": scenes2.hero, **{f"s{n:02d}": getattr(scenes1, f"s{n:02d}") for n in range(1, 24)}, **{f"s{n:02d}": getattr(scenes2, f"s{n:02d}") for n in range(24, 49)}, **{k: getattr(scenes2, k) for k in ("sA", "sB", "sC", "sD")}}
 # (palette, alt text) per chapter
 CH = {
  1: ("hw", "A power button, a bootloader and a CPU: booting a Multiboot2 kernel"), 2: ("screen", "A text-mode monitor with coloured character cells at address 0xB8000"),
@@ -24,6 +24,7 @@ CH = {
  37: ("media", "A video player and the segments of an adaptive stream"), 38: ("atm", "A cash machine with a PIN pad dispensing banknotes"), 39: ("atm", "A card terminal and an EMV chip card"),
  40: ("bank", "An invoice and a monthly billing calendar"), 41: ("travel", "An airplane on a route between two airports with competing fares"), 42: ("sport", "A match ticket with a barcode and a rotating code"),
  43: ("bet", "A betting odds board and casino chips"), 44: ("car", "A rental car and its key"), 45: ("net", "An IP header, an ICMP echo and ping ripples"), 46: ("irq", "Five numbered doors: gates installed in the interrupt descriptor table"),
+ 48: ("edgar", "A Form 10-K filing, the XBRL tags read from it, a balance scale of assets against liabilities plus equity, and the ratios computed from it"),
  47: ("auction", "A lamp on a pedestal, an auctioneer's gavel, a ladder of rising bids and a SOLD stamp: an eBay-style auction"),
 }
 APPX = {"a": ("ref", "sA", "x86 registers, assembly instructions and the machine code they become"), "b": ("ref", "sB", "A Unix terminal with a pipeline and a build command"),

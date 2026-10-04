@@ -1,0 +1,367 @@
+Unix OS from Scratch -- Chapter 48: kernel entry reached
+Multiboot2 magic confirmed in EAX: 0x36d76289
+Multiboot2 memory map: 7 real entries, 24 bytes each
+
+[... 1,317 lines of Chapters 8-47's own demos elided: this chapter's demo follows from its first line to its last ...]
+
+Starting this chapter's own EDGAR demo (six real SEC 10-K filings, XBRL parsed and ratios computed inside the kernel)...
+fat16_format: writing real boot sector/BPB to LBA 0...
+fat16_format: zeroing 128 real FAT sectors (2 copies)...
+fat16_format: zeroing 32 real root directory sectors...
+fat16_format: done -- real FAT16 volume written to disk
+fat16_init: real volume "UNIXOSFAT16" -- 512 bytes/sector, 1 sector(s)/cluster, 2 FAT(s) * 64 sectors, root dir 32 sectors (first at LBA 129), data starts LBA 161, 16223 usable clusters
+A fresh FAT16 volume was formatted to hold one report file per filing.
+Every P/E below uses an ILLUSTRATIVE price of $100.00 for every company -- a filing contains no share price, so the price is an input, not data.
+
+== AAPL -- Apple Inc. -- Form 10-K filed 2023-11-03, accession 0000320193-23-000106 (76789 bytes of XBRL in the kernel image)
+   https://www.sec.gov/Archives/edgar/data/320193/0000320193-23-000106-index.html
+  [AAPL] read 218 facts, 93 contexts, 2 units (0 facts dropped for a bad unit or number, 0 naming an unknown context); fiscal year ends 2023-09-30;
+    dimension-free contexts matched: 1 for the fiscal year, 1 for the balance-sheet date, 1 for the prior balance-sheet date
+    check_assets_eq_liab_plus_equity: PASS
+    check_liabilities_plus_equity: PASS
+    check_gross_profit: PASS
+    check_conflicting_duplicates: PASS
+    verdict: ACCEPTED
+    current_ratio  0.99x
+    quick_ratio  0.63x
+    cash_ratio  0.42x
+    liabilities_to_equity  4.67x
+    liabilities_to_assets  82.37%
+    equity_multiplier  5.67x
+    interest_coverage  29.06x
+    gross_margin  44.13%
+    operating_margin  29.82%
+    net_margin  25.31%
+    return_on_assets  27.50%
+    return_on_equity  171.95%
+    asset_turnover  1.09x
+    free_cash_flow  $99,584,000,000
+    fcf_margin  25.98%
+    eps_diluted_reported  $6.1300
+    price_to_earnings  16.31x
+fat16_create_file: "AAPL.RPT" -- 551 bytes, 2 cluster(s), first cluster 2
+fat16_read_file: "AAPL.RPT" -- 551 bytes read
+    report written to the FAT16 disk as AAPL.RPT (551 bytes), read back identical: YES
+@@CANON AAPL BEGIN
+check_assets_eq_liab_plus_equity PASS
+check_liabilities_plus_equity PASS
+check_gross_profit PASS
+check_conflicting_duplicates PASS
+verdict ACCEPTED
+current_ratio 99 x
+quick_ratio 63 x
+cash_ratio 42 x
+liabilities_to_equity 467 x
+liabilities_to_assets 8237 bp
+equity_multiplier 567 x
+interest_coverage 2906 x
+gross_margin 4413 bp
+operating_margin 2982 bp
+net_margin 2531 bp
+return_on_assets 2750 bp
+return_on_equity 17195 bp
+asset_turnover 109 x
+free_cash_flow 99584000000 usd
+fcf_margin 2598 bp
+eps_diluted_reported 61300 usd4
+price_to_earnings 1631 x
+@@CANON AAPL END
+
+== KO -- COCA COLA CO -- Form 10-K filed 2024-02-20, accession 0000021344-24-000009 (62429 bytes of XBRL in the kernel image)
+   https://www.sec.gov/Archives/edgar/data/21344/0000021344-24-000009-index.html
+  [KO] read 218 facts, 70 contexts, 2 units (0 facts dropped for a bad unit or number, 0 naming an unknown context); fiscal year ends 2023-12-31;
+    dimension-free contexts matched: 1 for the fiscal year, 1 for the balance-sheet date, 1 for the prior balance-sheet date
+    check_assets_eq_liab_plus_equity: PASS
+    check_liabilities_plus_equity: skipped (an input is missing)
+    check_gross_profit: PASS
+    check_conflicting_duplicates: PASS
+    verdict: ACCEPTED
+    current_ratio  1.13x
+    quick_ratio  0.54x
+    cash_ratio  0.40x
+    liabilities_to_equity  2.71x
+    liabilities_to_assets  71.87%
+    equity_multiplier  3.77x
+    interest_coverage  7.41x
+    gross_margin  59.52%
+    operating_margin  24.72%
+    net_margin  23.42%
+    return_on_assets  11.25%
+    return_on_equity  42.82%
+    asset_turnover  0.48x
+    free_cash_flow  $9,747,000,000
+    fcf_margin  21.30%
+    eps_diluted_reported  $2.4700
+    price_to_earnings  40.49x
+fat16_create_file: "KO.RPT" -- 548 bytes, 2 cluster(s), first cluster 4
+fat16_read_file: "KO.RPT" -- 548 bytes read
+    report written to the FAT16 disk as KO.RPT (548 bytes), read back identical: YES
+@@CANON KO BEGIN
+check_assets_eq_liab_plus_equity PASS
+check_liabilities_plus_equity SKIP
+check_gross_profit PASS
+check_conflicting_duplicates PASS
+verdict ACCEPTED
+current_ratio 113 x
+quick_ratio 54 x
+cash_ratio 40 x
+liabilities_to_equity 271 x
+liabilities_to_assets 7187 bp
+equity_multiplier 377 x
+interest_coverage 741 x
+gross_margin 5952 bp
+operating_margin 2472 bp
+net_margin 2342 bp
+return_on_assets 1125 bp
+return_on_equity 4282 bp
+asset_turnover 48 x
+free_cash_flow 9747000000 usd
+fcf_margin 2130 bp
+eps_diluted_reported 24700 usd4
+price_to_earnings 4049 x
+@@CANON KO END
+
+== NVDA -- NVIDIA CORP -- Form 10-K filed 2026-02-25, accession 0001045810-26-000021 (50880 bytes of XBRL in the kernel image)
+   https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/0001045810-26-000021-index.html
+  [NVDA] read 146 facts, 73 contexts, 2 units (0 facts dropped for a bad unit or number, 0 naming an unknown context); fiscal year ends 2026-01-25;
+    dimension-free contexts matched: 1 for the fiscal year, 1 for the balance-sheet date, 1 for the prior balance-sheet date
+    check_assets_eq_liab_plus_equity: PASS
+    check_liabilities_plus_equity: PASS
+    check_gross_profit: PASS
+    check_conflicting_duplicates: PASS
+    verdict: ACCEPTED
+    current_ratio  3.91x
+    quick_ratio  1.53x
+    cash_ratio  0.33x
+    liabilities_to_equity  0.31x
+    liabilities_to_assets  23.94%
+    equity_multiplier  1.31x
+    interest_coverage  503.42x
+    gross_margin  71.07%
+    operating_margin  60.38%
+    net_margin  55.60%
+    return_on_assets  75.42%
+    return_on_equity  101.49%
+    asset_turnover  1.36x
+    free_cash_flow  $96,676,000,000
+    fcf_margin  44.77%
+    eps_diluted_reported  $4.9000
+    price_to_earnings  20.41x
+fat16_create_file: "NVDA.RPT" -- 553 bytes, 2 cluster(s), first cluster 6
+fat16_read_file: "NVDA.RPT" -- 553 bytes read
+    report written to the FAT16 disk as NVDA.RPT (553 bytes), read back identical: YES
+@@CANON NVDA BEGIN
+check_assets_eq_liab_plus_equity PASS
+check_liabilities_plus_equity PASS
+check_gross_profit PASS
+check_conflicting_duplicates PASS
+verdict ACCEPTED
+current_ratio 391 x
+quick_ratio 153 x
+cash_ratio 33 x
+liabilities_to_equity 31 x
+liabilities_to_assets 2394 bp
+equity_multiplier 131 x
+interest_coverage 50342 x
+gross_margin 7107 bp
+operating_margin 6038 bp
+net_margin 5560 bp
+return_on_assets 7542 bp
+return_on_equity 10149 bp
+asset_turnover 136 x
+free_cash_flow 96676000000 usd
+fcf_margin 4477 bp
+eps_diluted_reported 49000 usd4
+price_to_earnings 2041 x
+@@CANON NVDA END
+
+== MSFT -- MICROSOFT CORP -- Form 10-K filed 2024-07-30, accession 0000950170-24-087843 (124233 bytes of XBRL in the kernel image)
+   https://www.sec.gov/Archives/edgar/data/789019/0000950170-24-087843-index.html
+  [MSFT] read 251 facts, 119 contexts, 2 units (0 facts dropped for a bad unit or number, 0 naming an unknown context); fiscal year ends 2024-06-30;
+    dimension-free contexts matched: 1 for the fiscal year, 1 for the balance-sheet date, 1 for the prior balance-sheet date
+    check_assets_eq_liab_plus_equity: PASS
+    check_liabilities_plus_equity: PASS
+    check_gross_profit: PASS
+    check_conflicting_duplicates: PASS
+    verdict: ACCEPTED
+    current_ratio  1.27x
+    quick_ratio  1.06x
+    cash_ratio  0.60x
+    liabilities_to_equity  0.91x
+    liabilities_to_assets  47.58%
+    equity_multiplier  1.91x
+    interest_coverage  37.29x
+    gross_margin  69.76%
+    operating_margin  44.64%
+    net_margin  35.96%
+    return_on_assets  19.07%
+    return_on_equity  37.13%
+    asset_turnover  0.53x
+    free_cash_flow  $74,071,000,000
+    fcf_margin  30.22%
+    eps_diluted_reported  $11.8000
+    price_to_earnings  8.47x
+fat16_create_file: "MSFT.RPT" -- 550 bytes, 2 cluster(s), first cluster 8
+fat16_read_file: "MSFT.RPT" -- 550 bytes read
+    report written to the FAT16 disk as MSFT.RPT (550 bytes), read back identical: YES
+@@CANON MSFT BEGIN
+check_assets_eq_liab_plus_equity PASS
+check_liabilities_plus_equity PASS
+check_gross_profit PASS
+check_conflicting_duplicates PASS
+verdict ACCEPTED
+current_ratio 127 x
+quick_ratio 106 x
+cash_ratio 60 x
+liabilities_to_equity 91 x
+liabilities_to_assets 4758 bp
+equity_multiplier 191 x
+interest_coverage 3729 x
+gross_margin 6976 bp
+operating_margin 4464 bp
+net_margin 3596 bp
+return_on_assets 1907 bp
+return_on_equity 3713 bp
+asset_turnover 53 x
+free_cash_flow 74071000000 usd
+fcf_margin 3022 bp
+eps_diluted_reported 118000 usd4
+price_to_earnings 847 x
+@@CANON MSFT END
+
+== XOM -- EXXON MOBIL CORP -- Form 10-K filed 2023-02-22, accession 0000034088-23-000020 (231044 bytes of XBRL in the kernel image)
+   https://www.sec.gov/Archives/edgar/data/34088/0000034088-23-000020-index.html
+  [XOM] read 253 facts, 160 contexts, 2 units (0 facts dropped for a bad unit or number, 0 naming an unknown context); fiscal year ends 2022-12-31;
+    dimension-free contexts matched: 1 for the fiscal year, 1 for the balance-sheet date, 1 for the prior balance-sheet date
+    check_assets_eq_liab_plus_equity: PASS
+    check_liabilities_plus_equity: PASS
+    check_gross_profit: skipped (an input is missing)
+    check_conflicting_duplicates: PASS
+    verdict: ACCEPTED
+    current_ratio  1.41x
+    quick_ratio  0.90x
+    cash_ratio  0.43x
+    liabilities_to_equity  0.85x
+    liabilities_to_assets  45.14%
+    equity_multiplier  1.89x
+    interest_coverage  n/a (missing input)
+    gross_margin  n/a (missing input)
+    operating_margin  n/a (missing input)
+    net_margin  13.47%
+    return_on_assets  15.75%
+    return_on_equity  30.66%
+    asset_turnover  1.17x
+    free_cash_flow  $58,390,000,000
+    fcf_margin  14.11%
+    eps_diluted_reported  $13.2600
+    price_to_earnings  7.54x
+fat16_create_file: "XOM.RPT" -- 578 bytes, 2 cluster(s), first cluster 10
+fat16_read_file: "XOM.RPT" -- 578 bytes read
+    report written to the FAT16 disk as XOM.RPT (578 bytes), read back identical: YES
+@@CANON XOM BEGIN
+check_assets_eq_liab_plus_equity PASS
+check_liabilities_plus_equity PASS
+check_gross_profit SKIP
+check_conflicting_duplicates PASS
+verdict ACCEPTED
+current_ratio 141 x
+quick_ratio 90 x
+cash_ratio 43 x
+liabilities_to_equity 85 x
+liabilities_to_assets 4514 bp
+equity_multiplier 189 x
+interest_coverage NA missing input
+gross_margin NA missing input
+operating_margin NA missing input
+net_margin 1347 bp
+return_on_assets 1575 bp
+return_on_equity 3066 bp
+asset_turnover 117 x
+free_cash_flow 58390000000 usd
+fcf_margin 1411 bp
+eps_diluted_reported 132600 usd4
+price_to_earnings 754 x
+@@CANON XOM END
+
+== JPM -- JPMORGAN CHASE & CO -- Form 10-K filed 2024-02-16, accession 0000019617-24-000225 (104109 bytes of XBRL in the kernel image)
+   https://www.sec.gov/Archives/edgar/data/19617/0000019617-24-000225-index.html
+  [JPM] read 265 facts, 153 contexts, 2 units (0 facts dropped for a bad unit or number, 0 naming an unknown context); fiscal year ends 2023-12-31;
+    dimension-free contexts matched: 1 for the fiscal year, 1 for the balance-sheet date, 1 for the prior balance-sheet date
+    check_assets_eq_liab_plus_equity: PASS
+    check_liabilities_plus_equity: PASS
+    check_gross_profit: skipped (an input is missing)
+    check_conflicting_duplicates: PASS
+    verdict: ACCEPTED
+    current_ratio  n/a (missing input)
+    quick_ratio  n/a (missing input)
+    cash_ratio  n/a (missing input)
+    liabilities_to_equity  10.82x
+    liabilities_to_assets  91.54%
+    equity_multiplier  11.82x
+    interest_coverage  n/a (missing input)
+    gross_margin  n/a (missing input)
+    operating_margin  n/a (missing input)
+    net_margin  31.34%
+    return_on_assets  1.31%
+    return_on_equity  15.98%
+    asset_turnover  0.04x
+    free_cash_flow  n/a (missing input)
+    fcf_margin  n/a (missing input)
+    eps_diluted_reported  $16.2300
+    price_to_earnings  6.16x
+fat16_create_file: "JPM.RPT" -- 623 bytes, 2 cluster(s), first cluster 12
+fat16_read_file: "JPM.RPT" -- 623 bytes read
+    report written to the FAT16 disk as JPM.RPT (623 bytes), read back identical: YES
+@@CANON JPM BEGIN
+check_assets_eq_liab_plus_equity PASS
+check_liabilities_plus_equity PASS
+check_gross_profit SKIP
+check_conflicting_duplicates PASS
+verdict ACCEPTED
+current_ratio NA missing input
+quick_ratio NA missing input
+cash_ratio NA missing input
+liabilities_to_equity 1082 x
+liabilities_to_assets 9154 bp
+equity_multiplier 1182 x
+interest_coverage NA missing input
+gross_margin NA missing input
+operating_margin NA missing input
+net_margin 3134 bp
+return_on_assets 131 bp
+return_on_equity 1598 bp
+asset_turnover 4 x
+free_cash_flow NA missing input
+fcf_margin NA missing input
+eps_diluted_reported 162300 usd4
+price_to_earnings 616 x
+@@CANON JPM END
+
+== Four deliberate attacks on the Apple filing. Each must be refused, and each says why.
+
+Attack 1: one digit of total assets changed (found at byte 49809): 352583000000 -> 352583000001
+  [attack 1] read 218 facts, 93 contexts, 2 units (0 facts dropped for a bad unit or number, 0 naming an unknown context); fiscal year ends 2023-09-30;
+    dimension-free contexts matched: 1 for the fiscal year, 1 for the balance-sheet date, 1 for the prior balance-sheet date
+    check_assets_eq_liab_plus_equity: FAIL
+    check_liabilities_plus_equity: PASS
+    check_gross_profit: PASS
+    check_conflicting_duplicates: PASS
+    verdict: REJECTED -- no ratios are computed from a filing that does not balance or contradicts itself
+tick: 1700
+
+Attack 2: a second us-gaap:Assets fact for the same balance-sheet date, value 1, appended before </xbrl>
+  [attack 2] read 219 facts, 93 contexts, 2 units (0 facts dropped for a bad unit or number, 0 naming an unknown context); fiscal year ends 2023-09-30;
+    dimension-free contexts matched: 1 for the fiscal year, 1 for the balance-sheet date, 1 for the prior balance-sheet date
+    check_assets_eq_liab_plus_equity: skipped (an input is missing)
+    check_liabilities_plus_equity: PASS
+    check_gross_profit: PASS
+    check_conflicting_duplicates: FAIL
+    verdict: REJECTED -- no ratios are computed from a filing that does not balance or contradicts itself
+
+Attack 3: the download is cut off after 40,000 of 76789 bytes
+  [attack 3] REFUSED while reading: document ends inside an element (code -2)
+
+Attack 4: an HTML error page where the document should be
+  [attack 4] REFUSED while reading: root element is not <xbrl> (code -10)
+
+Chapter 48 EDGAR demo complete: 6 filings analysed and ACCEPTED, 2 REJECTED, 2 refused while reading, 6 report files written and read back identical

@@ -205,7 +205,7 @@ From the later chapters on, the kernel is made of many files and each chapter's 
 3. **Link** all the objects with `ld -m elf_i386 -T NNN_linker.ld -o kernel.bin ...`.
 4. **Pack** with `grub-mkrescue` and **boot** with `qemu-system-x86_64` as in Steps 4e and 5.
 
-Chapters 46, 47 and 48 ship these steps as scripts in their `code` directory. Using Chapter 47 as the example:
+Chapters 47 and 48 ship these steps as scripts in their `code` directory (earlier chapters show their commands on the page). Using Chapter 47 as the example:
 
 ```bash
 cd docs/part47/code
@@ -260,7 +260,7 @@ Six "ok" lines mean everything works.
 | QEMU prints `Could not access KVM kernel module` | you added `-enable-kvm` | remove it; the book never needs KVM |
 | QEMU prints `gtk initialization failed` or `Could not initialize SDL` | no desktop display | add `-display none` (the book's serial output needs no window) |
 | QEMU starts but nothing is printed | missing `-serial stdio`, or the wrong ISO | copy the Step 5 command exactly |
-| The prompt never comes back | the kernel is idle by design, or a chapter's demo is still running | `Ctrl+C`; prefix the command with `timeout 30` (or longer for Chapters 46-48) |
+| The prompt never comes back | the kernel is idle by design, or a chapter's demo is still running | `Ctrl+C`; prefix the command with `timeout 30` (or longer for Chapters 46-48, whose demos run longer) |
 | `Permission denied` running `./build.sh` | script not marked executable | `chmod +x build.sh run.sh capture.sh` |
 | A chapter's output differs from the page in a number such as an address or a timestamp | those values legitimately change between runs and tool versions | compare the *structure*: the same lines in the same order, and the chapter's own pass/fail markers |
 | Something else | | run the Step 8 health check; the first line that does not print "ok" is where to look |

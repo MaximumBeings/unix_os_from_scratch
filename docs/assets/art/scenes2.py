@@ -153,3 +153,25 @@ def s47(s):  # eBay-style auction: the lamp, a gavel, rising bids, SOLD
         y = 64 + k * 46; s.rect(430, y, w + 40, 34, s.main if k < 3 else s.acc, s.dark, 2, 6, op=.95); s.text(448, y + 23, t, 18, s.dark, "start", bold=True)
         s.text(430 + w + 56, y + 23, "user %d" % (4, 5, 6, 6)[k], 13, s.light, "start", op=.85)
     s.add('<g transform="rotate(-8 693 272)"><rect x="620" y="250" width="146" height="42" rx="6" fill="none" stroke="#f87171" stroke-width="5"/><text x="693" y="281" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="26" font-weight="bold" fill="#f87171" text-anchor="middle">SOLD</text></g>')
+
+def s48(s):  # SEC EDGAR: a 10-K filing, its XBRL tags, and the ratios computed from them (a balance scale and ratio bars)
+    # the filing: a page with a folded corner and the form name
+    s.poly([(40, 60), (150, 60), (176, 86), (176, 270), (40, 270)], s.light, s.dark, 3); s.poly([(150, 60), (150, 86), (176, 86)], s.main, s.dark, 2)
+    s.text(108, 108, "FORM 10-K", 15, s.dark, bold=True); s.text(108, 128, "Apple Inc.", 12, s.dark); s.text(108, 144, "FY ends 2023-09-30", 10, s.dark)
+    for k in range(8): s.rect(58, 160 + k * 13, 100 - (k % 3) * 18, 6, s.main, None, 0, 2, op=.7)
+    s.text(108, 292, "sec.gov / EDGAR", 12, s.light, op=.85)
+    # the XBRL tags the kernel reads out of it
+    s.rect(206, 78, 232, 156, "#050d18", s.main, 2, 8, op=.95)
+    for k, t in enumerate(("<us-gaap:Assets", "  contextRef=\"c-22\"", "  unitRef=\"usd\">", "  352583000000", "</us-gaap:Assets>", "<us-gaap:Liabilities>", "  290437000000")):
+        s.text(220, 102 + k * 20, t, 13, s.acc if k in (0, 4, 5) else s.light, "start")
+    s.path("M178,170 q14,-6 26,0", stroke=s.acc, sw=4); s.poly([(204, 164), (214, 170), (204, 176)], s.acc)
+    s.path("M440,160 q14,-6 26,0", stroke=s.acc, sw=4); s.poly([(466, 154), (476, 160), (466, 166)], s.acc)
+    # the balance scale: assets on the left pan, liabilities + equity on the right
+    s.line(560, 98, 560, 250, s.light, 5); s.rect(520, 250, 80, 12, s.main, s.dark, 2, 3); s.line(500, 98, 620, 98, s.light, 6)
+    for cx, lab in ((500, "Assets"), (620, "L + E")):
+        s.line(cx, 98, cx - 26, 150, s.light, 2); s.line(cx, 98, cx + 26, 150, s.light, 2); s.path(f"M{cx - 30},150 h60 q-6,22 -30,22 q-24,0 -30,-22 z", s.main, s.dark, 3); s.text(cx, 192, lab, 13, s.light)
+    s.text(560, 84, "=", 22, s.acc, bold=True)
+    # the ratios
+    for k, (t, w) in enumerate((("current 0.99x", 118), ("gross 44.13%", 112), ("net 25.31%", 100), ("ROE 171.95%", 124))):
+        y = 62 + k * 52; s.rect(650, y, w, 30, s.acc if k == 1 else s.main, s.dark, 2, 6, op=.95); s.text(658, y + 20, t, 12, s.dark, "start", bold=True)
+
