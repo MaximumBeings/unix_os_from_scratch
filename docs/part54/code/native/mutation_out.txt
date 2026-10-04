@@ -4,3 +4,51 @@ X25519: the scalar's bit 254 is not forced: caught by tls_test, RFC 8448 trace, 
 X25519: the scalar's low bits are not cleared: caught by tls_test, RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
 X25519: wrong a24 constant (0xDB41 -> 0xDB40): caught by tls_test, RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
 X25519: the carry wraps with 37 instead of 38: caught by tls_test, RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
+X25519: multiplication folds with 37 instead of 38: caught by tls_test, RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
+X25519: the inversion exponent skips only bit 2: caught by tls_test, RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
+X25519: the high bit of the peer's point is not masked: caught by tls_test, primitives vs Python cryptography
+X25519: the ladder starts at bit 253: caught by tls_test, RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
+HKDF-Expand: the block counter starts at 2: caught by tls_test, RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
+HKDF-Expand: the previous block is not chained: caught by primitives vs Python cryptography
+HKDF label: prefix 'tls12 ' instead of 'tls13 ': caught by tls_test, RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
+HKDF label: the output length is encoded one too large: caught by tls_test, RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
+HKDF label: the label length byte omits the prefix: caught by tls_test, RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
+HKDF label: the context length byte is always 0: caught by tls_test, RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
+HKDF label: 250-byte labels are accepted: caught by tls_test
+GCM: GHASH reduction constant 0xe1 -> 0xe0: caught by tls_test, RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
+GCM: GHASH shifts by 2: caught by tls_test, RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
+GCM: the AAD and ciphertext bit lengths are swapped: caught by tls_test, RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
+GCM: the 32-bit counter increments only its low byte: caught by handshakes and attacks vs Python
+GCM: J0 ends in 0 instead of 1: caught by tls_test, RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
+GCM: only 15 bytes of the tag are compared: caught by tls_test, primitives vs Python cryptography, handshakes and attacks vs Python
+GCM: a failed open leaves the plaintext in the output: caught by tls_test
+GCM: an empty message (tag only) is refused: caught by primitives vs Python cryptography
+GCM: the AAD is not authenticated: caught by tls_test, RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
+RSA: the modulus length in limbs is truncated: caught by primitives vs Python cryptography
+RSA: the public exponent is applied once (no squarings): caught by RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
+RSA-PSS: emBits = modBits instead of modBits - 1: caught by RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
+RSA-PSS: the leading zero byte of EM is not required: caught by primitives vs Python cryptography
+RSA-PSS: the trailer byte is 0xbd: caught by RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
+RSA-PSS: MGF1 counter off by one: caught by RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
+RSA-PSS: the top bits of DB are not cleared: caught by RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
+RSA-PSS: the last padding byte is not checked: caught by primitives vs Python cryptography
+RSA-PSS: the 0x01 separator is 0x02: caught by RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
+RSA-PSS: the salt length is 31: caught by RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
+RSA-PSS: only 31 bytes of the hash are compared: caught by primitives vs Python cryptography
+RSA-PSS: moduli below 1024 bits are accepted: caught by primitives vs Python cryptography
+RSA-PSS: moduli above 2048 bits are accepted (buffer overrun): caught by primitives vs Python cryptography
+RSA-PSS: a signature of the wrong length is accepted: caught by primitives vs Python cryptography
+DER: three-byte lengths are accepted: caught by handshakes and attacks vs Python
+DER: a length beyond the buffer is accepted: caught by handshakes and attacks vs Python
+DER: the version field tag is wrong (0xa1): caught by RFC 8448 trace, handshakes and attacks vs Python, fuzz
+DER: only the first 10 bytes of the algorithm OID are compared: caught by handshakes and attacks vs Python
+DER: the BIT STRING's unused-bits byte is not checked: caught by handshakes and attacks vs Python
+DER: a modulus of 2049 to 2056 bits is accepted: caught by handshakes and attacks vs Python
+DER: a 5-byte exponent is accepted: caught by handshakes and attacks vs Python
+records: the nonce XOR starts at the wrong end: caught by RFC 8448 trace, handshakes and attacks vs Python
+records: the sequence number is not advanced on send: caught by RFC 8448 trace, handshakes and attacks vs Python
+records: the outer record version is 0x0301: caught by RFC 8448 trace, handshakes and attacks vs Python
+records: the inner content type is always application_data: caught by RFC 8448 trace, handshakes and attacks vs Python
+records: the length field omits the tag: caught by RFC 8448 trace, handshakes and attacks vs Python
+records: trailing bytes after a record are tolerated: caught by handshakes and attacks vs Python, fuzz
+records: the record version is not checked: caught by handshakes and attacks vs Python
