@@ -2105,6 +2105,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part51/51-limit-order-book-itch/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    51. A Limit-Order-Book Matching Engine: Price-Time Priority, and a Feed in NASDAQ ITCH Format That Rebuilds the Book
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -3320,6 +3348,19 @@
 <p>Worked answer: a txid hashes the transaction without witness data, so anything in a witness stack is invisible to the ordinary Merkle root. The witness commitment is double-SHA-256 of (the witness Merkle root, built from wtxids with zero for the coinbase, followed by the reserved value), so it covers the witness data. Flipping one bit of the reserved value leaves the Merkle root matching and breaks the commitment, which is the chapter's fifth attack.</p>
 <p><strong>5. Name three rules Bitcoin applies to a block that this validator does not, and what each would need.</strong></p>
 <p>Worked answer: (a) script execution and signature checking (an interpreter and secp256k1 ECDSA/Schnorr); (b) that every input spends an existing, unspent output (a coin database); (c) the block reward limit and the difficulty adjustment (the chain's height and the timestamps of earlier blocks). Also timestamp rules (median time past and a clock).</p>
+<hr />
+<h2 id="chapter-51-a-limit-order-book-matching-engine">Chapter 51: A Limit-Order-Book Matching Engine<a class="headerlink" href="#chapter-51-a-limit-order-book-matching-engine" title="Permanent link">&para;</a></h2>
+<p><em>(from <a href="../../part51/51-limit-order-book-itch/">51. A Limit-Order-Book Matching Engine</a>)</em></p>
+<p><strong>1. A buy of 200 at $100.01 meets asks of 100 and 50 at $100.00 (in that order of arrival) and 80 at $100.01. What trades, at what prices, and what rests?</strong></p>
+<p>Worked answer: best price first, earliest first within a price: 100 at $100.00 (the first ask), 50 at $100.00 (the second), then 50 of the 80 at $100.01. 100 + 50 + 50 = 200, so the buyer is completely filled and nothing rests from it; 30 remain of the $100.01 ask. Three Executed messages are published and no Add.</p>
+<p><strong>2. Why does the trade price come from the resting order, and why can an ITCH Executed message omit the price?</strong></p>
+<p>Worked answer: the resting order was posted first and promised its price; the incoming order only promised a limit, so it gets the better price (price improvement). Because an execution always happens at the resting order's own price, which the feed already told subscribers when the order was added, the Executed message needs only the order id, the shares and a match number.</p>
+<p><strong>3. Why does replacing an order to the same price lose its queue position, and what does the feed show if the new price would cross the book?</strong></p>
+<p>Worked answer: a replace is cancel-and-new in this engine (and at many venues), and priority is the order of arrival into the book, so the new order arrives last. If the new price crosses, it trades like a new order, so the feed shows a Delete of the old order, Executes against the resting orders, and an Add for any remainder, with no Replace message.</p>
+<p><strong>4. The subscriber refuses a feed in which a bid is priced at or above the best ask. Why is that safe to treat as corruption?</strong></p>
+<p>Worked answer: an exchange matches any crossing orders at once, so a book it publishes is never crossed; a feed that produces one has lost or altered a message (a missing Execute, a changed price). The equal-price case is crossed too, because the prices touch and would trade.</p>
+<p><strong>5. What would you add to this engine for IOC and fill-or-kill orders, and what new invariant would the fuzzer check?</strong></p>
+<p>Worked answer: a time-in-force field on new orders. IOC is what a market order already is with a limit price: match what crosses, discard the remainder. Fill-or-kill needs a pre-check that the whole quantity is available at acceptable prices (like the up-front capacity check) and refuses the order without side effects otherwise. New invariants: an IOC or FOK order never appears as an Add; a refused FOK changes nothing; an accepted FOK trades its full quantity.</p>
 
 
 

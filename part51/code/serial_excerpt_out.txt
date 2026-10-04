@@ -1,0 +1,156 @@
+Unix OS from Scratch -- Chapter 51: kernel entry reached
+Multiboot2 magic confirmed in EAX: 0x36d76289
+Multiboot2 memory map: 7 real entries, 24 bytes each
+
+[... 2,407 lines of Chapters 8-50's own demos elided: this chapter's demo follows from its first line to its last ...]
+
+Starting this chapter's own order-book demo (price-time matching engine publishing an ITCH-style feed)...
+fat16_format: writing real boot sector/BPB to LBA 0...
+fat16_format: zeroing 128 real FAT sectors (2 copies)...
+fat16_format: zeroing 32 real root directory sectors...
+fat16_format: done -- real FAT16 volume written to disk
+fat16_init: real volume "UNIXOSFAT16" -- 512 bytes/sector, 1 sector(s)/cluster, 2 FAT(s) * 64 sectors, root dir 32 sectors (first at LBA 129), data starts LBA 161, 16223 usable clusters
+A fresh FAT16 volume was formatted to hold the feed files.
+
+== Part 1. A hand-written scenario: 21 commands against an empty book (prices are in 1/10000 dollar: 1000100 is $100.0100)
+@@BOOK DEMO BEGIN
+cmd 1 ok
+feed 002441000100000000000003e80000000000000001530000006441434d4520202020000f42a4
+cmd 2 ok
+feed 002441000100000000000003f20000000000000002530000003241434d4520202020000f42a4
+cmd 3 ok
+feed 002441000100000000000003fc0000000000000003530000005041434d4520202020000f4308
+cmd 4 ok
+feed 002441000100000000000004060000000000000004420000006441434d4520202020000f41dc
+cmd 5 ok
+feed 002441000100000000000004100000000000000005420000003c41434d4520202020000f4178
+cmd 6 ok
+trade 1 6 1000100 100 1
+trade 2 6 1000100 20 2
+feed 001f450001000000000000041a0000000000000001000000640000000000000001001f450001000000000000041a0000000000000002000000140000000000000002
+cmd 7 ok
+feed 0017580001000000000000042400000000000000030000001e
+cmd 8 ok
+feed 0023550001000000000000042e0000000000000005000000000000000f0000003c000f4240
+cmd 9 ok
+trade 15 7 1000000 60 3
+trade 4 7 999900 30 4
+feed 001f4500010000000000000438000000000000000f0000003c0000000000000003001f450001000000000000043800000000000000040000001e0000000000000004
+cmd 10 ok
+feed 001344000100000000000004420000000000000004
+cmd 11 ok
+feed 0023550001000000000000044c0000000000000003000000000000000d00000032000f41dc
+cmd 12 ok
+trade 13 8 999900 50 5
+trade 2 8 1000100 30 6
+feed 001f4500010000000000000456000000000000000d000000320000000000000005001f450001000000000000045600000000000000020000001e0000000000000006002441000100000000000004560000000000000008420000001441434d4520202020000f4308
+cmd 13 unknown-id
+cmd 14 ok
+trade 8 9 1000200 20 7
+feed 001f450001000000000000046a00000000000000080000001400000000000000070024410001000000000000046a0000000000000009530000001441434d4520202020000f4240
+cmd 15 ok
+trade 9 10 1000000 20 8
+feed 001f45000100000000000004740000000000000009000000140000000000000008
+cmd 16 qty
+cmd 17 ok
+feed 002441000100000000000004880000000000000008530000000a41434d4520202020000f4434
+cmd 18 ok
+feed 00244100010000000000000492000000000000000c530000001941434d4520202020000f436c
+cmd 19 ok
+trade 12 13 1000300 25 9
+feed 001f450001000000000000049c000000000000000c000000190000000000000009
+cmd 20 unknown-id
+cmd 21 unknown-id
+ask 1000500 10
+hash ea5c82d6919e057e60f29fe820b913624008257f8f87d24a5bcfe33db75b9895
+stats trades 9 volume 355 notional 355018500 live 1
+rebuilt ok same-hash
+@@BOOK DEMO END
+  21 commands, 4 refused, 759 feed bytes in 22 messages
+fat16_create_file: "DEMO.ITC" -- 759 bytes, 2 cluster(s), first cluster 2
+fat16_read_file: "DEMO.ITC" -- 759 bytes read
+  the demo feed written to the FAT16 disk as DEMO.ITC (759 bytes), read back identical: YES
+
+  The same scenario, step by step, with the top of the book after each command:
+    1  N 1 S 1000100 100 1000   -> 0 trade(s)
+      best bid -   best ask 100 @ 1000100
+    2  N 2 S 1000100 50 1010   -> 0 trade(s)
+      best bid -   best ask 150 @ 1000100
+    3  N 3 S 1000200 80 1020   -> 0 trade(s)
+      best bid -   best ask 150 @ 1000100
+    4  N 4 B 999900 100 1030   -> 0 trade(s)
+      best bid 100 @ 999900   best ask 150 @ 1000100
+    5  N 5 B 999800 60 1040   -> 0 trade(s)
+      best bid 100 @ 999900   best ask 150 @ 1000100
+    6  N 6 B 1000100 120 1050   -> 2 trade(s)
+      best bid 100 @ 999900   best ask 30 @ 1000100
+    7  X 3 30 1060   -> 0 trade(s)
+      best bid 100 @ 999900   best ask 30 @ 1000100
+    8  R 5 15 1000000 60 1070   -> 0 trade(s)
+      best bid 60 @ 1000000   best ask 30 @ 1000100
+    9  N 7 S 0 90 1080   -> 2 trade(s)
+      best bid 70 @ 999900   best ask 30 @ 1000100
+    10  C 4 1090   -> 0 trade(s)
+      best bid -   best ask 30 @ 1000100
+    11  R 3 13 999900 50 1100   -> 0 trade(s)
+      best bid -   best ask 50 @ 999900
+    12  N 8 B 1000200 100 1110   -> 2 trade(s)
+      best bid 20 @ 1000200   best ask -
+    13  C 99 1120   -> 0 trade(s)
+      best bid 20 @ 1000200   best ask -
+    14  N 9 S 1000000 40 1130   -> 1 trade(s)
+      best bid -   best ask 20 @ 1000000
+    15  N 10 B 0 200 1140   -> 1 trade(s)
+      best bid -   best ask -
+    16  N 11 B 1000300 0 1150   -> 0 trade(s)
+      best bid -   best ask -
+    17  N 8 S 1000500 10 1160   -> 0 trade(s)
+      best bid -   best ask 10 @ 1000500
+    18  N 12 S 1000300 25 1170   -> 0 trade(s)
+      best bid -   best ask 25 @ 1000300
+    19  N 13 B 1000300 25 1180   -> 1 trade(s)
+      best bid -   best ask 10 @ 1000500
+    20  C 15 1190   -> 0 trade(s)
+      best bid -   best ask 10 @ 1000500
+    21  X 12 5 1200   -> 0 trade(s)
+      best bid -   best ask 10 @ 1000500
+
+== Part 2. 1,200 commands of SYNTHETIC random order flow (a random-walk price near $100, limit and market orders, cancels, replaces, reduces and some invalid commands)
+@@BOOK FLOW BEGIN
+bid 1001300 463
+bid 1001200 75
+bid 1001100 100
+bid 1000900 100
+bid 1000800 251
+bid 1000400 260
+bid 999900 10
+bid 999800 100
+ask 1009600 81
+ask 1009800 5
+hash 59e8de25393490ff377633a47be3c3880d336220fd3a0899520a43c867faac08
+stats trades 589 volume 73591 notional 73906336200 live 13
+rebuilt ok same-hash
+@@BOOK FLOW END
+  1200 commands: 508 refused (bad quantity, duplicate or unknown id, time going back, ...), 589 trades, 1026 feed messages (35508 bytes)
+  replaying the same 1,200 commands from scratch gives the same book hash: YES (the engine is deterministic)
+fat16_create_file: "FLOW.ITC" -- 35508 bytes, 70 cluster(s), first cluster 4
+fat16_read_file: "FLOW.ITC" -- 35508 bytes read
+  the flow feed written to the FAT16 disk as FLOW.ITC (35508 bytes), read back identical: YES
+fat16_read_file: "FLOW.ITC" -- 35508 bytes read
+  the book rebuilt from the copy READ BACK FROM DISK: same hash as the engine's book
+
+== Part 3. Six damaged copies of the demo feed (759 bytes). The subscriber must refuse each one and say why and where.
+  Attack 1: one message's type byte changed to Z
+    -> REFUSED at message 1: unknown message type
+  Attack 2: a message's length byte changed
+    -> REFUSED at message 1: wrong length for the message type
+  Attack 3: an Execute whose quantity is raised above what the order has left
+    -> REFUSED at message 6: execution larger than the remaining quantity
+  Attack 4: the first Add deleted (so its Execute names an unknown order)
+    -> REFUSED at message 5: execution of an unknown order
+  Attack 5: the feed cut off in the middle of a message
+    -> REFUSED at message 22: message runs past the end of the feed
+  Attack 6: the second Add given a price above the best ask (a crossed book)
+    -> REFUSED at message 4: the book is crossed or inconsistent after this message
+
+Chapter 51 order book demo complete: 21 scenario commands, 1200 flow commands, 589 trades in the flow, 2 feed files written and read back identical, 6 damaged feeds refused

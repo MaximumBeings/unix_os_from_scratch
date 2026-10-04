@@ -1,0 +1,40 @@
+== 1. the engine and the subscriber, worked by hand ==
+== 1. the feed's byte layout (NASDAQ ITCH 5.0), exactly ==
+
+== 2. price-time priority, worked by hand ==
+
+== 3. a limit order that does not cross never trades; equal prices DO cross ==
+
+== 4. cancel, reduce, replace ==
+
+== 5. refusals, each with its own code and no side effect ==
+
+== 6. capacity ==
+
+== 7. the subscriber refuses a damaged feed, with the reason and the message number ==
+
+47 passed, 0 failed
+47 lines PASS
+
+== 2. 60 random order flows (60 / 300 / 700 commands) and 3 damaged feeds of each: C vs the independent Python engine, subscriber and hash ==
+  ... refused: 171
+  ... still accepted (a consistent book): 9
+  commands: 21167
+  damaged feeds compared (cut): 40
+  damaged feeds compared (del): 30
+  damaged feeds compared (dup): 43
+  damaged feeds compared (flip): 33
+  damaged feeds compared (swap): 34
+  feed messages: 17341
+  order flows: 60
+  refused: dup-id: 40
+  refused: price: 34
+  refused: qty: 501
+  refused: reduce: 110
+  refused: time: 168
+  refused: unknown-id: 7697
+  trades: 9062
+60 order flows, 0 differences
+
+== 3. random API calls (2,000 per run, ordinary and extreme values), invariants after every call, feeds rebuilt and damaged ==
+24000 random calls (8891 accepted, 15109 refused: dup-id 297 qty 103 price 11 unknown-id 11078 time 3500 reduce 120 ); 216 prefixes of the feeds rebuilt; 480 damaged feeds: 469 refused, 11 accepted as a sane book; failures: 0
