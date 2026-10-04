@@ -138,3 +138,18 @@ def hero(s):  # landing page: the whole stack, from silicon up to the applied ch
     s.poly([(500, 190), (480, 205), (500, 200), (520, 205)], s.light, s.dark, 2); s.line(500, 176, 500, 214, s.light, 6); s.line(482, 192, 518, 192, s.light, 6)
     s.packet(540, 176, 100, 34, "IP", s.main); s.coin(690, 195, 20); s.arrow(400, 135, 460, 135, s.light, 3); s.arrow(400, 200, 470, 200, s.light, 2)
     s.text(400, 30, "Unix OS from Scratch", 22, s.light, bold=True)
+
+def s47(s):  # eBay-style auction: the lamp, a gavel, rising bids, SOLD
+    # the lamp on a pedestal
+    s.rect(70, 235, 120, 22, s.light, s.dark, 2, 4); s.rect(90, 257, 80, 14, s.main, s.dark, 2, 3)
+    s.path("M130,235 v-70", stroke=s.light, sw=6); s.poly([(95, 165), (165, 165), (150, 110), (110, 110)], s.acc, s.dark, 3)
+    s.circ(130, 175, 34, "#fff7c2", None, 0, op=.25); s.text(130, 90, "LOT 110001", 13, s.light, bold=True)
+    # the gavel, striking its block
+    s.rect(240, 232, 130, 24, s.main, s.dark, 3, 4)
+    s.add('<g transform="rotate(-32 330 170)"><rect x="262" y="160" width="96" height="16" rx="5" fill="#a8672d" stroke="#170c04" stroke-width="3"/><rect x="306" y="120" width="60" height="42" rx="7" fill="#c98a45" stroke="#170c04" stroke-width="3"/></g>')
+    for k in range(3): s.path(f"M{262 - k * 12},{205 - k * 8} q-8,8 0,16", stroke=s.acc, sw=3, op=.8 - k * .25)
+    # the ladder of bids, each a paddle with its price
+    for k, (t, w) in enumerate((("$9.99", 70), ("$15.50", 110), ("$40.00", 170), ("$45.00", 230))):
+        y = 64 + k * 46; s.rect(430, y, w + 40, 34, s.main if k < 3 else s.acc, s.dark, 2, 6, op=.95); s.text(448, y + 23, t, 18, s.dark, "start", bold=True)
+        s.text(430 + w + 56, y + 23, "user %d" % (4, 5, 6, 6)[k], 13, s.light, "start", op=.85)
+    s.add('<g transform="rotate(-8 693 272)"><rect x="620" y="250" width="146" height="42" rx="6" fill="none" stroke="#f87171" stroke-width="5"/><text x="693" y="281" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="26" font-weight="bold" fill="#f87171" text-anchor="middle">SOLD</text></g>')

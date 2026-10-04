@@ -1,0 +1,153 @@
+Unix OS from Scratch -- Chapter 47: kernel entry reached
+Multiboot2 magic confirmed in EAX: 0x36d76289
+Multiboot2 memory map: 7 real entries, 24 bytes each
+  base 0x0  length 0x9fc00  type 1 (available)
+  base 0x9fc00  length 0x400  type 2
+  base 0xf0000  length 0x10000  type 2
+  base 0x100000  length 0x3ee0000  type 1 (available)
+  base 0x3fe0000  length 0x20000  type 2
+  base 0xfffc0000  length 0x40000  type 2
+  base 0xfd00000000  length 0x300000000  type 2
+Kernel image occupies physical 0x100000 - 0x17ce98
+Real GRUB boot module found and RESERVED: "user_program", physical 0x185000 - 0x186304 (4868 bytes)
+Physical memory manager ready: 15968 free frames (63872 KiB usable)
+Allocated three real frames: 0x17d000, 0x17e000, 0x17f000
+Freed the middle frame 0x17e000 -- 15966 free frames now
+Allocated again: got 0x17e000 (matches the freed frame? yes)
+Paging: allocating page directory...
+Paging: page directory at 0x180000. Identity-mapping 0-64MiB (16 page tables)...
+Paging: identity map built. Loading CR3 and setting CR0.PG...
+...[Chapters 8-46's own output, lines 20-1106, unchanged in kind from Chapter 46's page]...
+
+Starting this chapter's own marketplace demo (an eBay-style auction, with a write-ahead log on the FAT16 disk)...
+rtl8139_init: found real device 0:3.0, vendor=10ec device=8139
+rtl8139_init: real I/O base = 0xc000
+rtl8139_init: real PCI Interrupt Line register reports IRQ 11
+rtl8139_init: installed a real IDT gate for vector 0x2b, dynamically, at runtime (idt_install_gate()), rather than idt_init() wiring a fixed vector at compile time
+rtl8139_init: real tx buffers at 0x22a000/0x22b000/0x22c000/0x22d000, real rx ring at 0x22e000 (3 contiguous frames, verified)
+rtl8139_init: real device brought up, real hardware loopback mode enabled (TCR read back as 0x74860000), real IRQ 11 unmasked
+    [... 5 lines of fat16_* driver trace omitted ...]
+A fresh FAT16 volume was formatted for the write-ahead log (this demo only needs the log; earlier chapters' files are gone).
+
+Part 1: funding three buyers (a funds-in step; Chapter 32's ACH is where such money really enters)
+    [... 3 lines of fat16_* driver trace omitted ...]
+After funding:  ledger total 0 (must be 0); escrow $0.00; fees $0.00; users 4/5/6/3: $500.00 $500.00 $500.00 $0.00
+
+Part 2: seller (user 3) lists a lamp: Sell Inventory offer shape, format AUCTION, 1 day, start $9.99, reserve $40.00
+    -> {"sku":"LAMP-BRASS-1","marketplaceId":"EBAY_US","format":"AUCTION","listingDuration":"DAYS_1","product":{"title":"Vintage brass desk lamp"},"pricingSummary":{"auctionStartPrice":{"currency":"USD","value":"9.99"},"auctionReservePrice":{"currency":"USD","value":"40.00"}}}
+    [... 1 lines of fat16_* driver trace omitted ...]
+    <- HTTP/1.1 200 OK
+       {"offerId":"OFR-110001","listingId":"110001","status":"PUBLISHED"}
+
+Part 3: the bidding war (proxy bidding: eBay bids for you up to your maximum, one increment above the runner-up)
+[t=100] Ann (user 4): POST place_proxy_bid maxAmount $20.00  (Idempotency-Key 1001)
+    [... 1 lines of fat16_* driver trace omitted ...]
+    <- HTTP/1.1 200 OK
+       {"proxyBidId":"PB-110001-4-1"}
+    [server console] price now $9.99, leader user 4 (standing maximum $20.00), minimum next bid $10.49, reserve met: no, accepted bids 1
+[t=200] Bob (user 5): POST place_proxy_bid maxAmount $15.00  (Idempotency-Key 1002)
+    [... 1 lines of fat16_* driver trace omitted ...]
+    <- HTTP/1.1 200 OK
+       {"proxyBidId":"PB-110001-5-2"}
+    [server console] price now $15.50, leader user 4 (standing maximum $20.00), minimum next bid $16.00, reserve met: no, accepted bids 2
+[t=300] Bob (user 5): POST place_proxy_bid maxAmount $12.00  (Idempotency-Key 1003)
+    [... 1 lines of fat16_* driver trace omitted ...]
+    <- HTTP/1.1 400 Bad Request
+       {"status":400,"errors":[{"errorId":9102,"domain":"API_MARKETPLACE","category":"REQUEST","message":"A standing maximum bid can only be raised"}]}
+    [server console] price now $15.50, leader user 4 (standing maximum $20.00), minimum next bid $16.00, reserve met: no, accepted bids 2
+[t=400] Cy (user 6): POST place_proxy_bid maxAmount $15.00  (Idempotency-Key 1004)
+    [... 1 lines of fat16_* driver trace omitted ...]
+    <- HTTP/1.1 400 Bad Request
+       {"status":400,"errors":[{"errorId":9101,"domain":"API_MARKETPLACE","category":"REQUEST","message":"Bid is below the minimum bid of 16.00 USD"}]}
+    [server console] price now $15.50, leader user 4 (standing maximum $20.00), minimum next bid $16.00, reserve met: no, accepted bids 2
+[t=500] Cy (user 6): POST place_proxy_bid maxAmount $45.00  (Idempotency-Key 1005)
+    [... 1 lines of fat16_* driver trace omitted ...]
+    <- HTTP/1.1 200 OK
+       {"proxyBidId":"PB-110001-6-3"}
+    [server console] price now $40.00, leader user 6 (standing maximum $45.00), minimum next bid $41.00, reserve met: yes, accepted bids 3
+[t=600] Ann (user 4): POST place_proxy_bid maxAmount $42.00  (Idempotency-Key 1006)
+    [... 1 lines of fat16_* driver trace omitted ...]
+    <- HTTP/1.1 200 OK
+       {"proxyBidId":"PB-110001-4-4"}
+    [server console] price now $43.00, leader user 6 (standing maximum $45.00), minimum next bid $44.00, reserve met: yes, accepted bids 4
+[t=700] Ann's phone retried request 1006 (the response was lost): the SAME Idempotency-Key and the SAME request
+[t=700] Ann (user 4): POST place_proxy_bid maxAmount $42.00  (Idempotency-Key 1006)
+    [... 1 lines of fat16_* driver trace omitted ...]
+    <- HTTP/1.1 200 OK  [Idempotency-Replayed: true]
+       {"proxyBidId":"PB-110001-4-4"}
+    [server console] price now $43.00, leader user 6 (standing maximum $45.00), minimum next bid $44.00, reserve met: yes, accepted bids 4
+[t=800] a buggy client reuses key 1006 for a DIFFERENT amount
+[t=800] Ann (user 4): POST place_proxy_bid maxAmount $44.00  (Idempotency-Key 1006)
+    [... 1 lines of fat16_* driver trace omitted ...]
+    <- HTTP/1.1 422 Unprocessable Entity
+       {"status":422,"errors":[{"errorId":9110,"domain":"API_MARKETPLACE","category":"REQUEST","message":"Idempotency-Key was reused with a different request"}]}
+    [server console] price now $43.00, leader user 6 (standing maximum $45.00), minimum next bid $44.00, reserve met: yes, accepted bids 4
+[t=900] Bob (user 5): POST place_proxy_bid maxAmount $45.00  (Idempotency-Key 1007)
+    [... 1 lines of fat16_* driver trace omitted ...]
+    <- HTTP/1.1 200 OK
+       {"proxyBidId":"PB-110001-5-5"}
+    [server console] price now $45.00, leader user 6 (standing maximum $45.00), minimum next bid $46.00, reserve met: yes, accepted bids 5
+[t=950] Bob bids $60.00, but one ciphertext byte is flipped on the wire
+    HMAC-SHA256 check on the received tampered request (276-byte frame), before any decryption: FAILED
+    Tampered request: refused as expected -- HMAC mismatch, nothing was decrypted; log records before 13, after 13 (nothing was logged or applied)
+
+What each side sees now (the item view is public; the bidding view is personal and uses eBay's Bidding shape):
+    -> GET item v1|110001|0
+    <- HTTP/1.1 200 OK
+       {"itemId":"v1|110001|0","title":"Vintage brass desk lamp","buyingOptions":["AUCTION"],"currentBidPrice":{"currency":"USD","value":"45.00"},"minimumPriceToBid":{"currency":"USD","value":"46.00"},"bidCount":5,"uniqueBidderCount":3,"itemEndDate":"2026-10-11T00:00:00.000Z","reservePriceMet":true}
+    -> GET bidding as Bob (user 5; outbid, so highBidder is false)
+    <- HTTP/1.1 200 OK
+       {"itemId":"v1|110001|0","auctionStatus":"ACTIVE","auctionEndDate":"2026-10-11T00:00:00.000Z","bidCount":5,"currentPrice":{"currency":"USD","value":"45.00"},"currentProxyBid":{"maxAmount":{"currency":"USD","value":"45.00"},"proxyBidId":"PB-110001-5"},"highBidder":false,"reservePriceMet":true,"suggestedBidAmounts":[{"currency":"USD","value":"46.00"},{"currency":"USD","value":"47.00"}]}
+    -> GET bidding as Cy (user 6; leading)
+    <- HTTP/1.1 200 OK
+       {"itemId":"v1|110001|0","auctionStatus":"ACTIVE","auctionEndDate":"2026-10-11T00:00:00.000Z","bidCount":5,"currentPrice":{"currency":"USD","value":"45.00"},"currentProxyBid":{"maxAmount":{"currency":"USD","value":"45.00"},"proxyBidId":"PB-110001-6"},"highBidder":true,"reservePriceMet":true,"suggestedBidAmounts":[{"currency":"USD","value":"46.00"},{"currency":"USD","value":"47.00"}]}
+
+Part 4: the auction ends (a hard close at the end time, like eBay's), a late bid is refused, the scheduler closes it, the winner checks out
+[t=86500] Ann (user 4): POST place_proxy_bid maxAmount $90.00  (Idempotency-Key 1009)
+    [... 1 lines of fat16_* driver trace omitted ...]
+    <- HTTP/1.1 400 Bad Request
+       {"status":400,"errors":[{"errorId":9103,"domain":"API_MARKETPLACE","category":"REQUEST","message":"The auction has ended"}]}
+    [server console] price now $45.00, leader user 6 (standing maximum $45.00), minimum next bid $46.00, reserve met: yes, accepted bids 5
+    [... 1 lines of fat16_* driver trace omitted ...]
+Close result: status SOLD, price $45.00, winner user 6 after 5 accepted bids (3 bidders)
+[t=86600] Bob (user 5, who LOST) tries to check out the lamp
+    [... 1 lines of fat16_* driver trace omitted ...]
+    <- HTTP/1.1 403 Forbidden
+       {"status":403,"errors":[{"errorId":9121,"domain":"API_MARKETPLACE","category":"REQUEST","message":"Only the winning bidder can check out"}]}
+[t=86600] Cy (user 6, the winner) checks out with $5.00 shipping: the payment moves into ESCROW
+    [... 1 lines of fat16_* driver trace omitted ...]
+    <- HTTP/1.1 200 OK
+       {"orderId":"ORD-110001","orderPaymentStatus":"PAID","lineItems":[{"lineItemId":"LI-110001","title":"Vintage brass desk lamp","total":{"currency":"USD","value":"45.00"}}],"pricingSummary":{"total":{"currency":"USD","value":"50.00"}},"paymentSummary":{"totalDueSeller":{"currency":"USD","value":"0.00"},"payments":[{"paymentStatus":"PAID","amount":{"currency":"USD","value":"50.00"}}]}}
+After checkout:  ledger total 0 (must be 0); escrow $50.00; fees $0.00; users 4/5/6/3: $500.00 $500.00 $450.00 $0.00
+[t=90000] delivery confirmed: escrow is released (seller paid less this chapter's fictional fee: 10% plus $0.30)
+    [... 1 lines of fat16_* driver trace omitted ...]
+    <- HTTP/1.1 200 OK
+       {"orderId":"ORD-110001","orderPaymentStatus":"PAID","lineItems":[{"lineItemId":"LI-110001","title":"Vintage brass desk lamp","total":{"currency":"USD","value":"45.00"}}],"pricingSummary":{"total":{"currency":"USD","value":"50.00"}},"paymentSummary":{"totalDueSeller":{"currency":"USD","value":"44.70"},"payments":[{"paymentStatus":"PAID","amount":{"currency":"USD","value":"50.00"}}]}}
+After release:   ledger total 0 (must be 0); escrow $0.00; fees $5.30; users 4/5/6/3: $500.00 $500.00 $450.00 $44.70
+Invariants (ledger sums to zero; escrow equals the PAID orders; no negative account; price within [start, leader's maximum]): held after all 18 commands
+
+Part 5: crash recovery from the disk
+The live marketplace: 18 log records on the FAT16 disk (W0000001.LOG ... W0000018.LOG), state hash (SHA-256, first 8 bytes) 0a4531012e49fb2e
+Simulated crash: every in-memory structure is destroyed (the server now serves an EMPTY marketplace) and the FAT16 volume is re-mounted from the disk
+    [... 20 lines of fat16_* driver trace omitted ...]
+Replay: 18 records applied; stopped because the log simply ends (no record with the next number); recovered state hash 0a4531012e49fb2e
+Recovered state equals the live state, bit for bit (SHA-256 of every field): YES; invariants on the recovered marketplace: hold
+
+Torn write: power is lost while record 18 (the delivery release) is being written -- the file ends after 50 of 108 bytes
+    [... 22 lines of fat16_* driver trace omitted ...]
+Replay: 17 records applied; stopped because a record exists but is SHORT (torn write); state is exactly the state before the damaged command: YES (order status PAID, escrow $50.00)
+Recovery step: the damaged tail record is dropped, the server resumes serving the recovered marketplace, and the client's retry of the release arrives
+    [... 2 lines of fat16_* driver trace omitted ...]
+    <- HTTP/1.1 200 OK
+       {"orderId":"ORD-110001","orderPaymentStatus":"PAID","lineItems":[{"lineItemId":"LI-110001","title":"Vintage brass desk lamp","total":{"currency":"USD","value":"45.00"}}],"pricingSummary":{"total":{"currency":"USD","value":"50.00"}},"paymentSummary":{"totalDueSeller":{"currency":"USD","value":"44.70"},"payments":[{"paymentStatus":"PAID","amount":{"currency":"USD","value":"50.00"}}]}}
+After the retry: 18 records on disk again, state hash 0a4531012e49fb2e -- equal to the hash before the crash: YES
+
+Bit rot: one payload byte of record 5 is flipped on the disk
+    [... 9 lines of fat16_* driver trace omitted ...]
+Replay: 4 records applied; stopped because CRC-32 mismatch (damaged record) -- everything after the damaged record is NOT applied (it cannot be trusted to follow a record that is missing); a real system would repair this from a replica
+    [... 21 lines of fat16_* driver trace omitted ...]
+Record 5 restored: 18 records applied (the log simply ends (no record with the next number)), state hash 0a4531012e49fb2e -- equal to the pre-crash hash: YES
+
+HMAC-SHA256 verdicts over the whole demo, every one checked BEFORE any decryption: 36 passed, 1 refused (the one tampered frame)
+Chapter 47 marketplace demo complete: 18 sealed exchanges, 18 log records on disk, final state hash 0a4531012e49fb2e
+

@@ -1,0 +1,18 @@
+-- 1. FAT16 volume: 512 bytes/sector, 1 sector/cluster, 2 FATs x 64 sectors, root at LBA 129, data at LBA 161; 18 log files found
+  ok   log files are consecutive from W0000001.LOG to W0000018.LOG
+-- 2. every log record: magic, length, sequence number, CRC-32 (Python's zlib)
+  ok   all 18 records pass every check (decoding stopped because: log ends)
+-- 3. independent replay of the whole log (invariants asserted after every command)
+  ok   18 commands replayed; ledger sums to zero, escrow equals the PAID orders, no negative account, price/leader rules held after every command
+-- 4. the state hash
+  ok   SHA-256 state hash of the independently replayed marketplace, first 8 bytes 0a4531012e49fb2e, equals the hash the kernel printed (0a4531012e49fb2e)
+-- 5. the kernel's narrated results against the independent replay
+  ok   after each of the 10 bid requests, the kernel's printed price, leader, maximum, minimum next bid, reserve flag and bid count equal the replay's
+  ok   balances after release (escrow, fees, users 4/5/6/3) printed by the kernel equal the replay's, and equal the arithmetic done by hand: fee = 10% of $50.00 + $0.30 = $5.30, seller receives $44.70
+  ok   final marketplace after replay: 18 commands, listing sold: True, winner user 6 at $45.00
+-- 6. every JSON body the kernel printed, parsed with Python's json module
+  ok   19 JSON bodies parsed (offer request, bid and bidding responses, item view, orders, error objects)
+  ok   every Amount is { currency: "USD", value: <string with exactly two decimals> }, as eBay's Amount type has it (value is a STRING)
+  ok   every auctionEndDate / itemEndDate is ISO-8601 and equals the epoch plus the 1-day listing duration (2026-10-11T00:00:00.000Z)
+  ok   45 distinct field names used in the printed bodies; every one is a field name that occurs in eBay's real OpenAPI schemas (the 611 distinct names read from the four spec files); names in neither: []; names this chapter uses in its OWN way (not confirmable by name): ['errors', 'status']
+all checks pass

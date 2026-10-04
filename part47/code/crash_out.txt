@@ -1,0 +1,33 @@
+kill  0: SIGKILL 0.218 s after Part 1 began (demo was in Part 3);  8 log files on the disk,  8 valid records replayed; decoding stopped: log ends; invariants hold
+kill  1: SIGKILL 0.267 s after Part 1 began (demo was in Part 3);  9 log files on the disk,  9 valid records replayed; decoding stopped: log ends; invariants hold
+kill  2: SIGKILL 0.281 s after Part 1 began (demo was in Part 3); 11 log files on the disk, 11 valid records replayed; decoding stopped: log ends; invariants hold
+kill  3: SIGKILL 0.213 s after Part 1 began (demo was in Part 3);  9 log files on the disk,  9 valid records replayed; decoding stopped: log ends; invariants hold
+kill  4: SIGKILL 0.318 s after Part 1 began (demo was in Part 3); 12 log files on the disk, 12 valid records replayed; decoding stopped: log ends; invariants hold
+kill  5: SIGKILL 0.243 s after Part 1 began (demo was in Part 3); 10 log files on the disk, 10 valid records replayed; decoding stopped: log ends; invariants hold
+kill  6: SIGKILL 0.025 s after Part 1 began (demo was in Part 1);  3 log files on the disk,  3 valid records replayed; decoding stopped: log ends; invariants hold
+kill  7: SIGKILL 0.259 s after Part 1 began (demo was in Part 3); 11 log files on the disk, 11 valid records replayed; decoding stopped: log ends; invariants hold
+kill  8: SIGKILL 0.015 s after Part 1 began (demo was in Part 1);  3 log files on the disk,  3 valid records replayed; decoding stopped: log ends; invariants hold
+kill  9: SIGKILL 0.064 s after Part 1 began (demo was in Part 2);  3 log files on the disk,  3 valid records replayed; decoding stopped: log ends; invariants hold
+kill 10: SIGKILL 0.164 s after Part 1 began (demo was in Part 3);  7 log files on the disk,  7 valid records replayed; decoding stopped: log ends; invariants hold
+kill 11: SIGKILL 0.599 s after Part 1 began (demo was in Part 5); 18 log files on the disk, 18 valid records replayed; decoding stopped: log ends; invariants hold
+kill 12: SIGKILL 0.299 s after Part 1 began (demo was in Part 3); 10 log files on the disk, 10 valid records replayed; decoding stopped: log ends; invariants hold
+kill 13: SIGKILL 0.339 s after Part 1 began (demo was in Part 3); 11 log files on the disk, 11 valid records replayed; decoding stopped: log ends; invariants hold
+kill 14: SIGKILL 0.569 s after Part 1 began (demo was in Part 4); 16 log files on the disk, 16 valid records replayed; decoding stopped: log ends; invariants hold
+kill 15: SIGKILL 0.557 s after Part 1 began (demo was in Part 4); 16 log files on the disk, 16 valid records replayed; decoding stopped: log ends; invariants hold
+kill 16: SIGKILL 0.352 s after Part 1 began (demo was in Part 3); 13 log files on the disk, 13 valid records replayed; decoding stopped: log ends; invariants hold
+kill 17: SIGKILL 0.143 s after Part 1 began (demo was in Part 3);  7 log files on the disk,  7 valid records replayed; decoding stopped: log ends; invariants hold
+kill 18: SIGKILL 0.324 s after Part 1 began (demo was in Part 3);  9 log files on the disk,  9 valid records replayed; decoding stopped: log ends; invariants hold
+kill 19: SIGKILL 0.223 s after Part 1 began (demo was in Part 3);  9 log files on the disk,  9 valid records replayed; decoding stopped: log ends; invariants hold
+kill 20: SIGKILL 0.594 s after Part 1 began (demo was in Part 5); 18 log files on the disk, 18 valid records replayed; decoding stopped: log ends; invariants hold
+kill 21: SIGKILL 0.021 s after Part 1 began (demo was in Part 1);  3 log files on the disk,  3 valid records replayed; decoding stopped: log ends; invariants hold
+kill 22: SIGKILL 0.232 s after Part 1 began (demo was in Part 3);  8 log files on the disk,  8 valid records replayed; decoding stopped: log ends; invariants hold
+kill 23: SIGKILL 0.426 s after Part 1 began (demo was in Part 3); 13 log files on the disk, 13 valid records replayed; decoding stopped: log ends; invariants hold
+kill 24: SIGKILL 0.373 s after Part 1 began (demo was in Part 3); 10 log files on the disk, 10 valid records replayed; decoding stopped: log ends; invariants hold
+kill 25: SIGKILL 0.346 s after Part 1 began (demo was in Part 3); 13 log files on the disk, 13 valid records replayed; decoding stopped: log ends; invariants hold
+kill 26: SIGKILL 0.472 s after Part 1 began (demo was in Part 4); 13 log files on the disk, 13 valid records replayed; decoding stopped: log ends; invariants hold
+kill 27: SIGKILL 0.148 s after Part 1 began (demo was in Part 3);  7 log files on the disk,  7 valid records replayed; decoding stopped: log ends; invariants hold
+kill 28: SIGKILL 0.521 s after Part 1 began (demo was in Part 4); 14 log files on the disk, 14 valid records replayed; decoding stopped: log ends; invariants hold
+kill 29: SIGKILL 0.567 s after Part 1 began (demo was in Part 4); 15 log files on the disk, 15 valid records replayed; decoding stopped: log ends; invariants hold
+
+30 hard kills: 30 left a log whose valid prefix replays to a consistent marketplace, 0 did not. Kills by demo phase (Part number when the kill landed): Part 1: 3, Part 2: 1, Part 3: 19, Part 4: 5, Part 5: 2
+0 of the kills left a damaged or inconsistent log tail that the reader had to REJECT instead of replaying (every kill landed between disk operations: no torn record was observed; the torn-tail path is exercised by the host tests and by the kernel's own injected tear, not by these kills)
