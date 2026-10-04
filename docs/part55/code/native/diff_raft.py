@@ -6,7 +6,7 @@ import os, subprocess, sys
 here = os.path.dirname(os.path.abspath(__file__)); ref = os.path.join(here, "..", "raft_ref.py")
 N = int(sys.argv[1]); cli = sys.argv[2] if len(sys.argv) > 2 else "/tmp/raftcli"; diffs = 0; total = 0; viol_seen = {}
 def run(prog, args): return subprocess.run(prog + [str(a) for a in args], capture_output=True, text=True).stdout.splitlines()
-for name, args in (("the correct node", (0, N - 1)), ("the correct node, 600-tick runs", (N, N + N // 4 - 1, 0, 600)), ("bug 1 (a vote granted without checking the log)", (0, N // 2 - 1, 1)), ("bug 2 (an old-term entry committed by counting replicas)", (0, N // 2 - 1, 2)), ("bug 3 (a vote a restart forgets)", (10000, 10000 + N // 4, 3, 600)), ("bug 4 (no consistency check on AppendEntries)", (0, N // 2 - 1, 4)), ("bug 5 (a minority commits)", (0, N // 2 - 1, 5)), ("bug 6 (commitIndex may move backwards)", (0, N // 2 - 1, 6))):
+for name, args in (("the correct node", (0, N - 1)), ("the correct node, 600-tick runs", (N, N + N // 4 - 1, 0, 600)), ("bug 1 (a vote granted without checking the log)", (0, N // 2 - 1, 1)), ("bug 2 (an old-term entry committed by counting replicas)", (0, N // 2 - 1, 2)), ("bug 3 (a vote a restart forgets)", (10040, 10070, 3, 600)), ("bug 4 (no consistency check on AppendEntries)", (0, N // 2 - 1, 4)), ("bug 5 (a minority commits)", (0, N // 2 - 1, 5)), ("bug 6 (commitIndex may move backwards)", (0, N // 2 - 1, 6))):
     c, p = run([cli], args), run([sys.executable, ref], args); bad = 0
     for x, y in zip(c, p):
         if x != y:

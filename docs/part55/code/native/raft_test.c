@@ -26,6 +26,7 @@ int main(void) {
     check("a second candidate in the same term is refused: one vote per term", k == 1 && out[0].granted == 0 && c.d.voted_for == 0);
     m = rv(0, 2, 1, 0, 0); k = raft_recv(&c, &m, 0, out); check("the same candidate asking again (a duplicated message) is granted again, idempotently", out[0].granted == 1);
     m = rv(1, 2, 0, 0, 0); k = raft_recv(&c, &m, 0, out); check("a RequestVote from an older term is refused and answered with the current term", out[0].granted == 0 && out[0].term == 1);
+    raft_init(&b, 1, 3, 0, 0); b.d.term = 3; m = rv(0, 1, 2, 0, 0); raft_recv(&b, &m, 0, out); check("a RequestVote from an older term is refused EVEN WHEN the node has not voted yet in its own term, and the node does not record a vote for that stale candidate", out[0].granted == 0 && b.d.voted_for == -1 && out[0].term == 3);
     { uint32_t t[3] = {1, 1, 2}; log_of(&d, 2, -1, 3, t); raft_init(&b, 1, 5, &d, 0);
       m = rv(0, 1, 3, 3, 1); raft_recv(&b, &m, 0, out); check("the up-to-date rule: a candidate whose last log TERM is lower is refused even with a longer log (last term 1 < 2)", out[0].granted == 0 && b.d.term == 3);
       raft_init(&b, 1, 5, &d, 0); m = rv(0, 1, 3, 2, 2); raft_recv(&b, &m, 0, out); check("equal last term but a shorter log (2 < 3) is refused", out[0].granted == 0);
