@@ -1,5 +1,7 @@
 # Unix OS from Scratch
 
+![A layered stack from hardware and boot code through the kernel up to a bank, an ATM, an umbrella and an airplane: a kernel built from nothing, and the applications on it](assets/art/hero.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 *A Bare-Metal x86-64 Kernel Built From Nothing*
 
 Every program in this author's other books -- a CUDA kernel, a tensor compiler, a C++ inference server -- ran *on top of* an operating system, and quietly relied on it for almost everything: memory that just appears when you ask, a filesystem, the ability to print a character to a screen. This book builds the thing underneath all of that. It starts at the one moment none of those other books ever had to think about -- the instant a CPU has power and literally nothing else exists yet, not even a guarantee that memory has been zeroed -- and builds forward from there: booting a real kernel with a real bootloader, talking to real hardware one device at a time, giving processes real memory isolation, and eventually a filesystem and a shell a person could actually type into.

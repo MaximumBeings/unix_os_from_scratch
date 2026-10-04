@@ -1,5 +1,7 @@
 # Getting Started
 
+![A terminal with a build command: getting started](assets/art/start.svg){ style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" }
+
 This book builds a bare-metal, x86-64-targeted, Unix-family-inspired kernel in C, assembled and linked with an ordinary freestanding toolchain -- no separate cross-compiler is needed, since this book's own kernel targets the same architecture (x86-64/i386-compatible) its cloud authoring machine already runs on. Booting is real: every kernel this book builds is packed into a bootable ISO with GRUB and genuinely booted in QEMU, a real, complete x86 hardware emulator -- not a simulator that approximates behavior, an emulator that actually executes the compiled machine code.
 
 ## Installing a toolchain
