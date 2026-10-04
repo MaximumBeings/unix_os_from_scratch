@@ -245,3 +245,19 @@ def s52(s):  # a pay stub: gross at the top, withholdings carved out, net at the
     for k, (a, c) in enumerate((("period 1-22: 6.2% each pay", s.main), ("period 23: only the last dollars", s.light), ("period 24+: Social Security $0", s.acc))):
         s.text(450, 190 + k * 26, a, 12, c, "start", bold=True)
     s.text(600, 280, "Additional Medicare 0.9% above $200,000", 11, s.light, op=.9)
+
+
+def s53(s):  # an LSM tree: the log and the memtable on top, flushed tables below, one big bottom table, a Bloom filter in front of a read
+    s.rect(60, 30, 150, 44, s.light, s.dark, 3, 8); s.text(135, 58, "WAL (log)", 14, s.dark, bold=True)
+    for k in range(5): s.rect(70 + k * 28, 80, 22, 12, s.acc, s.dark, 1, 2)
+    s.rect(250, 30, 220, 44, s.main, s.dark, 3, 8); s.text(360, 58, "MEMTABLE (sorted, RAM)", 13, s.dark, bold=True)
+    s.path("M360,76 L360,112", stroke=s.light, sw=3); s.text(400, 100, "flush", 12, s.light, "start", bold=True)
+    for k in range(3): s.rect(250 + k * 32, 118 + k * 20, 150, 20, s.light, s.main, 2, 5, op=.95); s.text(262 + k * 32, 133 + k * 20, "L0 table %d" % (3 - k), 11, s.dark, "start", bold=True)
+    s.path("M360,182 q0,18 0,36", stroke=s.light, sw=3); s.text(404, 206, "compact", 12, s.light, "start", bold=True)
+    s.rect(230, 222, 260, 44, s.dark, s.main, 3, 8); s.text(360, 250, "L1: one sorted table", 13, s.light, bold=True)
+    s.rect(560, 40, 200, 90, "#060c16", s.main, 2, 8); s.text(660, 62, "BLOOM FILTER", 12, s.light, bold=True)
+    for k in range(16): s.rect(572 + k * 11, 76, 9, 14, s.acc if k in (2, 7, 12) else s.dark, s.main, 1, 1)
+    s.text(660, 112, "not here: skip the table", 11, s.light, op=.9)
+    s.text(660, 160, "GET key", 13, s.main, bold=True); s.path("M590,170 L520,200", stroke=s.main, sw=2); s.path("M590,170 L520,148", stroke=s.main, sw=2)
+    s.path("M610,214 l30,30 m0,-30 l-30,30", stroke=s.acc, sw=5); s.text(700, 240, "crash!", 14, s.acc, "start", bold=True)
+    s.text(660, 276, "reopen: replay the log, cut the torn tail", 11, s.light, op=.9)

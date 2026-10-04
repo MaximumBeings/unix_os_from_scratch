@@ -1,0 +1,4 @@
+These ten files are test files from two open-source projects, copied unchanged:
+  x12_*.txt          github.com/imsweb/x12-parser   src/test/resources/837_5010/   commit 083c4e2a34805b1b92f2850d96c6d3e42cc6b755   (BSD 3-clause, see LICENSE_imsweb_x12-parser.txt)
+  835_mult_loops.txt github.com/azoner/pyx12        pyx12/tests/                   commit d6517b92d9e09330e7cdc204401b5e86b4f74bb1   (BSD 3-clause, see LICENSE_pyx12.txt)
+They are test inputs written to exercise those projects' parsers. They are in the real X12 formats, but they are not real claims and not real remittances, and (as this chapter shows) several are not even internally consistent.
