@@ -1170,9 +1170,9 @@ Worked answer: (a) a wrong **prior-year** balance sheet: only the current balanc
 
 ---
 
-## Chapter 49: Health-Care Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent
+## Chapter 49: Healthcare Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent
 
-*(from [49. Health-Care Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent](../part49/49-health-care-claims-x12-837-835.md))*
+*(from [49. Healthcare Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent](../part49/49-healthcare-claims-x12-837-835.md))*
 
 **1. What is the NPI check digit, why does the claim reader test it before anything else, and what does passing it prove and not prove?**
 
@@ -1193,3 +1193,30 @@ Worked answer: a **CO** (contractual obligation) adjustment is an amount the pro
 **5. Why must `charge = paid + CO + PR` hold exactly on every line, how does the engine enforce it, and how do the reconciler's three balance checks catch a tampered remittance?**
 
 Worked answer: every dollar billed has to end up somewhere: paid by the plan, written off by the provider, or owed by the patient. If a line did not balance, money would be created or lost between the claim and the ledger. The engine enforces it **by construction** (the plan pays the allowed amount less the patient's share, and the write-off is the charge less the allowed amount, so the three always sum to the charge) and **by check** (`adj_verify()` re-sums every line, every claim total and the accumulators before returning, and returns an error code otherwise); the differential test and the fuzzer check it again from outside. The reconciler works on the *remittance*, which is only text: per service line, `SVC02 - SVC03` must equal the sum of that line's `CAS` amounts; per claim, `CLP03 - CLP04` must equal the claim's adjustments; for the whole file, `BPR02` must equal the sum of `CLP04` less provider-level adjustments. Changing any one amount (a paid amount, an adjustment, the payment) breaks at least one of the three, which is exactly what the chapter's fifth attack shows: changing `CLP04` from $0 to $5 makes the claim unbalanced and the payment no longer equal to the sum of the claims.
+
+
+---
+
+## Chapter 50: A Bitcoin Block Validator
+
+*(from [50. A Bitcoin Block Validator](../part50/50-bitcoin-block-validator.md))*
+
+**1. Why is a block's hash computed twice, and why is it displayed reversed?**
+
+Worked answer: Bitcoin defines the hash as SHA-256 applied to the output of SHA-256; the doubling is a design choice commonly explained as protection against length-extension attacks on a single SHA-256. The 32 output bytes are compared with the target as a little-endian number, so the human-readable form (the leading zeros of proof of work on the left) is the bytes printed in reverse order. The code keeps raw digest order internally and reverses only when printing.
+
+**2. `[a, b, c]` and `[a, b, c, c]` have the same Merkle root. Why does that matter, and how does the validator handle it?**
+
+Worked answer: an odd level is padded by duplicating its last hash, so a third leaf `c` is paired with itself, exactly as an explicit repeated `c` would be. A block with the repeated transaction therefore has a valid root while differing from the genuine block, which lets an attacker produce a second block with the same header hash (CVE-2012-2459). The validator flags any two equal hashes side by side at any level as mutated and refuses the block as bad-txns-duplicate, even though the root matches; the chapter's synthetic block shows this.
+
+**3. Expand the compact target `0x1d00ffff` by hand, and say why `0x1d80ffff` is refused.**
+
+Worked answer: exponent 0x1d = 29, mantissa 0x00ffff. The target is 0x00ffff x 256^(29-3) = 0xffff followed by 26 zero bytes, which as 32 bytes is `00000000ffff0000...00`. In `0x1d80ffff` the mantissa's top bit (0x800000) is the sign bit, so it encodes a negative number, which is never a valid target.
+
+**4. Why is the witness reserved value covered by the commitment but not by the Merkle root of txids?**
+
+Worked answer: a txid hashes the transaction without witness data, so anything in a witness stack is invisible to the ordinary Merkle root. The witness commitment is double-SHA-256 of (the witness Merkle root, built from wtxids with zero for the coinbase, followed by the reserved value), so it covers the witness data. Flipping one bit of the reserved value leaves the Merkle root matching and breaks the commitment, which is the chapter's fifth attack.
+
+**5. Name three rules Bitcoin applies to a block that this validator does not, and what each would need.**
+
+Worked answer: (a) script execution and signature checking (an interpreter and secp256k1 ECDSA/Schnorr); (b) that every input spends an existing, unspent output (a coin database); (c) the block reward limit and the difficulty adjustment (the chain's height and the timestamps of earlier blocks). Also timestamp rules (median time past and a clock).

@@ -1,0 +1,1347 @@
+<xbrl
+  xml:lang="en-US"
+  xmlns="http://www.xbrl.org/2003/instance"
+  xmlns:aapl="http://www.apple.com/20230930"
+  xmlns:country="http://xbrl.sec.gov/country/2023"
+  xmlns:dei="http://xbrl.sec.gov/dei/2023"
+  xmlns:ecd="http://xbrl.sec.gov/ecd/2023"
+  xmlns:iso4217="http://www.xbrl.org/2003/iso4217"
+  xmlns:link="http://www.xbrl.org/2003/linkbase"
+  xmlns:srt="http://fasb.org/srt/2023"
+  xmlns:us-gaap="http://fasb.org/us-gaap/2023"
+  xmlns:xbrldi="http://xbrl.org/2006/xbrldi"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<context id="c-1">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+        </entity>
+        <period>
+            <startDate>2022-09-25</startDate>
+            <endDate>2023-09-30</endDate>
+        </period>
+    </context>
+<context id="c-14">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:ProductOrServiceAxis">us-gaap:ProductMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2022-09-25</startDate>
+            <endDate>2023-09-30</endDate>
+        </period>
+    </context>
+<context id="c-15">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:ProductOrServiceAxis">us-gaap:ProductMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2021-09-26</startDate>
+            <endDate>2022-09-24</endDate>
+        </period>
+    </context>
+<context id="c-16">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:ProductOrServiceAxis">us-gaap:ProductMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2020-09-27</startDate>
+            <endDate>2021-09-25</endDate>
+        </period>
+    </context>
+<context id="c-17">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:ProductOrServiceAxis">us-gaap:ServiceMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2022-09-25</startDate>
+            <endDate>2023-09-30</endDate>
+        </period>
+    </context>
+<context id="c-18">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:ProductOrServiceAxis">us-gaap:ServiceMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2021-09-26</startDate>
+            <endDate>2022-09-24</endDate>
+        </period>
+    </context>
+<context id="c-19">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:ProductOrServiceAxis">us-gaap:ServiceMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2020-09-27</startDate>
+            <endDate>2021-09-25</endDate>
+        </period>
+    </context>
+<context id="c-20">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+        </entity>
+        <period>
+            <startDate>2021-09-26</startDate>
+            <endDate>2022-09-24</endDate>
+        </period>
+    </context>
+<context id="c-21">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+        </entity>
+        <period>
+            <startDate>2020-09-27</startDate>
+            <endDate>2021-09-25</endDate>
+        </period>
+    </context>
+<context id="c-22">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+        </entity>
+        <period>
+            <instant>2023-09-30</instant>
+        </period>
+    </context>
+<context id="c-23">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+        </entity>
+        <period>
+            <instant>2022-09-24</instant>
+        </period>
+    </context>
+<context id="c-24">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+        </entity>
+        <period>
+            <instant>2021-09-25</instant>
+        </period>
+    </context>
+<context id="c-25">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+        </entity>
+        <period>
+            <instant>2020-09-26</instant>
+        </period>
+    </context>
+<context id="c-26">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementEquityComponentsAxis">us-gaap:CommonStockIncludingAdditionalPaidInCapitalMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2022-09-24</instant>
+        </period>
+    </context>
+<context id="c-27">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementEquityComponentsAxis">us-gaap:CommonStockIncludingAdditionalPaidInCapitalMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2021-09-25</instant>
+        </period>
+    </context>
+<context id="c-28">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementEquityComponentsAxis">us-gaap:CommonStockIncludingAdditionalPaidInCapitalMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2020-09-26</instant>
+        </period>
+    </context>
+<context id="c-32">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementEquityComponentsAxis">us-gaap:CommonStockIncludingAdditionalPaidInCapitalMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2023-09-30</instant>
+        </period>
+    </context>
+<context id="c-33">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementEquityComponentsAxis">us-gaap:RetainedEarningsMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2022-09-24</instant>
+        </period>
+    </context>
+<context id="c-34">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementEquityComponentsAxis">us-gaap:RetainedEarningsMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2021-09-25</instant>
+        </period>
+    </context>
+<context id="c-35">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementEquityComponentsAxis">us-gaap:RetainedEarningsMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2020-09-26</instant>
+        </period>
+    </context>
+<context id="c-36">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementEquityComponentsAxis">us-gaap:RetainedEarningsMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2022-09-25</startDate>
+            <endDate>2023-09-30</endDate>
+        </period>
+    </context>
+<context id="c-37">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementEquityComponentsAxis">us-gaap:RetainedEarningsMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2021-09-26</startDate>
+            <endDate>2022-09-24</endDate>
+        </period>
+    </context>
+<context id="c-38">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementEquityComponentsAxis">us-gaap:RetainedEarningsMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2020-09-27</startDate>
+            <endDate>2021-09-25</endDate>
+        </period>
+    </context>
+<context id="c-39">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementEquityComponentsAxis">us-gaap:RetainedEarningsMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2023-09-30</instant>
+        </period>
+    </context>
+<context id="c-40">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementEquityComponentsAxis">us-gaap:AccumulatedOtherComprehensiveIncomeMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2022-09-24</instant>
+        </period>
+    </context>
+<context id="c-41">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementEquityComponentsAxis">us-gaap:AccumulatedOtherComprehensiveIncomeMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2021-09-25</instant>
+        </period>
+    </context>
+<context id="c-42">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementEquityComponentsAxis">us-gaap:AccumulatedOtherComprehensiveIncomeMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2020-09-26</instant>
+        </period>
+    </context>
+<context id="c-46">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementEquityComponentsAxis">us-gaap:AccumulatedOtherComprehensiveIncomeMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2023-09-30</instant>
+        </period>
+    </context>
+<context id="c-47">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:ProductOrServiceAxis">aapl:IPhoneMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2022-09-25</startDate>
+            <endDate>2023-09-30</endDate>
+        </period>
+    </context>
+<context id="c-48">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:ProductOrServiceAxis">aapl:IPhoneMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2021-09-26</startDate>
+            <endDate>2022-09-24</endDate>
+        </period>
+    </context>
+<context id="c-49">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:ProductOrServiceAxis">aapl:IPhoneMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2020-09-27</startDate>
+            <endDate>2021-09-25</endDate>
+        </period>
+    </context>
+<context id="c-50">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:ProductOrServiceAxis">aapl:MacMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2022-09-25</startDate>
+            <endDate>2023-09-30</endDate>
+        </period>
+    </context>
+<context id="c-51">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:ProductOrServiceAxis">aapl:MacMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2021-09-26</startDate>
+            <endDate>2022-09-24</endDate>
+        </period>
+    </context>
+<context id="c-52">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:ProductOrServiceAxis">aapl:MacMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2020-09-27</startDate>
+            <endDate>2021-09-25</endDate>
+        </period>
+    </context>
+<context id="c-53">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:ProductOrServiceAxis">aapl:IPadMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2022-09-25</startDate>
+            <endDate>2023-09-30</endDate>
+        </period>
+    </context>
+<context id="c-54">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:ProductOrServiceAxis">aapl:IPadMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2021-09-26</startDate>
+            <endDate>2022-09-24</endDate>
+        </period>
+    </context>
+<context id="c-55">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:ProductOrServiceAxis">aapl:IPadMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2020-09-27</startDate>
+            <endDate>2021-09-25</endDate>
+        </period>
+    </context>
+<context id="c-56">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:ProductOrServiceAxis">aapl:WearablesHomeandAccessoriesMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2022-09-25</startDate>
+            <endDate>2023-09-30</endDate>
+        </period>
+    </context>
+<context id="c-57">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:ProductOrServiceAxis">aapl:WearablesHomeandAccessoriesMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2021-09-26</startDate>
+            <endDate>2022-09-24</endDate>
+        </period>
+    </context>
+<context id="c-58">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:ProductOrServiceAxis">aapl:WearablesHomeandAccessoriesMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2020-09-27</startDate>
+            <endDate>2021-09-25</endDate>
+        </period>
+    </context>
+<context id="c-64">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FinancialInstrumentAxis">us-gaap:CashMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2023-09-30</instant>
+        </period>
+    </context>
+<context id="c-65">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FairValueByFairValueHierarchyLevelAxis">us-gaap:FairValueInputsLevel1Member</xbrldi:explicitMember>
+                <xbrldi:explicitMember dimension="us-gaap:FinancialInstrumentAxis">us-gaap:MoneyMarketFundsMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2023-09-30</instant>
+        </period>
+    </context>
+<context id="c-66">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FairValueByFairValueHierarchyLevelAxis">us-gaap:FairValueInputsLevel1Member</xbrldi:explicitMember>
+                <xbrldi:explicitMember dimension="us-gaap:FinancialInstrumentAxis">us-gaap:EquitySecuritiesMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2023-09-30</instant>
+        </period>
+    </context>
+<context id="c-67">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FairValueByFairValueHierarchyLevelAxis">us-gaap:FairValueInputsLevel1Member</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2023-09-30</instant>
+        </period>
+    </context>
+<context id="c-68">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FairValueByFairValueHierarchyLevelAxis">us-gaap:FairValueInputsLevel2Member</xbrldi:explicitMember>
+                <xbrldi:explicitMember dimension="us-gaap:FinancialInstrumentAxis">us-gaap:USTreasurySecuritiesMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2023-09-30</instant>
+        </period>
+    </context>
+<context id="c-69">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FairValueByFairValueHierarchyLevelAxis">us-gaap:FairValueInputsLevel2Member</xbrldi:explicitMember>
+                <xbrldi:explicitMember dimension="us-gaap:FinancialInstrumentAxis">us-gaap:USGovernmentAgenciesDebtSecuritiesMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2023-09-30</instant>
+        </period>
+    </context>
+<context id="c-70">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FairValueByFairValueHierarchyLevelAxis">us-gaap:FairValueInputsLevel2Member</xbrldi:explicitMember>
+                <xbrldi:explicitMember dimension="us-gaap:FinancialInstrumentAxis">us-gaap:ForeignGovernmentDebtSecuritiesMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2023-09-30</instant>
+        </period>
+    </context>
+<context id="c-71">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FairValueByFairValueHierarchyLevelAxis">us-gaap:FairValueInputsLevel2Member</xbrldi:explicitMember>
+                <xbrldi:explicitMember dimension="us-gaap:FinancialInstrumentAxis">us-gaap:BankTimeDepositsMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2023-09-30</instant>
+        </period>
+    </context>
+<context id="c-72">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FairValueByFairValueHierarchyLevelAxis">us-gaap:FairValueInputsLevel2Member</xbrldi:explicitMember>
+                <xbrldi:explicitMember dimension="us-gaap:FinancialInstrumentAxis">us-gaap:CommercialPaperMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2023-09-30</instant>
+        </period>
+    </context>
+<context id="c-73">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FairValueByFairValueHierarchyLevelAxis">us-gaap:FairValueInputsLevel2Member</xbrldi:explicitMember>
+                <xbrldi:explicitMember dimension="us-gaap:FinancialInstrumentAxis">us-gaap:CorporateDebtSecuritiesMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2023-09-30</instant>
+        </period>
+    </context>
+<context id="c-74">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FairValueByFairValueHierarchyLevelAxis">us-gaap:FairValueInputsLevel2Member</xbrldi:explicitMember>
+                <xbrldi:explicitMember dimension="us-gaap:FinancialInstrumentAxis">us-gaap:USStatesAndPoliticalSubdivisionsMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2023-09-30</instant>
+        </period>
+    </context>
+<context id="c-75">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FairValueByFairValueHierarchyLevelAxis">us-gaap:FairValueInputsLevel2Member</xbrldi:explicitMember>
+                <xbrldi:explicitMember dimension="us-gaap:FinancialInstrumentAxis">us-gaap:AssetBackedSecuritiesMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2023-09-30</instant>
+        </period>
+    </context>
+<context id="c-76">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FairValueByFairValueHierarchyLevelAxis">us-gaap:FairValueInputsLevel2Member</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2023-09-30</instant>
+        </period>
+    </context>
+<context id="c-77">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FinancialInstrumentAxis">us-gaap:CashMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2022-09-24</instant>
+        </period>
+    </context>
+<context id="c-78">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FairValueByFairValueHierarchyLevelAxis">us-gaap:FairValueInputsLevel1Member</xbrldi:explicitMember>
+                <xbrldi:explicitMember dimension="us-gaap:FinancialInstrumentAxis">us-gaap:MoneyMarketFundsMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2022-09-24</instant>
+        </period>
+    </context>
+<context id="c-79">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FairValueByFairValueHierarchyLevelAxis">us-gaap:FairValueInputsLevel1Member</xbrldi:explicitMember>
+                <xbrldi:explicitMember dimension="us-gaap:FinancialInstrumentAxis">us-gaap:MutualFundMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2022-09-24</instant>
+        </period>
+    </context>
+<context id="c-80">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FairValueByFairValueHierarchyLevelAxis">us-gaap:FairValueInputsLevel1Member</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2022-09-24</instant>
+        </period>
+    </context>
+<context id="c-81">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FairValueByFairValueHierarchyLevelAxis">us-gaap:FairValueInputsLevel2Member</xbrldi:explicitMember>
+                <xbrldi:explicitMember dimension="us-gaap:FinancialInstrumentAxis">us-gaap:USTreasurySecuritiesMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2022-09-24</instant>
+        </period>
+    </context>
+<context id="c-82">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FairValueByFairValueHierarchyLevelAxis">us-gaap:FairValueInputsLevel2Member</xbrldi:explicitMember>
+                <xbrldi:explicitMember dimension="us-gaap:FinancialInstrumentAxis">us-gaap:USGovernmentAgenciesDebtSecuritiesMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2022-09-24</instant>
+        </period>
+    </context>
+<context id="c-83">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FairValueByFairValueHierarchyLevelAxis">us-gaap:FairValueInputsLevel2Member</xbrldi:explicitMember>
+                <xbrldi:explicitMember dimension="us-gaap:FinancialInstrumentAxis">us-gaap:ForeignGovernmentDebtSecuritiesMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2022-09-24</instant>
+        </period>
+    </context>
+<context id="c-84">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FairValueByFairValueHierarchyLevelAxis">us-gaap:FairValueInputsLevel2Member</xbrldi:explicitMember>
+                <xbrldi:explicitMember dimension="us-gaap:FinancialInstrumentAxis">us-gaap:BankTimeDepositsMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2022-09-24</instant>
+        </period>
+    </context>
+<context id="c-85">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FairValueByFairValueHierarchyLevelAxis">us-gaap:FairValueInputsLevel2Member</xbrldi:explicitMember>
+                <xbrldi:explicitMember dimension="us-gaap:FinancialInstrumentAxis">us-gaap:CommercialPaperMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2022-09-24</instant>
+        </period>
+    </context>
+<context id="c-86">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FairValueByFairValueHierarchyLevelAxis">us-gaap:FairValueInputsLevel2Member</xbrldi:explicitMember>
+                <xbrldi:explicitMember dimension="us-gaap:FinancialInstrumentAxis">us-gaap:CorporateDebtSecuritiesMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2022-09-24</instant>
+        </period>
+    </context>
+<context id="c-87">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FairValueByFairValueHierarchyLevelAxis">us-gaap:FairValueInputsLevel2Member</xbrldi:explicitMember>
+                <xbrldi:explicitMember dimension="us-gaap:FinancialInstrumentAxis">us-gaap:USStatesAndPoliticalSubdivisionsMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2022-09-24</instant>
+        </period>
+    </context>
+<context id="c-88">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FairValueByFairValueHierarchyLevelAxis">us-gaap:FairValueInputsLevel2Member</xbrldi:explicitMember>
+                <xbrldi:explicitMember dimension="us-gaap:FinancialInstrumentAxis">us-gaap:AssetBackedSecuritiesMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2022-09-24</instant>
+        </period>
+    </context>
+<context id="c-89">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:FairValueByFairValueHierarchyLevelAxis">us-gaap:FairValueInputsLevel2Member</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <instant>2022-09-24</instant>
+        </period>
+    </context>
+<context id="c-162">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementBusinessSegmentsAxis">aapl:AmericasSegmentMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2022-09-25</startDate>
+            <endDate>2023-09-30</endDate>
+        </period>
+    </context>
+<context id="c-163">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementBusinessSegmentsAxis">aapl:AmericasSegmentMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2021-09-26</startDate>
+            <endDate>2022-09-24</endDate>
+        </period>
+    </context>
+<context id="c-164">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementBusinessSegmentsAxis">aapl:AmericasSegmentMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2020-09-27</startDate>
+            <endDate>2021-09-25</endDate>
+        </period>
+    </context>
+<context id="c-165">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementBusinessSegmentsAxis">aapl:EuropeSegmentMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2022-09-25</startDate>
+            <endDate>2023-09-30</endDate>
+        </period>
+    </context>
+<context id="c-166">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementBusinessSegmentsAxis">aapl:EuropeSegmentMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2021-09-26</startDate>
+            <endDate>2022-09-24</endDate>
+        </period>
+    </context>
+<context id="c-167">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementBusinessSegmentsAxis">aapl:EuropeSegmentMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2020-09-27</startDate>
+            <endDate>2021-09-25</endDate>
+        </period>
+    </context>
+<context id="c-168">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementBusinessSegmentsAxis">aapl:GreaterChinaSegmentMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2022-09-25</startDate>
+            <endDate>2023-09-30</endDate>
+        </period>
+    </context>
+<context id="c-169">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementBusinessSegmentsAxis">aapl:GreaterChinaSegmentMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2021-09-26</startDate>
+            <endDate>2022-09-24</endDate>
+        </period>
+    </context>
+<context id="c-170">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementBusinessSegmentsAxis">aapl:GreaterChinaSegmentMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2020-09-27</startDate>
+            <endDate>2021-09-25</endDate>
+        </period>
+    </context>
+<context id="c-171">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementBusinessSegmentsAxis">aapl:JapanSegmentMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2022-09-25</startDate>
+            <endDate>2023-09-30</endDate>
+        </period>
+    </context>
+<context id="c-172">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementBusinessSegmentsAxis">aapl:JapanSegmentMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2021-09-26</startDate>
+            <endDate>2022-09-24</endDate>
+        </period>
+    </context>
+<context id="c-173">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementBusinessSegmentsAxis">aapl:JapanSegmentMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2020-09-27</startDate>
+            <endDate>2021-09-25</endDate>
+        </period>
+    </context>
+<context id="c-174">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementBusinessSegmentsAxis">aapl:RestOfAsiaPacificSegmentMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2022-09-25</startDate>
+            <endDate>2023-09-30</endDate>
+        </period>
+    </context>
+<context id="c-175">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementBusinessSegmentsAxis">aapl:RestOfAsiaPacificSegmentMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2021-09-26</startDate>
+            <endDate>2022-09-24</endDate>
+        </period>
+    </context>
+<context id="c-176">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="us-gaap:StatementBusinessSegmentsAxis">aapl:RestOfAsiaPacificSegmentMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2020-09-27</startDate>
+            <endDate>2021-09-25</endDate>
+        </period>
+    </context>
+<context id="c-177">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:ConsolidationItemsAxis">us-gaap:OperatingSegmentsMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2022-09-25</startDate>
+            <endDate>2023-09-30</endDate>
+        </period>
+    </context>
+<context id="c-178">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:ConsolidationItemsAxis">us-gaap:OperatingSegmentsMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2021-09-26</startDate>
+            <endDate>2022-09-24</endDate>
+        </period>
+    </context>
+<context id="c-179">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:ConsolidationItemsAxis">us-gaap:OperatingSegmentsMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2020-09-27</startDate>
+            <endDate>2021-09-25</endDate>
+        </period>
+    </context>
+<context id="c-186">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:StatementGeographicalAxis">country:US</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2022-09-25</startDate>
+            <endDate>2023-09-30</endDate>
+        </period>
+    </context>
+<context id="c-187">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:StatementGeographicalAxis">country:US</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2021-09-26</startDate>
+            <endDate>2022-09-24</endDate>
+        </period>
+    </context>
+<context id="c-188">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:StatementGeographicalAxis">country:US</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2020-09-27</startDate>
+            <endDate>2021-09-25</endDate>
+        </period>
+    </context>
+<context id="c-189">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:StatementGeographicalAxis">country:CN</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2022-09-25</startDate>
+            <endDate>2023-09-30</endDate>
+        </period>
+    </context>
+<context id="c-190">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:StatementGeographicalAxis">country:CN</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2021-09-26</startDate>
+            <endDate>2022-09-24</endDate>
+        </period>
+    </context>
+<context id="c-191">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:StatementGeographicalAxis">country:CN</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2020-09-27</startDate>
+            <endDate>2021-09-25</endDate>
+        </period>
+    </context>
+<context id="c-192">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:StatementGeographicalAxis">aapl:OtherCountriesMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2022-09-25</startDate>
+            <endDate>2023-09-30</endDate>
+        </period>
+    </context>
+<context id="c-193">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:StatementGeographicalAxis">aapl:OtherCountriesMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2021-09-26</startDate>
+            <endDate>2022-09-24</endDate>
+        </period>
+    </context>
+<context id="c-194">
+        <entity>
+            <identifier scheme="http://www.sec.gov/CIK">0000320193</identifier>
+            <segment>
+                <xbrldi:explicitMember dimension="srt:StatementGeographicalAxis">aapl:OtherCountriesMember</xbrldi:explicitMember>
+            </segment>
+        </entity>
+        <period>
+            <startDate>2020-09-27</startDate>
+            <endDate>2021-09-25</endDate>
+        </period>
+    </context>
+<unit id="usd">
+        <measure>iso4217:USD</measure>
+    </unit>
+<unit id="usdPerShare">
+        <divide>
+            <unitNumerator>
+                <measure>iso4217:USD</measure>
+            </unitNumerator>
+            <unitDenominator>
+                <measure>shares</measure>
+            </unitDenominator>
+        </divide>
+    </unit>
+<dei:EntityCentralIndexKey contextRef="c-1" id="f-62">0000320193</dei:EntityCentralIndexKey>
+<dei:DocumentType contextRef="c-1" id="f-1">10-K</dei:DocumentType>
+<dei:DocumentPeriodEndDate contextRef="c-1" id="f-4">2023-09-30</dei:DocumentPeriodEndDate>
+<dei:EntityRegistrantName contextRef="c-1" id="f-7">Apple Inc.</dei:EntityRegistrantName>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-14" decimals="-6" id="f-63" unitRef="usd">298085000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-15" decimals="-6" id="f-64" unitRef="usd">316199000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-16" decimals="-6" id="f-65" unitRef="usd">297392000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-17" decimals="-6" id="f-66" unitRef="usd">85200000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-18" decimals="-6" id="f-67" unitRef="usd">78129000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-19" decimals="-6" id="f-68" unitRef="usd">68425000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-1" decimals="-6" id="f-69" unitRef="usd">383285000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-20" decimals="-6" id="f-70" unitRef="usd">394328000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-21" decimals="-6" id="f-71" unitRef="usd">365817000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:CostOfGoodsAndServicesSold contextRef="c-14" decimals="-6" id="f-72" unitRef="usd">189282000000</us-gaap:CostOfGoodsAndServicesSold>
+<us-gaap:CostOfGoodsAndServicesSold contextRef="c-15" decimals="-6" id="f-73" unitRef="usd">201471000000</us-gaap:CostOfGoodsAndServicesSold>
+<us-gaap:CostOfGoodsAndServicesSold contextRef="c-16" decimals="-6" id="f-74" unitRef="usd">192266000000</us-gaap:CostOfGoodsAndServicesSold>
+<us-gaap:CostOfGoodsAndServicesSold contextRef="c-17" decimals="-6" id="f-75" unitRef="usd">24855000000</us-gaap:CostOfGoodsAndServicesSold>
+<us-gaap:CostOfGoodsAndServicesSold contextRef="c-18" decimals="-6" id="f-76" unitRef="usd">22075000000</us-gaap:CostOfGoodsAndServicesSold>
+<us-gaap:CostOfGoodsAndServicesSold contextRef="c-19" decimals="-6" id="f-77" unitRef="usd">20715000000</us-gaap:CostOfGoodsAndServicesSold>
+<us-gaap:CostOfGoodsAndServicesSold contextRef="c-1" decimals="-6" id="f-78" unitRef="usd">214137000000</us-gaap:CostOfGoodsAndServicesSold>
+<us-gaap:CostOfGoodsAndServicesSold contextRef="c-20" decimals="-6" id="f-79" unitRef="usd">223546000000</us-gaap:CostOfGoodsAndServicesSold>
+<us-gaap:CostOfGoodsAndServicesSold contextRef="c-21" decimals="-6" id="f-80" unitRef="usd">212981000000</us-gaap:CostOfGoodsAndServicesSold>
+<us-gaap:GrossProfit contextRef="c-1" decimals="-6" id="f-81" unitRef="usd">169148000000</us-gaap:GrossProfit>
+<us-gaap:GrossProfit contextRef="c-20" decimals="-6" id="f-82" unitRef="usd">170782000000</us-gaap:GrossProfit>
+<us-gaap:GrossProfit contextRef="c-21" decimals="-6" id="f-83" unitRef="usd">152836000000</us-gaap:GrossProfit>
+<us-gaap:OperatingIncomeLoss contextRef="c-1" decimals="-6" id="f-93" unitRef="usd">114301000000</us-gaap:OperatingIncomeLoss>
+<us-gaap:OperatingIncomeLoss contextRef="c-20" decimals="-6" id="f-94" unitRef="usd">119437000000</us-gaap:OperatingIncomeLoss>
+<us-gaap:OperatingIncomeLoss contextRef="c-21" decimals="-6" id="f-95" unitRef="usd">108949000000</us-gaap:OperatingIncomeLoss>
+<us-gaap:NetIncomeLoss contextRef="c-1" decimals="-6" id="f-105" unitRef="usd">96995000000</us-gaap:NetIncomeLoss>
+<us-gaap:NetIncomeLoss contextRef="c-20" decimals="-6" id="f-106" unitRef="usd">99803000000</us-gaap:NetIncomeLoss>
+<us-gaap:NetIncomeLoss contextRef="c-21" decimals="-6" id="f-107" unitRef="usd">94680000000</us-gaap:NetIncomeLoss>
+<us-gaap:EarningsPerShareDiluted
+      contextRef="c-1"
+      decimals="2"
+      id="f-111"
+      unitRef="usdPerShare">6.13</us-gaap:EarningsPerShareDiluted>
+<us-gaap:EarningsPerShareDiluted
+      contextRef="c-20"
+      decimals="2"
+      id="f-112"
+      unitRef="usdPerShare">6.11</us-gaap:EarningsPerShareDiluted>
+<us-gaap:EarningsPerShareDiluted
+      contextRef="c-21"
+      decimals="2"
+      id="f-113"
+      unitRef="usdPerShare">5.61</us-gaap:EarningsPerShareDiluted>
+<us-gaap:NetIncomeLoss contextRef="c-1" decimals="-6" id="f-120" unitRef="usd">96995000000</us-gaap:NetIncomeLoss>
+<us-gaap:NetIncomeLoss contextRef="c-20" decimals="-6" id="f-121" unitRef="usd">99803000000</us-gaap:NetIncomeLoss>
+<us-gaap:NetIncomeLoss contextRef="c-21" decimals="-6" id="f-122" unitRef="usd">94680000000</us-gaap:NetIncomeLoss>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-22" decimals="-6" id="f-150" unitRef="usd">29965000000</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-23" decimals="-6" id="f-151" unitRef="usd">23646000000</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-22" decimals="-6" id="f-152" unitRef="usd">31590000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-23" decimals="-6" id="f-153" unitRef="usd">24658000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:AccountsReceivableNetCurrent contextRef="c-22" decimals="-6" id="f-154" unitRef="usd">29508000000</us-gaap:AccountsReceivableNetCurrent>
+<us-gaap:AccountsReceivableNetCurrent contextRef="c-23" decimals="-6" id="f-155" unitRef="usd">28184000000</us-gaap:AccountsReceivableNetCurrent>
+<us-gaap:AssetsCurrent contextRef="c-22" decimals="-6" id="f-162" unitRef="usd">143566000000</us-gaap:AssetsCurrent>
+<us-gaap:AssetsCurrent contextRef="c-23" decimals="-6" id="f-163" unitRef="usd">135405000000</us-gaap:AssetsCurrent>
+<us-gaap:Assets contextRef="c-22" decimals="-6" id="f-172" unitRef="usd">352583000000</us-gaap:Assets>
+<us-gaap:Assets contextRef="c-23" decimals="-6" id="f-173" unitRef="usd">352755000000</us-gaap:Assets>
+<us-gaap:LiabilitiesCurrent contextRef="c-22" decimals="-6" id="f-184" unitRef="usd">145308000000</us-gaap:LiabilitiesCurrent>
+<us-gaap:LiabilitiesCurrent contextRef="c-23" decimals="-6" id="f-185" unitRef="usd">153982000000</us-gaap:LiabilitiesCurrent>
+<us-gaap:Liabilities contextRef="c-22" decimals="-6" id="f-192" unitRef="usd">290437000000</us-gaap:Liabilities>
+<us-gaap:Liabilities contextRef="c-23" decimals="-6" id="f-193" unitRef="usd">302083000000</us-gaap:Liabilities>
+<us-gaap:StockholdersEquity contextRef="c-22" decimals="-6" id="f-210" unitRef="usd">62146000000</us-gaap:StockholdersEquity>
+<us-gaap:StockholdersEquity contextRef="c-23" decimals="-6" id="f-211" unitRef="usd">50672000000</us-gaap:StockholdersEquity>
+<us-gaap:LiabilitiesAndStockholdersEquity contextRef="c-22" decimals="-6" id="f-212" unitRef="usd">352583000000</us-gaap:LiabilitiesAndStockholdersEquity>
+<us-gaap:LiabilitiesAndStockholdersEquity contextRef="c-23" decimals="-6" id="f-213" unitRef="usd">352755000000</us-gaap:LiabilitiesAndStockholdersEquity>
+<us-gaap:StockholdersEquity contextRef="c-23" decimals="-6" id="f-214" unitRef="usd">50672000000</us-gaap:StockholdersEquity>
+<us-gaap:StockholdersEquity contextRef="c-24" decimals="-6" id="f-215" unitRef="usd">63090000000</us-gaap:StockholdersEquity>
+<us-gaap:StockholdersEquity contextRef="c-25" decimals="-6" id="f-216" unitRef="usd">65339000000</us-gaap:StockholdersEquity>
+<us-gaap:StockholdersEquity contextRef="c-26" decimals="-6" id="f-217" unitRef="usd">64849000000</us-gaap:StockholdersEquity>
+<us-gaap:StockholdersEquity contextRef="c-27" decimals="-6" id="f-218" unitRef="usd">57365000000</us-gaap:StockholdersEquity>
+<us-gaap:StockholdersEquity contextRef="c-28" decimals="-6" id="f-219" unitRef="usd">50779000000</us-gaap:StockholdersEquity>
+<us-gaap:StockholdersEquity contextRef="c-32" decimals="-6" id="f-229" unitRef="usd">73812000000</us-gaap:StockholdersEquity>
+<us-gaap:StockholdersEquity contextRef="c-26" decimals="-6" id="f-230" unitRef="usd">64849000000</us-gaap:StockholdersEquity>
+<us-gaap:StockholdersEquity contextRef="c-27" decimals="-6" id="f-231" unitRef="usd">57365000000</us-gaap:StockholdersEquity>
+<us-gaap:StockholdersEquity contextRef="c-33" decimals="-6" id="f-232" unitRef="usd">-3068000000</us-gaap:StockholdersEquity>
+<us-gaap:StockholdersEquity contextRef="c-34" decimals="-6" id="f-233" unitRef="usd">5562000000</us-gaap:StockholdersEquity>
+<us-gaap:StockholdersEquity contextRef="c-35" decimals="-6" id="f-234" unitRef="usd">14966000000</us-gaap:StockholdersEquity>
+<us-gaap:NetIncomeLoss contextRef="c-36" decimals="-6" id="f-235" unitRef="usd">96995000000</us-gaap:NetIncomeLoss>
+<us-gaap:NetIncomeLoss contextRef="c-37" decimals="-6" id="f-236" unitRef="usd">99803000000</us-gaap:NetIncomeLoss>
+<us-gaap:NetIncomeLoss contextRef="c-38" decimals="-6" id="f-237" unitRef="usd">94680000000</us-gaap:NetIncomeLoss>
+<us-gaap:StockholdersEquity contextRef="c-39" decimals="-6" id="f-247" unitRef="usd">-214000000</us-gaap:StockholdersEquity>
+<us-gaap:StockholdersEquity contextRef="c-33" decimals="-6" id="f-248" unitRef="usd">-3068000000</us-gaap:StockholdersEquity>
+<us-gaap:StockholdersEquity contextRef="c-34" decimals="-6" id="f-249" unitRef="usd">5562000000</us-gaap:StockholdersEquity>
+<us-gaap:StockholdersEquity contextRef="c-40" decimals="-6" id="f-250" unitRef="usd">-11109000000</us-gaap:StockholdersEquity>
+<us-gaap:StockholdersEquity contextRef="c-41" decimals="-6" id="f-251" unitRef="usd">163000000</us-gaap:StockholdersEquity>
+<us-gaap:StockholdersEquity contextRef="c-42" decimals="-6" id="f-252" unitRef="usd">-406000000</us-gaap:StockholdersEquity>
+<us-gaap:StockholdersEquity contextRef="c-46" decimals="-6" id="f-256" unitRef="usd">-11452000000</us-gaap:StockholdersEquity>
+<us-gaap:StockholdersEquity contextRef="c-40" decimals="-6" id="f-257" unitRef="usd">-11109000000</us-gaap:StockholdersEquity>
+<us-gaap:StockholdersEquity contextRef="c-41" decimals="-6" id="f-258" unitRef="usd">163000000</us-gaap:StockholdersEquity>
+<us-gaap:StockholdersEquity contextRef="c-22" decimals="-6" id="f-259" unitRef="usd">62146000000</us-gaap:StockholdersEquity>
+<us-gaap:StockholdersEquity contextRef="c-23" decimals="-6" id="f-260" unitRef="usd">50672000000</us-gaap:StockholdersEquity>
+<us-gaap:StockholdersEquity contextRef="c-24" decimals="-6" id="f-261" unitRef="usd">63090000000</us-gaap:StockholdersEquity>
+<us-gaap:NetIncomeLoss contextRef="c-1" decimals="-6" id="f-268" unitRef="usd">96995000000</us-gaap:NetIncomeLoss>
+<us-gaap:NetIncomeLoss contextRef="c-20" decimals="-6" id="f-269" unitRef="usd">99803000000</us-gaap:NetIncomeLoss>
+<us-gaap:NetIncomeLoss contextRef="c-21" decimals="-6" id="f-270" unitRef="usd">94680000000</us-gaap:NetIncomeLoss>
+<us-gaap:NetCashProvidedByUsedInOperatingActivities contextRef="c-1" decimals="-6" id="f-298" unitRef="usd">110543000000</us-gaap:NetCashProvidedByUsedInOperatingActivities>
+<us-gaap:NetCashProvidedByUsedInOperatingActivities contextRef="c-20" decimals="-6" id="f-299" unitRef="usd">122151000000</us-gaap:NetCashProvidedByUsedInOperatingActivities>
+<us-gaap:NetCashProvidedByUsedInOperatingActivities contextRef="c-21" decimals="-6" id="f-300" unitRef="usd">104038000000</us-gaap:NetCashProvidedByUsedInOperatingActivities>
+<us-gaap:PaymentsToAcquirePropertyPlantAndEquipment contextRef="c-1" decimals="-6" id="f-310" unitRef="usd">10959000000</us-gaap:PaymentsToAcquirePropertyPlantAndEquipment>
+<us-gaap:PaymentsToAcquirePropertyPlantAndEquipment contextRef="c-20" decimals="-6" id="f-311" unitRef="usd">10708000000</us-gaap:PaymentsToAcquirePropertyPlantAndEquipment>
+<us-gaap:PaymentsToAcquirePropertyPlantAndEquipment contextRef="c-21" decimals="-6" id="f-312" unitRef="usd">11085000000</us-gaap:PaymentsToAcquirePropertyPlantAndEquipment>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-47" decimals="-6" id="f-370" unitRef="usd">200583000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-48" decimals="-6" id="f-371" unitRef="usd">205489000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-49" decimals="-6" id="f-372" unitRef="usd">191973000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-50" decimals="-6" id="f-373" unitRef="usd">29357000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-51" decimals="-6" id="f-374" unitRef="usd">40177000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-52" decimals="-6" id="f-375" unitRef="usd">35190000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-53" decimals="-6" id="f-376" unitRef="usd">28300000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-54" decimals="-6" id="f-377" unitRef="usd">29292000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-55" decimals="-6" id="f-378" unitRef="usd">31862000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-56" decimals="-6" id="f-379" unitRef="usd">39845000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-57" decimals="-6" id="f-380" unitRef="usd">41241000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-58" decimals="-6" id="f-381" unitRef="usd">38367000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-17" decimals="-6" id="f-382" unitRef="usd">85200000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-18" decimals="-6" id="f-383" unitRef="usd">78129000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-19" decimals="-6" id="f-384" unitRef="usd">68425000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-1" decimals="-6" id="f-385" unitRef="usd">383285000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-20" decimals="-6" id="f-386" unitRef="usd">394328000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-21" decimals="-6" id="f-387" unitRef="usd">365817000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:NetIncomeLoss contextRef="c-1" decimals="-6" id="f-407" unitRef="usd">96995000000</us-gaap:NetIncomeLoss>
+<us-gaap:NetIncomeLoss contextRef="c-20" decimals="-6" id="f-408" unitRef="usd">99803000000</us-gaap:NetIncomeLoss>
+<us-gaap:NetIncomeLoss contextRef="c-21" decimals="-6" id="f-409" unitRef="usd">94680000000</us-gaap:NetIncomeLoss>
+<us-gaap:EarningsPerShareDiluted
+      contextRef="c-1"
+      decimals="2"
+      id="f-422"
+      unitRef="usdPerShare">6.13</us-gaap:EarningsPerShareDiluted>
+<us-gaap:EarningsPerShareDiluted
+      contextRef="c-20"
+      decimals="2"
+      id="f-423"
+      unitRef="usdPerShare">6.11</us-gaap:EarningsPerShareDiluted>
+<us-gaap:EarningsPerShareDiluted
+      contextRef="c-21"
+      decimals="2"
+      id="f-424"
+      unitRef="usdPerShare">5.61</us-gaap:EarningsPerShareDiluted>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-64" decimals="-6" id="f-430" unitRef="usd">28359000000</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-64" decimals="-6" id="f-431" unitRef="usd">0</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-65" decimals="-6" id="f-437" unitRef="usd">481000000</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-65" decimals="-6" id="f-438" unitRef="usd">0</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-66" decimals="-6" id="f-444" unitRef="usd">0</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-66" decimals="-6" id="f-445" unitRef="usd">428000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-67" decimals="-6" id="f-451" unitRef="usd">481000000</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-67" decimals="-6" id="f-452" unitRef="usd">428000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-68" decimals="-6" id="f-458" unitRef="usd">35000000</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-68" decimals="-6" id="f-459" unitRef="usd">5468000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-69" decimals="-6" id="f-465" unitRef="usd">36000000</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-69" decimals="-6" id="f-466" unitRef="usd">271000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-70" decimals="-6" id="f-472" unitRef="usd">0</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-70" decimals="-6" id="f-473" unitRef="usd">11332000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-71" decimals="-6" id="f-479" unitRef="usd">1034000000</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-71" decimals="-6" id="f-480" unitRef="usd">320000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-72" decimals="-6" id="f-486" unitRef="usd">0</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-72" decimals="-6" id="f-487" unitRef="usd">608000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-73" decimals="-6" id="f-493" unitRef="usd">20000000</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-73" decimals="-6" id="f-494" unitRef="usd">12627000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-74" decimals="-6" id="f-500" unitRef="usd">0</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-74" decimals="-6" id="f-501" unitRef="usd">192000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-75" decimals="-6" id="f-507" unitRef="usd">0</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-75" decimals="-6" id="f-508" unitRef="usd">344000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-76" decimals="-6" id="f-514" unitRef="usd">1125000000</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-76" decimals="-6" id="f-515" unitRef="usd">31162000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-22" decimals="-6" id="f-521" unitRef="usd">29965000000</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-22" decimals="-6" id="f-522" unitRef="usd">31590000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-77" decimals="-6" id="f-526" unitRef="usd">18546000000</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-77" decimals="-6" id="f-527" unitRef="usd">0</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-78" decimals="-6" id="f-533" unitRef="usd">2929000000</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-78" decimals="-6" id="f-534" unitRef="usd">0</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-79" decimals="-6" id="f-540" unitRef="usd">0</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-79" decimals="-6" id="f-541" unitRef="usd">227000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-80" decimals="-6" id="f-547" unitRef="usd">2929000000</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-80" decimals="-6" id="f-548" unitRef="usd">227000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-81" decimals="-6" id="f-554" unitRef="usd">338000000</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-81" decimals="-6" id="f-555" unitRef="usd">5091000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-82" decimals="-6" id="f-561" unitRef="usd">0</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-82" decimals="-6" id="f-562" unitRef="usd">240000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-83" decimals="-6" id="f-568" unitRef="usd">0</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-83" decimals="-6" id="f-569" unitRef="usd">8806000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-84" decimals="-6" id="f-575" unitRef="usd">1805000000</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-84" decimals="-6" id="f-576" unitRef="usd">262000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-85" decimals="-6" id="f-582" unitRef="usd">28000000</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-85" decimals="-6" id="f-583" unitRef="usd">690000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-86" decimals="-6" id="f-589" unitRef="usd">0</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-86" decimals="-6" id="f-590" unitRef="usd">9023000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-87" decimals="-6" id="f-596" unitRef="usd">0</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-87" decimals="-6" id="f-597" unitRef="usd">266000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-88" decimals="-6" id="f-603" unitRef="usd">0</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-88" decimals="-6" id="f-604" unitRef="usd">53000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-89" decimals="-6" id="f-610" unitRef="usd">2171000000</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-89" decimals="-6" id="f-611" unitRef="usd">24431000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:CashAndCashEquivalentsAtCarryingValue contextRef="c-23" decimals="-6" id="f-617" unitRef="usd">23646000000</us-gaap:CashAndCashEquivalentsAtCarryingValue>
+<us-gaap:MarketableSecuritiesCurrent contextRef="c-23" decimals="-6" id="f-618" unitRef="usd">24658000000</us-gaap:MarketableSecuritiesCurrent>
+<us-gaap:InterestExpense contextRef="c-1" decimals="-6" id="f-713" unitRef="usd">3933000000</us-gaap:InterestExpense>
+<us-gaap:InterestExpense contextRef="c-20" decimals="-6" id="f-714" unitRef="usd">2931000000</us-gaap:InterestExpense>
+<us-gaap:InterestExpense contextRef="c-21" decimals="-6" id="f-715" unitRef="usd">2645000000</us-gaap:InterestExpense>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-162" decimals="-6" id="f-1081" unitRef="usd">162560000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-163" decimals="-6" id="f-1082" unitRef="usd">169658000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-164" decimals="-6" id="f-1083" unitRef="usd">153306000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:OperatingIncomeLoss contextRef="c-162" decimals="-6" id="f-1084" unitRef="usd">60508000000</us-gaap:OperatingIncomeLoss>
+<us-gaap:OperatingIncomeLoss contextRef="c-163" decimals="-6" id="f-1085" unitRef="usd">62683000000</us-gaap:OperatingIncomeLoss>
+<us-gaap:OperatingIncomeLoss contextRef="c-164" decimals="-6" id="f-1086" unitRef="usd">53382000000</us-gaap:OperatingIncomeLoss>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-165" decimals="-6" id="f-1087" unitRef="usd">94294000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-166" decimals="-6" id="f-1088" unitRef="usd">95118000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-167" decimals="-6" id="f-1089" unitRef="usd">89307000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:OperatingIncomeLoss contextRef="c-165" decimals="-6" id="f-1090" unitRef="usd">36098000000</us-gaap:OperatingIncomeLoss>
+<us-gaap:OperatingIncomeLoss contextRef="c-166" decimals="-6" id="f-1091" unitRef="usd">35233000000</us-gaap:OperatingIncomeLoss>
+<us-gaap:OperatingIncomeLoss contextRef="c-167" decimals="-6" id="f-1092" unitRef="usd">32505000000</us-gaap:OperatingIncomeLoss>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-168" decimals="-6" id="f-1093" unitRef="usd">72559000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-169" decimals="-6" id="f-1094" unitRef="usd">74200000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-170" decimals="-6" id="f-1095" unitRef="usd">68366000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:OperatingIncomeLoss contextRef="c-168" decimals="-6" id="f-1096" unitRef="usd">30328000000</us-gaap:OperatingIncomeLoss>
+<us-gaap:OperatingIncomeLoss contextRef="c-169" decimals="-6" id="f-1097" unitRef="usd">31153000000</us-gaap:OperatingIncomeLoss>
+<us-gaap:OperatingIncomeLoss contextRef="c-170" decimals="-6" id="f-1098" unitRef="usd">28504000000</us-gaap:OperatingIncomeLoss>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-171" decimals="-6" id="f-1099" unitRef="usd">24257000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-172" decimals="-6" id="f-1100" unitRef="usd">25977000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-173" decimals="-6" id="f-1101" unitRef="usd">28482000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:OperatingIncomeLoss contextRef="c-171" decimals="-6" id="f-1102" unitRef="usd">11888000000</us-gaap:OperatingIncomeLoss>
+<us-gaap:OperatingIncomeLoss contextRef="c-172" decimals="-6" id="f-1103" unitRef="usd">12257000000</us-gaap:OperatingIncomeLoss>
+<us-gaap:OperatingIncomeLoss contextRef="c-173" decimals="-6" id="f-1104" unitRef="usd">12798000000</us-gaap:OperatingIncomeLoss>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-174" decimals="-6" id="f-1105" unitRef="usd">29615000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-175" decimals="-6" id="f-1106" unitRef="usd">29375000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-176" decimals="-6" id="f-1107" unitRef="usd">26356000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:OperatingIncomeLoss contextRef="c-174" decimals="-6" id="f-1108" unitRef="usd">12066000000</us-gaap:OperatingIncomeLoss>
+<us-gaap:OperatingIncomeLoss contextRef="c-175" decimals="-6" id="f-1109" unitRef="usd">11569000000</us-gaap:OperatingIncomeLoss>
+<us-gaap:OperatingIncomeLoss contextRef="c-176" decimals="-6" id="f-1110" unitRef="usd">9817000000</us-gaap:OperatingIncomeLoss>
+<us-gaap:OperatingIncomeLoss contextRef="c-177" decimals="-6" id="f-1112" unitRef="usd">150888000000</us-gaap:OperatingIncomeLoss>
+<us-gaap:OperatingIncomeLoss contextRef="c-178" decimals="-6" id="f-1113" unitRef="usd">152895000000</us-gaap:OperatingIncomeLoss>
+<us-gaap:OperatingIncomeLoss contextRef="c-179" decimals="-6" id="f-1114" unitRef="usd">137006000000</us-gaap:OperatingIncomeLoss>
+<us-gaap:OperatingIncomeLoss contextRef="c-1" decimals="-6" id="f-1121" unitRef="usd">114301000000</us-gaap:OperatingIncomeLoss>
+<us-gaap:OperatingIncomeLoss contextRef="c-20" decimals="-6" id="f-1122" unitRef="usd">119437000000</us-gaap:OperatingIncomeLoss>
+<us-gaap:OperatingIncomeLoss contextRef="c-21" decimals="-6" id="f-1123" unitRef="usd">108949000000</us-gaap:OperatingIncomeLoss>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-186" decimals="-6" id="f-1125" unitRef="usd">138573000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-187" decimals="-6" id="f-1126" unitRef="usd">147859000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-188" decimals="-6" id="f-1127" unitRef="usd">133803000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-189" decimals="-6" id="f-1128" unitRef="usd">72559000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-190" decimals="-6" id="f-1129" unitRef="usd">74200000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-191" decimals="-6" id="f-1130" unitRef="usd">68366000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-192" decimals="-6" id="f-1131" unitRef="usd">172153000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-193" decimals="-6" id="f-1132" unitRef="usd">172269000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-194" decimals="-6" id="f-1133" unitRef="usd">163648000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-1" decimals="-6" id="f-1134" unitRef="usd">383285000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-20" decimals="-6" id="f-1135" unitRef="usd">394328000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+<us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax contextRef="c-21" decimals="-6" id="f-1136" unitRef="usd">365817000000</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+</xbrl>

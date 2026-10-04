@@ -1,0 +1,40 @@
+== 1. the validator: hashing, the compact target, real blocks against their published hashes, Core's transaction vectors, every rule, damage ==
+== 1. hashing and the compact target ==
+
+== 2. real blocks against their published hashes, heights and linkage ==
+
+== 3. Bitcoin Core's transaction test vectors (tx_valid.json, tx_invalid.json) ==
+
+== 4. every rule, with blocks built and mined here at the easy limit 0x207fffff ==
+
+== 4b. limits and corner cases of the serialisation ==
+
+== 5. damage ==
+
+61 passed, 0 failed
+61 lines PASS
+
+== 2. 400 random blocks (valid, SegWit, and 17 kinds of defect), then every data/btc block file and every Core transaction vector: C vs the independent Python reference ==
+  Bitcoin Core test-vector transactions compared: 214
+  blocks: 400
+  data/btc block files compared: 24
+  refused as unparseable: 22
+  verdict: INVALID bad-cb-length: 32
+  verdict: INVALID bad-cb-missing: 16
+  verdict: INVALID bad-cb-multiple: 23
+  verdict: INVALID bad-txnmrklroot: 23
+  verdict: INVALID bad-txns-duplicate: 11
+  verdict: INVALID bad-txns-inputs-duplicate: 16
+  verdict: INVALID bad-txns-prevout-null: 9
+  verdict: INVALID bad-txns-txouttotal-toolarge: 16
+  verdict: INVALID bad-txns-vout-empty: 16
+  verdict: INVALID bad-txns-vout-negative: 16
+  verdict: INVALID bad-txns-vout-toolarge: 16
+  verdict: INVALID bad-witness-merkle-match: 17
+  verdict: INVALID high-hash: 58
+  verdict: VALID: 109
+400 random blocks, 0 differences
+
+== 3. damaged blocks: 6,000 mutations of each of the 24 embedded blocks, sanitizers on: a changed block must never be valid ==
+144000 mutants of 24 files: 2589 byte-for-byte unchanged (still valid: 2538); of the 141411 that changed: 88504 refused while parsing, 52957 refused by a rule, 0 VALID (not counting 1 synthetic blocks whose only change was inside the 80-byte header: at the easy limit another header can be another valid block)
+rules that caught mutants: [bad-txnmrklroot 30970] [high-hash 20615] [bad-witness-merkle-match 1321] [bad-txns-duplicate 51]

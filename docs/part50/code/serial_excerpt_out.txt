@@ -1,0 +1,500 @@
+Unix OS from Scratch -- Chapter 50: kernel entry reached
+Multiboot2 magic confirmed in EAX: 0x36d76289
+Multiboot2 memory map: 7 real entries, 24 bytes each
+
+[... 1,907 lines of Chapters 8-49's own demos elided: this chapter's demo follows from its first line to its last ...]
+
+Starting this chapter's own Bitcoin demo (real blocks validated from their bytes, inside the kernel)...
+fat16_format: writing real boot sector/BPB to LBA 0...
+fat16_format: zeroing 128 real FAT sectors (2 copies)...
+fat16_format: zeroing 32 real root directory sectors...
+fat16_format: done -- real FAT16 volume written to disk
+fat16_init: real volume "UNIXOSFAT16" -- 512 bytes/sector, 1 sector(s)/cluster, 2 FAT(s) * 64 sectors, root dir 32 sectors (first at LBA 129), data starts LBA 161, 16223 usable clusters
+A fresh FAT16 volume was formatted to hold one validation report per block.
+
+== Part 1. Eleven REAL blocks: ten from testnet3 and the mainnet genesis block, validated from their bytes
+  tn_0: testnet block 0, 285 bytes, 1 transaction(s), weight 1140
+    hash       000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943
+    published  000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943 -> MATCH
+    target     00000000ffff0000000000000000000000000000000000000000000000000000
+    proof of work: PASS (36 leading zero bits in the hash)
+    Merkle root 4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b from the 1 transaction id(s): matches the header
+    coinbase height (BIP 34): none (a version-1 block predates BIP 34)
+    witness commitment: none (no witness data)
+    verdict: VALID
+  tn_2: testnet block 2, 190 bytes, 1 transaction(s), weight 760
+    hash       000000006c02c8ea6e4ff69651f7fcde348fb9d557a06e6957b65552002a7820
+    published  000000006c02c8ea6e4ff69651f7fcde348fb9d557a06e6957b65552002a7820 -> MATCH
+    target     00000000ffff0000000000000000000000000000000000000000000000000000
+    proof of work: PASS (33 leading zero bits in the hash)
+    Merkle root 20222eb90f5895556926c112bb5aa0df4ab5abc3107e21a6950aec3b2e3541e2 from the 1 transaction id(s): matches the header
+    coinbase height (BIP 34): none (a version-1 block predates BIP 34)
+    witness commitment: none (no witness data)
+    verdict: VALID
+  tn_3: testnet block 3, 190 bytes, 1 transaction(s), weight 760
+    hash       000000008b896e272758da5297bcd98fdc6d97c9b765ecec401e286dc1fdbe10
+    published  000000008b896e272758da5297bcd98fdc6d97c9b765ecec401e286dc1fdbe10 -> MATCH
+    target     00000000ffff0000000000000000000000000000000000000000000000000000
+    proof of work: PASS (32 leading zero bits in the hash)
+    Merkle root 71241692d7adc0980c018e764a50974f59e1657ba88a1b1503ae2a53fc5aba41 from the 1 transaction id(s): matches the header
+    coinbase height (BIP 34): none (a version-1 block predates BIP 34)
+    witness commitment: none (no witness data)
+    verdict: VALID
+  tn_15007: testnet block 15007, 190 bytes, 1 transaction(s), weight 760
+    hash       0000000038c44c703bae0f98cdd6bf30922326340a5996cc692aaae8bacf47ad
+    published  0000000038c44c703bae0f98cdd6bf30922326340a5996cc692aaae8bacf47ad -> MATCH
+    target     00000000ffff0000000000000000000000000000000000000000000000000000
+    proof of work: PASS (34 leading zero bits in the hash)
+    Merkle root af671b53674816e9161ab004709e51c6b00f02e318ee5cc5d64ad4ab70869beb from the 1 transaction id(s): matches the header
+    coinbase height (BIP 34): none (a version-1 block predates BIP 34)
+    witness commitment: none (no witness data)
+    verdict: VALID
+  tn_49291: testnet block 49291, 1597 bytes, 2 transaction(s), weight 6388
+    hash       0000000018b07dca1b28b4b5a119f6d6e71698ce1ed96f143f54179ce177a19c
+    published  0000000018b07dca1b28b4b5a119f6d6e71698ce1ed96f143f54179ce177a19c -> MATCH
+    target     00000000ffff0000000000000000000000000000000000000000000000000000
+    proof of work: PASS (35 leading zero bits in the hash)
+    Merkle root 76a7726e4b69270701d405005047a550e7048b1d0742755db10523c3525b4b60 from the 2 transaction id(s): matches the header
+    coinbase height (BIP 34): 49291 -- the block's published height is 49291: MATCH
+    witness commitment: none (no witness data)
+    verdict: VALID
+  tn_180480: testnet block 180480, 1344 bytes, 5 transaction(s), weight 5376
+    hash       00000000fd3ceb2404ff07a785c7fdcc76619edc8ed61bd25134eaa22084366a
+    published  00000000fd3ceb2404ff07a785c7fdcc76619edc8ed61bd25134eaa22084366a -> MATCH
+    target     00000000ffff0000000000000000000000000000000000000000000000000000
+    proof of work: PASS (32 leading zero bits in the hash)
+    Merkle root 97ef2321eb626743aabdc761cba644a5d62cc9dbeea791a8ea0befd7bf26e8d2 from the 5 transaction id(s): matches the header
+    coinbase height (BIP 34): 180480 -- the block's published height is 180480: MATCH
+    witness commitment: none (no witness data)
+    verdict: VALID
+  tn_926485: testnet block 926485, 1982 bytes, 5 transaction(s), weight 7055
+    hash       000000000000015d6077a411a8f5cc95caf775ccf11c54e27df75ce58d187313
+    published  000000000000015d6077a411a8f5cc95caf775ccf11c54e27df75ce58d187313 -> MATCH
+    target     0000000000000213ef0000000000000000000000000000000000000000000000
+    proof of work: PASS (55 leading zero bits in the hash)
+    Merkle root ed7ef6680f2fb9bf1f41c3e092862fa16f8f887aa6d7880447d2b6c9f83401c3 from the 5 transaction id(s): matches the header
+    coinbase height (BIP 34): 926485 -- the block's published height is 926485: MATCH
+    witness commitment: PASS
+    verdict: VALID
+  tn_987876: testnet block 987876, 193 bytes, 1 transaction(s), weight 772
+    hash       0000000000000c00901f2049055e2a437c819d79a3d54fd63e6af796cd7b8a79
+    published  0000000000000c00901f2049055e2a437c819d79a3d54fd63e6af796cd7b8a79 -> MATCH
+    target     0000000000007e25400000000000000000000000000000000000000000000000
+    proof of work: PASS (52 leading zero bits in the hash)
+    Merkle root ddf81227d7608267a21b2cf5f4b5935a5fd2f217d64e52eb5b2df1b37636e5f7 from the 1 transaction id(s): matches the header
+    coinbase height (BIP 34): 987876 -- the block's published height is 987876: MATCH
+    witness commitment: none (no witness data)
+    verdict: VALID
+  tn_1263442: testnet block 1263442, 518 bytes, 2 transaction(s), weight 1508
+    hash       000000006f27ddfe1dd680044a34548f41bed47eba9e6f0b310da21423bc5f33
+    published  000000006f27ddfe1dd680044a34548f41bed47eba9e6f0b310da21423bc5f33 -> MATCH
+    target     00000000dcad0000000000000000000000000000000000000000000000000000
+    proof of work: PASS (33 leading zero bits in the hash)
+    Merkle root ff984a3fd3a78002184410f9c180e71885c1f45e821aaabf1d15792649143f08 from the 2 transaction id(s): matches the header
+    coinbase height (BIP 34): 1263442 -- the block's published height is 1263442: MATCH
+    witness commitment: PASS
+    verdict: VALID
+  tn_1414221: testnet block 1414221, 165 bytes, 1 transaction(s), weight 660
+    hash       0000000000000027b2b3b3381f114f674f481544ff2be37ae3788d7e078383b1
+    published  0000000000000027b2b3b3381f114f674f481544ff2be37ae3788d7e078383b1 -> MATCH
+    target     000000000000004c5ff000000000000000000000000000000000000000000000
+    proof of work: PASS (58 leading zero bits in the hash)
+    Merkle root c8a022a001dee15f3af76546675fac3b4d9a84d966d0dfa927bc6dec14bbce70 from the 1 transaction id(s): matches the header
+    coinbase height (BIP 34): 1414221 -- the block's published height is 1414221: MATCH
+    witness commitment: none (no witness data)
+    verdict: VALID
+  mn_0: mainnet block 0, 285 bytes, 1 transaction(s), weight 1140
+    hash       000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f
+    published  000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f -> MATCH
+    target     00000000ffff0000000000000000000000000000000000000000000000000000
+    proof of work: PASS (43 leading zero bits in the hash)
+    Merkle root 4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b from the 1 transaction id(s): matches the header
+    coinbase height (BIP 34): none (a version-1 block predates BIP 34)
+    witness commitment: none (no witness data)
+    verdict: VALID
+
+== Part 2. A SYNTHETIC chain of twelve blocks, mined at easy difficulty (bits 1f00ffff): each block's previous-hash field must be the hash of the block before
+  height 1  hash 000046701a4073bb...  4 tx  BIP 34 height 1  link to previous: (first)  verdict VALID
+  height 2  hash 00000ab441c2e3c0...  1 tx  BIP 34 height 2  link to previous: YES  verdict VALID
+  height 3  hash 0000ee1240493032...  1 tx  BIP 34 height 3  link to previous: YES  verdict VALID
+  height 4  hash 00005d3ef12fd7bf...  3 tx  BIP 34 height 4  link to previous: YES  verdict VALID
+  height 5  hash 000086f0bbad73d1...  1 tx  BIP 34 height 5  link to previous: YES  verdict VALID
+  height 6  hash 0000e39f4ce35b0c...  3 tx  BIP 34 height 6  link to previous: YES  verdict VALID
+  height 7  hash 000024c10198a636...  1 tx  BIP 34 height 7  link to previous: YES  verdict VALID
+  height 8  hash 000025df2dfee2db...  1 tx  BIP 34 height 8  link to previous: YES  verdict VALID
+  height 9  hash 000076abaa6fc660...  3 tx  BIP 34 height 9  link to previous: YES  verdict VALID
+  height 10  hash 0000cb11c96568a5...  1 tx  BIP 34 height 10  link to previous: YES  verdict VALID
+  height 11  hash 0000c663ee5bc17d...  1 tx  BIP 34 height 11  link to previous: YES  verdict VALID
+  height 12  hash 00005153603acca4...  3 tx  BIP 34 height 12  link to previous: YES  verdict VALID
+  12 of 12 blocks valid and linked
+
+== Part 3. Bitcoin Core's own transaction test vectors (tx_valid.json, tx_invalid.json): parsed, then the context-free checks
+  invalid vector #6 (Core: "Tests for CheckTransaction()" group) refused: bad-txns-vout-empty   txid 743a2ad1...
+  invalid vector #7 (Core: "Tests for CheckTransaction()" group) refused: bad-txns-vout-negative   txid 0ea8dd5d...
+  invalid vector #8 (Core: "Tests for CheckTransaction()" group) refused: bad-txns-vout-toolarge   txid b9092b16...
+  invalid vector #9 (Core: "Tests for CheckTransaction()" group) refused: bad-txns-txouttotal-toolarge   txid 477b2849...
+  invalid vector #10 (Core: "Tests for CheckTransaction()" group) refused: bad-txns-inputs-duplicate   txid 6a6b568d...
+  invalid vector #11 (Core: "Tests for CheckTransaction()" group) refused: bad-cb-length   txid bf93c6fe...
+  invalid vector #12 (Core: "Tests for CheckTransaction()" group) refused: bad-cb-length   txid d12fb29f...
+  invalid vector #13 (Core: "Tests for CheckTransaction()" group) refused: bad-txns-prevout-null   txid a8743954...
+  invalid vector #14 (Core: "Tests for CheckTransaction()" group) refused: bad-txns-prevout-null   txid 2d3f5c65...
+  tx_valid.json: 121 transactions, 121 pass the context-free checks
+  tx_invalid.json: 93 transactions: 9 refused by CheckTransaction's own rules (listed above), 84 invalid only at the SCRIPT level (signatures, locktimes, witness programs: out of scope here) and so correctly pass
+  transactions that did not parse: 0
+
+== Part 4. Seven attacks. Each must be refused, and each says which rule caught it.
+
+  Attack 1: one bit of the nonce flipped in real block 180480 (a miner's work, undone)
+    verdict: high-hash
+  Attack 2: one bit flipped in the first transaction of block 180480 (inside the coinbase), header untouched
+    verdict: bad-txnmrklroot
+  Attack 3: the synthetic chain with block 3 left out: is block 4 (VALID) the child of block 2 (VALID)?
+    block 4's previous-hash field is not block 2's hash -> REFUSED: not a child, the chain is broken
+  Attack 4: the synthetic block whose transaction list ends with a transaction repeated (the 2012 Merkle-root trick)
+    the Merkle root matches the header (YES) yet the block is refused: bad-txns-duplicate
+  Attack 5: one bit flipped in the SegWit coinbase's witness reserved value of real block 926485
+    the transaction Merkle root still matches (YES: witness data is not in a txid) but verdict: bad-witness-merkle-match
+  Attack 6: real block 49291 cut off after 500 of 1597 bytes
+    verdict: the data ends inside a structure
+  Attack 7: real block 49291 checked against a HARDER difficulty limit than the one it was mined under (1c00ffff instead of 1d00ffff)
+    verdict: high-hash
+
+== Part 5. The canonical report of every block, written to the FAT16 disk as V01.RPT ... V24.RPT and printed between @@ markers
+fat16_create_file: "V01.RPT" -- 800 bytes, 2 cluster(s), first cluster 2
+fat16_read_file: "V01.RPT" -- 800 bytes read
+@@BLK tn_0 V01.RPT BEGIN
+block tn_0 size 285 weight 1140 ntx 1
+  header hash 000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943 prev 0000000000000000000000000000000000000000000000000000000000000000 merkle 4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b version 00000001 time 1296688602 bits 1d00ffff nonce 414098458
+  target 00000000ffff0000000000000000000000000000000000000000000000000000
+  pow PASS zero_bits 36
+  merkle PASS computed 4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b mutated no
+  coinbase first yes others no height none
+  witness none
+  tx 0 txid 4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b wtxid 4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b in 1 out 1 out_sat 5000000000 size 204 weight 816 check ok
+  verdict VALID
+@@BLK tn_0 END
+fat16_create_file: "V02.RPT" -- 799 bytes, 2 cluster(s), first cluster 4
+fat16_read_file: "V02.RPT" -- 799 bytes read
+@@BLK tn_2 V02.RPT BEGIN
+block tn_2 size 190 weight 760 ntx 1
+  header hash 000000006c02c8ea6e4ff69651f7fcde348fb9d557a06e6957b65552002a7820 prev 00000000b873e79784647a6c82962c70d228557d24a747ea4d1b8bbe878e1206 merkle 20222eb90f5895556926c112bb5aa0df4ab5abc3107e21a6950aec3b2e3541e2 version 00000001 time 1296688946 bits 1d00ffff nonce 875942400
+  target 00000000ffff0000000000000000000000000000000000000000000000000000
+  pow PASS zero_bits 33
+  merkle PASS computed 20222eb90f5895556926c112bb5aa0df4ab5abc3107e21a6950aec3b2e3541e2 mutated no
+  coinbase first yes others no height none
+  witness none
+  tx 0 txid 20222eb90f5895556926c112bb5aa0df4ab5abc3107e21a6950aec3b2e3541e2 wtxid 20222eb90f5895556926c112bb5aa0df4ab5abc3107e21a6950aec3b2e3541e2 in 1 out 1 out_sat 5000000000 size 109 weight 436 check ok
+  verdict VALID
+@@BLK tn_2 END
+fat16_create_file: "V03.RPT" -- 800 bytes, 2 cluster(s), first cluster 6
+fat16_read_file: "V03.RPT" -- 800 bytes read
+@@BLK tn_3 V03.RPT BEGIN
+block tn_3 size 190 weight 760 ntx 1
+  header hash 000000008b896e272758da5297bcd98fdc6d97c9b765ecec401e286dc1fdbe10 prev 000000006c02c8ea6e4ff69651f7fcde348fb9d557a06e6957b65552002a7820 merkle 71241692d7adc0980c018e764a50974f59e1657ba88a1b1503ae2a53fc5aba41 version 00000001 time 1296689030 bits 1d00ffff nonce 3066203397
+  target 00000000ffff0000000000000000000000000000000000000000000000000000
+  pow PASS zero_bits 32
+  merkle PASS computed 71241692d7adc0980c018e764a50974f59e1657ba88a1b1503ae2a53fc5aba41 mutated no
+  coinbase first yes others no height none
+  witness none
+  tx 0 txid 71241692d7adc0980c018e764a50974f59e1657ba88a1b1503ae2a53fc5aba41 wtxid 71241692d7adc0980c018e764a50974f59e1657ba88a1b1503ae2a53fc5aba41 in 1 out 1 out_sat 5000000000 size 109 weight 436 check ok
+  verdict VALID
+@@BLK tn_3 END
+fat16_create_file: "V04.RPT" -- 802 bytes, 2 cluster(s), first cluster 8
+fat16_read_file: "V04.RPT" -- 802 bytes read
+@@BLK tn_15007 V04.RPT BEGIN
+block tn_15007 size 190 weight 760 ntx 1
+  header hash 0000000038c44c703bae0f98cdd6bf30922326340a5996cc692aaae8bacf47ad prev 000000001e0e4b48b55ed74c37e44d5c979b869cc79a7e5de38f37aa92403902 merkle af671b53674816e9161ab004709e51c6b00f02e318ee5cc5d64ad4ab70869beb version 00000001 time 1338588099 bits 1d00ffff nonce 84950802
+  target 00000000ffff0000000000000000000000000000000000000000000000000000
+  pow PASS zero_bits 34
+  merkle PASS computed af671b53674816e9161ab004709e51c6b00f02e318ee5cc5d64ad4ab70869beb mutated no
+  coinbase first yes others no height none
+  witness none
+  tx 0 txid af671b53674816e9161ab004709e51c6b00f02e318ee5cc5d64ad4ab70869beb wtxid af671b53674816e9161ab004709e51c6b00f02e318ee5cc5d64ad4ab70869beb in 1 out 1 out_sat 5000000000 size 109 weight 436 check ok
+  verdict VALID
+@@BLK tn_15007 END
+fat16_create_file: "V05.RPT" -- 1014 bytes, 2 cluster(s), first cluster 10
+fat16_read_file: "V05.RPT" -- 1014 bytes read
+@@BLK tn_49291 V05.RPT BEGIN
+block tn_49291 size 1597 weight 6388 ntx 2
+  header hash 0000000018b07dca1b28b4b5a119f6d6e71698ce1ed96f143f54179ce177a19c prev 00000000f8628908eabaf2c2b42c480e249844e49727a2fea23c227472f4faab merkle 76a7726e4b69270701d405005047a550e7048b1d0742755db10523c3525b4b60 version 00000002 time 1359830501 bits 1d00ffff nonce 1208358945
+  target 00000000ffff0000000000000000000000000000000000000000000000000000
+  pow PASS zero_bits 35
+  merkle PASS computed 76a7726e4b69270701d405005047a550e7048b1d0742755db10523c3525b4b60 mutated no
+  coinbase first yes others no height 49291
+  witness none
+  tx 0 txid b7affcfed4349655d0363dcf32442e88a20b1b0a69ccef68b6547694aef5691a wtxid b7affcfed4349655d0363dcf32442e88a20b1b0a69ccef68b6547694aef5691a in 1 out 1 out_sat 5000100000 size 108 weight 432 check ok
+  tx 1 txid 4852fe372ff7534c16713b3146bbc1e86379c70bea4d5c02fb1fa0112980a081 wtxid 4852fe372ff7534c16713b3146bbc1e86379c70bea4d5c02fb1fa0112980a081 in 8 out 2 out_sat 53810000 size 1408 weight 5632 check ok
+  verdict VALID
+@@BLK tn_49291 END
+fat16_create_file: "V06.RPT" -- 1634 bytes, 4 cluster(s), first cluster 12
+fat16_read_file: "V06.RPT" -- 1634 bytes read
+@@BLK tn_180480 V06.RPT BEGIN
+block tn_180480 size 1344 weight 5376 ntx 5
+  header hash 00000000fd3ceb2404ff07a785c7fdcc76619edc8ed61bd25134eaa22084366a prev 000000004e3bcf3090b6ab8ae6bba3d9ef2d1f7dbd44a491a95a650a08aa5860 merkle 97ef2321eb626743aabdc761cba644a5d62cc9dbeea791a8ea0befd7bf26e8d2 version 00000002 time 1391850896 bits 1d00ffff nonce 264831488
+  target 00000000ffff0000000000000000000000000000000000000000000000000000
+  pow PASS zero_bits 32
+  merkle PASS computed 97ef2321eb626743aabdc761cba644a5d62cc9dbeea791a8ea0befd7bf26e8d2 mutated no
+  coinbase first yes others no height 180480
+  witness none
+  tx 0 txid 1ec748398ab3cf3790345d3e729a039736c6dc1deb7d80baf04dcf11c73dc75d wtxid 1ec748398ab3cf3790345d3e729a039736c6dc1deb7d80baf04dcf11c73dc75d in 1 out 1 out_sat 5000120000 size 109 weight 436 check ok
+  tx 1 txid 62a972ba5593255dd4662d470dfb0a075cfac6302a70ceb44d07c9c04a6b9a28 wtxid 62a972ba5593255dd4662d470dfb0a075cfac6302a70ceb44d07c9c04a6b9a28 in 3 out 1 out_sat 3414000000 size 180 weight 720 check ok
+  tx 2 txid 88b760ee751176d80b0808e7e72916a63684688f9ed6374c2368f300c1f84dd0 wtxid 88b760ee751176d80b0808e7e72916a63684688f9ed6374c2368f300c1f84dd0 in 1 out 2 out_sat 265893318 size 227 weight 908 check ok
+  tx 3 txid 28934e7f3b8ae2b0a0d75463a5313aa3ccea5522e226eee58e4f46ff9f2b98db wtxid 28934e7f3b8ae2b0a0d75463a5313aa3ccea5522e226eee58e4f46ff9f2b98db in 2 out 2 out_sat 5150000 size 374 weight 1496 check ok
+  tx 4 txid 5f0be77c5bba162290f74d01770dab8fb3b9c0a6fb9f02079de9505b6a1b2b35 wtxid 5f0be77c5bba162290f74d01770dab8fb3b9c0a6fb9f02079de9505b6a1b2b35 in 2 out 2 out_sat 1001016940 size 373 weight 1492 check ok
+  verdict VALID
+@@BLK tn_180480 END
+fat16_create_file: "V07.RPT" -- 1633 bytes, 4 cluster(s), first cluster 16
+fat16_read_file: "V07.RPT" -- 1633 bytes read
+@@BLK tn_926485 V07.RPT BEGIN
+block tn_926485 size 1982 weight 7055 ntx 5
+  header hash 000000000000015d6077a411a8f5cc95caf775ccf11c54e27df75ce58d187313 prev 00000000000000d1e2952098e3b773c475fdf826e38e60498aeff3db0eabbb60 merkle ed7ef6680f2fb9bf1f41c3e092862fa16f8f887aa6d7880447d2b6c9f83401c3 version 20000000 time 1472857006 bits 1a0213ef nonce 1104945868
+  target 0000000000000213ef0000000000000000000000000000000000000000000000
+  pow PASS zero_bits 55
+  merkle PASS computed ed7ef6680f2fb9bf1f41c3e092862fa16f8f887aa6d7880447d2b6c9f83401c3 mutated no
+  coinbase first yes others no height 926485
+  witness PASS
+  tx 0 txid 2b9baddbd2861c663978a98c6c3c7648e1cd5c41b451f4a35b7851dd4786d9d3 wtxid 3356a1abf6e1fdf9858a704c794aea3c4dfa97848b4b5390530204c7382fc6fc in 1 out 3 out_sat 312551300 size 265 weight 952 check ok
+  tx 1 txid d06d86bacf88f1f316d4470080b7869f1c298b850e7b219124ae131c0475abb0 wtxid 49c37eab32d83f31fafd15815ab047ef91a3a4bb86c9d25a28dbf4afdc156670 in 1 out 1 out_sat 20000000 size 375 weight 735 check ok
+  tx 2 txid 06eee51317a76a76c67499c8f782819745b58d28cdb4d8357ef7f7e6d79cc513 wtxid 06eee51317a76a76c67499c8f782819745b58d28cdb4d8357ef7f7e6d79cc513 in 1 out 2 out_sat 450370894 size 226 weight 904 check ok
+  tx 3 txid f56da6d0bb5807561c29093066edd1d505c2fa4ae89bb895c4318481d360fd3f wtxid f56da6d0bb5807561c29093066edd1d505c2fa4ae89bb895c4318481d360fd3f in 2 out 2 out_sat 116549999 size 370 weight 1480 check ok
+  tx 4 txid 32a52be869fc148b6104244859c879f1319cfd86e89e6f7fc1ffaaf518fa14be wtxid 32a52be869fc148b6104244859c879f1319cfd86e89e6f7fc1ffaaf518fa14be in 4 out 2 out_sat 292889999 size 665 weight 2660 check ok
+  verdict VALID
+@@BLK tn_926485 END
+fat16_create_file: "V08.RPT" -- 806 bytes, 2 cluster(s), first cluster 20
+fat16_read_file: "V08.RPT" -- 806 bytes read
+@@BLK tn_987876 V08.RPT BEGIN
+block tn_987876 size 193 weight 772 ntx 1
+  header hash 0000000000000c00901f2049055e2a437c819d79a3d54fd63e6af796cd7b8a79 prev 0000000000005f1c2fe3503803276e642daac86ba5950e0942b5fd6949f79426 merkle ddf81227d7608267a21b2cf5f4b5935a5fd2f217d64e52eb5b2df1b37636e5f7 version 20000000 time 1476291850 bits 1a7e2540 nonce 2523404107
+  target 0000000000007e25400000000000000000000000000000000000000000000000
+  pow PASS zero_bits 52
+  merkle PASS computed ddf81227d7608267a21b2cf5f4b5935a5fd2f217d64e52eb5b2df1b37636e5f7 mutated no
+  coinbase first yes others no height 987876
+  witness none
+  tx 0 txid ddf81227d7608267a21b2cf5f4b5935a5fd2f217d64e52eb5b2df1b37636e5f7 wtxid ddf81227d7608267a21b2cf5f4b5935a5fd2f217d64e52eb5b2df1b37636e5f7 in 1 out 1 out_sat 312500000 size 112 weight 448 check ok
+  verdict VALID
+@@BLK tn_987876 END
+fat16_create_file: "V09.RPT" -- 1013 bytes, 2 cluster(s), first cluster 22
+fat16_read_file: "V09.RPT" -- 1013 bytes read
+@@BLK tn_1263442 V09.RPT BEGIN
+block tn_1263442 size 518 weight 1508 ntx 2
+  header hash 000000006f27ddfe1dd680044a34548f41bed47eba9e6f0b310da21423bc5f33 prev 00000000b428e0bdccda662987a251a62f15ecd534b22ddb96a3399c521a8d1c merkle ff984a3fd3a78002184410f9c180e71885c1f45e821aaabf1d15792649143f08 version 20000000 time 1517700447 bits 1d00dcad nonce 2587571000
+  target 00000000dcad0000000000000000000000000000000000000000000000000000
+  pow PASS zero_bits 33
+  merkle PASS computed ff984a3fd3a78002184410f9c180e71885c1f45e821aaabf1d15792649143f08 mutated no
+  coinbase first yes others no height 1263442
+  witness PASS
+  tx 0 txid 7402a5a24a6a302e2a3ad9808aa2a776b824ae13a23fc09c860fa2aeabfb4bd9 wtxid 4da3003a98f8ea2a99b1cb24eccb6c02840182956c26153b0551679155465ddf in 1 out 2 out_sat 78127940 size 203 weight 704 check ok
+  tx 1 txid 2c21d40599523d6d24ed1cfe06346d0080362dc1d13f86d4a7f06931c73ce0e0 wtxid 0e18b1460f8c2008c9709107ef0b06c2f1dca5381b047f79554f03aa60c101a8 in 1 out 1 out_sat 16742215 size 234 weight 480 check ok
+  verdict VALID
+@@BLK tn_1263442 END
+fat16_create_file: "V10.RPT" -- 806 bytes, 2 cluster(s), first cluster 24
+fat16_read_file: "V10.RPT" -- 806 bytes read
+@@BLK tn_1414221 V10.RPT BEGIN
+block tn_1414221 size 165 weight 660 ntx 1
+  header hash 0000000000000027b2b3b3381f114f674f481544ff2be37ae3788d7e078383b1 prev 00000000402a03fb2cfbf153b2faae935acaed2b158f9607829d95a70783a84e merkle c8a022a001dee15f3af76546675fac3b4d9a84d966d0dfa927bc6dec14bbce70 version 20000000 time 1537801553 bits 194c5ff0 nonce 1171356071
+  target 000000000000004c5ff000000000000000000000000000000000000000000000
+  pow PASS zero_bits 58
+  merkle PASS computed c8a022a001dee15f3af76546675fac3b4d9a84d966d0dfa927bc6dec14bbce70 mutated no
+  coinbase first yes others no height 1414221
+  witness none
+  tx 0 txid c8a022a001dee15f3af76546675fac3b4d9a84d966d0dfa927bc6dec14bbce70 wtxid c8a022a001dee15f3af76546675fac3b4d9a84d966d0dfa927bc6dec14bbce70 in 1 out 1 out_sat 78125000 size 84 weight 336 check ok
+  verdict VALID
+@@BLK tn_1414221 END
+fat16_create_file: "V11.RPT" -- 801 bytes, 2 cluster(s), first cluster 26
+fat16_read_file: "V11.RPT" -- 801 bytes read
+@@BLK mn_0 V11.RPT BEGIN
+block mn_0 size 285 weight 1140 ntx 1
+  header hash 000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f prev 0000000000000000000000000000000000000000000000000000000000000000 merkle 4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b version 00000001 time 1231006505 bits 1d00ffff nonce 2083236893
+  target 00000000ffff0000000000000000000000000000000000000000000000000000
+  pow PASS zero_bits 43
+  merkle PASS computed 4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b mutated no
+  coinbase first yes others no height none
+  witness none
+  tx 0 txid 4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b wtxid 4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b in 1 out 1 out_sat 5000000000 size 204 weight 816 check ok
+  verdict VALID
+@@BLK mn_0 END
+fat16_create_file: "V12.RPT" -- 1409 bytes, 3 cluster(s), first cluster 28
+fat16_read_file: "V12.RPT" -- 1409 bytes read
+@@BLK syn_1 V12.RPT BEGIN
+block syn_1 size 1249 weight 4996 ntx 4
+  header hash 000046701a4073bb63f3273bb3bba45bae4246fab335af820cf87da47936720a prev 0000000000000000000000000000000000000000000000000000000000000000 merkle b0904a2c064fe3987d7ccccf5fb2b8da50c7b3298385d368eb819a2828fe4c61 version 20000000 time 1700000600 bits 1f00ffff nonce 301317
+  target 0000ffff00000000000000000000000000000000000000000000000000000000
+  pow PASS zero_bits 17
+  merkle PASS computed b0904a2c064fe3987d7ccccf5fb2b8da50c7b3298385d368eb819a2828fe4c61 mutated no
+  coinbase first yes others no height 1
+  witness none
+  tx 0 txid 71f7d8c1b4ac6d17552d1f28523fc5f3570ccff237991df341b845d087135119 wtxid 71f7d8c1b4ac6d17552d1f28523fc5f3570ccff237991df341b845d087135119 in 1 out 1 out_sat 2500000000 size 86 weight 344 check ok
+  tx 1 txid 20acf9ce7ab55743fa019265031668da84d301903237bd1567ca664e95243ea1 wtxid 20acf9ce7ab55743fa019265031668da84d301903237bd1567ca664e95243ea1 in 2 out 2 out_sat 2743319 size 372 weight 1488 check ok
+  tx 2 txid bcbb0c37367c25caca525bcf1aad6b81afcddc7079a95fa9e5117a03566518bb wtxid bcbb0c37367c25caca525bcf1aad6b81afcddc7079a95fa9e5117a03566518bb in 2 out 2 out_sat 237025 size 372 weight 1488 check ok
+  tx 3 txid 4eb2ef7994049b9cc54cfe1261b9b82aa8e96f9903ff94cd50714ab0ffe5155f wtxid 4eb2ef7994049b9cc54cfe1261b9b82aa8e96f9903ff94cd50714ab0ffe5155f in 2 out 1 out_sat 4317556 size 338 weight 1352 check ok
+  verdict VALID
+@@BLK syn_1 END
+fat16_create_file: "V13.RPT" -- 793 bytes, 2 cluster(s), first cluster 31
+fat16_read_file: "V13.RPT" -- 793 bytes read
+@@BLK syn_2 V13.RPT BEGIN
+block syn_2 size 167 weight 668 ntx 1
+  header hash 00000ab441c2e3c0f4a49b93a821f4d0cdb34ebabd552325d4f461232d4693a0 prev 000046701a4073bb63f3273bb3bba45bae4246fab335af820cf87da47936720a merkle f2f0c550db6c4457a7f9741eb53767f4e85904b9b344d3543c15ad201cfdfc72 version 20000000 time 1700001200 bits 1f00ffff nonce 236968
+  target 0000ffff00000000000000000000000000000000000000000000000000000000
+  pow PASS zero_bits 20
+  merkle PASS computed f2f0c550db6c4457a7f9741eb53767f4e85904b9b344d3543c15ad201cfdfc72 mutated no
+  coinbase first yes others no height 2
+  witness none
+  tx 0 txid f2f0c550db6c4457a7f9741eb53767f4e85904b9b344d3543c15ad201cfdfc72 wtxid f2f0c550db6c4457a7f9741eb53767f4e85904b9b344d3543c15ad201cfdfc72 in 1 out 1 out_sat 2500000000 size 86 weight 344 check ok
+  verdict VALID
+@@BLK syn_2 END
+fat16_create_file: "V14.RPT" -- 792 bytes, 2 cluster(s), first cluster 33
+fat16_read_file: "V14.RPT" -- 792 bytes read
+@@BLK syn_3 V14.RPT BEGIN
+block syn_3 size 167 weight 668 ntx 1
+  header hash 0000ee1240493032e3c4f219c020e4198e78814bc9e7988e225c637b6c590f03 prev 00000ab441c2e3c0f4a49b93a821f4d0cdb34ebabd552325d4f461232d4693a0 merkle 35a92e993b25e57888fed3f641683d4a11f59cb34bbc89188935ef2f00649b59 version 20000000 time 1700001800 bits 1f00ffff nonce 41174
+  target 0000ffff00000000000000000000000000000000000000000000000000000000
+  pow PASS zero_bits 16
+  merkle PASS computed 35a92e993b25e57888fed3f641683d4a11f59cb34bbc89188935ef2f00649b59 mutated no
+  coinbase first yes others no height 3
+  witness none
+  tx 0 txid 35a92e993b25e57888fed3f641683d4a11f59cb34bbc89188935ef2f00649b59 wtxid 35a92e993b25e57888fed3f641683d4a11f59cb34bbc89188935ef2f00649b59 in 1 out 1 out_sat 2500000000 size 86 weight 344 check ok
+  verdict VALID
+@@BLK syn_3 END
+fat16_create_file: "V15.RPT" -- 1202 bytes, 3 cluster(s), first cluster 35
+fat16_read_file: "V15.RPT" -- 1202 bytes read
+@@BLK syn_4 V15.RPT BEGIN
+block syn_4 size 730 weight 2920 ntx 3
+  header hash 00005d3ef12fd7bfca9f061a7ea00ba5554298bd357f14ca10c51e3e43548f8d prev 0000ee1240493032e3c4f219c020e4198e78814bc9e7988e225c637b6c590f03 merkle fc2484eb0c6f67eb57e83d4b5c05d3c20d51556d23422a79f5bc32eb2d0f72de version 20000000 time 1700002400 bits 1f00ffff nonce 61114
+  target 0000ffff00000000000000000000000000000000000000000000000000000000
+  pow PASS zero_bits 17
+  merkle PASS computed fc2484eb0c6f67eb57e83d4b5c05d3c20d51556d23422a79f5bc32eb2d0f72de mutated no
+  coinbase first yes others no height 4
+  witness none
+  tx 0 txid 9cb82f0248c123cb88c8f3bed0021b6bda0a750dcad7b0d22165813763c9129d wtxid 9cb82f0248c123cb88c8f3bed0021b6bda0a750dcad7b0d22165813763c9129d in 1 out 1 out_sat 2500000000 size 86 weight 344 check ok
+  tx 1 txid 1ada2948c32d2ef8ad04de8201eca5ac96aefa487346ef43ac2ff35cd8eba697 wtxid 1ada2948c32d2ef8ad04de8201eca5ac96aefa487346ef43ac2ff35cd8eba697 in 2 out 2 out_sat 4818244 size 372 weight 1488 check ok
+  tx 2 txid 28e800afe406d7f910a14199415ec48c78ac9f243f5a0bde2245263c50ac0f2b wtxid 28e800afe406d7f910a14199415ec48c78ac9f243f5a0bde2245263c50ac0f2b in 1 out 1 out_sat 4410117 size 191 weight 764 check ok
+  verdict VALID
+@@BLK syn_4 END
+fat16_create_file: "V16.RPT" -- 792 bytes, 2 cluster(s), first cluster 38
+fat16_read_file: "V16.RPT" -- 792 bytes read
+@@BLK syn_5 V16.RPT BEGIN
+block syn_5 size 167 weight 668 ntx 1
+  header hash 000086f0bbad73d1a063bb81cff584e2c19efd3ec0c08a439de6f188e78bcf09 prev 00005d3ef12fd7bfca9f061a7ea00ba5554298bd357f14ca10c51e3e43548f8d merkle 9bb49c7776f12867883e019b1f0b469e706ce5990161a917225b8e75286e1a6c version 20000000 time 1700003000 bits 1f00ffff nonce 48822
+  target 0000ffff00000000000000000000000000000000000000000000000000000000
+  pow PASS zero_bits 16
+  merkle PASS computed 9bb49c7776f12867883e019b1f0b469e706ce5990161a917225b8e75286e1a6c mutated no
+  coinbase first yes others no height 5
+  witness none
+  tx 0 txid 9bb49c7776f12867883e019b1f0b469e706ce5990161a917225b8e75286e1a6c wtxid 9bb49c7776f12867883e019b1f0b469e706ce5990161a917225b8e75286e1a6c in 1 out 1 out_sat 2500000000 size 86 weight 344 check ok
+  verdict VALID
+@@BLK syn_5 END
+fat16_create_file: "V17.RPT" -- 1204 bytes, 3 cluster(s), first cluster 40
+fat16_read_file: "V17.RPT" -- 1204 bytes read
+@@BLK syn_6 V17.RPT BEGIN
+block syn_6 size 1107 weight 3336 ntx 3
+  header hash 0000e39f4ce35b0c3db9c6f099b2a8dd38686e44abe304abd341f37d5ce8ab70 prev 000086f0bbad73d1a063bb81cff584e2c19efd3ec0c08a439de6f188e78bcf09 merkle 3d830a4fe83de244814c6a1bbdb41c6e29bf3f5a592f4d2d30833cfc300da941 version 20000000 time 1700003600 bits 1f00ffff nonce 13696
+  target 0000ffff00000000000000000000000000000000000000000000000000000000
+  pow PASS zero_bits 16
+  merkle PASS computed 3d830a4fe83de244814c6a1bbdb41c6e29bf3f5a592f4d2d30833cfc300da941 mutated no
+  coinbase first yes others no height 6
+  witness PASS
+  tx 0 txid 428eba9cdd3177c73555f4ae6df438b924ace216219d17e6e326c90029dda8a9 wtxid 2a78e748dbd7b585ccafa506646ceb4bcde7ec8552ba7bdc38d3a80ef0347bdd in 1 out 2 out_sat 2500000000 size 169 weight 568 check ok
+  tx 1 txid 187ba61766dc55363f8e90704e6c942459685aeafd52c64f5a201452e9e57b3a wtxid 652f94142943d0782afdf5faf4b7ae37d81e347b422e11c33c8e8817b0efb3ef in 1 out 1 out_sat 3978920 size 301 weight 874 check ok
+  tx 2 txid 83a271d45d1da2473adb8ac0e95bbdfcc0a249b6d6f5f5f0693cd07849cb3720 wtxid 0f1250454abd0435cea34d74483ea8a77957fe590816814fae8f7862b5094ba2 in 2 out 1 out_sat 3828474 size 556 weight 1570 check ok
+  verdict VALID
+@@BLK syn_6 END
+fat16_create_file: "V18.RPT" -- 792 bytes, 2 cluster(s), first cluster 43
+fat16_read_file: "V18.RPT" -- 792 bytes read
+@@BLK syn_7 V18.RPT BEGIN
+block syn_7 size 167 weight 668 ntx 1
+  header hash 000024c10198a63635062386c9c26086ee5fa72a8bef7fbd2feb7385743b770a prev 0000e39f4ce35b0c3db9c6f099b2a8dd38686e44abe304abd341f37d5ce8ab70 merkle 3e33e502ad85dcbe8048a91fb0c5f7b27eb4ca14ff457951faa624082853aaa5 version 20000000 time 1700004200 bits 1f00ffff nonce 15504
+  target 0000ffff00000000000000000000000000000000000000000000000000000000
+  pow PASS zero_bits 18
+  merkle PASS computed 3e33e502ad85dcbe8048a91fb0c5f7b27eb4ca14ff457951faa624082853aaa5 mutated no
+  coinbase first yes others no height 7
+  witness none
+  tx 0 txid 3e33e502ad85dcbe8048a91fb0c5f7b27eb4ca14ff457951faa624082853aaa5 wtxid 3e33e502ad85dcbe8048a91fb0c5f7b27eb4ca14ff457951faa624082853aaa5 in 1 out 1 out_sat 2500000000 size 86 weight 344 check ok
+  verdict VALID
+@@BLK syn_7 END
+fat16_create_file: "V19.RPT" -- 792 bytes, 2 cluster(s), first cluster 45
+fat16_read_file: "V19.RPT" -- 792 bytes read
+@@BLK syn_8 V19.RPT BEGIN
+block syn_8 size 167 weight 668 ntx 1
+  header hash 000025df2dfee2dbd1d256b701b29a71dce3f37dc52dcc1873cc93eade2624ac prev 000024c10198a63635062386c9c26086ee5fa72a8bef7fbd2feb7385743b770a merkle 7ce751bbbf0e0f9b9e5fecb176190322385c3abdbcfc737a4d4dbda0d30844a4 version 20000000 time 1700004800 bits 1f00ffff nonce 47530
+  target 0000ffff00000000000000000000000000000000000000000000000000000000
+  pow PASS zero_bits 18
+  merkle PASS computed 7ce751bbbf0e0f9b9e5fecb176190322385c3abdbcfc737a4d4dbda0d30844a4 mutated no
+  coinbase first yes others no height 8
+  witness none
+  tx 0 txid 7ce751bbbf0e0f9b9e5fecb176190322385c3abdbcfc737a4d4dbda0d30844a4 wtxid 7ce751bbbf0e0f9b9e5fecb176190322385c3abdbcfc737a4d4dbda0d30844a4 in 1 out 1 out_sat 2500000000 size 86 weight 344 check ok
+  verdict VALID
+@@BLK syn_8 END
+fat16_create_file: "V20.RPT" -- 1203 bytes, 3 cluster(s), first cluster 47
+fat16_read_file: "V20.RPT" -- 1203 bytes read
+@@BLK syn_9 V20.RPT BEGIN
+block syn_9 size 730 weight 2920 ntx 3
+  header hash 000076abaa6fc660d19be6f9fa328806164f897cbd3b8293d6d05de0a854cb2b prev 000025df2dfee2dbd1d256b701b29a71dce3f37dc52dcc1873cc93eade2624ac merkle ba8d292db1aeac4fe07a46efae69986ea6ce2ee5644439ff4f43beaad930eaca version 20000000 time 1700005400 bits 1f00ffff nonce 126032
+  target 0000ffff00000000000000000000000000000000000000000000000000000000
+  pow PASS zero_bits 17
+  merkle PASS computed ba8d292db1aeac4fe07a46efae69986ea6ce2ee5644439ff4f43beaad930eaca mutated no
+  coinbase first yes others no height 9
+  witness none
+  tx 0 txid 193ccc1930233b848d1bdab073171a0e3a2945e347110787482211ed2e644d81 wtxid 193ccc1930233b848d1bdab073171a0e3a2945e347110787482211ed2e644d81 in 1 out 1 out_sat 2500000000 size 86 weight 344 check ok
+  tx 1 txid f2c4e30ef1395ecc0acbeedb694249afbf939cee78143fe4b8b22d78bf35ab52 wtxid f2c4e30ef1395ecc0acbeedb694249afbf939cee78143fe4b8b22d78bf35ab52 in 2 out 2 out_sat 7020765 size 372 weight 1488 check ok
+  tx 2 txid e232a4bfea96fd957696c5d0893a2d661782d679bfb0b50c7546d7fea04e20e3 wtxid e232a4bfea96fd957696c5d0893a2d661782d679bfb0b50c7546d7fea04e20e3 in 1 out 1 out_sat 4077989 size 191 weight 764 check ok
+  verdict VALID
+@@BLK syn_9 END
+fat16_create_file: "V21.RPT" -- 793 bytes, 2 cluster(s), first cluster 50
+fat16_read_file: "V21.RPT" -- 793 bytes read
+@@BLK syn_10 V21.RPT BEGIN
+block syn_10 size 168 weight 672 ntx 1
+  header hash 0000cb11c96568a58cf43e8a9abf1d039ae25d8c253d8449fb4adae9e7c951f1 prev 000076abaa6fc660d19be6f9fa328806164f897cbd3b8293d6d05de0a854cb2b merkle b7d7128106cf0331de72fa478a554fa8ca7c2fc449f543e2aca41866add46b70 version 20000000 time 1700006000 bits 1f00ffff nonce 5964
+  target 0000ffff00000000000000000000000000000000000000000000000000000000
+  pow PASS zero_bits 16
+  merkle PASS computed b7d7128106cf0331de72fa478a554fa8ca7c2fc449f543e2aca41866add46b70 mutated no
+  coinbase first yes others no height 10
+  witness none
+  tx 0 txid b7d7128106cf0331de72fa478a554fa8ca7c2fc449f543e2aca41866add46b70 wtxid b7d7128106cf0331de72fa478a554fa8ca7c2fc449f543e2aca41866add46b70 in 1 out 1 out_sat 2500000000 size 87 weight 348 check ok
+  verdict VALID
+@@BLK syn_10 END
+fat16_create_file: "V22.RPT" -- 794 bytes, 2 cluster(s), first cluster 52
+fat16_read_file: "V22.RPT" -- 794 bytes read
+@@BLK syn_11 V22.RPT BEGIN
+block syn_11 size 168 weight 672 ntx 1
+  header hash 0000c663ee5bc17d1187e6f5a59c4bc662c7753c8e65b72b1a7b54df3363d6fd prev 0000cb11c96568a58cf43e8a9abf1d039ae25d8c253d8449fb4adae9e7c951f1 merkle c0d70f179eb00dabb0671136af7db927009efc498c4dbb33eaa56ca8f1ed5727 version 20000000 time 1700006600 bits 1f00ffff nonce 20138
+  target 0000ffff00000000000000000000000000000000000000000000000000000000
+  pow PASS zero_bits 16
+  merkle PASS computed c0d70f179eb00dabb0671136af7db927009efc498c4dbb33eaa56ca8f1ed5727 mutated no
+  coinbase first yes others no height 11
+  witness none
+  tx 0 txid c0d70f179eb00dabb0671136af7db927009efc498c4dbb33eaa56ca8f1ed5727 wtxid c0d70f179eb00dabb0671136af7db927009efc498c4dbb33eaa56ca8f1ed5727 in 1 out 1 out_sat 2500000000 size 87 weight 348 check ok
+  verdict VALID
+@@BLK syn_11 END
+fat16_create_file: "V23.RPT" -- 1205 bytes, 3 cluster(s), first cluster 54
+fat16_read_file: "V23.RPT" -- 1205 bytes read
+@@BLK syn_12 V23.RPT BEGIN
+block syn_12 size 912 weight 3648 ntx 3
+  header hash 00005153603acca4447c5a141f84f437471a0c2c6794b876ba9f5bcaf3ef6800 prev 0000c663ee5bc17d1187e6f5a59c4bc662c7753c8e65b72b1a7b54df3363d6fd merkle 5e28819d01437d2f2f0d752347a4bead42cdca381afa930816c6cf6f7efe51c0 version 20000000 time 1700007200 bits 1f00ffff nonce 47164
+  target 0000ffff00000000000000000000000000000000000000000000000000000000
+  pow PASS zero_bits 17
+  merkle PASS computed 5e28819d01437d2f2f0d752347a4bead42cdca381afa930816c6cf6f7efe51c0 mutated no
+  coinbase first yes others no height 12
+  witness none
+  tx 0 txid bd44f1bea6df8fe7ca3befa5e102bb5a32f670a7a6cdd0038f2964274d810046 wtxid bd44f1bea6df8fe7ca3befa5e102bb5a32f670a7a6cdd0038f2964274d810046 in 1 out 1 out_sat 2500000000 size 87 weight 348 check ok
+  tx 1 txid 89a039379969b17de1a98f110f94587c3c5a5d4ac205b82641bddbf1d9279d81 wtxid 89a039379969b17de1a98f110f94587c3c5a5d4ac205b82641bddbf1d9279d81 in 2 out 2 out_sat 4626174 size 372 weight 1488 check ok
+  tx 2 txid edf34e8b70d967e638d0e2b31d12054e8edd0fa2ed1c6db63059ce23cb853fd8 wtxid edf34e8b70d967e638d0e2b31d12054e8edd0fa2ed1c6db63059ce23cb853fd8 in 2 out 2 out_sat 3489179 size 372 weight 1488 check ok
+  verdict VALID
+@@BLK syn_12 END
+fat16_create_file: "V24.RPT" -- 1430 bytes, 3 cluster(s), first cluster 57
+fat16_read_file: "V24.RPT" -- 1430 bytes read
+@@BLK syn_dup V24.RPT BEGIN
+block syn_dup size 805 weight 3220 ntx 4
+  header hash 0000a832d9c8a69b3d001484a1dbdabfaf3d41f323f4fcd6887180bbc15204e8 prev 00005153603acca4447c5a141f84f437471a0c2c6794b876ba9f5bcaf3ef6800 merkle f6d11f7376a782b3057d9fa9126bb149f47e2bcfe3ef4f80c1d05075131aecd8 version 20000000 time 1700007800 bits 1f00ffff nonce 10947
+  target 0000ffff00000000000000000000000000000000000000000000000000000000
+  pow PASS zero_bits 16
+  merkle PASS computed f6d11f7376a782b3057d9fa9126bb149f47e2bcfe3ef4f80c1d05075131aecd8 mutated yes
+  coinbase first yes others no height 13
+  witness none
+  tx 0 txid 06f98f2e5b8849ff9a31757b7a5a15b92711ded25c9c8c67b08215bfe0d184c0 wtxid 06f98f2e5b8849ff9a31757b7a5a15b92711ded25c9c8c67b08215bfe0d184c0 in 1 out 1 out_sat 2500000000 size 83 weight 332 check ok
+  tx 1 txid 310ce4922d044c6448b7a7e6e22687ebb1ef40744802760ec2886452d4e43c4b wtxid 310ce4922d044c6448b7a7e6e22687ebb1ef40744802760ec2886452d4e43c4b in 1 out 1 out_sat 4281566 size 191 weight 764 check ok
+  tx 2 txid b402d5e93ea208dbfa2d7f0822195aeb971bf677d5c4cf9e22c84058669067ba wtxid b402d5e93ea208dbfa2d7f0822195aeb971bf677d5c4cf9e22c84058669067ba in 1 out 2 out_sat 1868015 size 225 weight 900 check ok
+  tx 3 txid b402d5e93ea208dbfa2d7f0822195aeb971bf677d5c4cf9e22c84058669067ba wtxid b402d5e93ea208dbfa2d7f0822195aeb971bf677d5c4cf9e22c84058669067ba in 1 out 2 out_sat 1868015 size 225 weight 900 check ok
+  verdict INVALID bad-txns-duplicate
+@@BLK syn_dup END
+
+Chapter 50 bitcoin demo complete: 11 real blocks validated, 11 published hashes matched, 23 valid blocks in all, 214 transaction vectors checked, 7 attacks refused, 24 report files written and read back identical

@@ -1,0 +1,48 @@
+-- 1. the FAT16 volume the kernel wrote
+  ok   24 report files on the disk: V01.RPT ... V24.RPT
+-- 2. all 24 blocks recomputed by the independent reference (Python hashlib and big integers)
+  ok   canonical blocks printed on the serial port: 24
+  ok   tn_0: kernel's printed report == reference == V01.RPT on the disk (9 lines, verdict VALID)
+  ok   tn_2: kernel's printed report == reference == V02.RPT on the disk (9 lines, verdict VALID)
+  ok   tn_3: kernel's printed report == reference == V03.RPT on the disk (9 lines, verdict VALID)
+  ok   tn_15007: kernel's printed report == reference == V04.RPT on the disk (9 lines, verdict VALID)
+  ok   tn_49291: kernel's printed report == reference == V05.RPT on the disk (10 lines, verdict VALID)
+  ok   tn_180480: kernel's printed report == reference == V06.RPT on the disk (13 lines, verdict VALID)
+  ok   tn_926485: kernel's printed report == reference == V07.RPT on the disk (13 lines, verdict VALID)
+  ok   tn_987876: kernel's printed report == reference == V08.RPT on the disk (9 lines, verdict VALID)
+  ok   tn_1263442: kernel's printed report == reference == V09.RPT on the disk (10 lines, verdict VALID)
+  ok   tn_1414221: kernel's printed report == reference == V10.RPT on the disk (9 lines, verdict VALID)
+  ok   mn_0: kernel's printed report == reference == V11.RPT on the disk (9 lines, verdict VALID)
+  ok   syn_1: kernel's printed report == reference == V12.RPT on the disk (12 lines, verdict VALID)
+  ok   syn_2: kernel's printed report == reference == V13.RPT on the disk (9 lines, verdict VALID)
+  ok   syn_3: kernel's printed report == reference == V14.RPT on the disk (9 lines, verdict VALID)
+  ok   syn_4: kernel's printed report == reference == V15.RPT on the disk (11 lines, verdict VALID)
+  ok   syn_5: kernel's printed report == reference == V16.RPT on the disk (9 lines, verdict VALID)
+  ok   syn_6: kernel's printed report == reference == V17.RPT on the disk (11 lines, verdict VALID)
+  ok   syn_7: kernel's printed report == reference == V18.RPT on the disk (9 lines, verdict VALID)
+  ok   syn_8: kernel's printed report == reference == V19.RPT on the disk (9 lines, verdict VALID)
+  ok   syn_9: kernel's printed report == reference == V20.RPT on the disk (11 lines, verdict VALID)
+  ok   syn_10: kernel's printed report == reference == V21.RPT on the disk (9 lines, verdict VALID)
+  ok   syn_11: kernel's printed report == reference == V22.RPT on the disk (9 lines, verdict VALID)
+  ok   syn_12: kernel's printed report == reference == V23.RPT on the disk (11 lines, verdict VALID)
+  ok   syn_dup: kernel's printed report == reference == V24.RPT on the disk (12 lines, verdict INVALID bad-txns-duplicate)
+-- 3. the published hashes
+  ok   all 11 real blocks: the hash in the kernel's printout equals the hash published in Bitcoin Core test data (blockfilters.json), and the kernel printed MATCH
+  ok   the mainnet genesis block's hash is 000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f, the one everybody knows
+-- 4. Bitcoin Core's transaction vectors
+  ok   reference: 121 valid vectors (121 pass), 93 invalid (9 refused by CheckTransaction, 84 script-level only)
+  ok   the nine refusals the kernel printed, in order, equal the reference's: bad-txns-vout-empty, bad-txns-vout-negative, bad-txns-vout-toolarge, bad-txns-txouttotal-toolarge, bad-txns-inputs-duplicate, bad-cb-length, bad-cb-length, bad-txns-prevout-null, bad-txns-prevout-null
+  ok   the kernel's counts (121 / 121; 93: 9 refused, 84 script-level) equal the reference's
+-- 5. the seven attacks reproduced in Python
+  ok   attack 1 (nonce bit): Python says high-hash, the kernel printed high-hash
+  ok   attack 2 (a bit of the coinbase): Python says bad-txnmrklroot, the kernel printed bad-txnmrklroot
+  ok   attack 3: block 4's previous-hash field is not block 2's hash (Python agrees), the kernel refused
+  ok   attack 4 (repeated transaction): the Merkle root matches, Python says bad-txns-duplicate, the kernel printed the same
+  ok   attack 5 (witness reserved value): Python says bad-witness-merkle-match, the kernel printed the same
+  ok   attack 6 (truncated at 500 bytes): Python refuses it as unparseable too
+  ok   attack 7 (harder limit than it was mined under): Python says high-hash
+-- 6. human-readable lines re-rendered from Python's numbers
+  ok   the printed target, leading-zero-bit count and BIP 34 height of all 11 real blocks equal the reference's
+  ok   final tally: 11 real blocks, 11 published hashes matched, 23 valid blocks, 214 transaction vectors, 7 attacks, 24 report files
+
+ALL CHECKS PASSED

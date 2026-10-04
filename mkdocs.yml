@@ -116,7 +116,8 @@ nav:
       - "46. Dynamic IDT Gate Installation: Closing a Gap Chapter 26 Left Open": part46/46-dynamic-idt-gate-installation.md
       - "47. An eBay-Style Marketplace: Proxy Bidding, Escrow Checkout, and a Write-Ahead Log That Survives a Crash": part47/47-an-ebay-style-marketplace.md
       - "48. SEC EDGAR Filings and Financial Ratios: Reading XBRL Inside a Kernel, and Refusing Filings That Do Not Add Up": part48/48-sec-edgar-financial-ratios.md
-      - "49. Health-Care Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent": part49/49-health-care-claims-x12-837-835.md
+      - "49. Healthcare Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent": part49/49-healthcare-claims-x12-837-835.md
+      - "50. A Bitcoin Block Validator: Double SHA-256, Merkle Roots, Proof of Work, and What a Block Must Satisfy Before Anyone Looks at the Chain": part50/50-bitcoin-block-validator.md
   - "Appendix -- Primers and Self-Check Answers":
       - "Appendix A. Introduction to x86 Assembly": appendixA/a-introduction-to-assembly.md
       - "Appendix B. Introduction to Unix": appendixB/b-introduction-to-unix.md

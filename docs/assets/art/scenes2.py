@@ -175,7 +175,7 @@ def s48(s):  # SEC EDGAR: a 10-K filing, its XBRL tags, and the ratios computed 
     for k, (t, w) in enumerate((("current 0.99x", 118), ("gross 44.13%", 112), ("net 25.31%", 100), ("ROE 171.95%", 124))):
         y = 62 + k * 52; s.rect(650, y, w, 30, s.acc if k == 1 else s.main, s.dark, 2, 6, op=.95); s.text(658, y + 20, t, 12, s.dark, "start", bold=True)
 
-def s49(s):  # health-care claims: an 837 claim form in, an adjudication ledger in the middle, an 835 remittance out
+def s49(s):  # healthcare claims: an 837 claim form in, an adjudication ledger in the middle, an 835 remittance out
     # the claim (837): a form with a cross and the segments that matter
     s.poly([(36, 56), (170, 56), (196, 82), (196, 280), (36, 280)], s.light, s.dark, 3); s.poly([(170, 56), (170, 82), (196, 82)], s.main, s.dark, 2)
     s.rect(52, 74, 30, 30, s.acc, s.dark, 2, 4); s.rect(62, 79, 10, 20, s.light, None, 0, 2); s.rect(57, 84, 20, 10, s.light, None, 0, 2)
@@ -198,3 +198,23 @@ def s49(s):  # health-care claims: an 837 claim form in, an adjudication ledger 
     for k, t in enumerate(("CLP*PCN-A001*1*202", "SVC*HC:99213*150*0", "CAS*CO*45*62", "CAS*PR*3*25**1*63", "BALANCED")):
         s.text(574, 134 + k * 24, t, 10, s.dark if k < 4 else s.acc, "start", bold=(k == 4))
     s.circ(690, 254, 18, s.acc, s.dark, 3); s.path("M680,254 l7,8 l13,-16", stroke=s.dark, sw=4)
+
+def s50(s):  # Bitcoin: blocks chained by hash, a Merkle tree of transactions, and a hash that must fall below a target
+    # the chain: three blocks, each holding the previous block's hash
+    for k, (x, t) in enumerate(((30, "BLOCK 926483"), (150, "BLOCK 926484"), (270, "BLOCK 926485"))):
+        s.rect(x, 70, 100, 110, s.light, s.dark, 3, 8); s.text(x + 50, 92, t, 10, s.dark, bold=True)
+        s.text(x + 8, 116, "prev", 10, s.dark, "start"); s.rect(x + 8, 122, 84, 8, s.main, None, 0, 2, op=.85)
+        s.text(x + 8, 146, "merkle", 10, s.dark, "start"); s.rect(x + 8, 152, 84, 8, s.acc, None, 0, 2, op=.85)
+        s.text(x + 8, 174, "nonce", 10, s.dark, "start")
+        if k < 2: s.path(f"M{x + 100},125 q10,-12 20,0", stroke=s.acc, sw=3); s.poly([(x + 118, 118), (x + 124, 125), (x + 118, 132)], s.acc)
+    s.text(215, 205, "hash of block N = double SHA-256 of its 80-byte header", 11, s.light, op=.9)
+    # the proof of work
+    s.rect(30, 222, 340, 52, "#0f0a03", s.main, 2, 8, op=.95); s.text(40, 244, "target  00000000000002 13ef...", 12, s.light, "start"); s.text(40, 264, "hash    000000000000015d 6077... <= target", 12, s.main, "start", bold=True)
+    s.circ(340, 248, 16, s.main, s.dark, 3); s.path("M332,248 l6,7 l11,-14", stroke=s.dark, sw=3)
+    # the Merkle tree
+    s.text(560, 56, "MERKLE TREE OF TRANSACTIONS", 12, s.light, bold=True)
+    pts = {"r": (560, 90), "a": (490, 150), "b": (630, 150), "1": (455, 220), "2": (525, 220), "3": (595, 220), "4": (665, 220)}
+    for a, b in (("r", "a"), ("r", "b"), ("a", "1"), ("a", "2"), ("b", "3"), ("b", "4")): s.line(pts[a][0], pts[a][1] + 14, pts[b][0], pts[b][1] - 14, s.light, 2, op=.7)
+    for k, (x, y) in pts.items():
+        root = k == "r"; s.rect(x - 32, y - 14, 64, 28, s.acc if root else s.main, s.dark, 2, 6); s.text(x, y + 5, "root" if root else ("tx " + k if k in "1234" else "hash"), 12, s.dark, bold=True)
+    s.text(560, 262, "= the root in the block header", 11, s.light, op=.9); s.text(560, 280, "3 txs: the third is paired with itself", 10, s.light, op=.75)
