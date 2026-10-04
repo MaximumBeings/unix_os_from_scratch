@@ -1116,3 +1116,28 @@ Worked answer: a reader should check the same evidence this book has always offe
 
 ---
 
+---
+
+## Chapter 47: An eBay-Style Marketplace: Proxy Bidding, Escrow Checkout, and a Write-Ahead Log That Survives a Crash
+
+*(from [47. An eBay-Style Marketplace: Proxy Bidding, Escrow Checkout, and a Write-Ahead Log That Survives a Crash](../part47/47-an-ebay-style-marketplace.md))*
+
+**1. Why does `mkt_submit()` write the log record *before* applying the command, and what could go wrong if the order were reversed?**
+
+Worked answer: if the command were applied first and logged second, a crash between the two steps would leave a marketplace whose in-memory state had moved (a bid accepted, money in escrow) with no record of why; after recovery that change would be silently gone, while the client -- who may already have been told "accepted" -- believes it happened. Logging first means a crash can only leave a record that was never applied, and replay then applies it, giving the state the client was promised. This is also why `mkt_apply()` must be a deterministic function of the command alone: replay has to reach the same state from the same record.
+
+**2. `mkt_apply()` reads no clock, yet auctions end at a time. How, and why is this design necessary for recovery?**
+
+Worked answer: the time is part of the command: every `mkt_cmd_t` carries `now`, supplied by the caller (the server stamps it when the request arrives) and written to the log with the rest of the command. During replay the logged time is used, not the current one. If `mkt_apply()` read a clock itself, replaying a bid a day later would find the auction already over and give a different state from the original run, and the recovered hash would not match.
+
+**3. Why is a retry with the same `Idempotency-Key` but a *different* request refused (422) rather than answered with the stored result?**
+
+Worked answer: answering a different request with the stored result of an earlier one would tell the client its new request succeeded when nothing about it was done -- a bid of $44.00 acknowledged with the proxy bid id of the $42.00 request. The stored fingerprint (an FNV-1a hash of the command's type and fields) distinguishes "the same request sent again" (answer from the table, change nothing) from "a different request under a reused key" (a client bug, which must be loud). The table is part of the replayed state, so this still holds for a retry that arrives after a crash and a recovery.
+
+**4. Work out by hand: bidder A has maximum $100.00 and bidder B has bid exactly $100.00 later. What is the price, who leads, and what is the price after A raises their maximum to $120.00?**
+
+Worked answer: the maxima are equal, so the earlier bidder, A, leads, and the price is capped at the leader's own maximum: $100.00. When A raises to $120.00, eBay bids again for A against the runner-up: B's maximum plus the increment that applies at $100.00 ($2.50, from the table for prices $100.00-$249.99) gives $102.50, which is below A's new maximum, so the price becomes **$102.50**. This is exactly the case that exposed the wrong first version of the Python reference (see "What the first runs found"), which had left the price at $100.00.
+
+**5. Six deliberately broken copies of the code survived the first version of the tests. Why is that more useful than if they had all been caught, and what did "release pays the full total and no fee" teach in particular?**
+
+Worked answer: each survivor pointed at a specific property no test had checked, so each led to a new test that now guards against a whole class of mistakes, not just the one mutant. "Release pays the full total and no fee" is the instructive case: every conservation invariant still held -- the money merely went to the seller instead of being split between seller and platform -- so an invariant checker that only asks "does the ledger sum to zero, is escrow right, is anything negative" could never see it. Conservation is necessary, not sufficient; the test that catches it checks that each release moves *exactly* the fee and the seller's share, to the cent.

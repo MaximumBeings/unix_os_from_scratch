@@ -1,0 +1,24 @@
+== auction engine vs the independent Python reference (20000 random auctions) ==
+C engine output and Python reference output are IDENTICAL (436661 lines)
+20000 auctions, 396661 bid events
+  event outcomes: accepted 62262, refused: auction ended 245621, refused: seller bidding 25052, refused: below the minimum bid 30446, refused: lowering own maximum 33280
+  closes: sold 16130, reserve not met 1960, no bids 1910; end-time extensions observed 4046
+
+== marketplace: invariants, replay, every log prefix, torn tails, idempotency, fee split, hash sensitivity (600 random marketplaces) ==
+Directed test 1: idempotency table full (24 keys): the next new key is refused with nothing applied, a known key is still answered from the table, and replay agrees
+Directed test 2: a winner with $5.00 against a $10.00 price: checkout refused (code 29), balance still $5.00, escrow empty, no order, invariants hold
+marketplaces 600, commands 35658: invariants held after every one; 600 full replays identical; 56188 log prefixes replayed identically; 3600 torn-tail cases recovered correctly;
+8465 retries answered from the stored result without changing anything; 8465 same-key-different-request refusals; listings sold 347, orders released 59, refunded 22; 59 releases checked to the cent; 5984 hash-sensitivity probes
+
+== ledger: conservation, overdraft, fee table vs decimal arithmetic ==
+1. 2000000 random transfers/deposits (1327206 applied, 672794 refused): ledger total 0 after every one, no negative account, refused transfers changed nothing
+2. overdraft: a $10.01 transfer from a $10.00 account is refused with nothing moved; spending exactly $10.00 works; the empty account then cannot pay even 1 cent
+100001 sale totals (0 to 100000 cents) checked against decimal half-up rounding: all identical
+
+== eBay-shaped messages: round trips, strict amounts, builders, 2,000,000 damaged inputs ==
+1. 200000 bid requests built, parsed back, identical (method, bidder, idempotency key, item id, amount)
+2. 17 amount strings (good and bad) parsed exactly as specified
+3. 20000 AUCTION offers built and parsed back, identical
+4. six builders x 699 buffer sizes: never wrote out of bounds; complete outputs are 207, 385, 280, 372, 110, 30 bytes
+5. 2000000 randomly damaged requests and bodies through every parser: no crash, no out-of-bounds access, every accepted value in range
+15 instants checked against datetime: all identical

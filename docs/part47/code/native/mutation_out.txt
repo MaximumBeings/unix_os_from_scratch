@@ -1,0 +1,32 @@
+NOTE: this script deliberately breaks copies of the chapter's sources. 'caught' lines are EXPECTED: they show the tests can detect the mistake.
+baseline (nothing broken): all tests pass (expected)
+tie-break reversed: the LATER bidder wins an equal maximum: caught by auction differential test
+increment table wrong at $25.00-$99.99 ($0.50 instead of $1.00): caught by auction differential test
+the price is no longer capped at the leader's own maximum: caught by auction differential test
+meeting the reserve no longer lifts the price to the reserve: caught by auction differential test
+minimum bid forgets the increment: caught by auction differential test
+a bidder may lower or repeat their own maximum: caught by auction differential test
+the seller may bid on their own item: caught by auction differential test
+a bid exactly at the end time is accepted (off by one): caught by auction differential test
+anti-sniping window off by one: caught by auction differential test
+an auction can be closed before its end time: caught by auction differential test
+reserve counts as met only when STRICTLY exceeded: caught by auction differential test
+runner-up chosen as the WEAKEST bidder instead of the strongest of the rest: caught by auction differential test
+an account may be overdrawn: caught by market_test, ledger_test
+the fee is not rounded half up: caught by ledger_test
+a transfer debits the sender but never credits the receiver (money destroyed): caught by market_test, ledger_test
+the idempotency fingerprint ignores the bid amount: caught by market_test
+retries are not recognised (the idempotency lookup never matches): caught by market_test
+checkout takes no money from the buyer: caught by market_test
+release pays the seller the full total and the platform takes no fee, escrow left over: caught by market_test
+the state hash leaves out the ledger balances: caught by market_test
+the state hash leaves out the contents of the orders: caught by market_test
+the state hash leaves out the contents of the idempotency table: caught by market_test
+the CRC is not checked when a record is read: caught by market_test
+the sequence number is not checked: caught by market_test
+wrong CRC polynomial: caught by market_test
+amounts with three decimals are accepted: caught by ebay_test
+the amount limit ($1,000,000.00) is not enforced: caught by ebay_test
+the Authorization header is parsed with the wrong prefix length: caught by ebay_test
+
+28 of 28 broken versions caught

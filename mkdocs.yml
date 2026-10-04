@@ -114,6 +114,7 @@ nav:
       - "44. Car Rental: A Real OTA Vehicle Availability and Reservation Codec": part44/44-car-rental.md
       - "45. A Minimal IP Layer: Real IPv4 and a Real ICMP Echo (Ping)": part45/45-minimal-ip-layer.md
       - "46. Dynamic IDT Gate Installation: Closing a Gap Chapter 26 Left Open": part46/46-dynamic-idt-gate-installation.md
+      - "47. An eBay-Style Marketplace: Proxy Bidding, Escrow Checkout, and a Write-Ahead Log That Survives a Crash": part47/47-an-ebay-style-marketplace.md
   - "Appendix -- Primers and Self-Check Answers":
       - "Appendix A. Introduction to x86 Assembly": appendixA/a-introduction-to-assembly.md
       - "Appendix B. Introduction to Unix": appendixB/b-introduction-to-unix.md
