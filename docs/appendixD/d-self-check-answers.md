@@ -1220,3 +1220,30 @@ Worked answer: a txid hashes the transaction without witness data, so anything i
 **5. Name three rules Bitcoin applies to a block that this validator does not, and what each would need.**
 
 Worked answer: (a) script execution and signature checking (an interpreter and secp256k1 ECDSA/Schnorr); (b) that every input spends an existing, unspent output (a coin database); (c) the block reward limit and the difficulty adjustment (the chain's height and the timestamps of earlier blocks). Also timestamp rules (median time past and a clock).
+
+
+---
+
+## Chapter 51: A Limit-Order-Book Matching Engine
+
+*(from [51. A Limit-Order-Book Matching Engine](../part51/51-limit-order-book-itch.md))*
+
+**1. A buy of 200 at $100.01 meets asks of 100 and 50 at $100.00 (in that order of arrival) and 80 at $100.01. What trades, at what prices, and what rests?**
+
+Worked answer: best price first, earliest first within a price: 100 at $100.00 (the first ask), 50 at $100.00 (the second), then 50 of the 80 at $100.01. 100 + 50 + 50 = 200, so the buyer is completely filled and nothing rests from it; 30 remain of the $100.01 ask. Three Executed messages are published and no Add.
+
+**2. Why does the trade price come from the resting order, and why can an ITCH Executed message omit the price?**
+
+Worked answer: the resting order was posted first and promised its price; the incoming order only promised a limit, so it gets the better price (price improvement). Because an execution always happens at the resting order's own price, which the feed already told subscribers when the order was added, the Executed message needs only the order id, the shares and a match number.
+
+**3. Why does replacing an order to the same price lose its queue position, and what does the feed show if the new price would cross the book?**
+
+Worked answer: a replace is cancel-and-new in this engine (and at many venues), and priority is the order of arrival into the book, so the new order arrives last. If the new price crosses, it trades like a new order, so the feed shows a Delete of the old order, Executes against the resting orders, and an Add for any remainder, with no Replace message.
+
+**4. The subscriber refuses a feed in which a bid is priced at or above the best ask. Why is that safe to treat as corruption?**
+
+Worked answer: an exchange matches any crossing orders at once, so a book it publishes is never crossed; a feed that produces one has lost or altered a message (a missing Execute, a changed price). The equal-price case is crossed too, because the prices touch and would trade.
+
+**5. What would you add to this engine for IOC and fill-or-kill orders, and what new invariant would the fuzzer check?**
+
+Worked answer: a time-in-force field on new orders. IOC is what a market order already is with a limit price: match what crosses, discard the remainder. Fill-or-kill needs a pre-check that the whole quantity is available at acceptable prices (like the up-front capacity check) and refuses the order without side effects otherwise. New invariants: an IOC or FOK order never appears as an Add; a refused FOK changes nothing; an accepted FOK trades its full quantity.

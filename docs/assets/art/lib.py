@@ -25,6 +25,7 @@ PALETTES = {   # (background top, background bottom, main, accent, light, dark)
     "edgar":   ("#0a1a2f", "#1d3b63", "#7dd3fc", "#fbbf24", "#eaf4ff", "#050d18"),
     "health":  ("#082a2a", "#0f5a5a", "#5eead4", "#fb7185", "#e6fffb", "#041717"),
     "btc":     ("#1c1206", "#4a3010", "#f7931a", "#60a5fa", "#fff4e0", "#0f0a03"),
+    "market":  ("#0c1a2a", "#173a5e", "#4ade80", "#f87171", "#e8f1fb", "#060e17"),
     "ref":     ("#1c1917", "#44403c", "#fbbf24", "#a3e635", "#faf5eb", "#0f0d0c"),
 }
 class Svg:

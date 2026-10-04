@@ -218,3 +218,17 @@ def s50(s):  # Bitcoin: blocks chained by hash, a Merkle tree of transactions, a
     for k, (x, y) in pts.items():
         root = k == "r"; s.rect(x - 32, y - 14, 64, 28, s.acc if root else s.main, s.dark, 2, 6); s.text(x, y + 5, "root" if root else ("tx " + k if k in "1234" else "hash"), 12, s.dark, bold=True)
     s.text(560, 262, "= the root in the block header", 11, s.light, op=.9); s.text(560, 280, "3 txs: the third is paired with itself", 10, s.light, op=.75)
+
+def s51(s):  # limit order book: bids stacked green on the left, asks red on the right, a trade in the middle, and the feed messages it publishes
+    s.text(210, 50, "BIDS (buyers)", 13, s.main, bold=True); s.text(500, 50, "ASKS (sellers)", 13, s.acc, bold=True)
+    for k, (p, q) in enumerate((("100.01", 120), ("100.00", 90), ("99.99", 160), ("99.98", 60))):
+        y = 76 + k * 38; w = q; s.rect(270 - w, y, w, 28, s.main, s.dark, 2, 4, op=.9); s.text(278, y + 19, p, 12, s.light, "start", bold=True); s.text(270 - w + 6, y + 19, str(q), 11, s.dark, "start", bold=True)
+    for k, (p, q) in enumerate((("100.02", 40), ("100.03", 70), ("100.05", 100), ("100.06", 60))):
+        y = 76 + k * 38; w = q; s.rect(440, y, w, 28, s.acc, s.dark, 2, 4, op=.9); s.text(432, y + 19, p, 12, s.light, "end", bold=True); s.text(446, y + 19, str(q), 11, s.dark, "start", bold=True)
+    s.rect(318, 232, 76, 34, s.light, s.dark, 3, 6); s.text(356, 254, "TRADE", 13, s.dark, bold=True); s.path("M280,150 q20,40 60,82", stroke=s.main, sw=3); s.path("M432,150 q-20,40 -60,82", stroke=s.acc, sw=3)
+    s.text(356, 286, "price-time priority: best price, then earliest", 11, s.light, op=.9)
+    # the feed
+    s.rect(580, 60, 190, 200, "#060e17", s.main, 2, 8, op=.95); s.text(675, 82, "ITCH FEED", 13, s.light, bold=True)
+    for k, (t, c) in enumerate((("A  add order", s.main), ("E  executed", s.acc), ("X  reduce", s.light), ("D  delete", s.light), ("U  replace", s.light))):
+        s.text(596, 116 + k * 28, t, 13, c, "start", bold=True)
+    s.text(675, 276, "rebuild the book from it", 11, s.light, op=.85)

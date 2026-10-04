@@ -1,0 +1,17 @@
+=== Assembling ASM ===
+=== Compiling C ===
+051_kmain.c:5992:17: warning: 'g_bk_cmds' defined but not used [-Wunused-variable]
+ 5992 | static uint32_t g_bk_cmds, g_bk_trades_total, g_bk_files, g_bk_refused;
+      |                 ^~~~~~~~~
+=== Linking kernel ===
+ld: warning: build/051_usermode.o: missing .note.GNU-stack section implies executable stack
+ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+ld: warning: build/kernel.bin has a LOAD segment with RWX permissions
+=== Building user program ===
+=== Checking multiboot2 ===
+MULTIBOOT_OK
+=== Building ISO ===
+Written to medium : 3090 sectors at LBA 0
+Writing to 'stdio:build/os.iso' completed successfully.
+
+=== DONE ===

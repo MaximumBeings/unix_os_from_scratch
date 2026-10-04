@@ -1,0 +1,21 @@
+-- 1. the FAT16 volume the kernel wrote
+  ok   files on the disk: DEMO.ITC, FLOW.ITC (759, 35508 bytes)
+-- 2. the hand-written scenario: the whole canonical text, kernel vs the Python engine
+  ok   the kernel's block (51 lines: every verdict, trade, feed message in hex, the book, its hash, and the rebuilt-book check) equals the Python engine's, line for line
+-- 3. 1,200 commands of synthetic flow
+  ok   the kernel's final book, hash, statistics and rebuilt-book verdict equal the Python engine's
+  ok   FLOW.ITC on the disk equals the feed the Python engine publishes, byte for byte (35508 bytes)
+  ok   DEMO.ITC on the disk equals the Python engine's feed, byte for byte (759 bytes)
+-- 4. each feed decoded FROM THE DISK by the independent subscriber
+  ok   DEMO.ITC: the Python subscriber rebuilds a book with hash ea5c82d6919e057e..., the hash the kernel printed
+  ok   FLOW.ITC: the Python subscriber rebuilds a book with hash 59e8de25393490ff..., the hash the kernel printed
+-- 5. the six attacks on the demo feed, re-run in Python
+  ok   attack 1: Python says 'REFUSED message 1: unknown message type', the kernel printed 'unknown message type' at message 1
+  ok   attack 2: Python says 'REFUSED message 1: wrong length for the message type', the kernel printed 'wrong length for the message type' at message 1
+  ok   attack 3: Python says 'REFUSED message 6: execution larger than the remaining quantity', the kernel printed 'execution larger than the remaining quantity' at message 6
+  ok   attack 4: Python says 'REFUSED message 5: execution of an unknown order', the kernel printed 'execution of an unknown order' at message 5
+  ok   attack 5: Python says 'REFUSED message 22: message runs past the end of the feed', the kernel printed 'message runs past the end of the feed' at message 22
+  ok   attack 6: Python says 'REFUSED message 4: the book is crossed or inconsistent after this message', the kernel printed 'the book is crossed or inconsistent after this message' at message 4
+  ok   final tally: 21 scenario commands, 1200 flow commands, 589 trades in the flow (counted in Python), 2 files written and read back, 6 damaged feeds refused
+
+ALL CHECKS PASSED

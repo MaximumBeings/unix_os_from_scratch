@@ -1,0 +1,41 @@
+NOTE: this script deliberately breaks copies of the chapter's sources. 'caught' lines are EXPECTED: they show the tests can detect the mistake.
+baseline (nothing broken): all tests pass (expected)
+best price: the best BID is the lowest price: caught by book_test, random flows vs the Python engine, fuzz
+best price: the best ASK is the highest price: caught by book_test, random flows vs the Python engine, fuzz
+time priority: among equal prices the LATEST order is first: caught by book_test, random flows vs the Python engine
+crossing: a limit equal to the best opposite price does not trade: caught by book_test, random flows vs the Python engine, fuzz
+matching: stops at a resting price equal to the limit: caught by book_test, random flows vs the Python engine, fuzz
+matching: trades at the taker's limit price instead of the resting price: caught by book_test, random flows vs the Python engine
+matching: the quantity traded is the larger of the two: caught by book_test, random flows vs the Python engine, fuzz
+a market order's remainder rests in the book: caught by book_test, random flows vs the Python engine, fuzz
+replace keeps its place in the queue: caught by book_test, random flows vs the Python engine, fuzz
+a replace that crosses the book is never matched: caught by book_test, random flows vs the Python engine, fuzz
+reduce by exactly the remaining quantity is accepted: caught by book_test, random flows vs the Python engine, fuzz
+a time stamp equal to the last one is refused: caught by book_test, random flows vs the Python engine
+a time stamp beyond 48 bits is accepted: caught by book_test, fuzz
+order id 0 is accepted: caught by book_test
+a quantity of 1,000,001 is accepted for a new order: caught by book_test, random flows vs the Python engine, fuzz
+full book: a crossing order whose remainder cannot rest is not refused up front: caught by book_test
+a replace to price 0 is accepted: caught by book_test, random flows vs the Python engine
+statistics: the trade count is not kept: caught by book_test, random flows vs the Python engine, fuzz
+statistics: the notional uses the taker's quantity twice: caught by book_test, random flows vs the Python engine, fuzz
+hash: bids sorted lowest price first: caught by random flows vs the Python engine
+hash: the quantity is left out: caught by random flows vs the Python engine
+hash: the side is left out: caught by random flows vs the Python engine
+price levels are not aggregated: caught by random flows vs the Python engine
+feed: the Execute message is 30 bytes long: caught by book_test, random flows vs the Python engine, fuzz
+feed: the time stamp is written in 5 bytes' worth (the top byte lost): caught by book_test
+feed: the side letter of a sell is B: caught by book_test, random flows vs the Python engine, fuzz
+subscriber: a message longer than what is left of the feed is accepted by two bytes: caught by book_test, random flows vs the Python engine
+subscriber: an Execute larger than the remaining quantity is accepted: caught by random flows vs the Python engine
+subscriber: match numbers are not checked: caught by random flows vs the Python engine
+subscriber: time may go backwards: caught by book_test, random flows vs the Python engine
+subscriber: a crossed book is accepted: caught by book_test, random flows vs the Python engine, fuzz
+subscriber: Replace keeps the queue position: caught by fuzz
+subscriber: an Add of an id that is already live is accepted: caught by book_test, random flows vs the Python engine
+subscriber: an unknown message type is skipped as if harmless: caught by book_test
+invariant: a bid EQUAL to the best ask is not crossed: caught by book_test, random flows vs the Python engine
+reference: ties go to the NEWEST order (the oracle itself broken): caught by random flows vs the Python engine
+reference: notional uses the wrong price (the oracle itself broken): caught by random flows vs the Python engine
+
+37 of 37 broken versions caught
