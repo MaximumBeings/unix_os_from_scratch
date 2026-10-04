@@ -1,0 +1,2 @@
+qemu-system-x86_64: terminating on signal 15 from pid 2743 (sh)
+boot finished after about 26 s: marker found

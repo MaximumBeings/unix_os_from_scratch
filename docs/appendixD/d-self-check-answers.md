@@ -1247,3 +1247,29 @@ Worked answer: an exchange matches any crossing orders at once, so a book it pub
 **5. What would you add to this engine for IOC and fill-or-kill orders, and what new invariant would the fuzzer check?**
 
 Worked answer: a time-in-force field on new orders. IOC is what a market order already is with a limit price: match what crosses, discard the remainder. Fill-or-kill needs a pre-check that the whole quantity is available at acceptable prices (like the up-front capacity check) and refuses the order without side effects otherwise. New invariants: an IOC or FOK order never appears as an Add; a refused FOK changes nothing; an accepted FOK trades its full quantity.
+
+---
+
+## Chapter 52: US Payroll Withholding
+
+*(from [52. US Payroll Withholding](../part52/52-us-payroll-withholding.md))*
+
+**1. Why is a 401(k) deferral subject to Social Security tax but not to income tax withholding, while a Section 125 deduction is exempt from both?**
+
+Worked answer: the tax code treats the two plans differently. A traditional 401(k) deferral is excluded from income-tax wages but remains FICA wages; a Section 125 (cafeteria plan) deduction is excluded from both. The engine therefore keeps two wage figures: wages for income tax = gross - 401(k) - Section 125, and wages for FICA = gross - Section 125. Employee 2's $8,000 monthly gross with $400 and $250 deductions gives income-tax wages of $7,350 and FICA wages of $7,750.
+
+**2. Employee 5 earns $9,350 in FICA wages per period. In which period does Social Security stop, how much is withheld in that period, and why does net pay go up in the next one?**
+
+Worked answer: after 18 periods the year-to-date wages are 18 x $9,350 = $168,300; only $176,100 - $168,300 = $7,800 is left under the wage base, so period 19 withholds 6.2% of $7,800 = $483.60 instead of $579.70, and the year-to-date reaches exactly $176,100. From period 20 the room is zero, so Social Security is $0.00 and net pay rises by $483.60 compared with period 19, because nothing is withheld for it.
+
+**3. Why does the engine cap the Social Security *tax* at $10,918.20 as well as the wages at $176,100?**
+
+Worked answer: each period's tax is rounded to the cent, so the sum of 26 rounded amounts could differ from 6.2% of the base by a few cents. Capping the cumulative tax at 6.2% of $176,100 = $10,918.20 guarantees the legal maximum is never exceeded, however the periods round. Employee 5's total is exactly $10,918.20.
+
+**4. Additional Medicare is withheld by the employer from $200,000 but the employer pays no matching share. Which year-to-date figure does the engine need to get the crossing period right?**
+
+Worked answer: the year-to-date Medicare wages. The period's Additional Medicare is 0.9% of (wages above $200,000 after this period) minus (wages above $200,000 before it). In employee 5's period 22 the before-figure is 0 and the after-figure is $5,700, so $51.30 is withheld; from period 23 the before-figure is already above the threshold, so the whole $9,350 bears 0.9% ($84.15).
+
+**5. All 55 mutants were caught, yet the tables could still be wrong. Why can no test in this chapter detect a wrong bracket limit that both implementations share, and what outside evidence would?**
+
+Worked answer: the Python reference and the C engine were both given the same table values, so a wrong value is wrong in both and they agree; the hand-worked tests use the same tables too. The tests prove the arithmetic and the year-long behaviour, not the law. Outside evidence is needed: the IRS's own Publication 15-T, or its published worked examples and the output of a certified payroll system, checked against the engine for the same inputs.
