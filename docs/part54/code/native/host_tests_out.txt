@@ -48,29 +48,93 @@ PASS the server's close_notify record is accepted and closes the connection
   AES-128-GCM seal (plaintext lengths 0-70 and random longer; AAD 0-70): 131
   HKDF-Expand-Label (labels up to 249 bytes, contexts up to 255, outputs up to 255 bytes): 120
   HKDF-Extract (empty, short, block-length and long salts): 120
+  RSA-PSS verify, 1008-bit key, genuine signature (outside the supported 1024 to 2048 bits: refused): 15
+  RSA-PSS verify, 1024-bit key, a genuine signature with an extra leading zero byte (wrong length): 6
+  RSA-PSS verify, 1024-bit key, a genuine signature with its leading zero byte stripped (wrong length): 6
+  RSA-PSS verify, 1024-bit key, a hand-built valid encoding: 6
+  RSA-PSS verify, 1024-bit key, a middle padding byte nonzero: 6
+  RSA-PSS verify, 1024-bit key, a top bit of the masked DB set (beyond emBits): 6
   RSA-PSS verify, 1024-bit key, genuine signature: 15
+  RSA-PSS verify, 1024-bit key, the 0x01 separator replaced by 0x02: 6
+  RSA-PSS verify, 1024-bit key, the embedded H differing from the true hash in its LAST byte only: 6
+  RSA-PSS verify, 1024-bit key, the first padding byte nonzero: 6
+  RSA-PSS verify, 1024-bit key, the last padding byte nonzero: 6
+  RSA-PSS verify, 1024-bit key, the salt altered after hashing: 6
+  RSA-PSS verify, 1024-bit key, the trailer 0xbd instead of 0xbc: 6
+  RSA-PSS verify, 1025-bit key, a genuine signature with an extra leading zero byte (wrong length): 6
+  RSA-PSS verify, 1025-bit key, a genuine signature with its leading zero byte stripped (wrong length): 6
+  RSA-PSS verify, 1025-bit key, a hand-built valid encoding: 6
+  RSA-PSS verify, 1025-bit key, a middle padding byte nonzero: 6
+  RSA-PSS verify, 1025-bit key, a non-zero leading byte before EM: 3
+  RSA-PSS verify, 1025-bit key, the 0x01 separator replaced by 0x02: 6
+  RSA-PSS verify, 1025-bit key, the embedded H differing from the true hash in its LAST byte only: 6
+  RSA-PSS verify, 1025-bit key, the first padding byte nonzero: 6
+  RSA-PSS verify, 1025-bit key, the last padding byte nonzero: 6
+  RSA-PSS verify, 1025-bit key, the salt altered after hashing: 6
+  RSA-PSS verify, 1025-bit key, the trailer 0xbd instead of 0xbc: 6
+  RSA-PSS verify, 1030-bit key, a genuine signature with an extra leading zero byte (wrong length): 6
+  RSA-PSS verify, 1030-bit key, a genuine signature with its leading zero byte stripped (wrong length): 6
+  RSA-PSS verify, 1030-bit key, a hand-built valid encoding: 6
+  RSA-PSS verify, 1030-bit key, a middle padding byte nonzero: 6
+  RSA-PSS verify, 1030-bit key, a top bit of the masked DB set (beyond emBits): 6
+  RSA-PSS verify, 1030-bit key, the 0x01 separator replaced by 0x02: 6
+  RSA-PSS verify, 1030-bit key, the embedded H differing from the true hash in its LAST byte only: 6
+  RSA-PSS verify, 1030-bit key, the first padding byte nonzero: 6
+  RSA-PSS verify, 1030-bit key, the last padding byte nonzero: 6
+  RSA-PSS verify, 1030-bit key, the salt altered after hashing: 6
+  RSA-PSS verify, 1030-bit key, the trailer 0xbd instead of 0xbc: 6
+  RSA-PSS verify, 1032-bit key, genuine signature: 30
+  RSA-PSS verify, 1536-bit key, a genuine signature with an extra leading zero byte (wrong length): 6
+  RSA-PSS verify, 1536-bit key, a genuine signature with its leading zero byte stripped (wrong length): 6
+  RSA-PSS verify, 1536-bit key, a hand-built valid encoding: 6
+  RSA-PSS verify, 1536-bit key, a middle padding byte nonzero: 6
+  RSA-PSS verify, 1536-bit key, a top bit of the masked DB set (beyond emBits): 6
   RSA-PSS verify, 1536-bit key, genuine signature: 15
-  RSA-PSS verify, 2048-bit key, genuine signature: 15
-  RSA-PSS verify, 3072-bit key, genuine signature (larger than the 2048-bit limit: refused): 15
-  RSA-PSS verify: a different message hash is refused: 45
-  RSA-PSS verify: a flipped signature bit is refused: 45
-  RSA-PSS verify: a short signature is refused: 45
-  RSA-PSS verify: a signature as large as the modulus (s = n) is refused: 45
-  RSA-PSS verify: a wrong public exponent (3) is refused: 45
-  RSA-PSS verify: an even exponent is refused: 45
-  RSA-PSS verify: another key's modulus refuses it: 45
+  RSA-PSS verify, 1536-bit key, the 0x01 separator replaced by 0x02: 6
+  RSA-PSS verify, 1536-bit key, the embedded H differing from the true hash in its LAST byte only: 6
+  RSA-PSS verify, 1536-bit key, the first padding byte nonzero: 6
+  RSA-PSS verify, 1536-bit key, the last padding byte nonzero: 6
+  RSA-PSS verify, 1536-bit key, the salt altered after hashing: 6
+  RSA-PSS verify, 1536-bit key, the trailer 0xbd instead of 0xbc: 6
+  RSA-PSS verify, 2041-bit key, a genuine signature with an extra leading zero byte (wrong length): 6
+  RSA-PSS verify, 2041-bit key, a genuine signature with its leading zero byte stripped (wrong length): 6
+  RSA-PSS verify, 2041-bit key, a hand-built valid encoding: 6
+  RSA-PSS verify, 2041-bit key, a middle padding byte nonzero: 6
+  RSA-PSS verify, 2041-bit key, a non-zero leading byte before EM: 2
+  RSA-PSS verify, 2041-bit key, the 0x01 separator replaced by 0x02: 6
+  RSA-PSS verify, 2041-bit key, the embedded H differing from the true hash in its LAST byte only: 6
+  RSA-PSS verify, 2041-bit key, the first padding byte nonzero: 6
+  RSA-PSS verify, 2041-bit key, the last padding byte nonzero: 6
+  RSA-PSS verify, 2041-bit key, the salt altered after hashing: 6
+  RSA-PSS verify, 2041-bit key, the trailer 0xbd instead of 0xbc: 6
+  RSA-PSS verify, 2048-bit key, a genuine signature with an extra leading zero byte (wrong length): 6
+  RSA-PSS verify, 2048-bit key, a genuine signature with its leading zero byte stripped (wrong length): 6
+  RSA-PSS verify, 2048-bit key, a hand-built valid encoding: 6
+  RSA-PSS verify, 2048-bit key, a middle padding byte nonzero: 6
+  RSA-PSS verify, 2048-bit key, a top bit of the masked DB set (beyond emBits): 6
+  RSA-PSS verify, 2048-bit key, genuine signature: 30
+  RSA-PSS verify, 2048-bit key, the 0x01 separator replaced by 0x02: 6
+  RSA-PSS verify, 2048-bit key, the embedded H differing from the true hash in its LAST byte only: 6
+  RSA-PSS verify, 2048-bit key, the first padding byte nonzero: 6
+  RSA-PSS verify, 2048-bit key, the last padding byte nonzero: 6
+  RSA-PSS verify, 2048-bit key, the salt altered after hashing: 6
+  RSA-PSS verify, 2048-bit key, the trailer 0xbd instead of 0xbc: 6
+  RSA-PSS verify, 3072-bit key, genuine signature (outside the supported 1024 to 2048 bits: refused): 15
+  RSA-PSS verify: a different message hash is refused: 90
+  RSA-PSS verify: a flipped signature bit is refused: 90
+  RSA-PSS verify: a short signature is refused: 90
+  RSA-PSS verify: a signature as large as the modulus (s = n) is refused: 90
+  RSA-PSS verify: a wrong public exponent (3) is refused: 90
+  RSA-PSS verify: an even exponent is refused: 90
+  RSA-PSS verify: another key's modulus refuses it: 90
   X25519: low-order / non-canonical points (all-zero output): 27
   X25519: random scalar and point: 240
   X25519: the RFC 7748 vector: 1
-1669 comparisons, 0 differences
+2433 comparisons, 0 differences
 
 == 4. full handshakes against the independent Python server, the attack catalogue, every byte flipped ==
-tls_hs.c: In function 'main':
-tls_hs.c:12:57: warning: unused variable 'b' [-Wunused-variable]
-   12 |     static char line[200000]; static uint8_t a[100000], b[100000], out[100000], app[100000];
-      |                                                         ^
-   outcomes of the ServerHello flips (rc: count): {-9: 5, -7: 2, -6: 4, -5: 15, -4: 64, -3: 4, -2: 1} ; of the flight flips: {-4: 640, -3: 4, -2: 1}
-  ClientHello records compared: 146
+   outcomes of the ServerHello flips (rc: count): {-9: 4, -7: 2, -6: 4, -5: 16, -4: 64, -3: 4, -2: 1} ; of the flight flips: {-4: 640, -3: 4, -2: 1}
+  ClientHello records compared: 158
   ServerHello record, every byte flipped: the client never connects ... byte flips tried: 95
   ServerHello: a HelloRetryRequest (the special random) ... correct result: 1
   ServerHello: a change_cipher_spec record carrying 02 instead of 01 ... correct result: 1
@@ -87,6 +151,8 @@ tls_hs.c:12:57: warning: unused variable 'b' [-Wunused-variable]
   ServerHello: compression method 1 ... correct result: 1
   ServerHello: handshake length field one too large ... correct result: 1
   ServerHello: key_share for group secp256r1 (0x0017) ... correct result: 1
+  ServerHello: key_share for group secp256r1 whose data is 32 bytes long (right length, wrong group) ... correct result: 1
+  ServerHello: key_share twice ... correct result: 1
   ServerHello: key_share with a 31-byte X25519 key ... correct result: 1
   ServerHello: legacy_version 0x0302 ... correct result: 1
   ServerHello: low-order X25519 key share #1 (the shared secret would be all zero) ... correct result: 1
@@ -115,8 +181,15 @@ tls_hs.c:12:57: warning: unused variable 'b' [-Wunused-variable]
   flight: EncryptedExtensions whose extension list overruns its message ... correct result: 1
   flight: Finished before CertificateVerify ... correct result: 1
   flight: Finished verify_data with one bit flipped ... correct result: 1
+  flight: a Certificate holding a 1008-bit RSA key (smaller than the 1024-bit limit) ... correct result: 1
+  flight: a Certificate holding a 2056-bit RSA key (larger than the 2048-bit limit) ... correct result: 1
   flight: a Certificate whose first entry is not a certificate (garbage DER) ... correct result: 1
   flight: a Certificate whose key is an EC key (not RSA) ... correct result: 1
+  flight: a Certificate whose outer DER length uses the three-byte form (unsupported) ... correct result: 1
+  flight: a Certificate whose public exponent is five bytes long (2^32 + 1) ... correct result: 1
+  flight: a Certificate whose public key algorithm OID is rsassa-pss (1.2.840.113549.1.1.10), not rsaEncryption ... correct result: 1
+  flight: a Certificate whose subjectPublicKey BIT STRING declares 1 unused bit ... correct result: 1
+  flight: a Certificate whose tbsCertificate length claims more bytes than exist ... correct result: 1
   flight: a Certificate with a non-zero request context ... correct result: 1
   flight: a Certificate with an empty certificate list ... correct result: 1
   flight: a CertificateRequest (client authentication) before the Certificate ... correct result: 1
@@ -127,6 +200,7 @@ tls_hs.c:12:57: warning: unused variable 'b' [-Wunused-variable]
   flight: a Finished of the wrong length (31 bytes) ... correct result: 1
   flight: a Finished that is the client's key schedule value, not the server's ... correct result: 1
   flight: a handshake message follows the server Finished in the same record ... correct result: 1
+  flight: a handshake message header claiming 16,777,215 bytes ... correct result: 1
   flight: an unknown handshake type (99) after EncryptedExtensions ... correct result: 1
   flight: no Certificate and no CertificateVerify (EncryptedExtensions then Finished) ... correct result: 1
   full secret sets (7 values each) compared: 40
@@ -139,10 +213,12 @@ tls_hs.c:12:57: warning: unused variable 'b' [-Wunused-variable]
   record layer: a record cut short ... correct result: 1
   record layer: a record with a trailing byte ... correct result: 1
   record layer: a server record delivered twice (the second has a stale sequence number) ... correct result: 1
+  record layer: a warning alert other than close_notify (user_canceled, 90) is treated as fatal ... correct result: 1
   record layer: an alert one byte long ... correct result: 1
   record layer: an inner plaintext of only zero bytes (no content type) ... correct result: 1
   record layer: an unknown inner content type (99) ... correct result: 1
   record layer: app data before the handshake finished (sealed with application keys during the handshake) ... correct result: 1
+  record layer: application data (inner type 23) sealed with the handshake keys during the handshake ... correct result: 1
   record layer: close_notify from the server closes the connection ... correct result: 1
   record layer: plaintext record after ServerHello ... correct result: 1
   record layer: records delivered out of order ... correct result: 1
@@ -152,7 +228,7 @@ tls_hs.c:12:57: warning: unused variable 'b' [-Wunused-variable]
   server application records delivered: 280
   server close_notify after the client's own close is ignored without error: 40
   server flights accepted (all in one record / split in two / one byte per record / padded): 40
-1874 checks, 0 differences
+1898 checks, 0 differences
 
 == 5. mutation fuzzing of the recorded handshake ==
 1500 fuzzed handshakes (964 with the ServerHello and flight left intact: 964 connected; 536 with one of them damaged): the client connected 0 times; error codes seen: record not allowed in this state=127 malformed record=318 record failed authentication (bad_record_mac)=780 unexpected or malformed handshake message=46 not TLS 1.3=4 cipher suite not offered=2 unusable key share=3 connection closed=30

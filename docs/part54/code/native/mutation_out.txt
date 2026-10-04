@@ -52,3 +52,40 @@ records: the inner content type is always application_data: caught by RFC 8448 t
 records: the length field omits the tag: caught by RFC 8448 trace, handshakes and attacks vs Python
 records: trailing bytes after a record are tolerated: caught by handshakes and attacks vs Python, fuzz
 records: the record version is not checked: caught by handshakes and attacks vs Python
+records: zero padding is not stripped: caught by handshakes and attacks vs Python
+records: the received sequence number is not advanced: caught by RFC 8448 trace, handshakes and attacks vs Python
+records: a warning alert other than close_notify closes cleanly: caught by handshakes and attacks vs Python
+records: application data before the handshake is delivered: caught by handshakes and attacks vs Python
+records: a handshake message after the handshake need not be a NewSessionTicket: caught by handshakes and attacks vs Python
+records: a handshake message waits for one byte more than it needs: caught by RFC 8448 trace, handshakes and attacks vs Python, fuzz
+records: an oversize handshake message length is not rejected: caught by handshakes and attacks vs Python
+ServerHello: the HelloRetryRequest random is not recognised: caught by handshakes and attacks vs Python
+ServerHello: a non-empty session id echo is accepted: caught by handshakes and attacks vs Python
+ServerHello: any cipher suite is accepted: caught by handshakes and attacks vs Python
+ServerHello: compression method 1 is accepted: caught by handshakes and attacks vs Python
+ServerHello: the selected version value is not checked: caught by handshakes and attacks vs Python
+ServerHello: a key share for another group is accepted: caught by handshakes and attacks vs Python
+ServerHello: unknown extensions are ignored: caught by handshakes and attacks vs Python
+ServerHello: a repeated supported_versions extension is accepted: caught by handshakes and attacks vs Python
+ServerHello: a repeated key_share extension is accepted: caught by handshakes and attacks vs Python
+ServerHello: the all-zero shared secret is accepted: caught by handshakes and attacks vs Python
+ServerHello: the downgrade sentinel is not checked: caught by handshakes and attacks vs Python
+ServerHello: the ServerHello is left out of the transcript: caught by RFC 8448 trace, handshakes and attacks vs Python, fuzz
+key schedule: the server handshake secret uses the client label: caught by RFC 8448 trace, handshakes and attacks vs Python, fuzz
+key schedule: the master secret is derived from the early secret: caught by RFC 8448 trace, handshakes and attacks vs Python
+key schedule: the client Finished key comes from the server's secret: caught by RFC 8448 trace, handshakes and attacks vs Python
+key schedule: the client application secret uses the server label: caught by RFC 8448 trace, handshakes and attacks vs Python
+key schedule: the receive sequence number is not reset after the handshake: caught by RFC 8448 trace, handshakes and attacks vs Python
+key schedule: the send sequence number is not reset after the handshake: caught by RFC 8448 trace, handshakes and attacks vs Python
+flight: the Certificate may come before EncryptedExtensions: caught by handshakes and attacks vs Python
+flight: a second EncryptedExtensions is accepted: caught by handshakes and attacks vs Python
+flight: the CertificateVerify signature scheme is not checked: caught by handshakes and attacks vs Python
+flight: the CertificateVerify context string says 'client': caught by RFC 8448 trace, handshakes and attacks vs Python, fuzz
+flight: the server Finished is not compared: caught by handshakes and attacks vs Python
+ClientHello: the legacy version is 0x0302: caught by RFC 8448 trace, handshakes and attacks vs Python, fuzz
+ClientHello: the server name length is off by one: caught by RFC 8448 trace, handshakes and attacks vs Python, fuzz
+ClientHello: an empty server name is accepted: caught by tls_test
+ClientHello: the output size check is too lenient: caught by tls_test
+reference: the transcript hash of the CertificateVerify omits the Certificate (the oracle itself broken): caught by handshakes and attacks vs Python
+
+87 of 87 broken versions caught

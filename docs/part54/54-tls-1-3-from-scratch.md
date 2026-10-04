@@ -126,7 +126,7 @@ All C is built with AddressSanitizer and UBSan from the same `054_tls.c` the ker
 - `tls_test.c`: 27 checks from RFC 7748 (the two test vectors, the iterated vectors including 1,000 iterations, the Alice and Bob exchange), RFC 5869 (test case 1), the GCM specification (test cases 1, 2 and 4) and the client's API (refusals, buffer sizes, the maximum record, sequence-number exhaustion).
 - `tls_trace.c`: the recorded RFC 8448 handshake, 17 checks, including an independent decryption of the flight, the 130-byte message that was signed, and every record the client sends.
 - `diff_prims.py` with `tls_prim.c`: X25519 (random inputs, the eight low-order points, non-canonical encodings), HKDF (random labels, contexts and lengths), AES-GCM (every length from 0 to 70, then every kind of damage), RSA-PSS (keys of 1008, 1024, 1536, 2048 and 3072 bits, damaged signatures, wrong hashes and keys): C against the independent library.
-- `diff_tls.py` with `tls_hs.c`: full handshakes against the independent Python server (1024- and 2048-bit keys; the flight in one record, in two, and one byte per record; with padding), application data both ways from 0 to 16,384 bytes, then the **attack catalogue** (about 70 damaged servers and records, each with the alert the protocol demands), then **every byte of the ServerHello and of the encrypted flight flipped, one at a time: the client must never reach the connected state**.
+- `diff_tls.py` with `tls_hs.c`: full handshakes against the independent Python server (1024- and 2048-bit keys; the flight in one record, in two, and one byte per record; with padding), application data both ways from 0 to 16,384 bytes, then the **attack catalogue** (over 80 damaged servers and records, each with the alert the protocol demands), then **every byte of the ServerHello and of the encrypted flight flipped, one at a time: the client must never reach the connected state**.
 - `tls_fuzz.c`: mutation fuzzing of the recorded handshake (bit flips, cuts, drops, duplicates, swaps, random bodies).
 
 ```c
@@ -181,7 +181,13 @@ All C is built with AddressSanitizer and UBSan from the same `054_tls.c` the ker
 --8<-- "docs/part54/code/native/mutation_out.txt"
 ```
 
-@@MUTATION@@
+**All 87 broken copies were caught** (23 by `tls_test`, 42 by the recorded RFC 8448 handshake, 35 by the primitive differential test, 73 by the handshake and attack tests, 32 by the fuzzer; many by several; one of the 87 is a mistake planted in the Python reference itself). The first run was **72 of 91**, and it was the most useful run of the chapter. Nineteen mutants survived; four were **equivalent** and were removed, and the other fifteen each pointed to a missing test, now added:
+
+- **Equivalent, removed:** a final field reduction done once instead of twice (after the carries the value is below 2p, so one subtraction always suffices); an even RSA exponent accepted (a signature cannot verify under one, because it has no inverse modulo the totient); a non-zero certificate request context accepted (the same combined condition rejects the message for its length anyway); and data after the server Finished accepted (a second check after the message is processed rejects it).
+- **RSA-PSS rules that no random test can reach**, because a random wrong signature fails the *first* rule it meets: the last padding byte, the leading zero byte before the encoded message (only for moduli whose length is 8k+1 bits), the final byte of the hash comparison, and signatures one byte too short or too long. `diff_prims.py` now builds encodings by hand, breaks one rule at a time, signs them with the raw private operation, and uses keys of 1,025, 1,030 and 2,041 bits as well as the usual sizes.
+- **Certificate parsing:** three-byte DER lengths, a length that overruns its buffer, a 2,056-bit or 1,008-bit key, and a five-byte exponent each now have a certificate crafted for them.
+- **Record and handshake rules:** an oversize handshake message length, a key share for the wrong group with the right length, a repeated key share, application data sealed under the handshake keys, and a warning alert other than close_notify (all alerts but close_notify are treated as fatal) each have a dedicated attack now.
+- **A weak mutant of my own:** "the GCM counter increments only three bytes" is invisible below 2^24 blocks; it became "only its low byte", which a 16,384-byte record catches.
 
 ## What the first runs found
 
