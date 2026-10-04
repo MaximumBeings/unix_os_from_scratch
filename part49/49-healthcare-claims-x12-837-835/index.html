@@ -16,7 +16,7 @@
         <link rel="prev" href="../../part48/48-sec-edgar-financial-ratios/">
       
       
-        <link rel="next" href="../../appendixA/a-introduction-to-assembly/">
+        <link rel="next" href="../../part50/50-bitcoin-block-validator/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>49. Health-Care Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent - Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development</title>
+        <title>49. Healthcare Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent - Unix OS from Scratch -- A Bare-Metal x86-64 Kernel Built From Nothing -- Under Development</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#49-health-care-claims-x12-837-in-adjudication-x12-835-out-and-a-remittance-that-must-balance-to-the-cent" class="md-skip">
+        <a href="#49-healthcare-claims-x12-837-in-adjudication-x12-835-out-and-a-remittance-that-must-balance-to-the-cent" class="md-skip">
           Skip to content
         </a>
       
@@ -116,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              49. Health-Care Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent
+              49. Healthcare Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent
             
           </span>
         </div>
@@ -2074,7 +2074,7 @@
   <span class="md-ellipsis">
     
   
-    49. Health-Care Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent
+    49. Healthcare Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent
   
 
     
@@ -2092,7 +2092,7 @@
   <span class="md-ellipsis">
     
   
-    49. Health-Care Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent
+    49. Healthcare Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent
   
 
     
@@ -2380,6 +2380,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part50/50-bitcoin-block-validator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    50. A Bitcoin Block Validator: Double SHA-256, Merkle Roots, Proof of Work, and What a Block Must Satisfy Before Anyone Looks at the Chain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -2867,10 +2895,10 @@
 
 
 
-<h1 id="49-health-care-claims-x12-837-in-adjudication-x12-835-out-and-a-remittance-that-must-balance-to-the-cent">49. Health-Care Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent<a class="headerlink" href="#49-health-care-claims-x12-837-in-adjudication-x12-835-out-and-a-remittance-that-must-balance-to-the-cent" title="Permanent link">&para;</a></h1>
+<h1 id="49-healthcare-claims-x12-837-in-adjudication-x12-835-out-and-a-remittance-that-must-balance-to-the-cent">49. Healthcare Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent<a class="headerlink" href="#49-healthcare-claims-x12-837-in-adjudication-x12-835-out-and-a-remittance-that-must-balance-to-the-cent" title="Permanent link">&para;</a></h1>
 <p><img alt="An X12 837 claim form, an adjudication ledger splitting a charge into plan, patient and write-off, and a balanced 835 remittance" src="../../assets/art/ch-49.svg" style="display:block;margin:0 auto;max-width:100%;height:auto;border-radius:6px" /></p>
 <p><strong>What you will understand:</strong> how a doctor's bill reaches an insurer and how the insurer's answer comes back, in the electronic formats the United States uses for it: <strong>ASC X12N 837 Professional</strong> (the claim) and <strong>835</strong> (the remittance advice). A strict X12 reader (<code>049_x12.h</code>/<code>049_x12.c</code>) that checks an interchange's envelope the way a clearinghouse does; a claim reader (<code>049_claim.h</code>/<code>049_claim.c</code>) that refuses claims whose provider ID has a bad <strong>check digit</strong>, whose total does not equal the sum of its lines, or whose hierarchy is broken; an <strong>adjudication engine</strong> (<code>049_adjud.h</code>/<code>049_adjud.c</code>) that turns each service line into what the plan allows, what it pays, what the patient owes and <strong>why every other dollar was not paid</strong>, in integer cents, with the guarantee <code>charge = paid + contractual write-offs + patient responsibility</code> on every line; an <strong>835 builder and reconciler</strong> (<code>049_remit.h</code>/<code>049_remit.c</code>) that writes the remittance and re-checks it the way a provider's billing office must before posting a payment; and independent verification that rebuilds every remittance from scratch in Python and compares it to the file on the disk, byte for byte.</p>
-<p><strong>What you need to know first:</strong> Chapters 19-23's FAT16 filesystem (each remittance is written to it and read back); Chapter 34's insurance case study (ACORD) for the general idea of a carrier answering a request in a standard's own message format; Chapter 47's and 48's testing discipline (a differential test against an independent implementation, sanitizer fuzzing, mutation testing) and the cumulative kernel this chapter carries forward. No health-care knowledge is assumed: every term is defined where it first appears.</p>
+<p><strong>What you need to know first:</strong> Chapters 19-23's FAT16 filesystem (each remittance is written to it and read back); Chapter 34's insurance case study (ACORD) for the general idea of a carrier answering a request in a standard's own message format; Chapter 47's and 48's testing discipline (a differential test against an independent implementation, sanitizer fuzzing, mutation testing) and the cumulative kernel this chapter carries forward. No healthcare knowledge is assumed: every term is defined where it first appears.</p>
 <h2 id="scope-three-confirmed-choices-before-writing-any-code">Scope: three confirmed choices before writing any code<a class="headerlink" href="#scope-three-confirmed-choices-before-writing-any-code" title="Permanent link">&para;</a></h2>
 <p>This chapter was one of four case studies requested together ("do all 4 starting with healthcare"). Scope was confirmed through one <code>AskUserQuestion</code> round of three questions:</p>
 <ul>
@@ -2971,7 +2999,7 @@
 <p>Amounts can be <strong>negative</strong> (a reversal); adjustments are signed.</p>
 <h2 id="the-x12-reader-049_x12h-and-049_x12c">The X12 reader: <code>049_x12.h</code> and <code>049_x12.c</code><a class="headerlink" href="#the-x12-reader-049_x12h-and-049_x12c" title="Permanent link">&para;</a></h2>
 <p>The reader splits the text into segments <strong>by pointer into the caller's buffer</strong> (no copy, no allocation), validates the ISA layout, learns the separators, and checks the envelope: nesting, counts and control numbers. A <strong>lenient</strong> flag, set by the caller, records count and control-number mismatches as warnings instead of refusing them (the open-source samples need it); it never forgives bad nesting or a damaged ISA. There is no <code>libgcc</code> in this kernel, so the amount formatter divides by shift-and-subtract (a 64-bit <code>/</code> would fail to link with an undefined <code>__udivdi3</code>, the failure Chapter 48 explains).</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="cm">/* Chapter 49: an X12 EDI reader. Health-care claims (837) and remittances (835) travel as X12: a stream of SEGMENTS, each a short identifier (CLM, SV1, NM1, ...) followed by ELEMENTS, separated by a character the SENDER chooses</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="cm">/* Chapter 49: an X12 EDI reader. Healthcare claims (837) and remittances (835) travel as X12: a stream of SEGMENTS, each a short identifier (CLM, SV1, NM1, ...) followed by ELEMENTS, separated by a character the SENDER chooses</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="cm"> * and announces in the very first segment. That first segment, ISA, is FIXED WIDTH (exactly 106 characters) and carries the three separators: the element separator (character 4, so &quot;ISA*00*...&quot;), the component separator (character 105)</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="cm"> * and the segment terminator (character 106). Everything else is a variable-length list. A transmission nests like this:</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="cm"> *     ISA interchange --- GS functional group --- ST transaction set (the claim, the remittance) --- SE --- GE --- IEA</span>
@@ -5154,13 +5182,13 @@
         
         
           
-          <a href="../../appendixA/a-introduction-to-assembly/" class="md-footer__link md-footer__link--next" aria-label="Next: Appendix A. Introduction to x86 Assembly">
+          <a href="../../part50/50-bitcoin-block-validator/" class="md-footer__link md-footer__link--next" aria-label="Next: 50. A Bitcoin Block Validator: Double SHA-256, Merkle Roots, Proof of Work, and What a Block Must Satisfy Before Anyone Looks at the Chain">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Appendix A. Introduction to x86 Assembly
+                50. A Bitcoin Block Validator: Double SHA-256, Merkle Roots, Proof of Work, and What a Block Must Satisfy Before Anyone Looks at the Chain
               </div>
             </div>
             <div class="md-footer__button md-icon">

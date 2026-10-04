@@ -7922,7 +7922,7 @@ void kmain(uint32_t magic, uint32_t mboot_info_addr) {
     edgar_demo();
 
     /* ================================================================
-     * Chapter 49: health-care claims -- see claims_demo() above and
+     * Chapter 49: healthcare claims -- see claims_demo() above and
      * 049_x12.h/049_claim.h/049_adjud.h/049_remit.h's own top-of-file
      * comments. */
     claims_demo();

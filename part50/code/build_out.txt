@@ -1,0 +1,14 @@
+=== Assembling ASM ===
+=== Compiling C ===
+=== Linking kernel ===
+ld: warning: build/050_usermode.o: missing .note.GNU-stack section implies executable stack
+ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+ld: warning: build/kernel.bin has a LOAD segment with RWX permissions
+=== Building user program ===
+=== Checking multiboot2 ===
+MULTIBOOT_OK
+=== Building ISO ===
+Written to medium : 3067 sectors at LBA 0
+Writing to 'stdio:build/os.iso' completed successfully.
+
+=== DONE ===

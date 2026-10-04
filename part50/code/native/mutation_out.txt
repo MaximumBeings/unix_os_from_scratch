@@ -1,0 +1,45 @@
+NOTE: this script deliberately breaks copies of the chapter's sources. 'caught' lines are EXPECTED: they show the tests can detect the mistake.
+baseline (nothing broken): all tests pass (expected)
+varint: a 0xfd-prefixed number is read from too few bytes: caught by btc_test
+compact: the 'negative' sign bit is ignored: caught by btc_test, random blocks, block files and Core vectors vs the Python reference
+compact: the overflow exponent limit is 35 instead of 34: caught by btc_test
+compact: a mantissa above 0xff is allowed one exponent too high: caught by btc_test
+compact: a mantissa above 0xffff is allowed one exponent too high: caught by btc_test
+compact: a zero target is accepted: caught by btc_test, random blocks, block files and Core vectors vs the Python reference
+compact: a target EQUAL to the limit is refused: caught by btc_test, random blocks, block files and Core vectors vs the Python reference
+proof of work: the comparison is reversed (a hash ABOVE the target passes): caught by btc_test, random blocks, block files and Core vectors vs the Python reference, fuzz property
+proof of work: leading zero bits counted four to a zero byte: caught by btc_test, random blocks, block files and Core vectors vs the Python reference
+Merkle: an odd level is not padded with its last hash: caught by btc_test, random blocks, block files and Core vectors vs the Python reference
+Merkle: side-by-side equal hashes are no longer flagged as mutation: caught by btc_test, random blocks, block files and Core vectors vs the Python reference
+Merkle: a pair is hashed once, not twice: caught by btc_test, random blocks, block files and Core vectors vs the Python reference
+transactions: the SegWit marker is looked for as 00 00: caught by btc_test, random blocks, block files and Core vectors vs the Python reference
+transactions: any flag byte is accepted, not only 01: caught by btc_test
+transactions: a witness flag with every witness empty is accepted: caught by btc_test
+txid: the stripped serialisation omits the lock time: caught by btc_test, random blocks, block files and Core vectors vs the Python reference
+weight: the stripped size is counted twice, not three times: caught by btc_test, random blocks, block files and Core vectors vs the Python reference
+coinbase: the null-index test is dropped (any single input with a null hash is a coinbase): caught by btc_test
+checks: an oversized transaction is accepted: caught by btc_test
+checks: an output of exactly 21,000,000 coins is refused: caught by btc_test, random blocks, block files and Core vectors vs the Python reference
+checks: outputs summing to exactly 21,000,000 coins are refused: caught by btc_test, random blocks, block files and Core vectors vs the Python reference
+checks: duplicate inputs that are next to each other are missed: caught by btc_test, random blocks, block files and Core vectors vs the Python reference
+checks: a coinbase script of 1 byte is accepted: caught by btc_test, random blocks, block files and Core vectors vs the Python reference
+checks: a coinbase script of 101 bytes is accepted: caught by btc_test, random blocks, block files and Core vectors vs the Python reference
+checks: a null input in an ordinary transaction is accepted: caught by btc_test, random blocks, block files and Core vectors vs the Python reference
+witness: the commitment marker's last byte is wrong (aa21a9ee instead of aa21a9ed): caught by btc_test, random blocks, block files and Core vectors vs the Python reference, fuzz property
+witness: the coinbase's own wtxid is not replaced by zeros in the witness Merkle tree: caught by btc_test, random blocks, block files and Core vectors vs the Python reference
+BIP 34: the sign bit of the height is read from the wrong bit: caught by btc_test, random blocks, block files and Core vectors vs the Python reference
+BIP 34: applied to version 1 blocks too: caught by random blocks, block files and Core vectors vs the Python reference
+block: 513 transactions are accepted (writes past the table): caught by btc_test
+block: bytes after the last transaction are accepted: caught by btc_test, fuzz property
+block: a block with zero transactions is parsed (reads an uninitialised coinbase): caught by btc_test
+transactions: 4097 inputs accepted (writes past the table): caught by btc_test
+verdict: a block with a duplicated transaction and a correct Merkle root is accepted: caught by btc_test, random blocks, block files and Core vectors vs the Python reference
+verdict: a block weight over 4,000,000 is accepted: caught by btc_test
+verdict: a second coinbase is accepted: caught by btc_test, random blocks, block files and Core vectors vs the Python reference
+verdict: a block whose first transaction is not a coinbase is accepted: caught by btc_test, random blocks, block files and Core vectors vs the Python reference
+verdict: a failing witness commitment is not an error: caught by btc_test, random blocks, block files and Core vectors vs the Python reference, fuzz property
+verdict: transaction checks are not applied to the block: caught by btc_test, random blocks, block files and Core vectors vs the Python reference
+reference: a duplicate hash pair is not flagged as mutated (the oracle itself broken): caught by random blocks, block files and Core vectors vs the Python reference
+reference: an output of exactly 21,000,000 coins is refused (the oracle itself broken): caught by random blocks, block files and Core vectors vs the Python reference
+
+41 of 41 broken versions caught

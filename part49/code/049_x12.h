@@ -1,4 +1,4 @@
-/* Chapter 49: an X12 EDI reader. Health-care claims (837) and remittances (835) travel as X12: a stream of SEGMENTS, each a short identifier (CLM, SV1, NM1, ...) followed by ELEMENTS, separated by a character the SENDER chooses
+/* Chapter 49: an X12 EDI reader. Healthcare claims (837) and remittances (835) travel as X12: a stream of SEGMENTS, each a short identifier (CLM, SV1, NM1, ...) followed by ELEMENTS, separated by a character the SENDER chooses
  * and announces in the very first segment. That first segment, ISA, is FIXED WIDTH (exactly 106 characters) and carries the three separators: the element separator (character 4, so "ISA*00*..."), the component separator (character 105)
  * and the segment terminator (character 106). Everything else is a variable-length list. A transmission nests like this:
  *     ISA interchange --- GS functional group --- ST transaction set (the claim, the remittance) --- SE --- GE --- IEA

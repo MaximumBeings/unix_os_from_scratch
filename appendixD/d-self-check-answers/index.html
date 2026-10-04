@@ -2056,14 +2056,42 @@
   
   
     <li class="md-nav__item">
-      <a href="../../part49/49-health-care-claims-x12-837-835/" class="md-nav__link">
+      <a href="../../part49/49-healthcare-claims-x12-837-835/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    49. Health-Care Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent
+    49. Healthcare Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../part50/50-bitcoin-block-validator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    50. A Bitcoin Block Validator: Double SHA-256, Merkle Roots, Proof of Work, and What a Block Must Satisfy Before Anyone Looks at the Chain
   
 
     
@@ -3267,8 +3295,8 @@
 <p><strong>5. Name two things the engine cannot detect, and say what would have to be added to detect each.</strong></p>
 <p>Worked answer: (a) a wrong <strong>prior-year</strong> balance sheet: only the current balance sheet is cross-checked, so a wrong prior-year figure flows into return on assets, return on equity and asset turnover unnoticed; detecting it means applying the same identity to the prior balance-sheet date. (b) a <strong>plausible but wrong income-statement figure</strong> (a digit flipped in net income gives a different, still-consistent filing): the engine checks accounting identities, not truth, and only gross profit has an identity to check against; detecting it needs a second source (the same figure in the filing's own cash-flow statement, or the figure as reported by a different tool or a later filing), which is cross-checking against another document, not more rules in this engine.</p>
 <hr />
-<h2 id="chapter-49-health-care-claims-x12-837-in-adjudication-x12-835-out-and-a-remittance-that-must-balance-to-the-cent">Chapter 49: Health-Care Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent<a class="headerlink" href="#chapter-49-health-care-claims-x12-837-in-adjudication-x12-835-out-and-a-remittance-that-must-balance-to-the-cent" title="Permanent link">&para;</a></h2>
-<p><em>(from <a href="../../part49/49-health-care-claims-x12-837-835/">49. Health-Care Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent</a>)</em></p>
+<h2 id="chapter-49-healthcare-claims-x12-837-in-adjudication-x12-835-out-and-a-remittance-that-must-balance-to-the-cent">Chapter 49: Healthcare Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent<a class="headerlink" href="#chapter-49-healthcare-claims-x12-837-in-adjudication-x12-835-out-and-a-remittance-that-must-balance-to-the-cent" title="Permanent link">&para;</a></h2>
+<p><em>(from <a href="../../part49/49-healthcare-claims-x12-837-835/">49. Healthcare Claims: X12 837 In, Adjudication, X12 835 Out, and a Remittance That Must Balance to the Cent</a>)</em></p>
 <p><strong>1. What is the NPI check digit, why does the claim reader test it before anything else, and what does passing it prove and not prove?</strong></p>
 <p>Worked answer: a National Provider Identifier is ten digits, the last of which is a Luhn checksum computed over the nine digits with the prefix <code>80840</code> prepended: from the right, every second digit is doubled (subtracting 9 from any result above 9) and the total must end in 0. <code>1234567893</code> passes; changing one digit anywhere (<code>1234567890</code>, <code>1234567894</code>) fails, because a Luhn checksum catches every single-digit error and most swaps of neighbouring digits. The reader tests it first because a mistyped provider id would send the money, and the remittance, to the wrong place; catching it costs ten additions. Passing proves only that the number is typed consistently; it does <strong>not</strong> prove the number belongs to a real, licensed provider, which needs a lookup in the NPI registry that this chapter does not do.</p>
 <p><strong>2. The open-source "valid" 837 sample fails the strict reader. Name the three things wrong with it, and say what the lenient flag forgives and what it does not.</strong></p>
@@ -3279,6 +3307,19 @@
 <p>Worked answer: a <strong>CO</strong> (contractual obligation) adjustment is an amount the provider must write off and may not bill to the patient: the difference between the charge and the fee schedule (CO-45), a duplicate (CO-18), a non-covered service under the provider's contract (CO-96). A <strong>PR</strong> (patient responsibility) adjustment is an amount the patient owes: co-pay (PR-3), deductible (PR-1), coinsurance (PR-2). They are kept in separate <code>CAS</code> segments, each starting with its group code, because the billing office handles them completely differently: CO amounts are posted as write-offs and PR amounts are transferred to a patient statement. Mixing them in one segment would make it impossible to tell what may be billed. The remittance's <code>CLP05</code> (patient responsibility) is the sum of the PR amounts, which is why the reconciler checks it.</p>
 <p><strong>5. Why must <code>charge = paid + CO + PR</code> hold exactly on every line, how does the engine enforce it, and how do the reconciler's three balance checks catch a tampered remittance?</strong></p>
 <p>Worked answer: every dollar billed has to end up somewhere: paid by the plan, written off by the provider, or owed by the patient. If a line did not balance, money would be created or lost between the claim and the ledger. The engine enforces it <strong>by construction</strong> (the plan pays the allowed amount less the patient's share, and the write-off is the charge less the allowed amount, so the three always sum to the charge) and <strong>by check</strong> (<code>adj_verify()</code> re-sums every line, every claim total and the accumulators before returning, and returns an error code otherwise); the differential test and the fuzzer check it again from outside. The reconciler works on the <em>remittance</em>, which is only text: per service line, <code>SVC02 - SVC03</code> must equal the sum of that line's <code>CAS</code> amounts; per claim, <code>CLP03 - CLP04</code> must equal the claim's adjustments; for the whole file, <code>BPR02</code> must equal the sum of <code>CLP04</code> less provider-level adjustments. Changing any one amount (a paid amount, an adjustment, the payment) breaks at least one of the three, which is exactly what the chapter's fifth attack shows: changing <code>CLP04</code> from $0 to $5 makes the claim unbalanced and the payment no longer equal to the sum of the claims.</p>
+<hr />
+<h2 id="chapter-50-a-bitcoin-block-validator">Chapter 50: A Bitcoin Block Validator<a class="headerlink" href="#chapter-50-a-bitcoin-block-validator" title="Permanent link">&para;</a></h2>
+<p><em>(from <a href="../../part50/50-bitcoin-block-validator/">50. A Bitcoin Block Validator</a>)</em></p>
+<p><strong>1. Why is a block's hash computed twice, and why is it displayed reversed?</strong></p>
+<p>Worked answer: Bitcoin defines the hash as SHA-256 applied to the output of SHA-256; the doubling is a design choice commonly explained as protection against length-extension attacks on a single SHA-256. The 32 output bytes are compared with the target as a little-endian number, so the human-readable form (the leading zeros of proof of work on the left) is the bytes printed in reverse order. The code keeps raw digest order internally and reverses only when printing.</p>
+<p><strong>2. <code>[a, b, c]</code> and <code>[a, b, c, c]</code> have the same Merkle root. Why does that matter, and how does the validator handle it?</strong></p>
+<p>Worked answer: an odd level is padded by duplicating its last hash, so a third leaf <code>c</code> is paired with itself, exactly as an explicit repeated <code>c</code> would be. A block with the repeated transaction therefore has a valid root while differing from the genuine block, which lets an attacker produce a second block with the same header hash (CVE-2012-2459). The validator flags any two equal hashes side by side at any level as mutated and refuses the block as bad-txns-duplicate, even though the root matches; the chapter's synthetic block shows this.</p>
+<p><strong>3. Expand the compact target <code>0x1d00ffff</code> by hand, and say why <code>0x1d80ffff</code> is refused.</strong></p>
+<p>Worked answer: exponent 0x1d = 29, mantissa 0x00ffff. The target is 0x00ffff x 256^(29-3) = 0xffff followed by 26 zero bytes, which as 32 bytes is <code>00000000ffff0000...00</code>. In <code>0x1d80ffff</code> the mantissa's top bit (0x800000) is the sign bit, so it encodes a negative number, which is never a valid target.</p>
+<p><strong>4. Why is the witness reserved value covered by the commitment but not by the Merkle root of txids?</strong></p>
+<p>Worked answer: a txid hashes the transaction without witness data, so anything in a witness stack is invisible to the ordinary Merkle root. The witness commitment is double-SHA-256 of (the witness Merkle root, built from wtxids with zero for the coinbase, followed by the reserved value), so it covers the witness data. Flipping one bit of the reserved value leaves the Merkle root matching and breaks the commitment, which is the chapter's fifth attack.</p>
+<p><strong>5. Name three rules Bitcoin applies to a block that this validator does not, and what each would need.</strong></p>
+<p>Worked answer: (a) script execution and signature checking (an interpreter and secp256k1 ECDSA/Schnorr); (b) that every input spends an existing, unspent output (a coin database); (c) the block reward limit and the difficulty adjustment (the chain's height and the timestamps of earlier blocks). Also timestamp rules (median time past and a clock).</p>
 
 
 
