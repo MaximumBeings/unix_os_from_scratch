@@ -6184,6 +6184,83 @@ static void lsm_demo(void) {
     kprintf("\nChapter 53 LSM demo complete: %u scripted commands, %u disk recoveries, %u crash points swept, %u failures\n", (unsigned)g_kv_cmds, (unsigned)g_kv_recover, (unsigned)g_kv_points, (unsigned)g_kv_fail);
 }
 
+/* =====================================================================================================================
+ * Chapter 54: the TLS 1.3 demo. (1) The client performs the handshake of RFC 8448 section 3 against the SERVER'S RECORDED BYTES (data/tls/rfc8448_simple.txt, from the Botan test data): it builds the ClientHello from the recorded random and X25519 key and must produce
+ * the recorded bytes; it accepts the recorded ServerHello and server flight (which needs the key schedule, AES-128-GCM, the RSA-PSS CertificateVerify and the server Finished all to be right); its own Finished, application data and close_notify records must equal the
+ * recorded ones. The secrets and records are printed between @@ markers for verify_054.py. (2) Fourteen attacks: the same recorded bytes damaged in a way a real attacker or a broken server could, each of which the client must refuse with the right reason and alert.
+ * Some attacks need a flight that is damaged but still validly ENCRYPTED: the demo decrypts the recorded flight with the derived server handshake keys, changes it, and encrypts it again. */
+extern const char tls_trace_start[], tls_trace_end[];
+static uint8_t g_tr_rng[64], g_tr_ch[300], g_tr_sh[200], g_tr_fl[800], g_tr_cf[100], g_tr_nst[300], g_tr_cad[100], g_tr_ca[100], g_tr_sad[100], g_tr_sa[100], g_tr_ccn[40], g_tr_scn[40];
+static uint32_t g_tr_chl, g_tr_shl, g_tr_fll, g_tr_cfl, g_tr_nstl, g_tr_cadl, g_tr_cal, g_tr_sadl, g_tr_sal, g_tr_ccnl, g_tr_scnl;
+static tls_t g_tls; static uint8_t g_tls_out[2000], g_tls_app[2000], g_tls_rec[2000];
+static uint32_t g_tls_steps, g_tls_refused, g_tls_fail;
+static int tr_nib(char c) { return c >= '0' && c <= '9' ? c - '0' : (c >= 'a' && c <= 'f' ? c - 'a' + 10 : -1); }
+static uint32_t tr_get(const char *key, uint8_t *out, uint32_t cap) { const char *p = tls_trace_start, *end = tls_trace_end; uint32_t kl = 0; while (key[kl]) { kl++; }
+    while (p < end) { int match = 1; for (uint32_t i = 0; i < kl; i++) { if (p + i >= end || p[i] != key[i]) { match = 0; break; } } if (match && p + kl + 3 <= end && p[kl] == ' ' && p[kl + 1] == '=' && p[kl + 2] == ' ') { p += kl + 3; uint32_t n = 0; while (p + 1 < end && tr_nib(p[0]) >= 0 && n < cap) { out[n++] = (uint8_t)(tr_nib(p[0]) * 16 + tr_nib(p[1])); p += 2; } return n; } while (p < end && *p != '\n') { p++; } p++; } return 0; }
+static void tr_hex(const char *label, const uint8_t *p, uint32_t n) { static const char H[] = "0123456789abcdef"; char b[1700]; uint32_t k = 0; for (uint32_t i = 0; i < n && k < sizeof b - 3; i++) { b[k++] = H[p[i] >> 4]; b[k++] = H[p[i] & 15]; } b[k] = 0; kprintf("%s %s\n", label, b); }
+static int tr_same(const uint8_t *a, const uint8_t *b, uint32_t n) { for (uint32_t i = 0; i < n; i++) { if (a[i] != b[i]) { return 0; } } return 1; }
+static void tr_step(const char *what, int ok) { g_tls_steps++; if (!ok) { g_tls_fail++; } kprintf("  %s: %s\n", what, ok ? "yes" : "NO (BUG)"); }
+static void tr_load(void) { tr_get("Client_RNG_Pool", g_tr_rng, 64); g_tr_chl = tr_get("Record_ClientHello_1", g_tr_ch, sizeof g_tr_ch); g_tr_shl = tr_get("Record_ServerHello", g_tr_sh, sizeof g_tr_sh); g_tr_fll = tr_get("Record_ServerHandshakeMessages", g_tr_fl, sizeof g_tr_fl); g_tr_cfl = tr_get("Record_ClientFinished", g_tr_cf, sizeof g_tr_cf);
+    g_tr_nstl = tr_get("Record_NewSessionTicket", g_tr_nst, sizeof g_tr_nst); g_tr_cadl = tr_get("Client_AppData", g_tr_cad, sizeof g_tr_cad); g_tr_cal = tr_get("Record_Client_AppData", g_tr_ca, sizeof g_tr_ca); g_tr_sadl = tr_get("Server_AppData", g_tr_sad, sizeof g_tr_sad); g_tr_sal = tr_get("Record_Server_AppData", g_tr_sa, sizeof g_tr_sa);
+    g_tr_ccnl = tr_get("Record_Client_CloseNotify", g_tr_ccn, sizeof g_tr_ccn); g_tr_scnl = tr_get("Record_Server_CloseNotify", g_tr_scn, sizeof g_tr_scn); }
+static int tr_rx(const uint8_t *rec, uint32_t n) { uint32_t ol = 0, al = 0; return tls_receive(&g_tls, rec, n, g_tls_out, sizeof g_tls_out, &ol, g_tls_app, sizeof g_tls_app, &al); }
+static void tr_hello(void) { uint32_t l = 0; tls_init(&g_tls); tls_client_hello(&g_tls, g_tr_rng, g_tr_rng + 32, "server", g_tls_rec, sizeof g_tls_rec, &l); }
+/* decrypt the recorded flight with the derived server handshake keys, let `how` change the plaintext, and encrypt it again as a genuine server would; returns the new record length */
+static uint8_t g_tr_pt[800];
+static uint32_t tr_reseal(int how) {
+    uint8_t k[16], iv[12]; tls_hkdf_expand_label(g_tls.s_hs, "key", 0, 0, k, 16); tls_hkdf_expand_label(g_tls.s_hs, "iv", 0, 0, iv, 12); uint32_t cl = g_tr_fll - 5; tls_gcm_open(k, iv, g_tr_fl, 5, g_tr_fl + 5, cl, g_tr_pt); uint32_t pl = cl - 16; /* includes the inner type byte */
+    uint32_t ee = 4 + (((uint32_t)g_tr_pt[1] << 16) | ((uint32_t)g_tr_pt[2] << 8) | g_tr_pt[3]); uint32_t ce = ee + 4 + (((uint32_t)g_tr_pt[ee + 1] << 16) | ((uint32_t)g_tr_pt[ee + 2] << 8) | g_tr_pt[ee + 3]); uint32_t cv = ce + 4 + (((uint32_t)g_tr_pt[ce + 1] << 16) | ((uint32_t)g_tr_pt[ce + 2] << 8) | g_tr_pt[ce + 3]); uint32_t fn = pl - 1 - 36;
+    if (how == 1) { g_tr_pt[ce + 8 + 20] ^= 1; (void)cv; } /* a bit inside the CertificateVerify signature */ else if (how == 2) { g_tr_pt[fn + 10] ^= 1; } /* a bit of the server Finished verify_data */
+    else if (how == 3) { uint8_t t[600]; uint32_t el = ee, cl2 = ce - ee; for (uint32_t i = 0; i < el; i++) { t[i] = g_tr_pt[i]; } for (uint32_t i = 0; i < cl2; i++) { g_tr_pt[i] = g_tr_pt[el + i]; } for (uint32_t i = 0; i < el; i++) { g_tr_pt[cl2 + i] = t[i]; } } /* EncryptedExtensions and Certificate swapped */
+    g_tls_rec[0] = 23; g_tls_rec[1] = 3; g_tls_rec[2] = 3; g_tls_rec[3] = g_tr_fl[3]; g_tls_rec[4] = g_tr_fl[4]; tls_gcm_seal(k, iv, g_tls_rec, 5, g_tr_pt, pl, g_tls_rec + 5); return 5 + pl + 16;
+}
+static void tr_attack(int n, const char *what, int rc, int want_rc, int want_alert) { int ok = rc == want_rc && g_tls.alert == want_alert && g_tls.state == TLS_ST_FAILED; g_tls_refused += ok ? 1u : 0u; if (!ok) { g_tls_fail++; }
+    kprintf("  attack %d: %s\n    -> client says \"%s\" (alert %d), connection %s%s\n", n, what, tls_strerror(rc), g_tls.alert, g_tls.state == TLS_ST_FAILED ? "failed" : "NOT FAILED", ok ? "" : "  (BUG: expected a different result)"); }
+static void tls_demo(void) {
+    kprintf("\nStarting this chapter's own TLS 1.3 demo (a client that completes the handshake of RFC 8448 section 3 and refuses damaged ones)...\n");
+    __asm__ volatile ("cli"); tr_load();
+    kprintf("The recorded handshake is the one in RFC 8448 section 3 as written down in the test data of the Botan library. This client does NOT validate the server's certificate chain, so it proves nothing about who the server is.\n");
+    kprintf("\n== Part 1. The handshake against the recorded server\n@@TLS TRACE BEGIN\n"); int rc;
+    tr_hello(); int ch_ok = g_tr_chl == 201 && tr_same(g_tls_rec, g_tr_ch, g_tr_chl); tr_hex("client_x25519_public", g_tls.pub, 32); tr_hex("client_hello_record", g_tls_rec, g_tr_chl); tr_hex("random", g_tls.random, 32); tr_hex("x25519_private", g_tls.priv, 32);
+    rc = tr_rx(g_tr_sh, g_tr_shl); tr_hex("server_hello_record", g_tr_sh, g_tr_shl);
+    { uint8_t z[32], early[32]; for (int i = 0; i < 32; i++) { z[i] = 0; } tls_hkdf_extract(0, 0, z, 32, early); tr_hex("early_secret", early, 32); }
+    tr_hex("handshake_secret", g_tls.hs_secret, 32); tr_hex("client_handshake_traffic_secret", g_tls.c_hs, 32); tr_hex("server_handshake_traffic_secret", g_tls.s_hs, 32); int sh_ok = rc == 0 && g_tls.state == TLS_ST_WAIT_FLIGHT;
+    rc = tr_rx(g_tr_fl, g_tr_fll); tr_hex("server_flight_record", g_tr_fl, g_tr_fll); int fl_ok = rc == 0 && g_tls.state == TLS_ST_CONNECTED; tr_hex("client_finished_record", g_tls_out, 58); int cf_ok = fl_ok && tr_same(g_tls_out, g_tr_cf, g_tr_cfl) && g_tr_cfl == 58;
+    tr_hex("transcript_hash_through_server_finished", g_tls.th_sf, 32); tr_hex("master_secret", g_tls.master, 32); tr_hex("client_application_traffic_secret", g_tls.c_ap, 32); tr_hex("server_application_traffic_secret", g_tls.s_ap, 32);
+    kprintf("rsa_modulus_bits %u rsa_exponent %u\n", (unsigned)g_tls.rsa_nlen * 8u, (unsigned)g_tls.rsa_e);
+    int nst_ok = 0, sa_ok = 0, ca_ok = 0, cn_ok = 0, sc_ok = 0; uint32_t l = 0, ol = 0, al = 0;
+    if (fl_ok) { rc = tr_rx(g_tr_nst, g_tr_nstl); nst_ok = rc == 0 && g_tls.tickets == 1; rc = tls_receive(&g_tls, g_tr_sa, g_tr_sal, g_tls_out, sizeof g_tls_out, &ol, g_tls_app, sizeof g_tls_app, &al); sa_ok = rc == 0 && al == g_tr_sadl && tr_same(g_tls_app, g_tr_sad, al); tr_hex("server_application_data", g_tls_app, al);
+        rc = tls_send(&g_tls, g_tr_cad, g_tr_cadl, g_tls_rec, sizeof g_tls_rec, &l); ca_ok = rc == 0 && l == g_tr_cal && tr_same(g_tls_rec, g_tr_ca, l); tr_hex("client_application_record", g_tls_rec, l);
+        rc = tls_close(&g_tls, g_tls_rec, sizeof g_tls_rec, &l); cn_ok = rc == 0 && l == g_tr_ccnl && tr_same(g_tls_rec, g_tr_ccn, l); tr_hex("client_close_notify_record", g_tls_rec, l);
+        g_tls.state = TLS_ST_CONNECTED; rc = tr_rx(g_tr_scn, g_tr_scnl); sc_ok = rc == 0 && g_tls.state == TLS_ST_CLOSED; }
+    kprintf("@@TLS TRACE END\n");
+    tr_step("the ClientHello record the client builds equals the recorded one (201 bytes)", ch_ok);
+    tr_step("the recorded ServerHello is accepted and the handshake secrets are derived", sh_ok);
+    tr_step("the recorded server flight is accepted: certificate key found, CertificateVerify signature verified, server Finished verified", fl_ok);
+    tr_step("the client Finished record the client sends equals the recorded one (58 bytes)", cf_ok);
+    tr_step("the NewSessionTicket record is accepted", nst_ok); tr_step("the server's application data decrypts to the recorded 50 bytes", sa_ok); tr_step("the client's application data record equals the recorded one (72 bytes)", ca_ok);
+    tr_step("the client's close_notify equals the recorded one (24 bytes)", cn_ok); tr_step("the server's close_notify closes the connection", sc_ok);
+    kprintf("\n== Part 2. Fourteen attacks on the same recorded handshake (each must be refused, with the right reason and alert)\n");
+    { uint8_t t[800]; for (uint32_t i = 0; i < g_tr_fll; i++) { t[i] = g_tr_fl[i]; }
+      tr_hello(); tr_rx(g_tr_sh, g_tr_shl); t[g_tr_fll - 1] ^= 1; tr_attack(1, "one bit of the authentication tag of the server's encrypted flight flipped", tr_rx(t, g_tr_fll), TLS_ERR_DECRYPT, TLS_ALERT_BAD_RECORD_MAC); t[g_tr_fll - 1] ^= 1;
+      tr_hello(); tr_rx(g_tr_sh, g_tr_shl); t[200] ^= 0x80; tr_attack(2, "one bit of the ciphertext in the middle of the flight flipped", tr_rx(t, g_tr_fll), TLS_ERR_DECRYPT, TLS_ALERT_BAD_RECORD_MAC); t[200] ^= 0x80;
+      tr_hello(); tr_rx(g_tr_sh, g_tr_shl); t[4] ^= 1; tr_attack(3, "the flight record's length field changed by one (the record is shorter than it claims)", tr_rx(t, g_tr_fll), TLS_ERR_RECORD, TLS_ALERT_DECODE_ERROR); t[4] ^= 1; }
+    { uint8_t t[200]; for (uint32_t i = 0; i < g_tr_shl; i++) { t[i] = g_tr_sh[i]; }
+      tr_hello(); t[5 + 4 + 2 + 32 + 1 + 1] = 0x02; tr_attack(4, "the ServerHello names cipher suite 0x1302 (TLS_AES_256_GCM_SHA384), which this client cannot use", tr_rx(t, g_tr_shl), TLS_ERR_SUITE, TLS_ALERT_ILLEGAL_PARAMETER); t[5 + 4 + 2 + 32 + 1 + 1] = 0x01;
+      tr_hello(); { static const uint8_t hrr[32] = {0xcf, 0x21, 0xad, 0x74, 0xe5, 0x9a, 0x61, 0x11, 0xbe, 0x1d, 0x8c, 0x02, 0x1e, 0x65, 0xb8, 0x91, 0xc2, 0xa2, 0x11, 0x16, 0x7a, 0xbb, 0x8c, 0x5e, 0x07, 0x9e, 0x09, 0xe2, 0xc8, 0xa8, 0x33, 0x9c}; for (int i = 0; i < 32; i++) { t[5 + 4 + 2 + i] = hrr[i]; } } tr_attack(5, "the ServerHello carries the special HelloRetryRequest random (retry is not supported)", tr_rx(t, g_tr_shl), TLS_ERR_HRR, TLS_ALERT_HANDSHAKE_FAILURE);
+      for (uint32_t i = 0; i < g_tr_shl; i++) { t[i] = g_tr_sh[i]; } tr_hello(); { uint32_t ks = 0; for (uint32_t i = 5; i + 6 < g_tr_shl; i++) { if (t[i] == 0x00 && t[i + 1] == 0x33 && t[i + 2] == 0x00 && t[i + 3] == 0x24) { ks = i + 8; break; } } for (int i = 0; i < 32; i++) { t[ks + i] = 0; } } tr_attack(6, "the server's X25519 key share is the all-zero point (the shared secret would be all zero)", tr_rx(t, g_tr_shl), TLS_ERR_KEY, TLS_ALERT_ILLEGAL_PARAMETER);
+      for (uint32_t i = 0; i < g_tr_shl; i++) { t[i] = g_tr_sh[i]; } tr_hello(); t[0] = 23; tr_attack(7, "the ServerHello arrives as an application_data record before any keys exist", tr_rx(t, g_tr_shl), TLS_ERR_STATE, TLS_ALERT_UNEXPECTED_MESSAGE); }
+    tr_hello(); tr_rx(g_tr_sh, g_tr_shl); { uint32_t n = tr_reseal(1); tr_attack(8, "a validly encrypted flight whose CertificateVerify signature has one bit flipped", tr_rx(g_tls_rec, n), TLS_ERR_SIG, TLS_ALERT_DECRYPT_ERROR); }
+    tr_hello(); tr_rx(g_tr_sh, g_tr_shl); { uint32_t n = tr_reseal(2); tr_attack(9, "a validly encrypted flight whose server Finished verify_data has one bit flipped", tr_rx(g_tls_rec, n), TLS_ERR_FINISHED, TLS_ALERT_DECRYPT_ERROR); }
+    tr_hello(); tr_rx(g_tr_sh, g_tr_shl); { uint32_t n = tr_reseal(3); tr_attack(10, "a validly encrypted flight in which EncryptedExtensions and Certificate are swapped", tr_rx(g_tls_rec, n), TLS_ERR_HANDSHAKE, TLS_ALERT_UNEXPECTED_MESSAGE); }
+    tr_hello(); tr_rx(g_tr_sh, g_tr_shl); tr_rx(g_tr_fl, g_tr_fll); tr_rx(g_tr_nst, g_tr_nstl); tr_rx(g_tr_sa, g_tr_sal); tr_attack(11, "the server's application data record delivered a second time (a replay)", tr_rx(g_tr_sa, g_tr_sal), TLS_ERR_DECRYPT, TLS_ALERT_BAD_RECORD_MAC);
+    tr_hello(); tr_rx(g_tr_sh, g_tr_shl); tr_rx(g_tr_fl, g_tr_fll); tr_attack(12, "the application data record delivered before the NewSessionTicket that precedes it (out of order)", tr_rx(g_tr_sa, g_tr_sal), TLS_ERR_DECRYPT, TLS_ALERT_BAD_RECORD_MAC);
+    tr_hello(); tr_rx(g_tr_sh, g_tr_shl); tr_rx(g_tr_fl, g_tr_fll); { uint8_t k[16], iv[12], n12[12], rec[40]; tls_hkdf_expand_label(g_tls.s_ap, "key", 0, 0, k, 16); tls_hkdf_expand_label(g_tls.s_ap, "iv", 0, 0, iv, 12); for (int i = 0; i < 12; i++) { n12[i] = iv[i]; } /* sequence 0 */ uint8_t inner[3] = {2, 40, 21}; rec[0] = 23; rec[1] = 3; rec[2] = 3; rec[3] = 0; rec[4] = 19; tls_gcm_seal(k, n12, rec, 5, inner, 3, rec + 5);
+      tr_attack(13, "a genuine fatal alert (handshake_failure) from the server under the application keys", tr_rx(rec, 24), TLS_ERR_ALERT, 40); }
+    tr_hello(); tr_rx(g_tr_sh, g_tr_shl); tr_rx(g_tr_fl, g_tr_fll); tr_attack(14, "a record cut short by one byte", tr_rx(g_tr_nst, g_tr_nstl - 1), TLS_ERR_RECORD, TLS_ALERT_DECODE_ERROR);
+    kprintf("\nChapter 54 TLS demo complete: %u handshake steps verified, %u attacks refused, %u failures\n", (unsigned)g_tls_steps, (unsigned)g_tls_refused, (unsigned)g_tls_fail);
+}
+
 void kmain(uint32_t magic, uint32_t mboot_info_addr) {
     serial_init();
     vga_init();
@@ -8290,5 +8367,8 @@ void kmain(uint32_t magic, uint32_t mboot_info_addr) {
      * above and 054_lsm.h's own top-of-file comment. */
     lsm_demo();
 
-    /* Chapter 54's own demo goes here */
+    /* ================================================================
+     * Chapter 54: a TLS 1.3 client -- see tls_demo() above and 054_tls.h's
+     * own top-of-file comment. */
+    tls_demo();
 }

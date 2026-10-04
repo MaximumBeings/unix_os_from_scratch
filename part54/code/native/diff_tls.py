@@ -137,6 +137,26 @@ attack("flight: a Certificate with a non-zero request context", lambda fl, s: fl
 attack("flight: a Certificate with an empty certificate list", lambda fl, s: fl.__setitem__("cert", b"\x0b\0\0\4\0\0\0\0"), E_CERT, A_BADCERT)
 attack("flight: a Certificate whose first entry is not a certificate (garbage DER)", lambda fl, s: fl.__setitem__("cert", b"\x0b" + T.u24(4 + 3 + 40 + 2) + b"\0" + T.u24(3 + 40 + 2) + T.u24(40) + rb(40) + T.u16(0)), E_CERT, A_BADCERT)
 attack("flight: a Certificate whose key is an EC key (not RSA)", lambda fl, s: fl.__setitem__("cert", b"\x0b" + T.u24(4 + 3 + 3 + 2) + b"\0" + T.u24(3 + 3 + 2) + T.u24(3) + b"\x30\x01\x00" + T.u16(0)), E_CERT, A_BADCERT)
+def oid_changed(fl, sch):
+    c = fl["cert"]; i = c.index(bytes.fromhex("2a864886f70d010101")); fl["cert"] = c[:i + 8] + b"\x0a" + c[i + 9:]
+attack("flight: a Certificate whose public key algorithm OID is rsassa-pss (1.2.840.113549.1.1.10), not rsaEncryption", oid_changed, E_CERT, A_BADCERT)
+def bitstring_unused(fl, sch):
+    c = fl["cert"]; i = c.index(bytes.fromhex("2a864886f70d010101")); j = c.index(b"\x03\x81\x8d\x00", i); fl["cert"] = c[:j + 3] + b"\x01" + c[j + 4:]
+attack("flight: a Certificate whose subjectPublicKey BIT STRING declares 1 unused bit", bitstring_unused, E_CERT, A_BADCERT)
+def rebuild_cert(fl, der):  # a Certificate message carrying `der` as its only entry
+    entry = T.u24(len(der)) + der + T.u16(0); body = b"\0" + T.u24(len(entry)) + entry; fl["cert"] = b"\x0b" + T.u24(len(body)) + body
+def der_three_byte_len(fl, sch): rebuild_cert(fl, b"\x30\x83\x00" + C1024[2:4] + C1024[4:])
+attack("flight: a Certificate whose outer DER length uses the three-byte form (unsupported)", der_three_byte_len, E_CERT, A_BADCERT)
+def der_len_too_big(fl, sch): c = bytearray(C1024); c[6:8] = b"\xff\xff"; rebuild_cert(fl, bytes(c))
+attack("flight: a Certificate whose tbsCertificate length claims more bytes than exist", der_len_too_big, E_CERT, A_BADCERT)
+def exponent_5_bytes(fl, sch): c = C1024; i = c.index(b"\x02\x03\x01\x00\x01"); rebuild_cert(fl, c[:i] + b"\x02\x05\x01\x00\x00\x00\x01" + c[i + 5:])
+attack("flight: a Certificate whose public exponent is five bytes long (2^32 + 1)", exponent_5_bytes, E_CERT, A_BADCERT)
+KBIG = rsa.generate_private_key(65537, 2056); CBIG = make_cert(KBIG)
+attack("flight: a Certificate holding a 2056-bit RSA key (larger than the 2048-bit limit)", None, E_CERT, A_BADCERT, key=KBIG, cert=CBIG)
+KSMALL = serialization.load_pem_private_key(open(os.path.join(here, "..", "data/tls/test_rsa1008.pem"), "rb").read(), None); CSMALL = make_cert(KSMALL)
+attack("flight: a Certificate holding a 1008-bit RSA key (smaller than the 1024-bit limit)", None, E_CERT, A_BADCERT, key=KSMALL, cert=CSMALL)
+def huge_hs_len(fl, sch): fl["ee"] = b"\x08\xff\xff\xff" + fl["ee"][4:]
+attack("flight: a handshake message header claiming 16,777,215 bytes", huge_hs_len, E_HS, A_ILLEGAL)
 attack("flight: a CertificateVerify with signature scheme 0x0403 (ecdsa) instead of 0x0804", lambda fl, s: fl.__setitem__("cv", fl["cv"][:4] + b"\x04\x03" + fl["cv"][6:]), E_SIG, A_ILLEGAL)
 attack("flight: a CertificateVerify whose signature length field is wrong", lambda fl, s: fl.__setitem__("cv", fl["cv"][:6] + b"\x00\x7f" + fl["cv"][8:]), E_HS, A_DECODE)
 def wrongkey(fl, sch):
@@ -162,6 +182,8 @@ attack("ServerHello: supported_versions says TLS 1.2 (0x0303)", None, E_VER, A_I
 attack("ServerHello: no supported_versions extension", None, E_VER, A_MISSING, mutate_sh=S(sv=b""))
 attack("ServerHello: no key_share extension", None, E_KEY, A_MISSING, mutate_sh=S(ks=b""))
 attack("ServerHello: key_share for group secp256r1 (0x0017)", None, E_KEY, A_ILLEGAL, mutate_sh=lambda f: sh_with(f, ks=T.u16(0x33) + T.u16(4 + 65) + T.u16(0x17) + T.u16(65) + b"\4" + rb(64)))
+attack("ServerHello: key_share for group secp256r1 whose data is 32 bytes long (right length, wrong group)", None, E_KEY, A_ILLEGAL, mutate_sh=lambda f: sh_with(f, ks=T.u16(0x33) + T.u16(36) + T.u16(0x17) + T.u16(32) + f["spub"]))
+attack("ServerHello: key_share twice", None, E_KEY, A_ILLEGAL, mutate_sh=lambda f: sh_with(f, extra=T.u16(0x33) + T.u16(36) + T.u16(0x1d) + T.u16(32) + f["spub"]))
 attack("ServerHello: key_share with a 31-byte X25519 key", None, E_KEY, A_ILLEGAL, mutate_sh=lambda f: sh_with(f, ks=T.u16(0x33) + T.u16(35) + T.u16(0x1d) + T.u16(31) + f["spub"][:31]))
 for i, pt in enumerate(["00" * 32, "01" + "00" * 31, "e0eb7a7c3b41b8ae1656e3faf19fc46ada098deb9c32b1fd866205165f49b800", "5f9c95bca3508c24b1d0b1559c83ef5b04445cc4581c8e86d8224eddd09f1157"]):
     attack(f"ServerHello: low-order X25519 key share #{i + 1} (the shared secret would be all zero)", None, E_KEY, A_ILLEGAL, mutate_sh=lambda f, pt=pt: sh_with(f, ks=T.u16(0x33) + T.u16(36) + T.u16(0x1d) + T.u16(32) + bytes.fromhex(pt)))
@@ -181,10 +203,12 @@ attack("ServerHello: a record cut short", None, E_RECORD, A_DECODE, mutate_sh=la
 attack("ServerHello: a change_cipher_spec record carrying 02 instead of 01", None, E_RECORD, A_UNEXP, mutate_sh=lambda f: b"\x14\x03\x03\0\1\2")
 # record layer after the handshake
 def tail_tests():
-    for kind in ["replay", "reorder", "truncated", "extra byte", "app data before the handshake finished", "fatal alert", "unknown inner type", "all-zero inner plaintext", "oversized plaintext", "alert of wrong length", "plaintext record after ServerHello", "handshake message in application phase", "sequence number exhausted"]:
+    for kind in ["replay", "reorder", "truncated", "extra byte", "app data before the handshake finished", "fatal alert", "unknown inner type", "all-zero inner plaintext", "oversized plaintext", "alert of wrong length", "plaintext record after ServerHello", "handshake message in application phase", "sequence number exhausted", "application data under handshake keys", "warning alert"]:
         rnd, priv, ch = start(); f = server().respond(ch); sch = f["sch"]; feed(f["sh"])
         if kind == "app data before the handshake finished":
             r = feed(T.Keys(sch.s_ap).seal(23, b"early")); expect("record layer: " + kind + " (sealed with application keys during the handshake)", r, E_DECRYPT, A_MAC); continue
+        if kind == "application data under handshake keys":
+            r = feed(T.Keys(sch.s_hs).seal(23, b"early data")); expect("record layer: application data (inner type 23) sealed with the handshake keys during the handshake", r, E_STATE, A_UNEXP); continue
         if kind == "plaintext record after ServerHello": r = feed(T.record(22, 0x303, b"\x14\0\0\x20" + rb(32))); expect("record layer: " + kind, r, E_STATE, A_UNEXP); continue
         for rec in flight_records(f): last = feed(rec)
         if last["rc"] != 0: bad("setup", last["raw"]); continue
@@ -198,6 +222,7 @@ def tail_tests():
         elif kind == "all-zero inner plaintext":
             hdr = b"\x17\x03\x03" + T.u16(20 + 16 - 16 + 16); inner = b"\0" * 20; hdr = b"\x17\x03\x03" + T.u16(len(inner) + 16); rec = hdr + T.gcm_seal(sk.key, T.nonce(sk.iv, sk.seq), hdr, inner); r = feed(rec); expect("record layer: an inner plaintext of only zero bytes (no content type)", r, E_RECORD, A_UNEXP)
         elif kind == "oversized plaintext": inner = b"x" * 16385 + b"\x17"; hdr = b"\x17\x03\x03" + T.u16(len(inner) + 16); rec = hdr + T.gcm_seal(sk.key, T.nonce(sk.iv, sk.seq), hdr, inner); r = feed(rec); expect("record layer: a protected record with 16,385 bytes of plaintext", r, E_RECORD, A_OVER)
+        elif kind == "warning alert": r = feed(sk.seal(21, b"\x01\x5a")); expect("record layer: a warning alert other than close_notify (user_canceled, 90) is treated as fatal", r, E_ALERT, 90)
         elif kind == "alert of wrong length": r = feed(sk.seal(21, b"\x01")); expect("record layer: an alert one byte long", r, E_RECORD, A_DECODE)
         elif kind == "handshake message in application phase": r = feed(sk.seal(22, b"\x14\0\0\x20" + rb(32))); expect("record layer: a Finished message after the handshake", r, E_HS, A_UNEXP)
         elif kind == "sequence number exhausted":

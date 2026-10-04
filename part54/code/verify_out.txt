@@ -1,0 +1,42 @@
+-- 1. the ClientHello
+  ok   the X25519 public key the kernel computed from the recorded private key equals Python's
+  ok   the kernel's ClientHello record (201 bytes) equals the one Python builds and the recorded one
+-- 2. the key schedule up to the handshake traffic secrets
+  ok   the ServerHello record the kernel fed itself is the recorded one
+  ok   early secret equals Python's: 33ad0a1c607ec03b...
+  ok   handshake secret equals Python's (from X25519 and the transcript): 1dc826e93606aa6f...
+  ok   client and server handshake traffic secrets equal Python's
+-- 3. the server's flight, decrypted and checked by Python
+  ok   Python decrypts the recorded flight with the server handshake keys (inner type 22)
+  ok   it holds EncryptedExtensions, Certificate, CertificateVerify, Finished, in that order
+  ok   the key the kernel read from the certificate has the size and exponent Python reads: 1024 bits, e = 65537
+  ok   Python verifies the CertificateVerify signature (RSA-PSS, SHA-256) over the transcript hash with the certificate's key
+  ok   Python verifies the server's Finished MAC
+  ok   the transcript hash through the server Finished equals Python's
+  ok   master secret equals Python's: 18df06843d13a08b...
+  ok   client and server application traffic secrets equal Python's
+-- 4. the client's records and the server's application records
+  ok   the client Finished record (58 bytes) equals the one Python builds and the recorded one
+  ok   Python decrypts the NewSessionTicket under the server application keys (sequence 0)
+  ok   Python decrypts the server's application record (sequence 1) to the 50 bytes the kernel printed
+  ok   the client's application record (72 bytes) equals the one Python builds
+  ok   the client's close_notify record equals the one Python builds
+  ok   Python decrypts the server's close_notify to the warning alert 'close_notify'
+-- 5. the fourteen attacks, each judged independently
+  ok   attack 1: kernel 'record failed authentication (bad_record_mac)' (alert 20); Python's independent check agrees the damaged input is bad
+  ok   attack 2: kernel 'record failed authentication (bad_record_mac)' (alert 20); Python's independent check agrees the damaged input is bad
+  ok   attack 3: kernel 'malformed record' (alert 50); Python's independent check agrees the damaged input is bad
+  ok   attack 4: kernel 'cipher suite not offered' (alert 47); Python's independent check agrees the damaged input is bad
+  ok   attack 5: kernel 'HelloRetryRequest is not supported' (alert 40); Python's independent check agrees the damaged input is bad
+  ok   attack 6: kernel 'unusable key share' (alert 47); Python's independent check agrees the damaged input is bad
+  ok   attack 7: kernel 'record not allowed in this state' (alert 10); Python's independent check agrees the damaged input is bad
+  ok   attack 8: kernel 'CertificateVerify signature invalid' (alert 51); Python's independent check agrees the damaged input is bad
+  ok   attack 9: kernel 'Finished verify_data wrong' (alert 51); Python's independent check agrees the damaged input is bad
+  ok   attack 10: kernel 'unexpected or malformed handshake message' (alert 10); Python's independent check agrees the damaged input is bad
+  ok   attack 11: kernel 'record failed authentication (bad_record_mac)' (alert 20); Python's independent check agrees the damaged input is bad
+  ok   attack 12: kernel 'record failed authentication (bad_record_mac)' (alert 20); Python's independent check agrees the damaged input is bad
+  ok   attack 13: kernel 'alert received' (alert 40); Python's independent check agrees the damaged input is bad
+  ok   attack 14: kernel 'malformed record' (alert 50); Python's independent check agrees the damaged input is bad
+  ok   final tally: 9 handshake steps verified, 14 attacks refused, 0 failures
+
+ALL CHECKS PASSED

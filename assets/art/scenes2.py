@@ -261,3 +261,16 @@ def s53(s):  # an LSM tree: the log and the memtable on top, flushed tables belo
     s.text(660, 160, "GET key", 13, s.main, bold=True); s.path("M590,170 L520,200", stroke=s.main, sw=2); s.path("M590,170 L520,148", stroke=s.main, sw=2)
     s.path("M610,214 l30,30 m0,-30 l-30,30", stroke=s.acc, sw=5); s.text(700, 240, "crash!", 14, s.acc, "start", bold=True)
     s.text(660, 276, "reopen: replay the log, cut the torn tail", 11, s.light, op=.9)
+
+
+def s54(s):  # TLS 1.3: client and server, the handshake messages between them, the padlock, and the key-schedule chain
+    s.rect(50, 34, 110, 176, s.light, s.dark, 3, 10); s.text(105, 60, "CLIENT", 14, s.dark, bold=True); s.rect(640, 34, 110, 176, s.light, s.dark, 3, 10); s.text(695, 60, "SERVER", 14, s.dark, bold=True)
+    rows = (("ClientHello + key share", 1, s.main), ("ServerHello + key share", -1, s.main), ("{EncryptedExtensions}", -1, s.acc), ("{Certificate}", -1, s.acc), ("{CertificateVerify}", -1, s.acc), ("{Finished}", -1, s.acc), ("{Finished}", 1, s.acc), ("application data", 2, s.light))
+    for k, (t, d, c) in enumerate(rows):
+        y = 56 + k * 20; x1, x2 = (170, 630) if d != -1 else (630, 170); sg = 1 if d != -1 else -1
+        s.path("M%d,%d L%d,%d M%d,%d l%d,-4 m%d,4 l%d,4" % (x1, y, x2, y, x2, y, -8 * sg, 8 * sg, -8 * sg), stroke=c, sw=2)
+        if d == 2: s.path("M170,%d l8,-4 m-8,4 l8,4" % y, stroke=c, sw=2)
+        s.text(400, y - 4, t, 11, c, bold=True)
+    s.rect(290, 80, 220, 84, "none", s.acc, 2, 8, op=.9); s.text(400, 211, "boxed: encrypted with the handshake keys", 11, s.acc, bold=True)
+    for k, t in enumerate(("Early", "Handshake", "Master")): s.rect(190 + k * 140, 224, 120, 30, s.dark, s.main, 2, 6); s.text(250 + k * 140, 244, t + " secret", 12, s.light, bold=True)
+    s.path("M312,239 L328,239 m-7,-4 l7,4 l-7,4 M452,239 L468,239 m-7,-4 l7,4 l-7,4", stroke=s.main, sw=2); s.text(400, 278, "HKDF chain: each step mixes in the key share, then the transcript hash", 11, s.light, op=.9)

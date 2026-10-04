@@ -9,7 +9,7 @@ static uint32_t hx(const char *s, uint8_t *o) { if (!strcmp(s, "-")) { return 0;
 static void hp(const uint8_t *p, uint32_t n) { for (uint32_t i = 0; i < n; i++) { printf("%02x", p[i]); } if (!n) { printf("-"); } }
 static tls_t T;
 int main(void) {
-    static char line[200000]; static uint8_t a[100000], b[100000], out[100000], app[100000];
+    static char line[200000]; static uint8_t a[100000], out[100000], app[100000];
     tls_init(&T);
     while (fgets(line, sizeof line, stdin)) {
         char *w[5] = {0}; int nw = 0; for (char *t = strtok(line, " \r\n"); t && nw < 5; t = strtok(0, " \r\n")) { w[nw++] = t; } if (!nw) { continue; }
