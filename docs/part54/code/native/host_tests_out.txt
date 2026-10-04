@@ -1,0 +1,158 @@
+== 1. the primitives and the API, from RFC 7748, RFC 5869 and the GCM specification ==
+== 1. X25519 (RFC 7748) ==
+== 2. HKDF (RFC 5869 test case 1) and the TLS labels ==
+== 3. AES-128-GCM (the GCM specification's test cases 1, 2 and 4) ==
+== 4. the client's API ==
+27 passed, 0 failed
+27 lines PASS
+
+== 2. the recorded handshake of RFC 8448 section 3: every byte the client sends equals the record, every server message is accepted ==
+PASS the client's random number pool is 64 bytes: a 32-byte ClientHello random then the 32-byte X25519 private key
+== 1. the ClientHello ==
+PASS the X25519 public key computed from the recorded private key is the recorded key share (99381de5...)
+PASS the ClientHello record the client builds equals the recorded one, byte for byte (201 bytes)
+== 2. the ServerHello ==
+PASS the recorded ServerHello record is accepted
+     early secret:      33ad0a1c607ec03b09e6cd9893680ce210adf300aa1f2660e1b22e10f170f92a
+     handshake secret:  1dc826e93606aa6fdc0aadc12f741b01046aa6b99f691ed221a9f0ca043fbeac
+     client hs traffic: b3eddb126e067f35a780b3abf45e2d8f3b1a950738f52e9600746a0e27a55a21
+     server hs traffic: b67b7d690cc16c4e75e54213cb2d37b4e9c912bcded9105d42befd59d391ad38
+PASS the early secret (no PSK) is the well-known 33ad0a1c607ec03b09e6cd9893680ce210adf300aa1f2660e1b22e10f170f92a
+== 3. the server's encrypted flight ==
+PASS the recorded server flight is one 679-byte record
+PASS independently decrypted, the record holds EncryptedExtensions, Certificate, CertificateVerify and Finished exactly as recorded, then the inner type byte 0x16 (handshake)
+PASS its signature field is the recorded 128-byte RSA-PSS signature
+PASS the client accepts it: the certificate's RSA key is found, the CertificateVerify signature is VERIFIED, the server Finished is verified
+PASS the RSA key taken from the certificate is a 1024-bit modulus with public exponent 65537
+PASS the 130-byte message the server signed (64 spaces, "TLS 1.3, server CertificateVerify", a zero byte, the transcript hash) equals the recorded one, so the transcript hash is right
+== 4. the client's Finished and the traffic keys ==
+PASS the client Finished record the client sends equals the recorded one, byte for byte (58 bytes)
+     master secret:      18df06843d13a08bf2a449844c5f8a478001bc4d4c627984d5a41da8d0402919
+     client ap traffic:  9e40646ce79a7f9dc05af8889bce6552875afa0b06df0087f792ebb7c17504a5
+     server ap traffic:  a11af9f05531f856ad47116b45a950328204b4f44bfb6b3a4b4f1f3fcb631643
+== 5. application data, the ticket, close_notify ==
+PASS the NewSessionTicket record (227 bytes) is accepted and counted
+PASS the server's application data record decrypts to the recorded 50 bytes (00 01 02 ... 31)
+PASS the client's application data record equals the recorded one, byte for byte (72 bytes)
+PASS the client's close_notify record equals the recorded one (24 bytes)
+PASS the server's close_notify record is accepted and closes the connection
+
+17 passed, 0 failed
+
+== 3. the primitives against an independent library (Python cryptography) ==
+  AES-128-GCM open of a genuine ciphertext: 131
+  AES-128-GCM open: a flipped bit anywhere in ciphertext or tag is refused: 131
+  AES-128-GCM open: a truncated message (a missing tag byte) is refused: 131
+  AES-128-GCM open: wrong AAD refused: 131
+  AES-128-GCM open: wrong nonce refused: 131
+  AES-128-GCM seal (plaintext lengths 0-70 and random longer; AAD 0-70): 131
+  HKDF-Expand-Label (labels up to 249 bytes, contexts up to 255, outputs up to 255 bytes): 120
+  HKDF-Extract (empty, short, block-length and long salts): 120
+  RSA-PSS verify, 1024-bit key, genuine signature: 15
+  RSA-PSS verify, 1536-bit key, genuine signature: 15
+  RSA-PSS verify, 2048-bit key, genuine signature: 15
+  RSA-PSS verify, 3072-bit key, genuine signature (larger than the 2048-bit limit: refused): 15
+  RSA-PSS verify: a different message hash is refused: 45
+  RSA-PSS verify: a flipped signature bit is refused: 45
+  RSA-PSS verify: a short signature is refused: 45
+  RSA-PSS verify: a signature as large as the modulus (s = n) is refused: 45
+  RSA-PSS verify: a wrong public exponent (3) is refused: 45
+  RSA-PSS verify: an even exponent is refused: 45
+  RSA-PSS verify: another key's modulus refuses it: 45
+  X25519: low-order / non-canonical points (all-zero output): 27
+  X25519: random scalar and point: 240
+  X25519: the RFC 7748 vector: 1
+1669 comparisons, 0 differences
+
+== 4. full handshakes against the independent Python server, the attack catalogue, every byte flipped ==
+tls_hs.c: In function 'main':
+tls_hs.c:12:57: warning: unused variable 'b' [-Wunused-variable]
+   12 |     static char line[200000]; static uint8_t a[100000], b[100000], out[100000], app[100000];
+      |                                                         ^
+   outcomes of the ServerHello flips (rc: count): {-9: 5, -7: 2, -6: 4, -5: 15, -4: 64, -3: 4, -2: 1} ; of the flight flips: {-4: 640, -3: 4, -2: 1}
+  ClientHello records compared: 146
+  ServerHello record, every byte flipped: the client never connects ... byte flips tried: 95
+  ServerHello: a HelloRetryRequest (the special random) ... correct result: 1
+  ServerHello: a change_cipher_spec record carrying 02 instead of 01 ... correct result: 1
+  ServerHello: a non-empty legacy_session_id_echo ... correct result: 1
+  ServerHello: a pre_shared_key extension although none was offered ... correct result: 1
+  ServerHello: a record claiming a plaintext length over 16,384 ... correct result: 1
+  ServerHello: a record cut short ... correct result: 1
+  ServerHello: a record whose legacy_version is 0x0301 ... correct result: 1
+  ServerHello: a record with trailing bytes beyond its length ... correct result: 1
+  ServerHello: an unknown extension (0x1234) ... correct result: 1
+  ServerHello: cipher suite 0x0000 ... correct result: 1
+  ServerHello: cipher suite TLS_AES_256_GCM_SHA384 (not offered as usable) ... correct result: 1
+  ServerHello: cipher suite TLS_CHACHA20_POLY1305_SHA256 (offered, not implemented) ... correct result: 1
+  ServerHello: compression method 1 ... correct result: 1
+  ServerHello: handshake length field one too large ... correct result: 1
+  ServerHello: key_share for group secp256r1 (0x0017) ... correct result: 1
+  ServerHello: key_share with a 31-byte X25519 key ... correct result: 1
+  ServerHello: legacy_version 0x0302 ... correct result: 1
+  ServerHello: low-order X25519 key share #1 (the shared secret would be all zero) ... correct result: 1
+  ServerHello: low-order X25519 key share #2 (the shared secret would be all zero) ... correct result: 1
+  ServerHello: low-order X25519 key share #3 (the shared secret would be all zero) ... correct result: 1
+  ServerHello: low-order X25519 key share #4 (the shared secret would be all zero) ... correct result: 1
+  ServerHello: no key_share extension ... correct result: 1
+  ServerHello: no supported_versions extension ... correct result: 1
+  ServerHello: sent as an application_data record (before any keys exist) ... correct result: 1
+  ServerHello: supported_versions says TLS 1.2 (0x0303) ... correct result: 1
+  ServerHello: supported_versions twice ... correct result: 1
+  ServerHello: the downgrade sentinel 'DOWNGRD\x00' in the random ... correct result: 1
+  ServerHello: the downgrade sentinel 'DOWNGRD\x01' in the random ... correct result: 1
+  a 16,385-byte send is refused ... correct result: 40
+  a client that has failed refuses even the genuine record afterwards ... correct result: 1
+  a record before the ClientHello is refused ... correct result: 1
+  client Finished records compared: 40
+  client application records compared (byte for byte): 280
+  client close_notify records compared: 40
+  data after close_notify is refused (connection closed) ... correct result: 1
+  encrypted flight record, every byte flipped: the client never connects ... byte flips tried: 645
+  flight: Certificate before EncryptedExtensions ... correct result: 1
+  flight: CertificateVerify before Certificate ... correct result: 1
+  flight: CertificateVerify signature with one bit flipped ... correct result: 1
+  flight: EncryptedExtensions sent twice ... correct result: 1
+  flight: EncryptedExtensions whose extension list overruns its message ... correct result: 1
+  flight: Finished before CertificateVerify ... correct result: 1
+  flight: Finished verify_data with one bit flipped ... correct result: 1
+  flight: a Certificate whose first entry is not a certificate (garbage DER) ... correct result: 1
+  flight: a Certificate whose key is an EC key (not RSA) ... correct result: 1
+  flight: a Certificate with a non-zero request context ... correct result: 1
+  flight: a Certificate with an empty certificate list ... correct result: 1
+  flight: a CertificateRequest (client authentication) before the Certificate ... correct result: 1
+  flight: a CertificateVerify signed by a different RSA key than the certificate's ... correct result: 1
+  flight: a CertificateVerify that signs the wrong transcript hash ... correct result: 1
+  flight: a CertificateVerify whose signature length field is wrong ... correct result: 1
+  flight: a CertificateVerify with signature scheme 0x0403 (ecdsa) instead of 0x0804 ... correct result: 1
+  flight: a Finished of the wrong length (31 bytes) ... correct result: 1
+  flight: a Finished that is the client's key schedule value, not the server's ... correct result: 1
+  flight: a handshake message follows the server Finished in the same record ... correct result: 1
+  flight: an unknown handshake type (99) after EncryptedExtensions ... correct result: 1
+  flight: no Certificate and no CertificateVerify (EncryptedExtensions then Finished) ... correct result: 1
+  full secret sets (7 values each) compared: 40
+  handshake-secret triples compared: 40
+  random garbage records fed after a valid ServerHello (never connected): 40
+  record layer: a Finished message after the handshake ... correct result: 1
+  record layer: a fatal handshake_failure alert from the server ... correct result: 1
+  record layer: a flipped bit in the flight's tag ... correct result: 1
+  record layer: a protected record with 16,385 bytes of plaintext ... correct result: 1
+  record layer: a record cut short ... correct result: 1
+  record layer: a record with a trailing byte ... correct result: 1
+  record layer: a server record delivered twice (the second has a stale sequence number) ... correct result: 1
+  record layer: an alert one byte long ... correct result: 1
+  record layer: an inner plaintext of only zero bytes (no content type) ... correct result: 1
+  record layer: an unknown inner content type (99) ... correct result: 1
+  record layer: app data before the handshake finished (sealed with application keys during the handshake) ... correct result: 1
+  record layer: close_notify from the server closes the connection ... correct result: 1
+  record layer: plaintext record after ServerHello ... correct result: 1
+  record layer: records delivered out of order ... correct result: 1
+  record layer: the receive sequence number at 2^64 - 1 (the next record is refused, never wrapped) ... correct result: 1
+  sending after close is refused ... correct result: 40
+  sending on a closed connection is refused ... correct result: 1
+  server application records delivered: 280
+  server close_notify after the client's own close is ignored without error: 40
+  server flights accepted (all in one record / split in two / one byte per record / padded): 40
+1874 checks, 0 differences
+
+== 5. mutation fuzzing of the recorded handshake ==
+1500 fuzzed handshakes (964 with the ServerHello and flight left intact: 964 connected; 536 with one of them damaged): the client connected 0 times; error codes seen: record not allowed in this state=127 malformed record=318 record failed authentication (bad_record_mac)=780 unexpected or malformed handshake message=46 not TLS 1.3=4 cipher suite not offered=2 unusable key share=3 connection closed=30

@@ -1,0 +1,6 @@
+NOTE: this script deliberately breaks copies of the chapter's sources. 'caught' lines are EXPECTED: they show the tests can detect the mistake.
+baseline (nothing broken): all tests pass (expected)
+X25519: the scalar's bit 254 is not forced: caught by tls_test, RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
+X25519: the scalar's low bits are not cleared: caught by tls_test, RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
+X25519: wrong a24 constant (0xDB41 -> 0xDB40): caught by tls_test, RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz
+X25519: the carry wraps with 37 instead of 38: caught by tls_test, RFC 8448 trace, primitives vs Python cryptography, handshakes and attacks vs Python, fuzz

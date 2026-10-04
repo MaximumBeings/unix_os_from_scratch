@@ -1299,3 +1299,29 @@ Worked answer: a tombstone exists to hide older values of the key in older table
 **5. The kernel sweep shows only 1 of 354 crash points landing on "the acknowledged state plus the operation in flight". Why so few, and why is it still correct that the contract allows both?**
 
 Worked answer: an operation costs its bytes plus one unit; it becomes durable when its last data byte is written but is acknowledged only after the final unit. The only crash points that leave the whole record written but unacknowledged are the single unit between those two moments, once per logged operation, and the sweep samples every 7th unit. At every other point the record is either absent or torn (cut off at recovery), so the state equals the acknowledged one. The contract must still allow both because the writer cannot know, after a crash, whether the last byte reached the disk.
+
+---
+
+## Chapter 54: TLS 1.3 From Scratch
+
+*(from [54. TLS 1.3 From Scratch](../part54/54-tls-1-3-from-scratch.md))*
+
+**1. Why is each record's nonce the IV XOR the sequence number, and what would go wrong if the sequence number were reset in the middle of a connection?**
+
+Worked answer: AES-GCM must never encrypt two different messages under the same key and nonce: reuse lets an attacker XOR two ciphertexts to cancel the key stream and recover the plaintexts' XOR, and it leaks the authentication subkey so records can be forged. The key is fixed for the epoch, so the nonce must change for every record. Using a counter makes uniqueness a matter of never repeating a number, with no random-number generator needed; XORing it into a per-direction random IV keeps the nonces of the two directions (and of different connections that happen to use the same key) from colliding. Resetting the counter mid-connection would repeat nonces under the same key, which is exactly the catastrophic case. That is also why this client refuses to send or receive once the 64-bit counter reaches its maximum instead of wrapping.
+
+**2. The transcript hash is mixed into every traffic secret. What attack does that stop, and which message would an attacker most want to change without the client noticing?**
+
+Worked answer: it binds the keys to the entire handshake as each side saw it, so an attacker who alters any handshake message (a downgrade of the offered cipher suites or groups in the ClientHello, a swapped key share, a different certificate) makes the two ends compute different keys, and the Finished MACs, which are keyed from those secrets and computed over the transcript, fail. The most attractive message to alter is the ClientHello (to downgrade the negotiated parameters), because it is sent in the clear before any keys exist; the transcript hash is what makes that visible at the Finished messages.
+
+**3. Attacks 8 and 9 in the demo are validly encrypted, so AES-GCM accepts them. What exactly catches them, and why is *decrypting successfully* not evidence that the server is genuine?**
+
+Worked answer: authenticated encryption shows only that the sender knew the traffic key, which an active attacker who completed the key exchange also does. What authenticates the *server* is the CertificateVerify signature (a signature by the certificate's private key over the transcript hash, which proves possession of that key and binds it to this particular handshake) and the server Finished (a MAC under a key derived from the whole handshake). Flipping a bit of the signature makes the RSA-PSS verification fail (attack 8); flipping a bit of verify_data makes the MAC comparison fail (attack 9). Decryption succeeding says nothing about either.
+
+**4. A server sends the X25519 public key `0`. What is the shared secret, why is that dangerous, and what does the client do?**
+
+Worked answer: X25519 with the point 0 (a low-order point) gives the all-zero shared secret whatever the client's private key is, so every secret derived from it is computable by anyone who sees the handshake. A malicious or confused peer could therefore make the session keys public. The client checks the output of the scalar multiplication and refuses an all-zero result with `illegal_parameter` (alert 47), as RFC 7748 recommends; the demo's attack 6 does exactly this.
+
+**5. This client verifies the CertificateVerify signature but not the certificate chain. Describe one attack that passes every check in this chapter, and what the missing piece is.**
+
+Worked answer: an attacker who sits between the client and the real server generates their own RSA key and a self-signed certificate for the server's name, answers the handshake with it, and signs the CertificateVerify with their own key. Every check in this chapter passes (the signature matches the key in the certificate the attacker sent), and the client talks to the attacker. The missing piece is chain validation against trust anchors the client already holds (and a check that the certificate names the host the client meant to reach, is within its validity period, and has not been revoked): the step that turns "the sender holds the key in this certificate" into "the sender is who the client meant to reach".
