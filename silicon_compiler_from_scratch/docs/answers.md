@@ -203,6 +203,18 @@ Worked answer: the bug where `start` is not ignored while the unit is busy, so a
 
 Worked answer: the high score gets `e = 65535`, and each of the 200 low scores (if more than 11.8 below it) gets 0, so the sum is 65535, `r = 2^38 / 65535`, and the high score's probability is 65536 (1.0) and every other element's is 0. The true softmax would give the 200 together a mass of up to `200 * 7.4e-6 = 1.5e-3`; the unit loses it. That is the intended trade for a 16-bit table, and it only matters if many tiny terms add up to something comparable to the large one. The Chapter 6 study shows the same effect in its largest error (N=64, one big score, 63 small ones).
 
+**6. Scores `[16, 0]` by hand.**
+
+Worked answer: m = 16, d = [0, 16], e = [65535, 24109], s = 89,644, r = floor(2^38 / 89644) = 3,066,327; p = [47911, 17625]. As fractions of 65536: 0.73106 and 0.26894, against the real 0.731059 and 0.268941: within 0.4 of a unit of 2^-16. The two sum to 65536.
+
+**7. Why is the cycle count independent of the data, and why does it matter?**
+
+Worked answer: every pass visits all N elements whatever their values, and the divider always runs W = 40 cycles. So the unit's latency is exactly 3N + 43 for any input, and whoever schedules around it (the sequencer in Chapter 7, the compiler's cycle model in Chapter 11) can budget it without waiting for data. A data-dependent latency (for example a divider that stops early) would force a handshake and make every schedule a distribution instead of a number.
+
+**8. Why is the top probability at k = 4 only 0.978?**
+
+Worked answer: clipping is not the reason. At k = 4 the scores are [127, 64, 32, 0, ...]; the second score is 63 below the maximum (a real distance of 3.94), so it still has weight exp(-3.94) = 0.019, the third has exp(-5.9) = 0.003, and so on. The top probability is 1 / (1 + 0.019 + 0.003 + ...) = 0.978. To get closer to 1 the scores would have to be farther apart than Q4.4 allows.
+
 ---
 
 ## Chapter 7

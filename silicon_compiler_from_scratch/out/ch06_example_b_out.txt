@@ -1,0 +1,21 @@
+== 1. temperature on the circuit: scores x = clip(round(16 * k * logit)), logits = [2.0, 1.0, 0.5, 0.0, -0.5, -1.0, -2.0, -3.0]
+   k (sharpness)   scores                              top p     p of 2nd   p of last    sum(p)   circuit = integer model?
+    0.25         [8, 4, 2, 0, -2, -4, -8, -12]         0.211      0.164     0.06052    65535   yes
+    0.50         [16, 8, 4, 0, -4, -8, -16, -24]       0.315      0.191     0.02586    65535   yes
+    1.00         [32, 16, 8, 0, -8, -16, -32, -48]     0.531      0.195     0.00359    65536   yes
+    2.00         [64, 32, 16, 0, -16, -32, -64, -96]   0.824      0.112     0.00003    65536   yes
+    4.00         [127, 64, 32, 0, -32, -64, -128, -128]  0.978      0.019     0.00000    65536   yes
+   Multiplying the scores by k is dividing the temperature by k. k = 0.25 is nearly flat; k = 4 puts almost everything on the top element.
+   (At k = 4 the top two scores clip at 127: the int8 range limits how sharp the distribution can be made. That is a property of Q4.4 scores.)
+
+== 2. the cut-off of the exp table: 1 big score (127) and 63 equal small scores (127 - d), N = 64
+   d    T[d]    p_big (fixed)   p_big (real)   error of p_big   p_small (fixed)  p_small (real)   sum of all p (fixed)
+  100     127       0.891190       0.891569       24.84 u       0.0017242      0.0017211      65524
+  150       6       0.994263       0.994685       27.67 u       0.0000916      0.0000844      65538
+  180       1       0.999039       0.999181        9.34 u       0.0000153      0.0000130      65536
+  188       1       0.999039       0.999503       30.44 u       0.0000153      0.0000079      65536
+  189       0       1.000000       0.999533       30.59 u       0.0000000      0.0000074      65536
+  200       0       1.000000       0.999765       15.38 u       0.0000000      0.0000037      65536
+   (u = units of 2^-16). Up to d = 188 the table still has a non-zero entry; from d = 189 the entry is 0 and the 63 small scores get probability exactly 0,
+   so the big one takes everything (65536). The real value is 0.9995 at d = 189: a deliberate rounding of probabilities below 7.4e-6 each, which add up over 63 terms to 4.7e-4.
+   The ORDER is never changed (the big score always has the largest p), which is what greedy decoding needs; the SUM of tiny probabilities is what is lost.
