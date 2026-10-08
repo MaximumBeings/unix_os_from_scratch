@@ -347,6 +347,18 @@ Worked answer: in the first clock the chip's random power-up state made it issue
 
 Worked answer: for those faults the equivalence checker proved that the faulty circuit computes the same function as the good one (under the operating constraint), so there is no input at all on which they change an output. They cost nothing functionally and cannot be detected by any test. Fault coverage is therefore quoted over the testable faults (here 297, not 300).
 
+**6. Shortest clock period for the path.**
+
+Worked answer: 0.30 (clock-to-q) + 0.07 + 0.16 + 0.11 + 0.04 (the four gates) + 0.10 (setup) = 0.78 ns, so at most 1 / 0.78 ns = 1.28 GHz in the toy library. Any slower path elsewhere would set the clock instead.
+
+**7. A 3.2x faster adder that is 20% of the critical path.**
+
+Worked answer: if the adder is 20% of the path's delay, the new path is 0.8 + 0.2 / 3.2 = 0.8625 of the old, so the clock can be 1 / 0.8625 = 1.16x faster. Speeding up a part helps in proportion to the fraction of the path it occupies (Amdahl's law applied to a path). In the requantizer the adders are a much larger fraction, which is why the same change helped there.
+
+**8. Why the first cut gave only 11%.**
+
+Worked answer: the clock is set by the slower stage. After cutting after the multiplier, stage 1 (the multiplier, 8.23 ns) and stage 2 (the rounding adder, shift and clamp, 8.39 ns) were almost equally long, both near the old whole-unit time of 9.87 ns less the savings from splitting; adding the register's 0.4 ns of clock-to-q and setup left 8.90 ns. Pipelining only pays when the cut divides the delay evenly, and here stage 2 was long because of a ripple adder, which has to be replaced to make the cut worth it.
+
 ---
 
 ## Chapter 11

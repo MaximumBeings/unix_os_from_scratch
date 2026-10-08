@@ -3,32 +3,32 @@
 
 === ga2 ===
 
-   Number of wires:              29139
-   Number of wire bits:          31345
-   Number of public wires:         156
-   Number of public wire bits:    2362
+   Number of wires:              29643
+   Number of wire bits:          31928
+   Number of public wires:         165
+   Number of public wire bits:    2450
    Number of memories:               0
    Number of memory bits:            0
    Number of processes:              0
-   Number of cells:              30997
-     AND2                         1201
-     AOI21                        2074
-     DFF                          1899
-     INV                          1531
-     MUX2                         1470
-     NAND2                        5783
-     NAND3                         631
-     NOR2                         4684
-     NOR3                          852
-     OAI21                        1871
-     OR2                           705
-     XNOR2                        5113
-     XOR2                         3174
+   Number of cells:              31580
+     AND2                         1180
+     AOI21                        2041
+     DFF                          1987
+     INV                          1578
+     MUX2                         1556
+     NAND2                        5925
+     NAND3                         701
+     NOR2                         4732
+     NOR3                          867
+     OAI21                        1960
+     OR2                           657
+     XNOR2                        5074
+     XOR2                         3313
      rowmem                          8
      sram                            1
 
    Area for cell type \sram is unknown!
    Area for cell type \rowmem is unknown!
 
-   Chip area for module '\ga2': 52334.500000
+   Chip area for module '\ga2': 53525.620000
 

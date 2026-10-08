@@ -12,3 +12,4 @@ library says NOR3 computes the wrong function: NOT CAUGHT   (the mapper used 0 N
 library says AND2 computes the wrong function: caught   (the mapper used 126 AND2 cells)
 library says OR2 computes the wrong function: NOT CAUGHT   (the mapper used 0 OR2 cells)
 library says BUF computes the wrong function: synthesis failed (caught at synthesis)
+mut=0

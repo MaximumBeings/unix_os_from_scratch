@@ -21,16 +21,16 @@
 == 3. synthesize every unit and the whole chip (memories stay as macros)
 unit         cells  area (GE)  flip-flops  critical path  gate depth  max clock  critical endpoint
 exp_lut        376        522           0        1.16 ns           8     862 MHz  output e
-divu          1254       2639         249        2.06 ns          14     485 MHz  $auto$ff.cc:266:slice$865.D
+divu          1253       2638         249        2.06 ns          14     485 MHz  $auto$ff.cc:266:slice$894.D
 requant       5403       7881           0        9.87 ns          79     101 MHz  output q
-systolic     15736      26062         704        5.22 ns          40     192 MHz  $auto$ff.cc:266:slice$1027.D
-ga2_st         427        884          67        2.11 ns          16     474 MHz  $auto$ff.cc:266:slice$769.D
+systolic     15782      26118         704        5.22 ns          40     192 MHz  $auto$ff.cc:266:slice$1236.D
+ga2_st         427        884          67        2.11 ns          16     474 MHz  $auto$ff.cc:266:slice$798.D
 ga2_rq        5858       8919          94        9.92 ns          80     101 MHz  output wd
-ga2_vadd       594       1230          93        2.31 ns          17     433 MHz  output ra
-ga2_amax       576       1248         108        2.06 ns          16     485 MHz  output ra
-ga2_sm        4832       8065         309        5.03 ns          39     199 MHz  $auto$ff.cc:266:slice$2800.D
-ga2_mm       12168      21150         875        5.94 ns          45     168 MHz  $auto$ff.cc:266:slice$3915.D
-ga2          30997      52334        1899       10.74 ns          83      93 MHz  sp.wdata
+ga2_vadd       596       1233          93        2.18 ns          16     459 MHz  output ra
+ga2_amax       575       1249         108        2.06 ns          16     485 MHz  output ra
+ga2_sm        4843       8074         309        5.02 ns          39     199 MHz  output wd
+ga2_mm       12134      21159         875        5.88 ns          42     170 MHz  $auto$ff.cc:266:slice$3714.D
+ga2          31580      53526        1987       10.47 ns          81      96 MHz  sp.wdata
 
 == 4. gate-level simulation of the whole chip: the SAME testbench and program suite, now driving the netlist of toy cells (memories as behavioural macros)
 78 programs written to out/ga2_programs.hex (18 directed, 60 random) (78 programs)

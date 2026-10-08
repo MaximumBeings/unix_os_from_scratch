@@ -4685,3 +4685,134 @@ Removed 0 unused modules.
      sram                            1
 
 13.27. Executing CHECK pass (checking for obvious problems).
+Checking module ga2...
+Found and reported 0 problems.
+
+14. Executing DFFLEGALIZE pass (convert FFs to types supported by the target).
+
+15. Executing DFFLIBMAP pass (mapping DFF cells to sequential cells from liberty file).
+  cell DFF (noninv, pins=3, area=5.00) is a direct match for cell type $_DFF_P_.
+  final dff cell mappings:
+    unmapped dff cell: $_DFF_N_
+    \DFF _DFF_P_ (.CK( C), .D( D), .Q( Q));
+    unmapped dff cell: $_DFF_NN0_
+    unmapped dff cell: $_DFF_NN1_
+    unmapped dff cell: $_DFF_NP0_
+    unmapped dff cell: $_DFF_NP1_
+    unmapped dff cell: $_DFF_PN0_
+    unmapped dff cell: $_DFF_PN1_
+    unmapped dff cell: $_DFF_PP0_
+    unmapped dff cell: $_DFF_PP1_
+    unmapped dff cell: $_DFFSR_NNN_
+    unmapped dff cell: $_DFFSR_NNP_
+    unmapped dff cell: $_DFFSR_NPN_
+    unmapped dff cell: $_DFFSR_NPP_
+    unmapped dff cell: $_DFFSR_PNN_
+    unmapped dff cell: $_DFFSR_PNP_
+    unmapped dff cell: $_DFFSR_PPN_
+    unmapped dff cell: $_DFFSR_PPP_
+
+15.1. Executing DFFLEGALIZE pass (convert FFs to types supported by the target).
+Mapping DFF cells in module `\ga2':
+  mapped 1987 $_DFF_P_ cells to \DFF cells.
+
+16. Executing ABC pass (technology mapping using ABC).
+
+16.1. Extracting gate netlist of module `\ga2' to `<abc-temp-dir>/input.blif'..
+Extracted 34208 gates and 36430 wires to a netlist network with 2220 inputs and 2101 outputs.
+
+16.1.1. Executing ABC.
+Running ABC command: "<yosys-exe-dir>/yosys-abc" -s -f <abc-temp-dir>/abc.script 2>&1
+ABC: ABC command line: "source <abc-temp-dir>/abc.script".
+ABC: 
+ABC: + read_blif <abc-temp-dir>/input.blif 
+ABC: + read_lib -w /home/user/unix_os_from_scratch/silicon_compiler_from_scratch/lib/toy.lib 
+ABC: Parsing finished successfully.  Parsing time =     0.00 sec
+ABC: Warning: Templates are not defined.
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "DFF".
+ABC: Library "toy" from "/home/user/unix_os_from_scratch/silicon_compiler_from_scratch/lib/toy.lib" has 13 cells (1 skipped: 1 seq; 0 tri-state; 0 no func; 0 dont_use).  Time =     0.00 sec
+ABC: Memory =    0.05 MB. Time =     0.00 sec
+ABC: + strash 
+ABC: + &get -n 
+ABC: + &fraig -x 
+ABC: + &put 
+ABC: + scorr 
+ABC: Warning: The network is combinational (run "fraig" or "fraig_sweep").
+ABC: + dc2 
+ABC: + dretime 
+ABC: + strash 
+ABC: + &get -n 
+ABC: + &dch -f 
+ABC: + &nf 
+ABC: + &put 
+ABC: + write_blif <abc-temp-dir>/output.blif 
+
+16.1.2. Re-integrating ABC results.
+ABC RESULTS:               INV cells:     1578
+ABC RESULTS:               OR2 cells:      657
+ABC RESULTS:              XOR2 cells:     3313
+ABC RESULTS:             NAND3 cells:      701
+ABC RESULTS:             NAND2 cells:     5925
+ABC RESULTS:             AOI21 cells:     2041
+ABC RESULTS:              AND2 cells:     1180
+ABC RESULTS:              NOR3 cells:      867
+ABC RESULTS:             XNOR2 cells:     5074
+ABC RESULTS:              NOR2 cells:     4732
+ABC RESULTS:             OAI21 cells:     1960
+ABC RESULTS:              MUX2 cells:     1556
+ABC RESULTS:        internal signals:    32109
+ABC RESULTS:           input signals:     2220
+ABC RESULTS:          output signals:     2101
+Removing temp directory.
+
+17. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \ga2..
+Removed 0 unused cells and 35834 unused wires.
+<suppressed ~269 debug messages>
+
+18. Printing statistics.
+
+=== ga2 ===
+
+   Number of wires:              29643
+   Number of wire bits:          31928
+   Number of public wires:         165
+   Number of public wire bits:    2450
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:              31580
+     AND2                         1180
+     AOI21                        2041
+     DFF                          1987
+     INV                          1578
+     MUX2                         1556
+     NAND2                        5925
+     NAND3                         701
+     NOR2                         4732
+     NOR3                          867
+     OAI21                        1960
+     OR2                           657
+     XNOR2                        5074
+     XOR2                         3313
+     rowmem                          8
+     sram                            1
+
+   Area for cell type \sram is unknown!
+   Area for cell type \rowmem is unknown!
+
+   Chip area for module '\ga2': 53525.620000
+
+19. Executing Verilog backend.
+
+19.1. Executing BMUXMAP pass.
+
+19.2. Executing DEMUXMAP pass.
+Dumping module `\ga2'.
+
+20. Executing JSON backend.
+
+Warnings: 2 unique messages, 2 total
+End of script. Logfile hash: 2c0e888455, CPU: user 21.67s system 0.17s, MEM: 237.12 MB peak
+Yosys 0.33 (git sha1 2584903a060)
+Time spent: 31% 2x abc (9 sec), 19% 101x opt_expr (6 sec), ...

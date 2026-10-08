@@ -11,7 +11,7 @@ for k, (a, b, fl, sk) in enumerate(st):
     x = 14 + k * 154; f.box(x, 60, 138, 64, [a], fl, sk, 14, True, sub=b)
     if k < 5: f.arrow(x + 140, 92, x + 152, 92, C["ink"], 2)
 f.box(404, 160, 140, 44, ["toy.lib: 14 cells", "area + delay each"], C["yellow2"], C["gray"], 11.5, True); f.arrow(474, 160, 474, 126, C["gray"], 1.8, 8, "4 3")
-f.box(14, 160, 340, 44, ["memories stay as black boxes (a real chip uses a memory compiler's macro)"], C["gray2"], C["gray"], 11.5)
+f.box(14, 160, 250, 52, ["memories stay black boxes", "(a chip uses a memory macro)"], C["gray2"], C["gray"], 11.5)
 f.lines(470, 250, ["Every step preserves the function. The next sections check that it did, three ways:", "gate-level simulation, fault grading, and equivalence checking."], 12.5, C["ink"], lh=19); f.save(f"{OUT}/ch10-flow.svg")
 # 10.2 toy library
 cells = re.findall(r"cell\((\w+)\) \{\n    area : ([\d.]+);", lib); dl = [re.search(r'cell_rise\(scalar\) \{ values\("([\d.]+)"\)', lib[lib.index(f"cell({n})"):]).group(1) for n, _ in cells]
@@ -23,7 +23,7 @@ f.arrow(132, 80, 192, 80, C["ink"], 2); f.box(194, 60, 100, 40, ["INV"], C["gree
 f.arrow(296, 80, 356, 80, C["ink"], 2); f.box(358, 60, 130, 40, ["output z"], C["red2"], C["red"], 13, True); f.text(423, 118, "+ setup 0.10", 11, C["red"])
 f.text(600, 84, "= 0.30 + 0.04 + 0.10 = 0.44 ns", 14, C["red"], "start", True, True)
 f.box(30, 160, 100, 40, ["a"], C["gray2"], C["gray"], 13, True); f.arrow(132, 180, 192, 180, C["ink"], 2); f.box(194, 160, 90, 40, ["INV"], C["green2"], C["green"], 12, True); f.arrow(286, 180, 326, 180, C["ink"], 2); f.box(328, 160, 90, 40, ["NAND2"], C["green2"], C["green"], 12, True); f.arrow(420, 180, 460, 180, C["ink"], 2); f.box(462, 160, 90, 40, ["INV"], C["green2"], C["green"], 12, True); f.arrow(554, 180, 594, 180, C["ink"], 2); f.box(596, 160, 80, 40, ["y"], C["red2"], C["red"], 13, True)
-f.text(690, 184, "0.04 + 0.07 + 0.04 = 0.15 (+ 0.10 setup = 0.25)", 12, C["line"], "start", False, True)
+f.text(690, 178, "0.04 + 0.07 + 0.04 = 0.15", 12, C["line"], "start", False, True); f.text(690, 196, "(+ 0.10 setup = 0.25)", 12, C["line"], "start", False, True)
 f.text(450, 250, "the analyzer prints 0.44 ns at output z: the longer of the paths, as computed here by hand", 12.5, C["ink"], "middle", True); f.save(f"{OUT}/ch10-sta.svg")
 # 10.4 adder delay vs width (example A)
 ws = A["W"]; ch = line_chart(860, 380, ws, [[r[0] for r in A["ripple"]], [r[0] for r in A["plus"]], [r[0] for r in A["kogge"]]], "Adder delay against width in the toy library (measured)", "adder width in bits (log scale)", "critical path (ns)", [C["red"], C["gray"], C["green"]], ["ripple chain", "'+' (Yosys default)", "Kogge-Stone prefix"], logx=True, xfmt="{:g}", yfmt="{:.1f}", ymin=0); ch.save(f"{OUT}/ch10-adders.svg")
@@ -42,5 +42,5 @@ f.box(470, 60, 400, 150, [], C["red2"], C["red"]); f.text(670, 84, "what a four-
 f.lines(450, 250, ["The two-valued function is the same, so the optimizer was free to rearrange it. Unreset flip-flops hold x in simulation, and the rearranged logic", "lets an x leak where the original did not. Fixes: reset everything (costs area) or start gate-level simulation from a defined state."], 12, C["line"], lh=18); f.save(f"{OUT}/ch10-xpess.svg")
 # 10.8 fault coverage
 pts = [(int(m.group(1)), float(m.group(3))) for m in re.finditer(r"^\s*(\d+)\s+(\d+)\s+([\d.]+)%", flt, re.M)]
-ch = line_chart(860, 380, [p[0] for p in pts], [[p[1] for p in pts], [100.0] * len(pts)], "Stuck-at fault coverage of the requantizer as the test set grows (measured on a 300-fault sample)", "vectors applied (log scale)", "coverage (%)", [C["blue"], C["green"]], ["directed + random vectors", "after the 71 generated patterns"], logx=True, xfmt="{:g}", yfmt="{:.0f}", ymin=0, ymax=100); ch.save(f"{OUT}/ch10-faults.svg")
+ch = line_chart(860, 380, [p[0] for p in pts], [[p[1] for p in pts]], "Stuck-at fault coverage of the requantizer as the test set grows (measured on a 300-fault sample)", "vectors applied (log scale)", "coverage of testable faults (%)", [C["blue"]], ["directed + random vectors (76% at the end; 100% after adding the 71 generated patterns)"], logx=True, xfmt="{:g}", yfmt="{:.0f}", ymin=0, ymax=100); ch.save(f"{OUT}/ch10-faults.svg")
 print("9 figures written")
