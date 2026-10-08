@@ -383,6 +383,18 @@ Worked answer: (a). The no-reuse program is correct and the reuse program overwr
 
 Worked answer: with `y` near `-x` the sum is tiny, and an int8 sum at a scale that holds the large operands rounds it to about zero, so even the correct compiler is far from floating point there. The graph exists to catch a compiler that picks the sum's scale from the sum alone: the rescaled operands then clip, and the sum of the clipped values is far from the real-number result, which check (d) reports. Random graphs almost never contain a cancellation, so only a directed case reveals that bug.
 
+**6. Why the scores' scale is 0.0625 and not 0.0201.**
+
+Worked answer: the softmax unit's input is defined as the score times 16 stored in an int8 (Q4.4), so the scale of the tensor feeding it must be exactly 1/16 = 0.0625. With scale 0.0201 the integers would mean three times larger real values than the softmax unit assumes (0.0625 / 0.0201 = 3.1), the exponentials would be those of the wrong numbers, and the probabilities wrong. The price of pinning is range: the scores can only reach 127/16 = 7.9 before they saturate, which the compiler checks and reports as a note.
+
+**7. The `MM` instructions for 5 x 12 times 12 x 10.**
+
+Worked answer: ceil(5/4) x ceil(10/4) = 2 x 3 = 6 instructions: (M, N) = (4, 4), (4, 4), (4, 2) for rows 0-3, and (1, 4), (1, 4), (1, 2) for row 4. All have K = 12, `lda` = 12 (the row length of A), `ldb` = 10 (the row length of B) and `ldc` = 10 (the row length of C).
+
+**8. Why width 64 fails even with reuse.**
+
+Worked answer: the second layer's weight matrix is 64 x 64 = 4,096 words, the whole scratchpad. The compiler must hold it together with the activations that feed and leave the product, so it cannot fit. At width 48 the same weight is 2,304 words, leaving room. A model that does not fit must be split into pieces (the compiler has no spilling; the page lists this as not covered).
+
 ---
 
 ## Chapter 12

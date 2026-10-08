@@ -1,0 +1,95 @@
+== PASS 0: the graph (what the user writes)
+  %0  = input             -> (1, 8)  q
+  %1  = input             -> (5, 8)  kc
+  %2  = input             -> (1, 8)  kn
+  %3  = concat   %1, %2   -> (6, 8)  
+  %4  = matmul   %0, %3   -> (1, 6)   ^T x0.3536
+  %5  = softmax  %4       -> (1, 6)  
+  %6  = input             -> (5, 8)  vc
+  %7  = input             -> (1, 8)  vn
+  %8  = concat   %6, %7   -> (6, 8)  
+  %9  = matmul   %5, %8   -> (1, 8)  
+  %10 = output   %9       -> (1, 8)  out
+
+== PASS 1: calibration: run the graph in floating point on 20 sample sets; each tensor's range is the largest |value| seen
+  %0  input    range   2.5978
+  %1  input    range   3.1547
+  %2  input    range   2.8494
+  %3  concat   range   3.1547
+  %4  matmul   range   2.5511
+  %5  softmax  range   0.7433
+  %6  input    range   3.6058
+  %7  input    range   3.0773
+  %8  concat   range   3.6058
+  %9  matmul   range   2.2089
+  %10 output   range   2.2089
+
+== PASS 2: scale planning: one int8 scale per tensor (range / 127), with groups and pinned scales
+  %0  input    scale 0.020455  (range/127 = 0.020455)
+  %1  input    scale 0.024840  (range/127 = 0.024840)  <- shares a scale with its concat result (same buffer)
+  %2  input    scale 0.024840  (range/127 = 0.022436)  <- shares a scale with its concat result (same buffer)
+  %3  concat   scale 0.024840  (range/127 = 0.024840)
+  %4  matmul   scale 0.062500  (range/127 = 0.020087)  <- pinned: softmax input must be Q4.4 (1/16)
+  %5  softmax  scale 0.007874  (range/127 = 0.005853)  <- pinned: softmax output is a probability, 1/127
+  %6  input    scale 0.028392  (range/127 = 0.028392)  <- shares a scale with its concat result (same buffer)
+  %7  input    scale 0.028392  (range/127 = 0.024231)  <- shares a scale with its concat result (same buffer)
+  %8  concat   scale 0.028392  (range/127 = 0.028392)
+  %9  matmul   scale 0.017393  (range/127 = 0.017393)
+  %10 output   scale 0.017393  (range/127 = 0.017393)
+
+== PASS 3: requantizer parameters: M = factor x scale_a x scale_b / scale_out, written as mantissa / 2^shift (Chapter 3)
+  node 4: M ~ 12345120 / 2^32 = 0.00287432
+  node 5: M ~ 16646144 / 2^33 = 0.00193787
+  node 9: M ~ 13800986 / 2^30 = 0.01285317
+
+== PASS 4: tiling: each matmul is cut into 4x4 output tiles, one MM instruction each
+  %4: (1 x 8) x (8 x 6) -> 1 x 2 = 2 tile(s): [rows 0-0, cols 0-3], [rows 0-0, cols 4-5]
+  %9: (1 x 6) x (6 x 8) -> 1 x 2 = 2 tile(s): [rows 0-0, cols 0-3], [rows 0-0, cols 4-7]
+
+== PASS 5: allocation: scratchpad words over time, recorded from the allocator itself, numbered in the order the events happen
+  events in order (the allocator is first-fit with coalescing; a buffer is released after its last consumer):
+    0: alloc   48 words at    0 ..   47
+    1: alloc    8 words at   48 ..   55
+    2: alloc    6 words at   56 ..   61
+    3: alloc    6 words at   62 ..   67
+    4: free     6 words at   62
+    5: free    48 words at    0
+    6: free     8 words at   48
+    7: alloc    6 words at    0 ..    5
+    8: alloc    6 words at    6 ..   11
+    9: free     6 words at    6
+   10: free     6 words at   56
+   11: alloc   48 words at    6 ..   53
+   12: alloc    8 words at   54 ..   61
+   13: alloc    8 words at   62 ..   69
+   14: free     8 words at   62
+   15: free     6 words at    0
+   16: free    48 words at    6
+   17: free     8 words at   54
+  scratchpad high-water mark with reuse: 70 words; without reuse: 132 words (of 4096)
+  note: kc and kn are VIEWS of one buffer (the concat result), as are vc and vn: the cache plus the new row is assembled in place, so the concatenation costs no instruction.
+
+== PASS 6: emission: the program
+    0  LD   dst=0 src=8 len=40
+    1  LD   dst=40 src=48 len=8
+    2  LD   dst=48 src=0 len=8
+    3  MM   dst=62 A=48 B=0 M=1 K=8 N=4 tb=1 lda=8 ldb=8 ldc=6
+    4  MM   dst=66 A=48 B=32 M=1 K=8 N=2 tb=1 lda=8 ldb=8 ldc=6
+    5  RQ   dst=56 src=62 len=6 m=12345120 s=32 relu=0
+    6  SM   dst=6 src=56 len=6
+    7  RQ   dst=0 src=6 len=6 m=16646144 s=33 relu=0
+    8  LD   dst=6 src=56 len=40
+    9  LD   dst=46 src=96 len=8
+   10  MM   dst=62 A=0 B=6 M=1 K=6 N=4 tb=0 lda=6 ldb=8 ldc=8
+   11  MM   dst=66 A=0 B=10 M=1 K=6 N=4 tb=0 lda=6 ldb=8 ldc=8
+   12  RQ   dst=54 src=62 len=8 m=13800986 s=30 relu=0
+   13  ST   src=54 dst=104 len=8
+   14  HALT
+
+15 instructions (including HALT); cycles on GA-2 (model): 484
+
+== checks: the compiled program against the integer interpreter, and against floating point
+  simulator output equals the interpreter's integers: True;  relative error against floating point: 2.36%
+  stage-wise real-number check (every tensor within one level of the meaning of its operation): no problems
+  output (float): [0.244, 0.209, 0.052, 0.244, -0.974, 1.078, 0.122, 0.417]
+  reference    : [0.239, 0.21, 0.044, 0.22, -0.998, 1.092, 0.125, 0.413]

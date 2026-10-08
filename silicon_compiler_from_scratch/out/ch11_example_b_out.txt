@@ -1,0 +1,29 @@
+== 1. the default graph (batch 4, 16 inputs, 32 hidden, 8 classes): compile, run, compare
+  40 instructions, scratchpad high-water 1728 words, 7740 cycles on GA-2 (model)
+  class (compiled): [2, 2, 1, 2]  class (floating point): [2, 2, 1, 2]  probabilities relative error 2.92%
+  RTL in Icarus     PASS: 1 programs match the Python reference (memory and all five cycle counters), 7740 cycles in total (exit status 0) (exit 0)
+  RTL in Verilator  PASS: 1 programs match the Python reference (memory and all five cycle counters), 7740 cycles in total (exit status 0) (exit 0)
+
+== 2. sweep the hidden width: footprint, cycles and accuracy (reference simulator + cycle model; the K <= 64 limit shows at 64 and above)
+  hidden  instr  spad words (reuse / no reuse)  cycles   error vs float   class agreement
+       8     28           256 /    512          1800        1.91%      DIFFER (see below)
+      16     32           448 /    992          3364        2.63%      all agree
+      32     40          1728 /   2336          7740        1.88%      all agree
+      48     48          3328 /   full         13780        2.44%      all agree
+      64  does not compile: scratchpad is full: cannot place a buffer of 4096 words (free: 3840 words in 2 pieces)
+  note: hidden 8: sample 2 gets class 1 instead of 6; the two largest floating-point probabilities are 0.166 and 0.165, a gap of 0.001
+  (a class flips only where two probabilities are nearly tied: a 2% error in the probabilities can reorder a 0.001 gap. The probabilities themselves stay within about 2-3% in every row.)
+
+== 3. what Capra refuses, with the exact message and the fix
+  a product with inner dimension 65
+      message: matmul node 2: inner dimension 65 exceeds the matrix unit's limit of 64
+      fix: split the contraction into pieces of at most 64 (the hardware has no int32 accumulate instruction), or reduce the width
+  a relu that is not directly after a matmul
+      message: relu on node 1 (add) cannot be fused into a requantizer
+      fix: put the relu directly after a matmul that has no other consumer (the compiler fuses it into the requantizer)
+  matrix shapes that do not match
+      message: matmul shapes (2, 3) x (4, 4)
+      fix: check the shapes; transpose_b=True multiplies by the transpose of the second operand
+  tensors too big for the 4,096-word scratchpad (a 64 x 64 weight is the whole of it)
+      message: scratchpad is full: cannot place a buffer of 4096 words (free: 3584 words in 1 pieces)
+      fix: use smaller tensors or fewer live at once (the allocator already reuses dead buffers); a bigger model must be split into pieces that fit
