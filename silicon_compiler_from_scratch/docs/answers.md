@@ -419,6 +419,18 @@ Worked answer: for example "A's row step uses K instead of lda" and "C's row ste
 
 Worked answer: for the tiling, the compiler's battery of Chapter 11 (the interpreter and every-tensor checks) and then the capstone; for the requantizer RTL, Chapter 3's 201,808-vector comparison and mutation run, then Chapter 7's program suite (which uses `RQ`) and, since the requantizer is the chip's critical path, the gate-level checks of Chapter 10.
 
+**6. The first four tokens of each rule.**
+
+Worked answer: for f(t) = (5t + 3) mod 16 starting at 0: 5 x 0 + 3 = 3; 5 x 3 + 3 = 18, mod 16 = 2; 5 x 2 + 3 = 13; 5 x 13 + 3 = 68, mod 16 = 4: so 0, 3, 2, 13, 4. For f(t) = (3t + 7) mod 16: 7; 3 x 7 + 7 = 28, mod 16 = 12; 3 x 12 + 7 = 43, mod 16 = 11; 3 x 11 + 7 = 40, mod 16 = 8: so 0, 7, 12, 11, 8. Both match the closed forms in the run outputs.
+
+**7. Would a logit error of 5.0 change the decision?**
+
+Worked answer: the margin between the winner (+7.82) and the next logit (+0.5) is about 7.3. If each logit can be wrong by 5.0, their difference can be wrong by up to 10, which exceeds the margin, so the decision could flip. With the measured error of 0.05 the difference moves by at most 0.1, 1.4% of the margin. A decision is safe when the margin exceeds twice the largest error on a logit; this model has a wide margin, which is why int8 is safe here and why the generic random model (small margins) flips about 3% of the time.
+
+**8. Why fix the KV cache's range from outside?**
+
+Worked answer: each decode step is a separately compiled program, and without `ranges=` each would calibrate its own scale for k and v from its own context length. The host stores the cache as the dequantized values the chip returned and re-quantizes it with the next program's scale; if that scale changed from step to step, every step would re-round every cached row at a different resolution and the scale would depend on the length of the context. Fixing one range for the `k` and `v` tags (taken over all steps in calibration) gives every program the same scale for the cache.
+
 ---
 
 ## Chapter 1 (additional questions)

@@ -1,0 +1,35 @@
+model: 16 tokens, width 16, feed-forward 32, one layer, one head. The designed rule is f(t) = (5t + 3) mod 16.
+the weights are constructed so that rule holds; attention and the feed-forward block run for real but are small (Chapter 12 text).
+
+step  context  in -> out   float winner   gap (best - 2nd, as % of logit range)   logits (chip, as int8 x scale): top three
+   1        1   0 ->  3       3              81.2%                              tok 3: +9.08, tok 14: +1.36, tok 8: +1.00
+   2        2   3 ->  2       2              83.4%                              tok 2: +7.47, tok 3: +1.01, tok 8: +0.93
+   3        3   2 -> 13      13              87.3%                              tok 13: +7.82, tok 3: +0.50, tok 10: +0.43
+   4        4  13 ->  4       4              87.5%                              tok 4: +8.01, tok 5: +0.63, tok 9: +0.49
+   5        5   4 ->  7       7              86.6%                              tok 7: +7.34, tok 1: +0.69, tok 3: +0.35
+   6        6   7 ->  6       6              89.7%                              tok 6: +7.89, tok 1: +0.49, tok 3: +0.35
+   7        7   6 ->  1       1              88.4%                              tok 1: +8.31, tok 12: +0.35, tok 15: +0.21
+   8        8   1 ->  8       8              83.9%                              tok 8: +8.01, tok 11: +0.56, tok 6: +0.28
+
+one step in detail (step 3): the 16 logits, chip against floating point (a logit is the model's score for each possible next token)
+  token  0  float  -0.178   chip  -0.143   diff +0.034
+  token  1  float  +0.192   chip  +0.143   diff -0.048
+  token  2  float  +0.278   chip  +0.287   diff +0.009
+  token  3  float  +0.508   chip  +0.502   diff -0.006
+  token  4  float  -0.051   chip  -0.072   diff -0.021
+  token  5  float  +0.354   chip  +0.359   diff +0.005
+  token  6  float  +0.181   chip  +0.215   diff +0.034
+  token  7  float  -0.116   chip  -0.143   diff -0.027
+  token  8  float  +0.253   chip  +0.287   diff +0.034
+  token  9  float  +0.120   chip  +0.143   diff +0.023
+  token 10  float  +0.472   chip  +0.430   diff -0.042
+  token 11  float  -0.222   chip  -0.215   diff +0.007
+  token 12  float  +0.439   chip  +0.430   diff -0.008
+  token 13  float  +7.827   chip  +7.818   diff -0.009   <- winner
+  token 14  float  -0.049   chip  +0.000   diff +0.049
+  token 15  float  -0.554   chip  -0.574   diff -0.020
+
+the winner (13) is the token the rule says follows 2: f(2) = 13.
+the largest chip-vs-float difference on any logit at this step is 0.049, against a winning margin of 7.32: the margin is what makes int8 safe here.
+
+what the host did at each step (the chip has no instruction for these): picked the embedding row of the input token, kept the KV cache in its own memory between steps, fed the chosen token back.

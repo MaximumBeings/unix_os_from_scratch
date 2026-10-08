@@ -25,7 +25,7 @@ step  context  instr  cycles  matrix    DMA  vector  token
   24       24     74    9039    5196   3203     490  1 -> 8
 
 24 tokens: 192710 cycles in all, 8030 per token on average (first step 7000, last 9039).
-At the 10.74 ns critical path of Chapter 10's toy-library timing (93 MHz) that would be 11582 tokens per second -- a toy-library, no-memory-timing figure, quoted only to show the order of magnitude.
+At the 10.47 ns critical path of Chapter 10's toy-library timing (96 MHz) that would be 11956 tokens per second -- a toy-library, no-memory-timing figure, quoted only to show the order of magnitude.
 
 == 4. a generic model: random weights, random embeddings (so the answer is not designed). Teacher-forced: both systems see the same tokens; how often does the chip pick the token floating point picks?
 3 models x 16 start tokens x 12 steps = 576 decisions: the chip agrees with floating point on 559 (97.0%); relative logit error: mean 2.3%, worst 6.1%

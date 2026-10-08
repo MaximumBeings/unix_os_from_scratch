@@ -3,7 +3,7 @@
 import math, os, random, re, sys
 os.environ["GA2_EXT"] = "8192"
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "model"))
-import hw, ga2_isa as I, ga2_progs as G, compiler as C, tiny_lm as T
+import hw, ga2_isa as I, ga2_progs as G, capra as C, tiny_lm as T
 F = ["rtl/sram.v", "rtl/dma.v", "rtl/systolic.v", "rtl/requant.v", "rtl/exp_lut.v", "rtl/divu.v", "rtl/rowmem.v", "rtl/ga2_vec.v", "rtl/ga2_sm.v", "rtl/ga2_mm.v", "rtl/ga2.v", "tb/extmem_rw.v", "tb/ga2_tb.v"]
 def line(out): return ([l for l in out.splitlines() if l.startswith(("PASS", "FAIL", "MISMATCH"))] or out.strip().splitlines()[-2:])[0]
 N = 24; m = T.make_model("structured")
@@ -37,7 +37,7 @@ for i, r in enumerate(rec):
     if i < 4 or i >= N - 2 or i % 6 == 5: print(f"{i+1:4d} {r['L']:8d} {n:6d} {tot:7d} {mm_:7d} {dma:6d} {vec:7d}  {toks[i]} -> {toks[i+1]}")
 total = sum(res[i][0] for i in range(N))
 print(f"\n24 tokens: {total} cycles in all, {total/N:.0f} per token on average (first step {res[0][0]}, last {res[N-1][0]}).")
-print(f"At the 10.74 ns critical path of Chapter 10's toy-library timing (93 MHz) that would be {93e6/(total/N):.0f} tokens per second -- a toy-library, no-memory-timing figure, quoted only to show the order of magnitude.")
+print(f"At the 10.47 ns critical path of Chapter 10's toy-library timing (96 MHz) that would be {96e6/(total/N):.0f} tokens per second -- a toy-library, no-memory-timing figure, quoted only to show the order of magnitude.")
 print("\n== 4. a generic model: random weights, random embeddings (so the answer is not designed). Teacher-forced: both systems see the same tokens; how often does the chip pick the token floating point picks?")
 agree = tot_steps = 0; errs = []
 for seed in (1, 2, 3):
