@@ -1,5 +1,5 @@
-site_name: Silicon Compiler from Scratch -- An Open-Source LLM-Inference Accelerator, From Verilog to the Compiler That Targets It -- Under Development
-site_description: A systolic array in Verilog, int8 quantization, KV cache and batching, bandwidth analysis, a Yosys synthesis flow, and a compiler from a model graph to the chip. Open-source tools only.
+site_name: "Capra: Silicon Compiler from Scratch"
+site_description: "Capra, a compiler for an open-source LLM-inference accelerator, built from scratch - a systolic array in Verilog, int8 quantization, KV cache and batching, a Yosys synthesis flow, and the compiler that targets the chip. Open-source tools only."
 site_author: Oluwaseyi Awoga
 copyright: Copyright &copy; 2026 Oluwaseyi Awoga
 

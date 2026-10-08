@@ -1,0 +1,23 @@
+cycles for ONE decode step at context length t (cycle model); the circuit's counter in brackets where it was run
+   t   cached  recompute   ratio
+   1     2500       2460    0.98
+   2     2601       2723    1.05   circuit 2601 / 2723: agrees
+   3     2680       2986    1.11
+   4     2759       3249    1.18   circuit 2759 / 3249: agrees
+   6     2957       4543    1.54
+   8     3115       5069    1.63   circuit 3115 / 5069: agrees
+  12     3471       6889    1.98
+  16     3827       8709    2.28   circuit 3827 / 8709: agrees
+  24     4539      12349    2.72
+  32     5251      15989    3.04   circuit 5251 / 15989: agrees
+
+generating 32 tokens one after another: cached 124,346 cycles in total, recompute 295,184 cycles (2.37x)
+per token, the cached step grows from 2500 to 5251 cycles (+89 per extra token); recompute from 2460 to 15989 (+436 per extra token)
+
+== the memory side (derived arithmetic)
+GA-2 head, int8: 2 x 16 x 1 = 32 bytes of cache per token. A decode step at context t RE-READS the whole cache: LD of (t-1) rows of K and of V = 2 x 16 x (t-1) words
+  GA-2 head                                                       32 bytes/token         0.1 MiB at 2,048 tokens      0.00 GiB at 32,768
+  a 1B-class model: 16 layers x 16 heads x 64, fp16           65,536 bytes/token       128.0 MiB at 2,048 tokens      2.00 GiB at 32,768
+  a 7B-class model: 32 x 32 x 128, fp16                      524,288 bytes/token      1024.0 MiB at 2,048 tokens     16.00 GiB at 32,768
+  a 70B-class model with 8 KV heads: 80 x 8 x 128, fp16      327,680 bytes/token       640.0 MiB at 2,048 tokens     10.00 GiB at 32,768
+(the last line anticipates Chapter 14: sharing keys and values between query heads shrinks the cache by the ratio of query heads to KV heads)

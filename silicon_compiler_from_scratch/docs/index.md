@@ -1,4 +1,4 @@
-# Silicon Compiler from Scratch
+# Capra: Silicon Compiler from Scratch
 
 ![index](assets/art/index.svg)
 

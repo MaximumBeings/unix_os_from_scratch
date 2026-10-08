@@ -1,0 +1,24 @@
+keys   K = [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0], [-1.0, 0.0]]
+values V = [[1.0, 0.0], [0.0, 2.0], [2.0, 2.0], [-1.0, 1.0]]
+the newest token's query q = [1.0, 0.5]    (width d = 2, so scores are divided by sqrt(2) = 1.4142)
+
+== 1. real numbers
+scores   = K q / sqrt(d) = [0.7071, 0.3536, 1.0607, -0.7071]    (position 2 is most similar to q: K[2] = [1,1])
+weights  = softmax(scores) = [0.2968, 0.2084, 0.4227, 0.0722]   sum = 1.0
+output   = weights V = [1.07, 1.3343]   <- a weighted average of the four value vectors
+check one component by hand: out[0] = 0.2968*1 + 0.2084*0 + 0.4227*2 + 0.0722*(-1) = 1.0700
+
+== 2. the chip's integers: score x 16 as an int8 (Q4.4), integer softmax, weights as int8 in 0..127
+scores x 16, rounded      = [11, 6, 17, -11]
+integer softmax (Q0.16)   = [19054, 13940, 27724, 4818]   =  [0.2907, 0.2127, 0.423, 0.0735]  sum = 65536
+weights as int8 (x127)    = [37, 27, 54, 9]   sum = 127
+error of the weights:  [0.00605, 0.00431, 0.00038, 0.00136]
+output from int8 weights  = [1.0709, 1.3465]   vs real [1.07, 1.3343]
+
+== 3. the same four tokens as a PREFILL: every token attends at once, with the causal mask (a token may not see later ones)
+  token 0 attends with weights [1.0, 0.0, 0.0, 0.0]
+  token 1 attends with weights [0.33, 0.67, 0.0, 0.0]
+  token 2 attends with weights [0.248, 0.248, 0.503, 0.0]
+  token 3 attends with weights [0.297, 0.208, 0.423, 0.072]
+the last row equals the decode weights of part 1: True
+so decoding the 4th token needs only the last row; with a KV cache, the other three rows are never recomputed.
