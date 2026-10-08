@@ -1,0 +1,15 @@
+NOTE: this script deliberately breaks copies of the RTL. 'caught' lines are EXPECTED: they show the programs notice the mistake.
+UNPACK: the fields are taken in reverse order: caught
+UNPACK: the fields are not sign-extended: caught
+UNPACK: outputs advance 4 words per source word, not 8: caught
+UNPACK: one source word too many: caught
+UNPACK: the last field of each word is skipped: caught
+UNPACK: the word is latched before the read data is valid: caught
+UNPACK: reads one word too high: caught
+UNPACK: the length field is 8 bits wide: caught
+UNPACK: the destination field is read from the source field: caught
+sequencer: UNPACK's write enable is dropped: caught
+sequencer: UNPACK is counted as DMA time: caught
+sequencer: UNPACK's completion is never seen: caught
+
+UNPACK: 12 of 12 broken circuits caught
