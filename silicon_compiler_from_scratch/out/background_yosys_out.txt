@@ -1,0 +1,32 @@
+2.25. Printing statistics.
+
+=== vote3_assign ===
+
+   Number of wires:                  8
+   Number of wire bits:              8
+   Number of public wires:           4
+   Number of public wire bits:       4
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                  5
+     $_AND_                          3
+     $_OR_                           2
+
+2.26. Executing CHECK pass (checking for obvious problems).
+Checking module vote3_assign...
+Found and reported 0 problems.
+
+3. Executing ABC pass (technology mapping using ABC).
+   Number of cells:                  5
+     $_AND_                          3
+     $_OR_                           2
+
+   Number of cells:                  4
+     $_SDFF_PP0_                     3
+     vote3_assign                    1
+
+   Number of cells:                  8
+     $_AND_                          3
+     $_OR_                           2
+     $_SDFF_PP0_                     3

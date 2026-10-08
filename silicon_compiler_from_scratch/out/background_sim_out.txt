@@ -1,0 +1,21 @@
+a b c | assign always gates | expected
+0 0 0 |   0      0      0   |    0
+0 0 1 |   0      0      0   |    0
+0 1 0 |   0      0      0   |    0
+0 1 1 |   1      1      1   |    1
+1 0 0 |   0      0      0   |    0
+1 0 1 |   1      1      1   |    1
+1 1 0 |   1      1      1   |    1
+1 1 1 |   1      1      1   |    1
+
+clocked: input d is shifted in on each rising edge; y is the vote of the last three values
+cycle 0  d=0  window=000  y=0
+cycle 1  d=1  window=001  y=0
+cycle 2  d=1  window=011  y=1
+cycle 3  d=1  window=111  y=1
+cycle 4  d=0  window=110  y=1
+cycle 5  d=0  window=100  y=0
+cycle 6  d=1  window=001  y=0
+cycle 7  d=0  window=010  y=0
+PASS: all three descriptions agree with the majority function (exit status 0)
+tb/demo_vote3_tb.v:20: $finish called at 86000 (1ps)

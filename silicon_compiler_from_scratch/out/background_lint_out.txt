@@ -1,0 +1,8 @@
+%Warning-WIDTHTRUNC: /tmp/lint_demo.v:2:14: Operator ASSIGNW expects 3 bits on the Assign RHS, but Assign RHS's VARREF 'a' generates 4 bits.
+                                          : ... note: In instance 'lint_demo'
+    2 |     assign y = a;
+      |              ^
+                     ... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.020
+                     ... Use "/* verilator lint_off WIDTHTRUNC */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: /tmp/lint_demo.v:1:30: Bits of signal are not used: 'a'[3]
+                                            : ... note: In instance 'lint_demo'
