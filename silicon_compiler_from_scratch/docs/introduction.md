@@ -91,7 +91,7 @@ The host looks up the token's embedding (the chip has no gather instruction). Th
 | **3. The Whole Chip** | 7 GA-2; 8 Attention and the KV cache; 9 Batching and bandwidth | What is the machine, as a programmer sees it? What does a language model compute per token? Why is decoding slow and what helps? | a chip that runs programs; an attention step; a batched decoder and a roofline |
 | **4. Verilog to Gates** | 10 Synthesis, timing and gate-level verification | Can it be built, how fast, and are we sure the netlist still works? | a 31,580-cell netlist passing the same programs |
 | **5. Compilation** | 11 Capra; 12 Capstone | Can a program write the programs? Does the whole stack work together? | a tiny transformer decoding 24 tokens on the chip |
-| **6. Case Studies** *(in progress)* | 13 to 17 | How do the techniques of industrial inference (int4 weights, grouped-query attention, paged KV cache, speculative decoding, mixture of experts) fit this stack? | each technique built and tested on the same chip and compiler |
+| **6. Case Studies** | 13 to 17 | How do the techniques of industrial inference (int4 weights, grouped-query attention, paged KV cache, speculative decoding, mixture of experts) fit this stack? | each technique built and tested on the same chip and compiler |
 
 Outside the parts: **Getting Started** (install and verify the tools), **Background** (what Verilog is and what each tool does), the **Appendices** (primers; *in progress*), and the **Answers** to every chapter's self-check questions.
 

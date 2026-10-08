@@ -1,0 +1,20 @@
+== 1. software checks: the router sends each token to its group's expert; any other expert breaks the rule for every token; the chip's route equals the float route; programs equal the interpreter; the dense (no routing) model agrees
+  problems: none
+
+== 2. 24 decode steps of the structured model
+  routed decode follows the rule: True; routes: [0, 3, 2, 1, 0, 3, 2, 1, 0, 3, 2, 1, 0, 3, 2, 1, 0, 3, 2, 1, 0, 3, 2, 1]
+  dense-all decode follows the rule: True
+  routed (A then B_e)         Icarus    PASS: 48 programs match the Python reference (memory and all five cycle counters), 198614 cycles in total (exit status 0) (exit 0)
+  routed (A then B_e)         Verilator PASS: 48 programs match the Python reference (memory and all five cycle counters), 198614 cycles in total (exit status 0) (exit 0)
+  dense-all (every expert)    Icarus    PASS: 24 programs match the Python reference (memory and all five cycle counters), 399542 cycles in total (exit status 0) (exit 0)
+  dense-all (every expert)    Verilator PASS: 24 programs match the Python reference (memory and all five cycle counters), 399542 cycles in total (exit status 0) (exit 0)
+  Chapter 12 model (1 FFN)    Icarus    PASS: 24 programs match the Python reference (memory and all five cycle counters), 192710 cycles in total (exit status 0) (exit 0)
+  Chapter 12 model (1 FFN)    Verilator PASS: 24 programs match the Python reference (memory and all five cycle counters), 192710 cycles in total (exit status 0) (exit 0)
+
+decoder                               feed-forward weights  programs   step 1  step 24  24 steps  vs 1 FFN
+one feed-forward block (Chapter 12)                   1024        24     7000     9039    192710     1.00x
+4 experts, routed (one used)                          4096        48     7246     9285    198614     1.03x
+4 experts, dense (all used)                           4096        24    15618    17657    399542     2.07x
+
+  routed step 24: program A 5589 cycles (matrix 3162, DMA 1975, vector 344); program B 3696 cycles (matrix 2144, DMA 1353, vector 141)
+  the price of the second program: B's 1353 DMA cycles include loading h again and the output matrix; the dispatch itself costs no chip cycles (the host picks the program)

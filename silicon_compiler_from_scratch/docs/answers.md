@@ -605,6 +605,49 @@ Worked answer: if the bonus token is dropped, the next block starts from the las
 5. Try making the draft's argmax tie-break differently (lowest index versus highest): the output cannot change, so the tests cannot catch it; it is an equivalent mutant for exactness and a quality difference for the acceptance rate.
 ---
 
+## Chapter 17
+
+**1. Why two programs, and what does the host do between them?**
+
+Worked answer: the chip executes a fixed instruction sequence; it has no branch, so a program cannot choose which expert's weights to use depending on a value it computed. Program A computes the router's choice and writes it out (with `h`). The host reads the choice, picks the compiled program of that expert and starts it with `h` as input.
+
+**2. Why does a wrong expert give the input token?**
+
+Worked answer: each expert has hidden units that fire only for the four tokens of its own group. A token of another group fires none of them, so the expert outputs about zero, `y = h` stays equal to the token's own embedding, and the output matrix (which reads embeddings) gives the highest logit to the token that was just given.
+
+**3. Why do all the B programs cost the same?**
+
+Worked answer: cycle counts depend on the shapes of the matrices and the instruction sequence, which are identical for the four experts (same sizes, same instructions); only the weight values differ. A difference would need different expert sizes, a different number of rows, or different instruction sequences.
+
+**4. Distinct experts for B = 4, E = 8.**
+
+Worked answer: 8 * (1 - (7/8)^4) = 8 * (1 - 0.586) = 3.31.
+
+**5. Why not 50%?**
+
+Worked answer: eight separate programs each pay the fixed cost of a program (loading the weights, the output matrix and the fetch and halt); four grouped programs pay it four times, plus the cost of the additional rows. The grouped cost is 4 fixed + 8 rows' worth of arithmetic, so it is more than half of 8 fixed + 8 rows' worth.
+
+**6. Why is a flipped route a bigger error than a flipped rounding?**
+
+Worked answer: a rounding error changes a logit by a fraction of a step. A flipped route replaces the whole function that processes the token (a different expert with different weights), so the output can change completely; on the structured model it changes the predicted token for sure.
+
+**7. Why is top-1 without a gate acceptable here but not for training?**
+
+Worked answer: here nothing is trained and the decision is what matters. In training, the gate (the router's probability multiplying the expert's output) is the path by which the loss sends a gradient to the router; without it the router would get no learning signal.
+
+**8. Why did the output tests miss the wrong memory image?**
+
+Worked answer: the outputs come from running the reference simulator with the correct `h`; the record kept for the RTL replay is built separately, and a replay of a self-consistent but wrong image passes (the RTL agrees with the reference run on the wrong data). Only a check that compares the image with the `h` that program A produced sees the difference.
+
+## Chapter 17 -- hints for the exercises
+
+1. Take the two best router scores; run B for both experts and add their `h`-relative outputs on the host (or build a B with two experts); expect about 2x the expert-stage cost.
+2. Multiply `Wr` by 0.2: the winner's score falls to about 0.4 and the others to about 0.1, close to the int8 step; look for flips at the 0.2-0.1 range.
+3. Count, per expert, tokens beyond the second; those are dropped (the residual passes through unchanged).
+4. For `E = 8` each expert has two tokens; the touched-experts formula is `8 (1 - (7/8)^B)`.
+5. Calibrate with a start set that never reaches one expert so that the fallback runs; check whether the program still compiles and follows the rule.
+---
+
 ## Chapter 1 (additional questions)
 
 **6. In the ripple example the `sum` bus shows `6, 4, 0, 8` after 7 + 1. Why are there wrong values at all, and how long after the inputs change is the answer valid?**

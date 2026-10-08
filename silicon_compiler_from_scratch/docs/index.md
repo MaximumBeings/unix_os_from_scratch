@@ -20,7 +20,7 @@ This book builds a small neural-network accelerator the way a chip team would, i
 | **3. The Whole Chip** | 7-9 | An instruction set, a sequencer and a chip that runs programs; attention with a KV cache; batching and a roofline analysis of why decoding is slow |
 | **4. From Verilog to Gates** | 10 | Synthesis to a cell library, a timing analyzer, gate-level simulation, fault grading and equivalence checking |
 | **5. Compilation** | 11-12 | Capra, a compiler from a model graph to the chip's instructions; a tiny transformer decoding tokens on the simulated silicon |
-| **6. Case Studies** *(in progress)* | 13-17 | Industrial techniques built and tested on the stack: int4 weight-only quantization, grouped-query attention, paged KV cache with a sliding window, speculative decoding, mixture-of-experts routing |
+| **6. Case Studies** | 13-17 | Industrial techniques built and tested on the stack: int4 weight-only quantization, grouped-query attention, paged KV cache with a sliding window, speculative decoding, mixture-of-experts routing |
 | **Appendices** *(in progress)* | A-G | Primers: digital logic, Verilog, number formats, linear algebra for ML, transformers and LLM inference, memory systems, the EDA flow |
 
 **The rules of the book**

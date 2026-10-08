@@ -75,4 +75,5 @@ nav:
       - "14. Grouped-Query Attention": part14/14-grouped-query-attention.md
       - "15. A Paged KV Cache and Sliding-Window Attention": part15/15-paged-cache-and-window.md
       - "16. Speculative Decoding": part16/16-speculative-decoding.md
+      - "17. Mixture-of-Experts Routing": part17/17-mixture-of-experts.md
   - Answers to the Self-Check Questions: answers.md

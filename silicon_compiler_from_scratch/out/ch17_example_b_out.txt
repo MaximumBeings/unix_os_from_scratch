@@ -1,0 +1,29 @@
+== 1. does int8 quantization flip the router's decision?  Random MoE models, teacher-forced on the float tokens (3 models x 16 starts x 12 steps = 576 decisions)
+   chip route = float route on 569/576 decisions (98.8%); 7 flips, all at a float margin (top-1 minus top-2 over the logit range) of at most 0.152
+   token agreement with float: when the route agrees 555/569 (97.5%); when the route flipped 2/7 (28.6%)
+   float margins: median 0.32; 9.9% of decisions have a margin under 0.05 and 25.9% under 0.15: those are the decisions int8 noise can flip
+
+== 2. load balance and the experts a batch touches
+   how often the float router chose each expert on the random models: [165, 107, 196, 108] of 576 ([29, 19, 34, 19]%): not uniform. The structured model is perfectly balanced by construction: 6 tokens per expert per 24 steps.
+   expected number of DISTINCT experts one decode step of B concurrent requests touches (each reads its token's expert once per step), E = 4: uniform router, and the measured skew above
+   B  uniform (formula)  uniform (simulated)  skewed (simulated)   of 4
+   1               1.00                 1.00                1.00    25%
+   2               1.75                 1.75                1.74    44%
+   4               2.73                 2.73                2.68    68%
+   8               3.60                 3.61                3.52    90%
+  16               3.96                 3.96                3.92    99%
+  32               4.00                 4.00                4.00   100%
+   at B = 1 only a quarter of the expert weights are read; at B = 16 almost all of them are: the saving of an MoE shrinks with the batch, and a skewed router reads fewer experts but makes the busiest one the bottleneck
+
+== 3. grouped execution on the chip: 8 tokens' h vectors (taken from 8 consecutive steps of the structured decode), run expert by expert with the tokens routed to it as the rows of one program
+   8 tokens routed as [(0, 2), (1, 2), (2, 2), (3, 2)] (expert, tokens); one B program per expert with that many rows
+   cycles: 8 separate B programs 29,568; 4 grouped programs 17,048 (0.58 of the separate cost); the chosen tokens are identical to the separate runs: True
+   grouping is what makes a batch of tokens cheap: each expert's weights are loaded once for all the tokens that use it. It needs the host to reorder the batch, and an expert that gets one token still pays the full weight load
+
+== 4. serving arithmetic (DERIVED, ASSUMED): a model whose feed-forward weights are 8 GB per layer-stack as a dense model, or split into E experts with top-1 routing; everything else (attention, embeddings) 4 GB, int8; bandwidth-bound; tokens/s at 1 TB/s
+   E  total weights  active at B=1  tokens/s, B=1  B=8: experts touched  tokens/s per request, B=8
+   1           12 GB           12 GB             83                  1.00                         83
+   4           36 GB           12 GB             83                  3.60                         30
+  16          132 GB           12 GB             83                  6.45                         18
+  64          516 GB           12 GB             83                  7.58                         15
+   (an expert here is a full 8 GB feed-forward stack, so E experts hold E times the knowledge capacity.) At B = 1 the speed is that of the dense 12 GB model whatever E is; at B = 8 the larger E touches more distinct experts and the speed per request falls toward that of a model with all the experts loaded. The capacity to store all experts is the real cost of an MoE: the chip must hold 4 + 8E GB

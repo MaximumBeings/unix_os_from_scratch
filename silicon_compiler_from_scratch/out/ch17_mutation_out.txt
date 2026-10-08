@@ -1,0 +1,24 @@
+NOTE: this script deliberately breaks copies of the model. 'caught' is EXPECTED: it shows the checks notice the mistake.
+unbroken model passes: True
+dispatch: the host runs the next expert: caught
+dispatch: the host always runs expert 0: caught
+router: the float step takes the least likely expert: caught
+router: the router weight is applied to x instead of h: caught
+router: the router reads the wrong columns (two experts swapped): caught
+expert: the second matrix comes from the next expert: caught
+expert: the residual connection is left out of B: caught
+expert: the relu is left out of B: caught
+expert: the float step uses expert 0's weights: caught
+hand-over: program B gets the integer h instead of the real h: caught
+hand-over: program B's external memory is built from a different h: caught
+hand-over: the router's choice is read from the wrong output: caught
+structured model: the experts are assigned to the wrong groups: caught
+structured model: an expert's output does not subtract the input: caught
+cache: the new key and value are swapped on the way back: caught
+dense comparison: only expert 0 is added: caught
+
+mixture of experts: 16 of 16 broken versions caught
+
+Changes that look like bugs and are not:
+EQUIVALENT in effect: the record reports the router's choice as the expert that ran (the same thing whenever the dispatch is right; a wrong dispatch is caught by the tokens and by the check of the program that ran): NOT CAUGHT
+NOT EXERCISED (every expert is used in the calibration runs, so the fallback never runs; a test that left an expert unused would exercise it): NOT CAUGHT
