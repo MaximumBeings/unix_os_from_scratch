@@ -1,0 +1,55 @@
+site_name: Silicon Compiler from Scratch -- An Open-Source LLM-Inference Accelerator, From Verilog to the Compiler That Targets It -- Under Development
+site_description: A systolic array in Verilog, int8 quantization, KV cache and batching, bandwidth analysis, a Yosys synthesis flow, and a compiler from a model graph to the chip. Open-source tools only.
+site_author: Oluwaseyi Awoga
+copyright: Copyright &copy; 2026 Oluwaseyi Awoga
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: amber
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: amber
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - toc.follow
+    - search.suggest
+    - content.code.copy
+  icon:
+    logo: material/chip
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - tables
+  - toc:
+      permalink: true
+  - attr_list
+  - md_in_html
+
+plugins:
+  - search
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - "1. The Flow: One Circuit Through Four Tools, and a Way to Test the Tests": part01/01-the-flow.md
+  - Answers to the Self-Check Questions: answers.md

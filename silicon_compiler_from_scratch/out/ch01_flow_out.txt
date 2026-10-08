@@ -1,0 +1,18 @@
+== 1. the golden model writes the 512 expected answers
+512 cases written to out/adder4_vectors.hex
+
+== 2. Icarus Verilog
+PASS: all 512 cases match the golden model
+tb/adder4_tb.v:15: $finish called at 512000 (1ps) 
+(exit status 0)
+
+== 3. Verilator, a second, independent simulator
+PASS: all 512 cases match the golden model
+- tb/adder4_tb.v:15: Verilog $finish 
+(exit status 0)
+
+== 4. Yosys, generic gates
+cells after mapping to simple gates: {'$_NAND_': 12, '$_XOR_': 8} total 20
+
+== 5. Yosys, for an FPGA (the Lattice iCE40 family's 4-input lookup tables)
+cells: {'SB_LUT4': 9} total 9

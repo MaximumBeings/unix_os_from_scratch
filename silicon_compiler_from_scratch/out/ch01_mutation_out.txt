@@ -1,0 +1,16 @@
+NOTE: this script deliberately breaks copies of rtl/adder4.v. 'caught' lines are EXPECTED: they show the testbench can detect the mistake.
+sum: the carry-in is left out of the sum: caught
+sum: an AND instead of an XOR: caught
+carry: the carry-in term is dropped: caught
+carry: OR instead of AND between the generate and propagate terms: caught
+chain: every stage takes the adder's own carry-in: caught
+chain: stage i feeds stage i, not stage i + 1: caught
+chain: the carry-in is tied to zero: caught
+output: the carry-out is taken one stage early: caught
+wiring: bit 1 of b is replaced by bit 1 of a: caught
+structure: only three of the four stages are built: caught
+
+10 of 10 broken circuits caught
+
+An equivalent change (same behaviour, different text):
+EQUIVALENT: carry written with OR instead of XOR for the propagate term: NOT CAUGHT
