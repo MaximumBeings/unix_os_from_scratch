@@ -1,0 +1,38 @@
+== 1. eight shapes in both simulators: TILE words, CPW compute cycles per word, LAT memory latency, T tiles
+(the first shape is the one the four overhead constants of the schedule model were read from; the other seven are predictions)
+6 tiles of 16 words written to out/dbuf_vectors.hex; schedule model: serial 252 cycles, double-buffered 157
+  Icarus    PASS: TILE=16 CPW=1 LAT=4, 6 tiles: sums match, cycles serial=252 double-buffered=157 match the schedule model (exit status 0) (exit 0)
+  Verilator PASS: TILE=16 CPW=1 LAT=4, 6 tiles: sums match, cycles serial=252 double-buffered=157 match the schedule model (exit status 0) (exit 0)
+6 tiles of 16 words written to out/dbuf_vectors.hex; schedule model: serial 348 cycles, double-buffered 233
+  Icarus    PASS: TILE=16 CPW=2 LAT=4, 6 tiles: sums match, cycles serial=348 double-buffered=233 match the schedule model (exit status 0) (exit 0)
+  Verilator PASS: TILE=16 CPW=2 LAT=4, 6 tiles: sums match, cycles serial=348 double-buffered=233 match the schedule model (exit status 0) (exit 0)
+5 tiles of 8 words written to out/dbuf_vectors.hex; schedule model: serial 280 cycles, double-buffered 196
+  Icarus    PASS: TILE=8 CPW=4 LAT=10, 5 tiles: sums match, cycles serial=280 double-buffered=196 match the schedule model (exit status 0) (exit 0)
+  Verilator PASS: TILE=8 CPW=4 LAT=10, 5 tiles: sums match, cycles serial=280 double-buffered=196 match the schedule model (exit status 0) (exit 0)
+3 tiles of 32 words written to out/dbuf_vectors.hex; schedule model: serial 216 cycles, double-buffered 146
+  Icarus    PASS: TILE=32 CPW=1 LAT=2, 3 tiles: sums match, cycles serial=216 double-buffered=146 match the schedule model (exit status 0) (exit 0)
+  Verilator PASS: TILE=32 CPW=1 LAT=2, 3 tiles: sums match, cycles serial=216 double-buffered=146 match the schedule model (exit status 0) (exit 0)
+7 tiles of 4 words written to out/dbuf_vectors.hex; schedule model: serial 434 cycles, double-buffered 272
+  Icarus    PASS: TILE=4 CPW=8 LAT=20, 7 tiles: sums match, cycles serial=434 double-buffered=272 match the schedule model (exit status 0) (exit 0)
+  Verilator PASS: TILE=4 CPW=8 LAT=20, 7 tiles: sums match, cycles serial=434 double-buffered=272 match the schedule model (exit status 0) (exit 0)
+9 tiles of 8 words written to out/dbuf_vectors.hex; schedule model: serial 207 cycles, double-buffered 119
+  Icarus    PASS: TILE=8 CPW=1 LAT=1, 9 tiles: sums match, cycles serial=207 double-buffered=119 match the schedule model (exit status 0) (exit 0)
+  Verilator PASS: TILE=8 CPW=1 LAT=1, 9 tiles: sums match, cycles serial=207 double-buffered=119 match the schedule model (exit status 0) (exit 0)
+4 tiles of 64 words written to out/dbuf_vectors.hex; schedule model: serial 656 cycles, double-buffered 455
+  Icarus    PASS: TILE=64 CPW=1 LAT=30, 4 tiles: sums match, cycles serial=656 double-buffered=455 match the schedule model (exit status 0) (exit 0)
+  Verilator PASS: TILE=64 CPW=1 LAT=30, 4 tiles: sums match, cycles serial=656 double-buffered=455 match the schedule model (exit status 0) (exit 0)
+1 tiles of 8 words written to out/dbuf_vectors.hex; schedule model: serial 34 cycles, double-buffered 34
+  Icarus    PASS: TILE=8 CPW=2 LAT=4, 1 tiles: sums match, cycles serial=34 double-buffered=34 match the schedule model (exit status 0) (exit 0)
+  Verilator PASS: TILE=8 CPW=2 LAT=4, 1 tiles: sums match, cycles serial=34 double-buffered=34 match the schedule model (exit status 0) (exit 0)
+
+== 2. what double buffering buys: TILE=16, LAT=4, 16 tiles, sweeping the compute time per word (measured in Icarus)
+ CPW  load L  compute C  serial  double  speedup  who sets the pace
+   1      23         19     672     387     1.74  the load (memory bound)
+   2      23         35     928     583     1.59  the compute (compute bound)
+   4      23         67    1440    1095     1.32  the compute (compute bound)
+   8      23        131    2464    2119     1.16  the compute (compute bound)
+  16      23        259    4512    4167     1.08  the compute (compute bound)
+
+== 3. Yosys: what the pieces cost
+dma   generic gates    227   iCE40 cells   156 (flip-flops 50, block RAMs 0)
+dbuf  generic gates  17750   iCE40 cells   762 (flip-flops 273, block RAMs 2)

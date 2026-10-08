@@ -1,0 +1,23 @@
+NOTE: this script deliberately breaks copies of the RTL. 'caught' lines are EXPECTED: they show the testbench can detect the mistake.
+controller: a load may overwrite a bank that is still full: caught   [16w/cpw1: NOT CAUGHT; 8w/cpw4: caught]
+controller: double buffering is never used (always serial): caught   [16w/cpw1: caught; 8w/cpw4: caught]
+controller: serial mode overlaps like double buffering: caught   [16w/cpw1: caught; 8w/cpw4: caught]
+controller: every load goes to bank 0: caught   [16w/cpw1: caught; 8w/cpw4: caught]
+controller: compute always reads bank 0: caught   [16w/cpw1: caught; 8w/cpw4: caught]
+controller: the base address is ignored: caught   [16w/cpw1: caught; 8w/cpw4: caught]
+controller: tile addresses overlap by one word: caught   [16w/cpw1: caught; 8w/cpw4: caught]
+controller: the DMA is told to move one word too few: caught   [16w/cpw1: caught; 8w/cpw4: caught]
+controller: the accumulator is not cleared between tiles: caught   [16w/cpw1: caught; 8w/cpw4: caught]
+controller: the last word is never added: caught   [16w/cpw1: caught; 8w/cpw4: caught]
+controller: the sum is reported before the last read arrives: caught   [16w/cpw1: caught; 8w/cpw4: caught]
+controller: the last word of the tile is skipped: caught   [16w/cpw1: caught; 8w/cpw4: caught]
+controller: one tile too many is loaded: caught   [16w/cpw1: caught; 8w/cpw4: caught]
+controller: a word is read in the first cycle of its slot (timing changes): caught   [16w/cpw1: NOT CAUGHT; 8w/cpw4: caught]
+controller: compute waits on the wrong bank's flag: caught   [16w/cpw1: caught; 8w/cpw4: caught]
+dma: requests all go to the first word: caught   [16w/cpw1: caught; 8w/cpw4: caught]
+dma: answers are written one word too high: caught   [16w/cpw1: caught; 8w/cpw4: caught]
+dma: done is raised one answer too early: caught   [16w/cpw1: caught; 8w/cpw4: caught]
+dma: writes only every other answer: caught   [16w/cpw1: caught; 8w/cpw4: caught]
+sram: the write is lost: caught   [16w/cpw1: caught; 8w/cpw4: caught]
+
+tile streamer: 20 of 20 broken circuits caught
