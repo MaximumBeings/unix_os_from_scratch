@@ -1,0 +1,12 @@
+== 1. the golden model writes its vectors
+201808 requantization cases written to out/requant_vectors.hex
+
+== 2. requant_tb in Icarus Verilog
+PASS: the requantizer matches the golden model on all 201808 cases (exit status 0)
+
+== 2. requant_tb in Verilator
+PASS: the requantizer matches the golden model on all 201808 cases (exit status 0)
+
+== 3. Yosys: what the requantizer costs
+requant   generic gates  5322
+          iCE40 cells    2777 {'SB_CARRY': 138, 'SB_LUT4': 2639}

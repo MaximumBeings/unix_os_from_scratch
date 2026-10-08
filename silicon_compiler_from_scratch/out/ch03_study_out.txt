@@ -1,0 +1,23 @@
+== 1. relative RMS error of an int8 layer (X: 32 x K, W: K x 32, fp64 is the reference)
+case                                             K=64    K=256   K=1024
+per-tensor scale, plain weights                1.109%   1.415%   1.429%
+per-column scale, plain weights                1.022%   1.176%   1.225%
+per-tensor scale, one column x30               2.482%   3.576%   5.034%
+per-column scale, one column x30               0.762%   1.192%   1.472%
+
+== 2. the outlier hurts the OTHER columns: error measured on columns 1..31 only (K=256)
+per-tensor   error on the normal columns: 19.485%
+per-column   error on the normal columns: 1.261%
+
+== 3. the mantissa/shift form of a real multiplier
+worst relative error of M ~ m/2^s over 100000 random M in [2^-16, 1]: 5.933e-08   (bound 2^-24 = 5.960e-08)
+
+== 4. end to end: int8 layer, requantized to int8, against the fp64 result (K=256)
+m = 10289232 (24 bits), s = 32; int8 output error relative to fp64: 1.478%
+max |acc| seen 53183 of 2^31 = 2147483648: the 32-bit accumulator is 40379x larger than needed here
+
+== 5. bytes per weight, and what a 7-billion-parameter model occupies
+fp32        4.0 bytes/weight    28.0 GB   (derived: 7e9 x bytes)
+fp16/bf16   2.0 bytes/weight    14.0 GB   (derived: 7e9 x bytes)
+int8        1.0 bytes/weight     7.0 GB   (derived: 7e9 x bytes)
+int4        0.5 bytes/weight     3.5 GB   (derived: 7e9 x bytes)

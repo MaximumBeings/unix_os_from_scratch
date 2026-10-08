@@ -1,0 +1,23 @@
+NOTE: this script deliberately breaks copies of the RTL. 'caught' lines are EXPECTED: they show the testbench can detect the mistake.
+rounding constant left out (truncate): caught
+rounding constant is 2^s instead of 2^(s-1): caught
+clamp removed (low 7 bits kept): caught
+clamp returns 126: caught
+clamp at 128 (allows -128): caught
+rounding done on the signed value (floor), not the magnitude: caught
+negative sign not restored: caught
+relu ignored: caught
+relu always on: caught
+mantissa truncated to 23 bits: caught
+product truncated to 48 bits: caught
+shift amount off by one: caught
+shift uses only 5 bits: caught
+most negative accumulator not handled (magnitude as 31 bits): caught
+ties round toward zero (rounding constant minus one): caught
+
+requantizer: 15 of 15 broken circuits caught
+
+Changes that look like bugs and are not:
+EQUIVALENT: shift of 0 adds a half (1 << 63 is cut to 0 by the 56-bit wire): NOT CAUGHT
+EQUIVALENT: clamp compares against 126 (a magnitude of 127 is returned as 127 either way): NOT CAUGHT
+EQUIVALENT: compare against the limit with >= 128 instead of > 127: NOT CAUGHT
