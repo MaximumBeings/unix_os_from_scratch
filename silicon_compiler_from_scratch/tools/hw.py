@@ -15,11 +15,11 @@ def sim_icarus(files, top, root=ROOT, defines=()):
     rc, out = _run(["iverilog", "-g2012", "-Wall", "-s", top, "-o", exe] + ["-D" + x for x in defines] + list(files), cwd=root)
     if rc != 0: shutil.rmtree(d, ignore_errors=True); return 99, "COMPILE ERROR\n" + out
     rc, out = _run(["vvp", "-n", exe], cwd=root); shutil.rmtree(d, ignore_errors=True); return rc, out
-def sim_verilator(files, top, root=ROOT, defines=()):
+def sim_verilator(files, top, root=ROOT, defines=(), args=(), runargs=()):
     d = tempfile.mkdtemp(prefix="vlt_")
-    rc, out = _run(["verilator", "--binary", "--timing", "-Wno-fatal", "-Wno-lint", "-Wno-style", "--top-module", top, "-Mdir", d, "-o", "sim"] + ["-D" + x for x in defines] + list(files), cwd=root)
+    rc, out = _run(["verilator", "--binary", "--timing", "-Wno-fatal", "-Wno-lint", "-Wno-style", "--top-module", top, "-Mdir", d, "-o", "sim"] + list(args) + ["-D" + x for x in defines] + list(files), cwd=root)
     if rc != 0: shutil.rmtree(d, ignore_errors=True); return 99, "COMPILE ERROR\n" + out
-    rc, out = _run([os.path.join(d, "sim")], cwd=root); shutil.rmtree(d, ignore_errors=True); return rc, out
+    rc, out = _run([os.path.join(d, "sim")] + list(runargs), cwd=root); shutil.rmtree(d, ignore_errors=True); return rc, out
 def synth_stats(files, top, script=None, root=ROOT):
     """Runs Yosys on the files and returns {'cells': {type: count}, 'total': n, 'log': text}. The default script is the generic flow: read, elaborate, optimize, map to simple gates."""
     script = script or f"synth -flatten -top {top}; stat"

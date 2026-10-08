@@ -1,0 +1,25 @@
+requantizer: 5403 gates, 7881 NAND2-equivalents; 5403 gate outputs, 150 sampled, 300 stuck-at faults
+41808 requantization cases written to out/requant_vectors.hex
+
+== 1. fault coverage as the test set grows (1808 directed vectors come first, then random ones)
+ vectors applied  detected  coverage
+              50       117    39.00%
+             200       123    41.00%
+            1808       160    53.33%   <- all directed vectors
+            1908       163    54.33%
+            2808       173    57.67%
+           11808       210    70.00%
+           41808       226    75.33%   <- everything
+
+== 2. the 74 faults no vector detected: redundant, or a gap in the tests?  (equivalence checking with the input m[23] held at 1)
+  proven REDUNDANT under the constraint (no test can detect them): 3
+  TESTABLE but missed by all 41808 vectors: 71   (the checker returns one distinguishing input for each; a few of them:)
+    acc=997757377 m=12553790 s=48 relu=0
+    acc=25 m=13170147 s=22 relu=0
+    acc=12712723 m=15135588 s=41 relu=0
+    acc=-2072159338 m=15757040 s=51 relu=0
+
+== 3. use those inputs as test vectors (automatic test pattern generation) and grade again
+  with 71 extra vectors appended: 297 of 300 faults detected; 3 are redundant, so 297 of 297 testable faults = 100.00%
+
+== summary: random + directed vectors alone: 226 of 297 testable faults (76.09%); after test pattern generation: 100.00%

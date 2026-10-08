@@ -20,7 +20,7 @@ module ga2_tb;
     ga2 dut (.clk(clk), .rst(rst), .start(start), .halted(halted), .imem_addr(imem_addr), .imem_data(imem_data),
         .req_valid(req_valid), .req_addr(req_addr), .resp_valid(resp_valid), .resp_data(resp_data), .wr_valid(wr_valid), .wr_addr(wr_addr), .wr_data(wr_data),
         .cyc_total(cyc_total), .cyc_mm(cyc_mm), .cyc_dma(cyc_dma), .cyc_vec(cyc_vec), .n_inst(n_inst));
-    extmem_rw #(.LAT(LAT), .DEPTH(EXT)) ext (.clk(clk), .req_valid(req_valid), .req_addr(req_addr), .resp_valid(resp_valid), .resp_data(resp_data), .wr_valid(wr_valid), .wr_addr(wr_addr), .wr_data(wr_data));
+    extmem_rw #(.LAT(LAT), .DEPTH(EXT)) ext (.clk(clk), .rst(rst), .req_valid(req_valid), .req_addr(req_addr), .resp_valid(resp_valid), .resp_data(resp_data), .wr_valid(wr_valid), .wr_addr(wr_addr), .wr_data(wr_data));
     always #5 clk = ~clk;
     reg [31:0] vec [0:4194303]; integer np, p, off, ni, i, w, bad, badprog, waited, total_cycles; reg [31:0] want [0:4];
     initial begin
