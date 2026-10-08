@@ -1,0 +1,37 @@
+NOTE: this script deliberately breaks copies of the RTL. 'caught' lines are EXPECTED: they show the testbenches can detect the mistake.
+table entry 0 (exp(0) = 1.0) is one too small: caught
+table entry 64 is one too large: caught
+the last nonzero entry is zero: caught
+the last entry is 1: caught
+entry 17 has two digits swapped: caught
+
+exp table: 5 of 5 broken circuits caught
+EQUIVALENT: the default branch returns 1 (all 256 values of d are listed, so it is unreachable): NOT CAUGHT
+
+divu: compares with > so an exact fit is not subtracted: caught
+divu: the divisor is not subtracted: caught
+divu: the quotient bit is inverted: caught
+divu: one iteration too few: caught
+divu: division by zero gives quotient 0: caught
+divu: the remainder output drops its top bit: caught
+divu: a start during a division restarts it: caught
+divu: the numerator bits are taken from the wrong end: caught
+
+divider: 8 of 8 broken circuits caught
+
+softmax: the maximum starts at 0 instead of -128: caught   [N=8: caught; N=3: caught]
+softmax: the sum is not cleared between rows: caught   [N=8: caught; N=3: caught]
+softmax: the minimum is found instead of the maximum: caught   [N=8: caught; N=3: caught]
+softmax: the table is indexed by x, not by the distance from the maximum: caught   [N=8: caught; N=3: caught]
+softmax: the distance is x - m: caught   [N=8: caught; N=3: caught]
+softmax: the numerator of the reciprocal is 2^37: caught   [N=8: caught; N=3: caught]
+softmax: no rounding constant: caught   [N=8: caught; N=3: caught]
+softmax: the output slice is shifted down one bit: caught   [N=8: caught; N=3: caught]
+softmax: the output slice is shifted up one bit: caught   [N=8: caught; N=3: caught]
+softmax: the sum leaves out the last element: caught   [N=8: caught; N=3: caught]
+softmax: the first element's exponent is stored in the wrong slot: caught   [N=8: caught; N=3: caught]
+softmax: the divider reads the sum one cycle too early (before the last add): caught   [N=8: caught; N=3: caught]
+softmax: the reciprocal is not latched: caught   [N=8: caught; N=3: caught]
+softmax: the maximum search stops one element early: caught   [N=8: caught; N=3: caught]
+
+softmax unit: 14 of 14 broken circuits caught

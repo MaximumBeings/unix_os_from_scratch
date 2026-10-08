@@ -1,0 +1,40 @@
+== 1. the exp table and the divider
+256 table entries written to out/exp_table.hex
+24157 division cases written to out/divu_vectors.hex
+  exp_lut_tb Icarus    PASS: all 256 table entries match the golden table (exit status 0) (exit 0)
+  exp_lut_tb Verilator PASS: all 256 table entries match the golden table (exit status 0) (exit 0)
+  divu_tb    Icarus    PASS: 24157 divisions match the golden model, each in the same number of cycles (exit status 0) (exit 0)
+  divu_tb    Verilator PASS: 24157 divisions match the golden model, each in the same number of cycles (exit status 0) (exit 0)
+
+== 2. the softmax unit, for several vector lengths N
+907 softmax cases (N=1) written to out/softmax_vectors.hex
+  Icarus    PASS: N=1, 907 softmax cases match the golden model; every case took 46 cycles (exit status 0) (exit 0)
+  Verilator PASS: N=1, 907 softmax cases match the golden model; every case took 46 cycles (exit status 0) (exit 0)
+907 softmax cases (N=2) written to out/softmax_vectors.hex
+  Icarus    PASS: N=2, 907 softmax cases match the golden model; every case took 49 cycles (exit status 0) (exit 0)
+  Verilator PASS: N=2, 907 softmax cases match the golden model; every case took 49 cycles (exit status 0) (exit 0)
+907 softmax cases (N=5) written to out/softmax_vectors.hex
+  Icarus    PASS: N=5, 907 softmax cases match the golden model; every case took 58 cycles (exit status 0) (exit 0)
+  Verilator PASS: N=5, 907 softmax cases match the golden model; every case took 58 cycles (exit status 0) (exit 0)
+907 softmax cases (N=8) written to out/softmax_vectors.hex
+  Icarus    PASS: N=8, 907 softmax cases match the golden model; every case took 67 cycles (exit status 0) (exit 0)
+  Verilator PASS: N=8, 907 softmax cases match the golden model; every case took 67 cycles (exit status 0) (exit 0)
+907 softmax cases (N=16) written to out/softmax_vectors.hex
+  Icarus    PASS: N=16, 907 softmax cases match the golden model; every case took 91 cycles (exit status 0) (exit 0)
+  Verilator PASS: N=16, 907 softmax cases match the golden model; every case took 91 cycles (exit status 0) (exit 0)
+907 softmax cases (N=64) written to out/softmax_vectors.hex
+  Icarus    PASS: N=64, 907 softmax cases match the golden model; every case took 235 cycles (exit status 0) (exit 0)
+  Verilator PASS: N=64, 907 softmax cases match the golden model; every case took 235 cycles (exit status 0) (exit 0)
+
+== 3. the cycle count: measured against the formula 3N + 43 (3 passes over N elements + the 40-cycle division + 3 cycles of control)
+N=  1  measured   46  formula   46  ok
+N=  2  measured   49  formula   49  ok
+N=  5  measured   58  formula   58  ok
+N=  8  measured   67  formula   67  ok
+N= 16  measured   91  formula   91  ok
+N= 64  measured  235  formula  235  ok
+
+== 4. Yosys: what the pieces cost
+exp_lut  generic gates    442   iCE40 cells   191 (flip-flops 0)
+divu     generic gates    769   iCE40 cells   545 (flip-flops 249)
+softmax  generic gates   5598   iCE40 cells  3102 (flip-flops 474)

@@ -1,0 +1,14 @@
+  N inputs                  cases  max abs err  in 2^-16  worst |sum-1|  argmax kept
+  4 uniform -128..127        3000     2.62e-05      1.72       1.53e-05        1.000
+  4 narrow -16..15           3000     1.21e-05      0.79       1.53e-05        1.000
+  4 one big, rest small      3000     2.03e-05      1.33       0.00e+00        1.000
+  8 uniform -128..127        3000     3.91e-05      2.56       3.05e-05        1.000
+  8 narrow -16..15           3000     1.07e-05      0.70       4.58e-05        1.000
+  8 one big, rest small      3000     3.37e-05      2.21       0.00e+00        1.000
+ 64 uniform -128..127        3000     1.94e-05      1.27       1.68e-04        1.000
+ 64 narrow -16..15           3000     8.06e-06      0.53       2.14e-04        1.000
+ 64 one big, rest small      3000     1.70e-04     11.12       0.00e+00        1.000
+
+entries of the exp table that are zero (the probability of anything that far below the maximum is rounded to 0):
+first zero entry d = 189: exp(-189/16) = 7.411e-06 (half a unit of 65535 = 7.630e-06)
+the divider's range: s = sum of e_i lies between 65535 and 4194240 so r = 2^38 / s needs 23 bits at most and the product e_i * r needs 38 bits
