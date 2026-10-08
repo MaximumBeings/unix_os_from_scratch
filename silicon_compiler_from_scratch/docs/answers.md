@@ -221,3 +221,27 @@ Worked answer: 7.0 GB of weights divided by 1.07 GB of cache per request is 6.5.
 **5. Why did the first version of the batch test miss "every sequence reads the hidden state of sequence 0", and what fixed it?**
 
 Worked answer: the batched step and the single-sequence step are built by the same builder, so both read sequence 0's state for every sequence and agree with each other. The first version compared with the integer reference only for a batch of one, which means only sequence 0, whose state is the correct one. Comparing every sequence, decoded alone, with the integer reference makes the single run for sequences 1 to 3 wrong, and the mismatch appears.
+
+---
+
+## Chapter 10
+
+**1. Why does the toy library come with two files generated from one table?**
+
+Worked answer: synthesis reads the Liberty file (functions, areas, delays) while simulation reads Verilog models of the same cells. If a function differed between them, the netlist would be wrong with respect to its own simulation models in a way no tool would warn about. Generating both from one table removes the possibility; the mutation run then breaks it on purpose to check that simulation would notice.
+
+**2. The critical path of the chip is `sp.rdata -> ... -> sp.wdata`. Which unit is on it, and what would you change?**
+
+Worked answer: the requantizer, inside the `RQ` unit: it sits between the scratchpad's read data and its write data, 79 gates deep (9.87 ns). Pipelining it, i.e. a register in the middle of the 32 x 24 multiplier, so that `RQ` takes two or three cycles per word, would shorten the clock period to about that of the next-slowest units (5-6 ns in this model); the cost is a larger constant in the cycle model for `RQ`.
+
+**3. What is X-pessimism, and what evidence shows that the Icarus failure was not a logic error?**
+
+Worked answer: a four-state simulator propagates `x` through logic that, after optimization, no longer simplifies it away (as in `(a & b) | (a & ~b)` with `b = x`); real flip-flops would hold a definite 0 or 1. Evidence it was not a logic error: the same netlist passes in Verilator (two-state), passes in Icarus when the flip-flop model gives a defined power-up value, and passes in Verilator from three random power-up states, with identical memory and cycle counts every time.
+
+**4. Why did the first random power-up run produce `deadbeef` in the data, and who was at fault?**
+
+Worked answer: in the first clock the chip's random power-up state made it issue a memory request before reset took effect; the testbench's memory answered it eight cycles later (with its out-of-range pattern) just as the real first load began, so the first word of the data was wrong. The testbench was at fault: its memory model did not discard in-flight requests at reset, which a real system's reset would do.
+
+**5. What does it mean that 3 faults were "proven redundant", and why is detecting them not a goal?**
+
+Worked answer: for those faults the equivalence checker proved that the faulty circuit computes the same function as the good one (under the operating constraint), so there is no input at all on which they change an output. They cost nothing functionally and cannot be detected by any test. Fault coverage is therefore quoted over the testable faults (here 297, not 300).

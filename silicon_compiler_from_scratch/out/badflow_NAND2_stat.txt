@@ -1,0 +1,27 @@
+
+8. Printing statistics.
+
+=== requant ===
+
+   Number of wires:               5345
+   Number of wire bits:           5411
+   Number of public wires:           5
+   Number of public wire bits:      71
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:               5348
+     AOI21                         484
+     INV                           409
+     MUX2                          175
+     NAND2                        1216
+     NAND3                         140
+     NOR2                          453
+     NOR3                          234
+     OAI21                         313
+     OR2                           312
+     XNOR2                         992
+     XOR2                          620
+
+   Chip area for module '\requant': 7881.730000
+

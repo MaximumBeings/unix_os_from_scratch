@@ -40,3 +40,4 @@ ga2          30997      52334        1899       10.74 ns          83      93 MHz
   Icarus (4-state), flip-flops start at 0     : PASS: 30 programs match the Python reference (memory and all five cycle counters), 60832 cycles in total (exit status 0) (exit 0)
   Verilator, random power-up state, seed 1  : PASS: 30 programs match the Python reference (memory and all five cycle counters), 60832 cycles in total (exit status 0) (exit 0)
   Verilator, random power-up state, seed 2  : PASS: 30 programs match the Python reference (memory and all five cycle counters), 60832 cycles in total (exit status 0) (exit 0)
+  Verilator, random power-up state, seed 3  : PASS: 30 programs match the Python reference (memory and all five cycle counters), 60832 cycles in total (exit status 0) (exit 0)

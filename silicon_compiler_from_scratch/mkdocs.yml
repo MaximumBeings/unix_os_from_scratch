@@ -60,4 +60,5 @@ nav:
   - "7. GA-2: An Instruction Set, a Sequencer, and the Whole Chip": part07/07-the-whole-chip.md
   - "8. Attention and the KV Cache: One Decode Step, From Hidden State to Output": part08/08-attention-kv-cache.md
   - "9. Batching and Bandwidth: Why Decoding Is Slow, and What Helps": part09/09-batching-and-bandwidth.md
+  - "10. Synthesis, Timing and Gate-Level Verification": part10/10-synthesis-and-gate-level.md
   - Answers to the Self-Check Questions: answers.md
