@@ -56,4 +56,3 @@ EQUIVALENT within the ISA: M is a 3-bit field (every legal M, 1 to 4, fits in th
 EQUIVALENT within the tested range: the load source address is 12 bits wide (the test memory has 2048 words): NOT CAUGHT
 EQUIVALENT: VADD reads its two sources in the other order (addition commutes): NOT CAUGHT
 EQUIVALENT: rows of A beyond M are not masked off (PE(i,j) depends only on row i and column j): NOT CAUGHT
-mut=0
