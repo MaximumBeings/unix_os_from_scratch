@@ -245,3 +245,27 @@ Worked answer: in the first clock the chip's random power-up state made it issue
 **5. What does it mean that 3 faults were "proven redundant", and why is detecting them not a goal?**
 
 Worked answer: for those faults the equivalence checker proved that the faulty circuit computes the same function as the good one (under the operating constraint), so there is no input at all on which they change an output. They cost nothing functionally and cannot be detected by any test. Fault coverage is therefore quoted over the testable faults (here 297, not 300).
+
+---
+
+## Chapter 11
+
+**1. Why does the compiler reject a matmul with `K = 65`, and what would the hardware need to support it?**
+
+Worked answer: the matrix unit's operand memories hold 64 values per row and column, and one `MM` instruction computes a whole inner product. A longer inner dimension would have to be split into two products whose int32 results are added, but the ISA has no instruction that accumulates int32 values (VADD is a saturating int8 add), so the compiler cannot express it and refuses. Supporting it needs an accumulate flag on `MM` (or an int32 add) so partial sums can be combined before the single requantization.
+
+**2. Why was forcing both operands of an `add` to share a scale wrong, and what does the compiler do instead?**
+
+Worked answer: when one operand is pinned (a softmax output is always 1/127, a range of 1.0) the shared scale cannot hold an operand that reaches 3, so that operand saturated and the output was 50-100% wrong. The compiler now gives the sum its own scale, covering both operands and the sum, and inserts an `RQ` (int8 to int8, multiplier `scale_operand / scale_sum`) on each operand whose scale differs.
+
+**3. Why is check (c) run with buffer reuse switched off?**
+
+Worked answer: with reuse, a tensor's space is given to later tensors, so after the program ends its original location holds something else and cannot be read back for comparison. With reuse off, every tensor keeps its own buffer to the end, so each can be compared with the interpreter. Check (a) separately ties the reuse version to the no-reuse version.
+
+**4. Which check catches "buffers are released one step too early", and why do the others not?**
+
+Worked answer: (a). The no-reuse program is correct and the reuse program overwrites a live buffer, so their outputs differ. (c) runs with reuse off, so it never exercises freeing; (b) compares the no-reuse run with the interpreter; (d) and (e) also read the no-reuse run or only judge scales and accuracy.
+
+**5. Why is the cancellation graph tested without an accuracy bound, and what bug does it exist to catch?**
+
+Worked answer: with `y` near `-x` the sum is tiny, and an int8 sum at a scale that holds the large operands rounds it to about zero, so even the correct compiler is far from floating point there. The graph exists to catch a compiler that picks the sum's scale from the sum alone: the rescaled operands then clip, and the sum of the clipped values is far from the real-number result, which check (d) reports. Random graphs almost never contain a cancellation, so only a directed case reveals that bug.

@@ -1,0 +1,81 @@
+== 1. one graph, compiled: a two-layer network with a softmax head and a residual connection
+the graph:
+  %0  = input               -> (5, 12)  x
+  %1  = weight              -> (12, 10)  w1
+  %2  = matmul   %0, %1     -> (5, 10)  
+  %3  = relu     %2         -> (5, 10)  
+  %4  = weight              -> (10, 10)  w2
+  %5  = matmul   %3, %4     -> (5, 10)  
+  %6  = add      %5, %3     -> (5, 10)  
+  %7  = weight              -> (10, 3)  w3
+  %8  = matmul   %6, %7     -> (5, 3)   x0.5
+  %9  = softmax  %8         -> (5, 3)  
+  %10 = output   %9         -> (5, 3)  probs
+  %11 = argmax   %9         -> (5, 1)  
+  %12 = output   %11        -> (5, 1)  class
+
+compiled: 38 instructions, scratchpad high-water mark 280 of 4096 words, external memory 330 words; notes: none
+scales chosen by the compiler (real value per int8 step): {'%0': 0.02763, '%1': 0.0078, '%2': 0.03246, '%3': 0.03246, '%4': 0.00822, '%5': 0.03763, '%6': 0.04381, '%7': 0.00561, '%8': 0.0625, '%9': 0.00787, '%10': 0.00787, '%12': 0.01575}
+the program:
+    0  LD   dst=0 src=0 len=60
+    1  LD   dst=60 src=60 len=120
+    2  MM   dst=230 A=0 B=60 M=4 K=12 N=4 tb=0 lda=12 ldb=10 ldc=10
+    3  MM   dst=234 A=0 B=64 M=4 K=12 N=4 tb=0 lda=12 ldb=10 ldc=10
+    4  MM   dst=238 A=0 B=68 M=4 K=12 N=2 tb=0 lda=12 ldb=10 ldc=10
+    5  MM   dst=270 A=48 B=60 M=1 K=12 N=4 tb=0 lda=12 ldb=10 ldc=10
+    6  MM   dst=274 A=48 B=64 M=1 K=12 N=4 tb=0 lda=12 ldb=10 ldc=10
+    7  MM   dst=278 A=48 B=68 M=1 K=12 N=2 tb=0 lda=12 ldb=10 ldc=10
+    8  RQ   dst=180 src=230 len=50 m=14251070 s=31 relu=1
+    9  LD   dst=0 src=180 len=100
+   10  MM   dst=230 A=180 B=0 M=4 K=10 N=4 tb=0 lda=10 ldb=10 ldc=10
+   11  MM   dst=234 A=180 B=4 M=4 K=10 N=4 tb=0 lda=10 ldb=10 ldc=10
+   12  MM   dst=238 A=180 B=8 M=4 K=10 N=2 tb=0 lda=10 ldb=10 ldc=10
+   13  MM   dst=270 A=220 B=0 M=1 K=10 N=4 tb=0 lda=10 ldb=10 ldc=10
+   14  MM   dst=274 A=220 B=4 M=1 K=10 N=4 tb=0 lda=10 ldb=10 ldc=10
+   15  MM   dst=278 A=220 B=8 M=1 K=10 N=2 tb=0 lda=10 ldb=10 ldc=10
+   16  RQ   dst=100 src=230 len=50 m=15229501 s=31 relu=0
+   17  RQ   dst=0 src=100 len=50 m=14409190 s=24 relu=0
+   18  RQ   dst=50 src=180 len=50 m=12429377 s=24 relu=0
+   19  VADD dst=230 src1=0 src2=50 len=50
+   20  LD   dst=0 src=280 len=30
+   21  MM   dst=45 A=230 B=0 M=4 K=10 N=3 tb=0 lda=10 ldb=3 ldc=3
+   22  MM   dst=57 A=270 B=0 M=1 K=10 N=3 tb=0 lda=10 ldb=3 ldc=3
+   23  RQ   dst=30 src=45 len=15 m=8446838 s=32 relu=0
+   24  SM   dst=15 src=30 len=3
+   25  SM   dst=18 src=33 len=3
+   26  SM   dst=21 src=36 len=3
+   27  SM   dst=24 src=39 len=3
+   28  SM   dst=27 src=42 len=3
+   29  RQ   dst=0 src=15 len=15 m=16646144 s=33 relu=0
+   30  ST   src=0 dst=310 len=15
+   31  AMAX dst=15 src=0 len=3
+   32  AMAX dst=16 src=3 len=3
+   33  AMAX dst=17 src=6 len=3
+   34  AMAX dst=18 src=9 len=3
+   35  AMAX dst=19 src=12 len=3
+   36  ST   src=15 dst=325 len=5
+   37  HALT
+
+class (circuit-model): [2, 2, 1, 1, 1]  class (floating point): [2, 2, 1, 1, 1]   probabilities: relative error 2.00%
+
+== 2. twelve random graphs (seeds 100-111, not in the test battery) on the RTL
+  Icarus    PASS: 12 programs match the Python reference (memory and all five cycle counters), 17022 cycles in total (exit status 0) (exit 0)
+  Verilator PASS: 12 programs match the Python reference (memory and all five cycle counters), 17022 cycles in total (exit status 0) (exit 0)
+
+ seed  nodes  instr  scratchpad words (reuse)  (no reuse)   cycles  error vs float
+  100     15     20                       240         282      830           2.92%
+  101     21     40                       184         325     1497           2.62%
+  102     13     24                       145         329     1124           2.35%
+  103     11     32                       480         684     2659           3.21%
+  104     10     15                        38          47      237           0.00%
+  105     18     46                       203         471     2200           3.71%
+  106     12     41                       276         528     2600           2.37%
+  107     15     26                       221         418     1503           1.52%
+  108     18     33                       175         385     1183           1.62%
+  109     13     24                        64         138      770           1.07%
+  110     11     21                       188         328     1080           2.48%
+  111     16     27                       198         430     1339           1.68%
+
+== 3. a network that fits only because buffers are reused: 6 layers of (8 x 32) times (32 x 32)
+with reuse: 111 instructions, scratchpad high-water mark 1792 words
+without reuse: scratchpad is full: cannot place a buffer of 256 words (free: 0 words in 0 pieces)
