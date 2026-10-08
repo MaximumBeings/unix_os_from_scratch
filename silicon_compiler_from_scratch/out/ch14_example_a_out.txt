@@ -1,0 +1,18 @@
+== 1. who reads whose cache?  H = 4 query heads, G key/value groups; head h uses group h // (H/G)
+  G=4 (MHA): head 0 -> group 0, head 1 -> group 1, head 2 -> group 2, head 3 -> group 3   cache per token: 32 words
+  G=2 (GQA): head 0 -> group 0, head 1 -> group 0, head 2 -> group 1, head 3 -> group 1   cache per token: 16 words
+  G=1 (MQA): head 0 -> group 0, head 1 -> group 0, head 2 -> group 0, head 3 -> group 0   cache per token: 8 words
+
+== 2. one decode step with 3 tokens of context, GQA with G = 2, floating point (random model, seed 5, with Wq and Wk multiplied by 6 for this display only: the untouched model's attention is nearly uniform at three tokens)
+  token 1: q has 16 numbers (4 heads x 4), k and v have 8 numbers (2 groups x 4)
+  head 0 reads group 0: scores [0.391, -1.443, 1.286] -> softmax [0.277, 0.044, 0.679]
+  head 1 reads group 0: scores [0.442, 2.109, 0.668] -> softmax [0.132, 0.701, 0.166]
+  head 2 reads group 1: scores [-0.6, 1.349, -0.049] -> softmax [0.103, 0.72, 0.178]
+  head 3 reads group 1: scores [0.056, -0.486, -0.255] -> softmax [0.432, 0.251, 0.317]
+  heads 0 and 1 look at the SAME three keys with different queries and so attend differently; that is all grouped-query attention changes.
+
+== 3. what the compiler emits for one decode step at context 8 (instruction counts)
+  G=4: AMAX=1  HALT=1  LD=28  MM=56  RQ=40  SM=4  ST=11  VADD=5   | words loaded from external memory: 2544; scratchpad high-water: 592
+  G=2: AMAX=1  HALT=1  LD=20  MM=52  RQ=37  SM=4  ST=7  VADD=5   | words loaded from external memory: 2176; scratchpad high-water: 592
+  G=1: AMAX=1  HALT=1  LD=16  MM=50  RQ=35  SM=4  ST=5  VADD=5   | words loaded from external memory: 1992; scratchpad high-water: 592
+  The query/score/context/output matmuls of the four heads do not depend on G; the K and V projections (and their cache loads, stores and requantizers) do: MM falls 56 -> 52 -> 50.

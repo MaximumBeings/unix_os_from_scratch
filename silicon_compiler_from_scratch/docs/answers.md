@@ -430,23 +430,6 @@ Worked answer: the margin between the winner (+7.82) and the next logit (+0.5) i
 **8. Why fix the KV cache's range from outside?**
 
 Worked answer: each decode step is a separately compiled program, and without `ranges=` each would calibrate its own scale for k and v from its own context length. The host stores the cache as the dequantized values the chip returned and re-quantizes it with the next program's scale; if that scale changed from step to step, every step would re-round every cached row at a different resolution and the scale would depend on the length of the context. Fixing one range for the `k` and `v` tags (taken over all steps in calibration) gives every program the same scale for the cache.
-
----
-
-## Chapter 1 (additional questions)
-
-**6. In the ripple example the `sum` bus shows `6, 4, 0, 8` after 7 + 1. Why are there wrong values at all, and how long after the inputs change is the answer valid?**
-
-Worked answer: every full adder computes its sum from the carry it sees *now*, and the carries have not yet arrived: at the first instant all carries are still 0, so the sum bits are those of 0111 + 0001 without carries, giving 0110 (6). Then carry 1 reaches stage 1 and the sum becomes 0100 (4), carry 2 reaches stage 2 (0000), and carry 3 reaches stage 3 (1000 = 8). With a 1 ns delay per full adder the answer is valid 4 ns after the inputs change: three carry hops plus the last stage's own delay.
-
-**7. Why do clocked blocks use `<=` and not `=`? What goes wrong in a design with two registers that swap their values (`a <= b; b <= a;`) if you write `=`?**
-
-Worked answer: non-blocking assignments sample every right-hand side with the values from before the clock edge and update all the registers together afterwards, as real flip-flops do. With `a = b; b = a;` the first statement overwrites `a` immediately, so the second copies the *new* `a`, and both registers end up holding the old `b`: the swap is lost. With `<=` both read the old values and the registers really exchange them.
-
-**8. The asynchronous-reset mutant of the counter is caught only because the testbench checks `wrap`. Explain why a test that checked only `q` after the clock edge would have missed it.**
-
-Worked answer: the testbench raises `rst` in the middle of a cycle and samples `q` after the next rising edge. By then both the synchronous circuit (which resets at the edge) and the asynchronous one (which reset earlier) show `q = 0`, so they look identical. They differ only in *when* `q` changed, which is visible in the combinational output `wrap = en && q == 15`: in the asynchronous circuit it drops immediately when `rst` rises, in the synchronous one it stays until the edge. Only a check of `wrap` before the edge sees the difference.
-
 ---
 
 ## Chapter 13
@@ -483,15 +466,6 @@ Worked answer: the designed model's answer is fixed by large, well-separated log
 
 Worked answer: the product `x W` accumulates in integers; each output column j is multiplied by `scale_x * scale_Wj` to return to real values. With one scale per tensor, one multiplier and shift (the RQ instruction's `m` and `s`) serve every column; with per-column scales the multiplier differs by column, so RQ would need a vector of multipliers or one RQ per column.
 
----
-
-## Chapter 1 -- hints for the exercises
-
-1. 65,536 x 2 = 131,072 cases: still exhaustive and still fast; the 8-bit settling time in the delayed model would be 8 stages' worth.
-2. A decade counter's wrap condition is `q == 9`; mutants worth adding: wraps at 10, wraps at 15 (not changed from the original), reset loads 9.
-3. A reasonable priority is rst, then load, then en; the mutants are each swap of that order, and a missing `load` case.
-4. For the 8-bit-input adder there is no input that is not tested; for a 16-bit adder with 1,000 random cases, a mutant that breaks only when `a == 16'hFFFF && b == 16'h0001` is untouched by random testing with overwhelming probability.
-
 ## Chapter 13 -- hints for the exercises
 
 1. Uniform weights have no tails, so the largest weight is only 1.7x the standard deviation instead of about 3x: fewer codes are wasted on rare large values.
@@ -500,3 +474,69 @@ Worked answer: the product `x W` accumulates in integers; each output column j i
 4. Two outputs per cycle gives 1 + 1 + 4 = 6 cycles per word; the break-even becomes 7/6 = 1.17 words per cycle, still only a little above this chip's 1 word per cycle.
 5. Make several int4 weights of about 1,400 elements each (they need 175 staging words each) so that without release the staging areas plus the weight buffers exceed 4,096 words.
 6. One multiply and one add (or one multiply of the dequantized outputs) per output element: 32 extra operations for a 1x32 result; the result equals the dequantized per-column study up to the requantizer's own rounding.
+---
+
+## Chapter 14
+
+**1. Head 5 with H = 8, G = 2; cache words for head width 16.**
+
+Worked answer: each group serves H / G = 4 heads, so head 5 reads group 5 // 4 = 1. The cache per token is 2 * G * d words: with d = 16 that is 2 * 8 * 16 = 256 words for G = 8, 64 for G = 2 and 32 for G = 1.
+
+**2. Why split the output projection into per-head slices?**
+
+Worked answer: `[a0 a1 a2 a3] Wo` has entry j equal to the sum over all 16 positions of `a_i Wo[i][j]`. Splitting the positions into four blocks of 4 gives four partial sums, `a_h` times the rows of `Wo` belonging to head h, and their total is the same number. Capra has no column concatenation or slice, but it has `matmul` and `add`.
+
+**3. Why are Wk and Wv smaller under GQA?**
+
+Worked answer: they produce one key and value of width d per group, not per head: `D x (G*d)` instead of `D x (H*d)`. The query side (`Wq`, `Wo`) keeps all H heads and does not change.
+
+**4. Pooling independent against similar heads.**
+
+Worked answer: the pooled key is the mean of the heads' keys. If the two heads are independent, the mean is a third, different vector that matches neither (its scores correlate with each head's scores only about 0.7 at best, and with random weights much less usefully), so the attention patterns change. If the heads are nearly equal, the mean is nearly each of them and nothing changes. At eps = 0 the mean of equal vectors is the vector itself, so the conversion is exact.
+
+**5. Why do matrix cycles fall with G?**
+
+Worked answer: each group needs a key projection and a value projection (matmuls of the new token with Wk and Wv); fewer groups mean fewer such projections (the MM count falls from 56 to 52 to 50) and a smaller requantization workload. The query, score, context and output matmuls of the four heads do not change.
+
+**6. 256 KiB and 64 KiB per token.**
+
+Worked answer: MHA: 2 (K and V) * 32 layers * 32 heads * 128 values * 1 byte = 262,144 bytes = 256 KiB. GQA with 8 groups: 2 * 32 * 8 * 128 = 65,536 bytes = 64 KiB.
+
+**7. Why did the float-step "no 1/sqrt(d)" mutant survive the first run?**
+
+Worked answer: the mutant changed the float reference only, while checks 1 and 3 compare the float model with itself (or with a rule that attention hardly influences), and check 2 compares the chip's logits with float through a 15% bound that attention's small contribution does not exceed. Only an independent reference step (check 5), or a tensor-level comparison (check 7), disagrees.
+
+**8. Why is a 15% logit bound not enough?**
+
+Worked answer: logits are dominated by the residual path and the output matrix; the attention output is a small part of them. A wrong attention changes the logits by less than the bound, so the check passes while attention is wrong. The remedy is to compare the attention output itself.
+
+## Chapter 14 -- hints for the exercises
+
+1. Group the heads as `h // 4`, `h // 2`, `h` for G = 2, 4, 8; the structured rule is decided by the embeddings and Wout, so it should still hold.
+2. Re-solve `Wo` on the pooled model so that `Wo_new = argmin |A_pooled Wo_new - A_mha Wo|` over a batch of activations; the normal equations are small (16 x 16).
+3. Int4 activations halve the 64 KiB to 32 KiB for G = 8, but the chip has no int4 matrix operand: the activation path would need the operand-path unpacking of Chapter 13's last section.
+4. Raise a `CompileError`-style error when `H % G != 0`; the test builds the graph with `G = 3` and expects the refusal.
+5. Calibration range of `v`: halve it. If the checks still pass, either the effect is below the 12% bound (a gap in the check) or the compiler clamps to the range (then equivalent).
+---
+
+## Chapter 1 (additional questions)
+
+**6. In the ripple example the `sum` bus shows `6, 4, 0, 8` after 7 + 1. Why are there wrong values at all, and how long after the inputs change is the answer valid?**
+
+Worked answer: every full adder computes its sum from the carry it sees *now*, and the carries have not yet arrived: at the first instant all carries are still 0, so the sum bits are those of 0111 + 0001 without carries, giving 0110 (6). Then carry 1 reaches stage 1 and the sum becomes 0100 (4), carry 2 reaches stage 2 (0000), and carry 3 reaches stage 3 (1000 = 8). With a 1 ns delay per full adder the answer is valid 4 ns after the inputs change: three carry hops plus the last stage's own delay.
+
+**7. Why do clocked blocks use `<=` and not `=`? What goes wrong in a design with two registers that swap their values (`a <= b; b <= a;`) if you write `=`?**
+
+Worked answer: non-blocking assignments sample every right-hand side with the values from before the clock edge and update all the registers together afterwards, as real flip-flops do. With `a = b; b = a;` the first statement overwrites `a` immediately, so the second copies the *new* `a`, and both registers end up holding the old `b`: the swap is lost. With `<=` both read the old values and the registers really exchange them.
+
+**8. The asynchronous-reset mutant of the counter is caught only because the testbench checks `wrap`. Explain why a test that checked only `q` after the clock edge would have missed it.**
+
+Worked answer: the testbench raises `rst` in the middle of a cycle and samples `q` after the next rising edge. By then both the synchronous circuit (which resets at the edge) and the asynchronous one (which reset earlier) show `q = 0`, so they look identical. They differ only in *when* `q` changed, which is visible in the combinational output `wrap = en && q == 15`: in the asynchronous circuit it drops immediately when `rst` rises, in the synchronous one it stays until the edge. Only a check of `wrap` before the edge sees the difference.
+---
+
+## Chapter 1 -- hints for the exercises
+
+1. 65,536 x 2 = 131,072 cases: still exhaustive and still fast; the 8-bit settling time in the delayed model would be 8 stages' worth.
+2. A decade counter's wrap condition is `q == 9`; mutants worth adding: wraps at 10, wraps at 15 (not changed from the original), reset loads 9.
+3. A reasonable priority is rst, then load, then en; the mutants are each swap of that order, and a missing `load` case.
+4. For the 8-bit-input adder there is no input that is not tested; for a 16-bit adder with 1,000 random cases, a mutant that breaks only when `a == 16'hFFFF && b == 16'h0001` is untouched by random testing with overwhelming probability.

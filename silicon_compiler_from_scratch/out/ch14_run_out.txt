@@ -1,0 +1,25 @@
+== 1. the grouped float step equals an ordinary MHA step with replicated K/V heads (independent form: 4 full heads, no grouping logic)
+  3 random models x 6 steps: largest logit difference 0.00e+00 (should be rounding only)
+
+== 2. compiled program == plain-Python meaning of the graph, for every step of every G (structured model); and distance from floating point
+  G=4: steps where compiled != interpreted: 0/24; relative logit error vs float: mean 1.2%, worst 1.6%; scratchpad high-water 856 words
+  G=2: steps where compiled != interpreted: 0/24; relative logit error vs float: mean 1.1%, worst 1.4%; scratchpad high-water 608 words
+  G=1: steps where compiled != interpreted: 0/24; relative logit error vs float: mean 1.1%, worst 1.4%; scratchpad high-water 592 words
+
+== 3. the rule f(t) = 5t+3 mod 16 under MHA, GQA, MQA (24 tokens from token 0)
+  G=4: float True   chip True
+  G=2: float True   chip True
+  G=1: float True   chip True
+
+== 4. the decodes replayed on the RTL
+  G=4 Icarus    PASS: 24 programs match the Python reference (memory and all five cycle counters), 223384 cycles in total (exit status 0) (exit 0)
+  G=4 Verilator PASS: 24 programs match the Python reference (memory and all five cycle counters), 223384 cycles in total (exit status 0) (exit 0)
+  G=2 Icarus    PASS: 24 programs match the Python reference (memory and all five cycle counters), 198308 cycles in total (exit status 0) (exit 0)
+  G=2 Verilator PASS: 24 programs match the Python reference (memory and all five cycle counters), 198308 cycles in total (exit status 0) (exit 0)
+  G=1 Icarus    PASS: 24 programs match the Python reference (memory and all five cycle counters), 186110 cycles in total (exit status 0) (exit 0)
+  G=1 Verilator PASS: 24 programs match the Python reference (memory and all five cycle counters), 186110 cycles in total (exit status 0) (exit 0)
+
+  G  kv words/token  instr step 24  cycles step 1  cycles step 24  24 steps   (matrix / DMA / vector at step 24)
+  4              32            161           7900           10608    223384   5616 / 3395 / 1273
+  2              16            142           7088            9404    198308   5176 / 2675 / 1267
+  1               8            132           6682            8792    186110   4956 / 2315 / 1255

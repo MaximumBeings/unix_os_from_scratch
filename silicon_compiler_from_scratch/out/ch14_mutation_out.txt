@@ -1,0 +1,18 @@
+NOTE: this script deliberately breaks copies of the model. 'caught' is EXPECTED: it shows the checks notice the mistake.
+unbroken model passes: True
+float step: query head h reads group h % r instead of h // r: caught
+float step: the scores are not divided by sqrt(d): caught
+float step: the values come from the keys' columns: caught
+conversion: keys are summed in a group instead of averaged: caught
+conversion: only the first head of each group is kept: caught
+graph: query head h reads group h % r: caught
+graph: the query slice starts one column late: caught
+graph: every group uses group 0's key weights: caught
+graph: the output projection rows are taken from the wrong head: caught
+graph: the head outputs are not all added: caught
+graph: attention scale is 1/d instead of 1/sqrt(d): caught
+host: the cache of group g is cut from the wrong columns: caught
+host: the new value of each group is stored before its key: caught
+cache size formula drops the factor 2 (keys and values): caught
+
+GQA model and graph: 14 of 14 broken versions caught

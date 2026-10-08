@@ -72,4 +72,5 @@ nav:
       - "12. Capstone: A Tiny Transformer Decodes on the Chip": part12/12-capstone.md
   - "Part 6 -- Case Studies":
       - "13. int4 Weight-Only Quantization": part13/13-int4-weights.md
+      - "14. Grouped-Query Attention": part14/14-grouped-query-attention.md
   - Answers to the Self-Check Questions: answers.md

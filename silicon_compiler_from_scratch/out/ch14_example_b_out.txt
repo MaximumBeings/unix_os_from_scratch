@@ -1,0 +1,22 @@
+== 1. converting a model that was NOT trained for grouping: mean-pool the K and V heads of each group (floating point against the original MHA; 3 random models x 16 starts x 12 steps)
+  G        agreement  mean logit error
+  4    576/576 (100.0%)              0.0%
+  2    293/576 ( 50.9%)             39.0%
+  1    184/576 ( 31.9%)             45.0%
+
+== 2. the same conversion when the heads of a group were already similar (a model 'trained for sharing'): each head's K/V weights = a shared group weight + noise of relative size eps
+   eps  G=2 agreement  G=2 logit error  G=1 agreement  G=1 logit error
+  1.00          50.9%            39.0%          31.9%            45.0%
+  0.50          85.4%            23.6%          73.1%            26.8%
+  0.25          90.6%            11.9%          85.8%            13.9%
+  0.10          93.2%             4.9%          95.7%             6.0%
+  0.00         100.0%             0.0%         100.0%             0.0%
+  (eps = 1 is the untouched random model of part 1 with G = 2 and 1; eps = 0 makes the heads of each group identical, so pooling changes nothing and the conversion is exact)
+
+== 3. what sharing buys in serving (DERIVED arithmetic for an ASSUMED chip: 80 GB, 2 TB/s; 7B-class model: 32 layers, 32 query heads, head width 128, int8 weights and cache; context 8192)
+variant           KV heads  KV KiB/token  KV GiB/request  max batch  tokens/s at B=1  tokens/s at max batch
+MHA                     32           256            2.00         33              219                    848
+GQA (8 groups)           8            64            0.50        135              265                   3397
+GQA (4 groups)           4            32            0.25        271              275                   6797
+MQA                      1             8            0.06       1087              283                  27193
+  At B = 1 the weights dominate and sharing changes little; at the largest batch the cache dominates and MQA/GQA move the limit from capacity-bound to bandwidth-bound much later.
