@@ -29,7 +29,7 @@ WORLD = {
 }
 # page id -> (world, cast)  (the first species is the lead)
 PLAN = {
- "index": ("earth", ["alpine", "markhor", "nubian", "bezoar", "domestic"]), "getting-started": ("earth", ["domestic", "bezoar", "iberian", "tur"]), "install": ("mars", ["nubian", "domestic", "walia", "siberian"]),
+ "index": ("earth", ["alpine", "markhor", "nubian", "bezoar", "domestic"]), "background": ("triton", ["markhor", "siberian", "bezoar", "alpine"]), "getting-started": ("earth", ["domestic", "bezoar", "iberian", "tur"]), "install": ("mars", ["nubian", "domestic", "walia", "siberian"]),
  "ch-01": ("earth", ["bezoar", "domestic", "alpine", "siberian"]), "ch-02": ("mars", ["nubian", "walia", "iberian", "markhor"]), "ch-03": ("moon", ["siberian", "alpine", "tur", "domestic", "bezoar"]),
  "ch-04": ("titan", ["markhor", "siberian", "alpine", "nubian"]), "ch-05": ("europa", ["alpine", "tur", "iberian", "domestic", "walia"]), "ch-06": ("io", ["walia", "nubian", "bezoar", "markhor"]),
  "ch-07": ("mars", ["iberian", "alpine", "siberian", "tur", "domestic"]), "ch-08": ("enceladus", ["tur", "markhor", "bezoar", "alpine"]), "ch-09": ("twin", ["domestic", "domestic", "domestic", "domestic", "alpine", "markhor"]),

@@ -1,5 +1,10 @@
 # Background: Verilog and the Tools
 
+![background](assets/art/background.svg)
+
+--8<-- "docs/assets/art/background.md"
+
+
 **What you will understand:** why chips are designed with a *language* rather than drawn, what Verilog is and how it differs from a programming language, what it can and cannot do, and what each of the tools in this book does and why it was chosen. By the end you will be able to read the Verilog in every chapter, run the commands in the book and know which tool a number came from.
 
 **What you need to know first:** the [Getting Started](getting-started.md) page (tools installed). No hardware experience is assumed; a little programming in any language helps.

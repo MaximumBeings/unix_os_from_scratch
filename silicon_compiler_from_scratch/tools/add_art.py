@@ -7,6 +7,7 @@ def pid_for(rel):
     if rel == "getting-started.md": return "getting-started"
     if rel == "answers.md": return "answers"
     if rel == "install.md": return "install"
+    if rel == "background.md": return "background"
     m = re.match(r"part(\d+)/(\d+)-", rel)
     if m: return "ch-%02d" % int(m.group(2))
     m = re.match(r"appendix/([a-g])-", rel)
