@@ -1,0 +1,18 @@
+requests (output tokens each): [14, 3, 9, 5, 12, 2, 7, 10]   batch capacity 4   total tokens 62
+
+cost of one decode step on GA-2 (cycles), from the batched program, for a few batch shapes (every sequence at the same token t):
+  1 sequence(s) at token 8:   3115 cycles (  3115 per token)
+  2 sequence(s) at token 8:   4353 cycles (  2176 per token)
+  3 sequence(s) at token 8:   5591 cycles (  1864 per token)
+  4 sequence(s) at token 8:   6829 cycles (  1707 per token)
+
+static      total  170118 cycles for 62 tokens =    2744 cycles per token;  request completion time: mean    93170, worst  170118
+continuous  total   98964 cycles for 62 tokens =    1596 cycles per token;  request completion time: mean    59092, worst   98964
+
+continuous batching finishes the same work 1.72x faster and the mean request completes 1.58x sooner.
+steps with how many sequences really generating a token (static, including the idle padded ones in brackets):
+  static    : ['4/4', '4/4', '4/4', '3/4', '3/4', '2/4', '2/4', '2/4', '2/4', '1/4', '1/4', '1/4', '1/4', '1/4', '4/4', '4/4', '3/4', '3/4', '3/4', '3/4', '3/4', '2/4', '2/4', '2/4', '1/4', '1/4']
+  continuous: ['4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '4', '2', '1', '1', '1', '1']
+
+static batching spent 42 of 104 sequence-slots on requests that had already finished (40% waste); continuous batching spent none (every slot is a live request).
+The ragged batch of Chapter 9's circuit run (tokens 3, 9, 1, 14 at the same step) is exactly what continuous batching creates all the time.

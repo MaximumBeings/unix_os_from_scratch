@@ -1,0 +1,28 @@
+model: 7B-class, int8 weights, int8 KV cache: weights 7.0 GB, KV cache 256 KiB per token
+
+tokens per second = B x BW / (weight bytes + B x KV bytes per request)   [memory-bound, one full read of the weights and every cache per step]
+batch size is limited by capacity: weights + B x KV <= memory
+
+-- context 2,048 tokens: KV cache 0.50 GiB per request --
+chip                        max batch (capacity)     B=1     B=4    B=16    B=64  best tokens/s  limit as B grows
+chip A: 24 GB, 0.5 TB/s                       31      66     219     513      --            656               931
+chip B: 80 GB, 2 TB/s                        135     265     875    2053    3095           3397              3725
+chip C: 192 GB, 5 TB/s                       344     663    2186    5132    7737           8973              9313
+
+-- context 8,192 tokens: KV cache 2.00 GiB per request --
+chip                        max batch (capacity)     B=1     B=4    B=16    B=64  best tokens/s  limit as B grows
+chip A: 24 GB, 0.5 TB/s                        7      55     128      --      --            159               233
+chip B: 80 GB, 2 TB/s                         33     219     513     774      --            848               931
+chip C: 192 GB, 5 TB/s                        86     547    1283    1934    2215           2243              2328
+
+-- context 32,768 tokens: KV cache 8.00 GiB per request --
+chip                        max batch (capacity)     B=1     B=4    B=16    B=64  best tokens/s  limit as B grows
+chip A: 24 GB, 0.5 TB/s                        1      32      --      --      --             32                58
+chip B: 80 GB, 2 TB/s                          8     128     193      --      --            211               233
+chip C: 192 GB, 5 TB/s                        21     321     484     554      --            560               582
+
+reading it:
+ * at batch 1 the speed is bandwidth / weight bytes: 0.5e12 / 7e9 = 71 tokens/s on chip A, 286 on chip B, 714 on chip C (before the cache read).
+ * chip A holds exactly one 32,768-token request next to the weights (7 GB + 8.6 GB = 15.6 GB; a second request would need 24.2 GB): look at the 'max batch' column.
+ * past a point more batch adds almost nothing: the curve flattens at bandwidth / KV bytes per request, the 'limit' column. Long contexts lower that limit and the max batch together.
+ * on these assumed chips capacity ends the curve before it has flattened (chip A at 2,048 tokens reaches 656 of its 931 limit): a bigger memory buys more batch, and more batch buys throughput only until the curve flattens.

@@ -311,6 +311,18 @@ Worked answer: 7.0 GB of weights divided by 1.07 GB of cache per request is 6.5.
 
 Worked answer: the batched step and the single-sequence step are built by the same builder, so both read sequence 0's state for every sequence and agree with each other. The first version compared with the integer reference only for a batch of one, which means only sequence 0, whose state is the correct one. Comparing every sequence, decoded alone, with the integer reference makes the single run for sequences 1 to 3 wrong, and the mismatch appears.
 
+**6. The maximum batch of 33 on chip B at 8,192 tokens.**
+
+Worked answer: capacity is 80 GB; the weights take 7 GB, leaving 73 GB. One request's cache is 256 KiB x 8,192 tokens = 2 GiB = 2.147 GB. 73 / 2.147 = 33.99, and a batch must be a whole number of requests that fit, so 33 (a 34th would need 71.1 GB of cache and 78.1 GB in all, over the 80 GB with no room for anything else).
+
+**7. Slots spent by static batching on lengths 14, 3, 9, 5.**
+
+Worked answer: the group runs 14 steps with four slots: 14 x 4 = 56 sequence-slots. Only 14 + 3 + 9 + 5 = 31 are useful; 25 slots (45%) are spent on requests that have already finished.
+
+**8. The best fraction of peak for attention-dominated decoding.**
+
+Worked answer: with memory delivering one word per cycle, the highest attainable rate is intensity x 1 = 2.35 MACs per cycle at L = 16, against a peak of 16: 2.35 / 16 = 14.7%. The circuit reaches 0.33 to 0.61 MACs per cycle (2% to 4% of peak), because instructions also do not overlap.
+
 ---
 
 ## Chapter 10
