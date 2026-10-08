@@ -1,0 +1,27 @@
+
+9. Printing statistics.
+
+=== kogge_w16 ===
+
+   Number of wires:                 92
+   Number of wire bits:            138
+   Number of public wires:           3
+   Number of public wire bits:      49
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                106
+     AND2                            9
+     AOI21                          10
+     INV                             4
+     NAND2                          21
+     NAND3                           1
+     NOR2                           20
+     NOR3                            4
+     OAI21                           9
+     OR2                             5
+     XNOR2                          17
+     XOR2                            6
+
+   Chip area for module '\kogge_w16': 147.530000
+

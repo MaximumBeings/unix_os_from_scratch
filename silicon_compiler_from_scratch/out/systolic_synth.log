@@ -66,6 +66,7 @@ Generating RTLIL representation for module `\ga2_st'.
 Generating RTLIL representation for module `\ga2_rq'.
 Generating RTLIL representation for module `\ga2_vadd'.
 Generating RTLIL representation for module `\ga2_amax'.
+Generating RTLIL representation for module `\ga2_unp'.
 Successfully finished Verilog frontend.
 
 9. Executing Verilog-2005 frontend: rtl/ga2_sm.v
@@ -97,6 +98,7 @@ Used module:     \pe
 Removing unused module `\ga2'.
 Removing unused module `\ga2_mm'.
 Removing unused module `\ga2_sm'.
+Removing unused module `\ga2_unp'.
 Removing unused module `\ga2_amax'.
 Removing unused module `\ga2_vadd'.
 Removing unused module `\ga2_rq'.
@@ -105,7 +107,7 @@ Removing unused module `\divu'.
 Removing unused module `\exp_lut'.
 Removing unused module `\requant'.
 Removing unused module `\dma'.
-Removed 11 unused modules.
+Removed 12 unused modules.
 
 13. Executing SYNTH pass.
 
@@ -192,11 +194,11 @@ No latch inferred for signal `\systolic.\bw[19]' from process `\systolic.$proc$r
 
 13.2.9. Executing PROC_DFF pass (convert process syncs to FFs).
 Creating register for signal `\pe.\a_out' using process `\pe.$proc$rtl/systolic.v:6$15'.
-  created $dff cell `$procdff$484' with positive edge clock.
+  created $dff cell `$procdff$513' with positive edge clock.
 Creating register for signal `\pe.\b_out' using process `\pe.$proc$rtl/systolic.v:6$15'.
-  created $dff cell `$procdff$485' with positive edge clock.
+  created $dff cell `$procdff$514' with positive edge clock.
 Creating register for signal `\pe.\acc' using process `\pe.$proc$rtl/systolic.v:6$15'.
-  created $dff cell `$procdff$486' with positive edge clock.
+  created $dff cell `$procdff$515' with positive edge clock.
 
 13.2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
 
@@ -306,46 +308,46 @@ Finding identical cells in module `\systolic'.
 Removed a total of 0 cells.
 
 13.9.6. Executing OPT_DFF pass (perform DFF optimizations).
-Adding SRST signal on $flatten\row[3].col[3].u.$procdff$486 ($dff) from module systolic (D = $flatten\row[3].col[3].u.$add$rtl/systolic.v:8$17_Y, Q = \row[3].col[3].u.acc, rval = 0).
-Adding SRST signal on $flatten\row[3].col[2].u.$procdff$486 ($dff) from module systolic (D = $flatten\row[3].col[2].u.$add$rtl/systolic.v:8$17_Y, Q = \row[3].col[2].u.acc, rval = 0).
-Adding SRST signal on $flatten\row[3].col[2].u.$procdff$484 ($dff) from module systolic (D = \row[3].col[1].u.a_out, Q = \row[3].col[2].u.a_out, rval = 8'00000000).
-Adding SRST signal on $flatten\row[3].col[1].u.$procdff$486 ($dff) from module systolic (D = $flatten\row[3].col[1].u.$add$rtl/systolic.v:8$17_Y, Q = \row[3].col[1].u.acc, rval = 0).
-Adding SRST signal on $flatten\row[3].col[1].u.$procdff$484 ($dff) from module systolic (D = \row[3].col[0].u.a_out, Q = \row[3].col[1].u.a_out, rval = 8'00000000).
-Adding SRST signal on $flatten\row[3].col[0].u.$procdff$486 ($dff) from module systolic (D = $flatten\row[3].col[0].u.$add$rtl/systolic.v:8$17_Y, Q = \row[3].col[0].u.acc, rval = 0).
-Adding SRST signal on $flatten\row[3].col[0].u.$procdff$484 ($dff) from module systolic (D = \a_edge [31:24], Q = \row[3].col[0].u.a_out, rval = 8'00000000).
-Adding SRST signal on $flatten\row[2].col[3].u.$procdff$486 ($dff) from module systolic (D = $flatten\row[2].col[3].u.$add$rtl/systolic.v:8$17_Y, Q = \row[2].col[3].u.acc, rval = 0).
-Adding SRST signal on $flatten\row[2].col[3].u.$procdff$485 ($dff) from module systolic (D = \row[1].col[3].u.b_out, Q = \row[2].col[3].u.b_out, rval = 8'00000000).
-Adding SRST signal on $flatten\row[2].col[2].u.$procdff$486 ($dff) from module systolic (D = $flatten\row[2].col[2].u.$add$rtl/systolic.v:8$17_Y, Q = \row[2].col[2].u.acc, rval = 0).
-Adding SRST signal on $flatten\row[2].col[2].u.$procdff$485 ($dff) from module systolic (D = \row[1].col[2].u.b_out, Q = \row[2].col[2].u.b_out, rval = 8'00000000).
-Adding SRST signal on $flatten\row[2].col[2].u.$procdff$484 ($dff) from module systolic (D = \row[2].col[1].u.a_out, Q = \row[2].col[2].u.a_out, rval = 8'00000000).
-Adding SRST signal on $flatten\row[2].col[1].u.$procdff$486 ($dff) from module systolic (D = $flatten\row[2].col[1].u.$add$rtl/systolic.v:8$17_Y, Q = \row[2].col[1].u.acc, rval = 0).
-Adding SRST signal on $flatten\row[2].col[1].u.$procdff$485 ($dff) from module systolic (D = \row[1].col[1].u.b_out, Q = \row[2].col[1].u.b_out, rval = 8'00000000).
-Adding SRST signal on $flatten\row[2].col[1].u.$procdff$484 ($dff) from module systolic (D = \row[2].col[0].u.a_out, Q = \row[2].col[1].u.a_out, rval = 8'00000000).
-Adding SRST signal on $flatten\row[2].col[0].u.$procdff$486 ($dff) from module systolic (D = $flatten\row[2].col[0].u.$add$rtl/systolic.v:8$17_Y, Q = \row[2].col[0].u.acc, rval = 0).
-Adding SRST signal on $flatten\row[2].col[0].u.$procdff$485 ($dff) from module systolic (D = \row[1].col[0].u.b_out, Q = \row[2].col[0].u.b_out, rval = 8'00000000).
-Adding SRST signal on $flatten\row[2].col[0].u.$procdff$484 ($dff) from module systolic (D = \a_edge [23:16], Q = \row[2].col[0].u.a_out, rval = 8'00000000).
-Adding SRST signal on $flatten\row[1].col[3].u.$procdff$486 ($dff) from module systolic (D = $flatten\row[1].col[3].u.$add$rtl/systolic.v:8$17_Y, Q = \row[1].col[3].u.acc, rval = 0).
-Adding SRST signal on $flatten\row[1].col[3].u.$procdff$485 ($dff) from module systolic (D = \row[0].col[3].u.b_out, Q = \row[1].col[3].u.b_out, rval = 8'00000000).
-Adding SRST signal on $flatten\row[1].col[2].u.$procdff$486 ($dff) from module systolic (D = $flatten\row[1].col[2].u.$add$rtl/systolic.v:8$17_Y, Q = \row[1].col[2].u.acc, rval = 0).
-Adding SRST signal on $flatten\row[1].col[2].u.$procdff$485 ($dff) from module systolic (D = \row[0].col[2].u.b_out, Q = \row[1].col[2].u.b_out, rval = 8'00000000).
-Adding SRST signal on $flatten\row[1].col[2].u.$procdff$484 ($dff) from module systolic (D = \row[1].col[1].u.a_out, Q = \row[1].col[2].u.a_out, rval = 8'00000000).
-Adding SRST signal on $flatten\row[1].col[1].u.$procdff$486 ($dff) from module systolic (D = $flatten\row[1].col[1].u.$add$rtl/systolic.v:8$17_Y, Q = \row[1].col[1].u.acc, rval = 0).
-Adding SRST signal on $flatten\row[1].col[1].u.$procdff$485 ($dff) from module systolic (D = \row[0].col[1].u.b_out, Q = \row[1].col[1].u.b_out, rval = 8'00000000).
-Adding SRST signal on $flatten\row[1].col[1].u.$procdff$484 ($dff) from module systolic (D = \row[1].col[0].u.a_out, Q = \row[1].col[1].u.a_out, rval = 8'00000000).
-Adding SRST signal on $flatten\row[1].col[0].u.$procdff$486 ($dff) from module systolic (D = $flatten\row[1].col[0].u.$add$rtl/systolic.v:8$17_Y, Q = \row[1].col[0].u.acc, rval = 0).
-Adding SRST signal on $flatten\row[1].col[0].u.$procdff$485 ($dff) from module systolic (D = \row[0].col[0].u.b_out, Q = \row[1].col[0].u.b_out, rval = 8'00000000).
-Adding SRST signal on $flatten\row[1].col[0].u.$procdff$484 ($dff) from module systolic (D = \a_edge [15:8], Q = \row[1].col[0].u.a_out, rval = 8'00000000).
-Adding SRST signal on $flatten\row[0].col[3].u.$procdff$486 ($dff) from module systolic (D = $flatten\row[0].col[3].u.$add$rtl/systolic.v:8$17_Y, Q = \row[0].col[3].u.acc, rval = 0).
-Adding SRST signal on $flatten\row[0].col[3].u.$procdff$485 ($dff) from module systolic (D = \b_edge [31:24], Q = \row[0].col[3].u.b_out, rval = 8'00000000).
-Adding SRST signal on $flatten\row[0].col[2].u.$procdff$486 ($dff) from module systolic (D = $flatten\row[0].col[2].u.$add$rtl/systolic.v:8$17_Y, Q = \row[0].col[2].u.acc, rval = 0).
-Adding SRST signal on $flatten\row[0].col[2].u.$procdff$485 ($dff) from module systolic (D = \b_edge [23:16], Q = \row[0].col[2].u.b_out, rval = 8'00000000).
-Adding SRST signal on $flatten\row[0].col[2].u.$procdff$484 ($dff) from module systolic (D = \row[0].col[1].u.a_out, Q = \row[0].col[2].u.a_out, rval = 8'00000000).
-Adding SRST signal on $flatten\row[0].col[1].u.$procdff$486 ($dff) from module systolic (D = $flatten\row[0].col[1].u.$add$rtl/systolic.v:8$17_Y, Q = \row[0].col[1].u.acc, rval = 0).
-Adding SRST signal on $flatten\row[0].col[1].u.$procdff$485 ($dff) from module systolic (D = \b_edge [15:8], Q = \row[0].col[1].u.b_out, rval = 8'00000000).
-Adding SRST signal on $flatten\row[0].col[1].u.$procdff$484 ($dff) from module systolic (D = \row[0].col[0].u.a_out, Q = \row[0].col[1].u.a_out, rval = 8'00000000).
-Adding SRST signal on $flatten\row[0].col[0].u.$procdff$486 ($dff) from module systolic (D = $flatten\row[0].col[0].u.$add$rtl/systolic.v:8$17_Y, Q = \row[0].col[0].u.acc, rval = 0).
-Adding SRST signal on $flatten\row[0].col[0].u.$procdff$485 ($dff) from module systolic (D = \b_edge [7:0], Q = \row[0].col[0].u.b_out, rval = 8'00000000).
-Adding SRST signal on $flatten\row[0].col[0].u.$procdff$484 ($dff) from module systolic (D = \a_edge [7:0], Q = \row[0].col[0].u.a_out, rval = 8'00000000).
+Adding SRST signal on $flatten\row[3].col[3].u.$procdff$515 ($dff) from module systolic (D = $flatten\row[3].col[3].u.$add$rtl/systolic.v:8$17_Y, Q = \row[3].col[3].u.acc, rval = 0).
+Adding SRST signal on $flatten\row[3].col[2].u.$procdff$515 ($dff) from module systolic (D = $flatten\row[3].col[2].u.$add$rtl/systolic.v:8$17_Y, Q = \row[3].col[2].u.acc, rval = 0).
+Adding SRST signal on $flatten\row[3].col[2].u.$procdff$513 ($dff) from module systolic (D = \row[3].col[1].u.a_out, Q = \row[3].col[2].u.a_out, rval = 8'00000000).
+Adding SRST signal on $flatten\row[3].col[1].u.$procdff$515 ($dff) from module systolic (D = $flatten\row[3].col[1].u.$add$rtl/systolic.v:8$17_Y, Q = \row[3].col[1].u.acc, rval = 0).
+Adding SRST signal on $flatten\row[3].col[1].u.$procdff$513 ($dff) from module systolic (D = \row[3].col[0].u.a_out, Q = \row[3].col[1].u.a_out, rval = 8'00000000).
+Adding SRST signal on $flatten\row[3].col[0].u.$procdff$515 ($dff) from module systolic (D = $flatten\row[3].col[0].u.$add$rtl/systolic.v:8$17_Y, Q = \row[3].col[0].u.acc, rval = 0).
+Adding SRST signal on $flatten\row[3].col[0].u.$procdff$513 ($dff) from module systolic (D = \a_edge [31:24], Q = \row[3].col[0].u.a_out, rval = 8'00000000).
+Adding SRST signal on $flatten\row[2].col[3].u.$procdff$515 ($dff) from module systolic (D = $flatten\row[2].col[3].u.$add$rtl/systolic.v:8$17_Y, Q = \row[2].col[3].u.acc, rval = 0).
+Adding SRST signal on $flatten\row[2].col[3].u.$procdff$514 ($dff) from module systolic (D = \row[1].col[3].u.b_out, Q = \row[2].col[3].u.b_out, rval = 8'00000000).
+Adding SRST signal on $flatten\row[2].col[2].u.$procdff$515 ($dff) from module systolic (D = $flatten\row[2].col[2].u.$add$rtl/systolic.v:8$17_Y, Q = \row[2].col[2].u.acc, rval = 0).
+Adding SRST signal on $flatten\row[2].col[2].u.$procdff$514 ($dff) from module systolic (D = \row[1].col[2].u.b_out, Q = \row[2].col[2].u.b_out, rval = 8'00000000).
+Adding SRST signal on $flatten\row[2].col[2].u.$procdff$513 ($dff) from module systolic (D = \row[2].col[1].u.a_out, Q = \row[2].col[2].u.a_out, rval = 8'00000000).
+Adding SRST signal on $flatten\row[2].col[1].u.$procdff$515 ($dff) from module systolic (D = $flatten\row[2].col[1].u.$add$rtl/systolic.v:8$17_Y, Q = \row[2].col[1].u.acc, rval = 0).
+Adding SRST signal on $flatten\row[2].col[1].u.$procdff$514 ($dff) from module systolic (D = \row[1].col[1].u.b_out, Q = \row[2].col[1].u.b_out, rval = 8'00000000).
+Adding SRST signal on $flatten\row[2].col[1].u.$procdff$513 ($dff) from module systolic (D = \row[2].col[0].u.a_out, Q = \row[2].col[1].u.a_out, rval = 8'00000000).
+Adding SRST signal on $flatten\row[2].col[0].u.$procdff$515 ($dff) from module systolic (D = $flatten\row[2].col[0].u.$add$rtl/systolic.v:8$17_Y, Q = \row[2].col[0].u.acc, rval = 0).
+Adding SRST signal on $flatten\row[2].col[0].u.$procdff$514 ($dff) from module systolic (D = \row[1].col[0].u.b_out, Q = \row[2].col[0].u.b_out, rval = 8'00000000).
+Adding SRST signal on $flatten\row[2].col[0].u.$procdff$513 ($dff) from module systolic (D = \a_edge [23:16], Q = \row[2].col[0].u.a_out, rval = 8'00000000).
+Adding SRST signal on $flatten\row[1].col[3].u.$procdff$515 ($dff) from module systolic (D = $flatten\row[1].col[3].u.$add$rtl/systolic.v:8$17_Y, Q = \row[1].col[3].u.acc, rval = 0).
+Adding SRST signal on $flatten\row[1].col[3].u.$procdff$514 ($dff) from module systolic (D = \row[0].col[3].u.b_out, Q = \row[1].col[3].u.b_out, rval = 8'00000000).
+Adding SRST signal on $flatten\row[1].col[2].u.$procdff$515 ($dff) from module systolic (D = $flatten\row[1].col[2].u.$add$rtl/systolic.v:8$17_Y, Q = \row[1].col[2].u.acc, rval = 0).
+Adding SRST signal on $flatten\row[1].col[2].u.$procdff$514 ($dff) from module systolic (D = \row[0].col[2].u.b_out, Q = \row[1].col[2].u.b_out, rval = 8'00000000).
+Adding SRST signal on $flatten\row[1].col[2].u.$procdff$513 ($dff) from module systolic (D = \row[1].col[1].u.a_out, Q = \row[1].col[2].u.a_out, rval = 8'00000000).
+Adding SRST signal on $flatten\row[1].col[1].u.$procdff$515 ($dff) from module systolic (D = $flatten\row[1].col[1].u.$add$rtl/systolic.v:8$17_Y, Q = \row[1].col[1].u.acc, rval = 0).
+Adding SRST signal on $flatten\row[1].col[1].u.$procdff$514 ($dff) from module systolic (D = \row[0].col[1].u.b_out, Q = \row[1].col[1].u.b_out, rval = 8'00000000).
+Adding SRST signal on $flatten\row[1].col[1].u.$procdff$513 ($dff) from module systolic (D = \row[1].col[0].u.a_out, Q = \row[1].col[1].u.a_out, rval = 8'00000000).
+Adding SRST signal on $flatten\row[1].col[0].u.$procdff$515 ($dff) from module systolic (D = $flatten\row[1].col[0].u.$add$rtl/systolic.v:8$17_Y, Q = \row[1].col[0].u.acc, rval = 0).
+Adding SRST signal on $flatten\row[1].col[0].u.$procdff$514 ($dff) from module systolic (D = \row[0].col[0].u.b_out, Q = \row[1].col[0].u.b_out, rval = 8'00000000).
+Adding SRST signal on $flatten\row[1].col[0].u.$procdff$513 ($dff) from module systolic (D = \a_edge [15:8], Q = \row[1].col[0].u.a_out, rval = 8'00000000).
+Adding SRST signal on $flatten\row[0].col[3].u.$procdff$515 ($dff) from module systolic (D = $flatten\row[0].col[3].u.$add$rtl/systolic.v:8$17_Y, Q = \row[0].col[3].u.acc, rval = 0).
+Adding SRST signal on $flatten\row[0].col[3].u.$procdff$514 ($dff) from module systolic (D = \b_edge [31:24], Q = \row[0].col[3].u.b_out, rval = 8'00000000).
+Adding SRST signal on $flatten\row[0].col[2].u.$procdff$515 ($dff) from module systolic (D = $flatten\row[0].col[2].u.$add$rtl/systolic.v:8$17_Y, Q = \row[0].col[2].u.acc, rval = 0).
+Adding SRST signal on $flatten\row[0].col[2].u.$procdff$514 ($dff) from module systolic (D = \b_edge [23:16], Q = \row[0].col[2].u.b_out, rval = 8'00000000).
+Adding SRST signal on $flatten\row[0].col[2].u.$procdff$513 ($dff) from module systolic (D = \row[0].col[1].u.a_out, Q = \row[0].col[2].u.a_out, rval = 8'00000000).
+Adding SRST signal on $flatten\row[0].col[1].u.$procdff$515 ($dff) from module systolic (D = $flatten\row[0].col[1].u.$add$rtl/systolic.v:8$17_Y, Q = \row[0].col[1].u.acc, rval = 0).
+Adding SRST signal on $flatten\row[0].col[1].u.$procdff$514 ($dff) from module systolic (D = \b_edge [15:8], Q = \row[0].col[1].u.b_out, rval = 8'00000000).
+Adding SRST signal on $flatten\row[0].col[1].u.$procdff$513 ($dff) from module systolic (D = \row[0].col[0].u.a_out, Q = \row[0].col[1].u.a_out, rval = 8'00000000).
+Adding SRST signal on $flatten\row[0].col[0].u.$procdff$515 ($dff) from module systolic (D = $flatten\row[0].col[0].u.$add$rtl/systolic.v:8$17_Y, Q = \row[0].col[0].u.acc, rval = 0).
+Adding SRST signal on $flatten\row[0].col[0].u.$procdff$514 ($dff) from module systolic (D = \b_edge [7:0], Q = \row[0].col[0].u.b_out, rval = 8'00000000).
+Adding SRST signal on $flatten\row[0].col[0].u.$procdff$513 ($dff) from module systolic (D = \a_edge [7:0], Q = \row[0].col[0].u.a_out, rval = 8'00000000).
 
 13.9.7. Executing OPT_CLEAN pass (remove unused cells and wires).
 Finding unused cells or wires in module \systolic..
@@ -404,16 +406,16 @@ Removed top 16 bits (of 32) from port Y of cell systolic.$flatten\row[2].col[1].
 Removed top 16 bits (of 32) from port B of cell systolic.$flatten\row[2].col[1].u.$add$rtl/systolic.v:8$17 ($add).
 Removed top 16 bits (of 32) from port Y of cell systolic.$flatten\row[2].col[3].u.$mul$rtl/systolic.v:8$16 ($mul).
 Removed top 16 bits (of 32) from port B of cell systolic.$flatten\row[2].col[3].u.$add$rtl/systolic.v:8$17 ($add).
-Removed top 16 bits (of 32) from port Y of cell systolic.$flatten\row[3].col[0].u.$mul$rtl/systolic.v:8$16 ($mul).
-Removed top 16 bits (of 32) from port B of cell systolic.$flatten\row[3].col[0].u.$add$rtl/systolic.v:8$17 ($add).
 Removed top 16 bits (of 32) from port Y of cell systolic.$flatten\row[2].col[2].u.$mul$rtl/systolic.v:8$16 ($mul).
 Removed top 16 bits (of 32) from port B of cell systolic.$flatten\row[2].col[2].u.$add$rtl/systolic.v:8$17 ($add).
-Removed top 16 bits (of 32) from port Y of cell systolic.$flatten\row[3].col[3].u.$mul$rtl/systolic.v:8$16 ($mul).
-Removed top 16 bits (of 32) from port B of cell systolic.$flatten\row[3].col[3].u.$add$rtl/systolic.v:8$17 ($add).
-Removed top 16 bits (of 32) from port Y of cell systolic.$flatten\row[3].col[2].u.$mul$rtl/systolic.v:8$16 ($mul).
-Removed top 16 bits (of 32) from port B of cell systolic.$flatten\row[3].col[2].u.$add$rtl/systolic.v:8$17 ($add).
 Removed top 16 bits (of 32) from port Y of cell systolic.$flatten\row[3].col[1].u.$mul$rtl/systolic.v:8$16 ($mul).
 Removed top 16 bits (of 32) from port B of cell systolic.$flatten\row[3].col[1].u.$add$rtl/systolic.v:8$17 ($add).
+Removed top 16 bits (of 32) from port Y of cell systolic.$flatten\row[3].col[2].u.$mul$rtl/systolic.v:8$16 ($mul).
+Removed top 16 bits (of 32) from port B of cell systolic.$flatten\row[3].col[2].u.$add$rtl/systolic.v:8$17 ($add).
+Removed top 16 bits (of 32) from port Y of cell systolic.$flatten\row[3].col[0].u.$mul$rtl/systolic.v:8$16 ($mul).
+Removed top 16 bits (of 32) from port B of cell systolic.$flatten\row[3].col[0].u.$add$rtl/systolic.v:8$17 ($add).
+Removed top 16 bits (of 32) from port Y of cell systolic.$flatten\row[3].col[3].u.$mul$rtl/systolic.v:8$16 ($mul).
+Removed top 16 bits (of 32) from port B of cell systolic.$flatten\row[3].col[3].u.$add$rtl/systolic.v:8$17 ($add).
 
 13.11. Executing PEEPOPT pass (run peephole optimizers).
 
@@ -470,22 +472,22 @@ Extracting $alu and $macc cells in module systolic:
   merging $macc model for $flatten\row[0].col[2].u.$mul$rtl/systolic.v:8$16 into $flatten\row[0].col[2].u.$add$rtl/systolic.v:8$17.
   merging $macc model for $flatten\row[0].col[1].u.$mul$rtl/systolic.v:8$16 into $flatten\row[0].col[1].u.$add$rtl/systolic.v:8$17.
   merging $macc model for $flatten\row[0].col[0].u.$mul$rtl/systolic.v:8$16 into $flatten\row[0].col[0].u.$add$rtl/systolic.v:8$17.
-  creating $macc cell for $flatten\row[3].col[0].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$527
-  creating $macc cell for $flatten\row[1].col[3].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$528
-  creating $macc cell for $flatten\row[2].col[3].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$529
-  creating $macc cell for $flatten\row[1].col[2].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$530
-  creating $macc cell for $flatten\row[3].col[1].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$531
-  creating $macc cell for $flatten\row[1].col[1].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$532
-  creating $macc cell for $flatten\row[2].col[1].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$533
-  creating $macc cell for $flatten\row[1].col[0].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$534
-  creating $macc cell for $flatten\row[3].col[2].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$535
-  creating $macc cell for $flatten\row[0].col[3].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$536
-  creating $macc cell for $flatten\row[2].col[2].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$537
-  creating $macc cell for $flatten\row[0].col[2].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$538
-  creating $macc cell for $flatten\row[3].col[3].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$539
-  creating $macc cell for $flatten\row[0].col[1].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$540
-  creating $macc cell for $flatten\row[2].col[0].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$541
-  creating $macc cell for $flatten\row[0].col[0].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$542
+  creating $macc cell for $flatten\row[3].col[0].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$556
+  creating $macc cell for $flatten\row[1].col[3].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$557
+  creating $macc cell for $flatten\row[2].col[3].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$558
+  creating $macc cell for $flatten\row[1].col[2].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$559
+  creating $macc cell for $flatten\row[3].col[1].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$560
+  creating $macc cell for $flatten\row[1].col[1].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$561
+  creating $macc cell for $flatten\row[2].col[1].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$562
+  creating $macc cell for $flatten\row[1].col[0].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$563
+  creating $macc cell for $flatten\row[3].col[2].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$564
+  creating $macc cell for $flatten\row[0].col[3].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$565
+  creating $macc cell for $flatten\row[2].col[2].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$566
+  creating $macc cell for $flatten\row[0].col[2].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$567
+  creating $macc cell for $flatten\row[3].col[3].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$568
+  creating $macc cell for $flatten\row[0].col[1].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$569
+  creating $macc cell for $flatten\row[2].col[0].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$570
+  creating $macc cell for $flatten\row[0].col[0].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:365:replace_macc$571
   created 0 $alu and 16 $macc cells.
 
 13.14. Executing SHARE pass (SAT-based resource sharing).
@@ -753,16 +755,16 @@ Using extmapper maccmap for cells of type $macc.
   add \a_edge [15:8] * \row[0].col[0].u.b_out (8x8 bits, signed)
   add \row[1].col[2].u.acc (32 bits, signed)
   add \row[1].col[1].u.a_out * \row[0].col[2].u.b_out (8x8 bits, signed)
-  add \row[1].col[3].u.acc (32 bits, signed)
-  add \row[1].col[2].u.a_out * \row[0].col[3].u.b_out (8x8 bits, signed)
   add \row[0].col[2].u.acc (32 bits, signed)
   add \row[0].col[1].u.a_out * \b_edge [23:16] (8x8 bits, signed)
-  add \row[0].col[1].u.acc (32 bits, signed)
-  add \row[0].col[0].u.a_out * \b_edge [15:8] (8x8 bits, signed)
-  add \row[0].col[3].u.acc (32 bits, signed)
-  add \row[0].col[2].u.a_out * \b_edge [31:24] (8x8 bits, signed)
   add \row[1].col[1].u.acc (32 bits, signed)
   add \row[1].col[0].u.a_out * \row[0].col[1].u.b_out (8x8 bits, signed)
+  add \row[0].col[3].u.acc (32 bits, signed)
+  add \row[0].col[2].u.a_out * \b_edge [31:24] (8x8 bits, signed)
+  add \row[1].col[3].u.acc (32 bits, signed)
+  add \row[1].col[2].u.a_out * \row[0].col[3].u.b_out (8x8 bits, signed)
+  add \row[0].col[1].u.acc (32 bits, signed)
+  add \row[0].col[0].u.a_out * \b_edge [15:8] (8x8 bits, signed)
 Using extmapper simplemap for cells of type $and.
 Using template $paramod\_90_fa\WIDTH=32'00000000000000000000000000100000 for cells of type $fa.
 Using extmapper simplemap for cells of type $not.
@@ -779,26 +781,26 @@ No more expansions possible.
 
 13.22.1. Executing OPT_EXPR pass (perform const folding).
 Optimizing module systolic.
-<suppressed ~5212 debug messages>
+<suppressed ~5177 debug messages>
 
 13.22.2. Executing OPT_MERGE pass (detect identical cells).
 Finding identical cells in module `\systolic'.
-<suppressed ~22884 debug messages>
-Removed a total of 7628 cells.
+<suppressed ~22830 debug messages>
+Removed a total of 7610 cells.
 
 13.22.3. Executing OPT_DFF pass (perform DFF optimizations).
 
 13.22.4. Executing OPT_CLEAN pass (remove unused cells and wires).
 Finding unused cells or wires in module \systolic..
-Removed 924 unused cells and 2076 unused wires.
-<suppressed ~925 debug messages>
+Removed 925 unused cells and 2062 unused wires.
+<suppressed ~926 debug messages>
 
 13.22.5. Finished fast OPT passes.
 
 13.23. Executing ABC pass (technology mapping using ABC).
 
 13.23.1. Extracting gate netlist of module `\systolic' to `<abc-temp-dir>/input.blif'..
-Extracted 16060 gates and 16828 wires to a netlist network with 768 inputs and 512 outputs.
+Extracted 16112 gates and 16880 wires to a netlist network with 768 inputs and 512 outputs.
 
 13.23.1.1. Executing ABC.
 Running ABC command: "<yosys-exe-dir>/yosys-abc" -s -f <abc-temp-dir>/abc.script 2>&1
@@ -813,17 +815,17 @@ ABC: + map
 ABC: + write_blif <abc-temp-dir>/output.blif 
 
 13.23.1.2. Re-integrating ABC results.
-ABC RESULTS:               MUX cells:        4
-ABC RESULTS:              NAND cells:      682
-ABC RESULTS:               AND cells:      829
-ABC RESULTS:               NOT cells:      631
-ABC RESULTS:                OR cells:     2024
+ABC RESULTS:               MUX cells:        2
+ABC RESULTS:              NAND cells:      704
+ABC RESULTS:               AND cells:      813
+ABC RESULTS:               NOT cells:      633
+ABC RESULTS:                OR cells:     2029
 ABC RESULTS:             ORNOT cells:      398
-ABC RESULTS:               NOR cells:      706
-ABC RESULTS:            ANDNOT cells:     5509
-ABC RESULTS:               XOR cells:     4291
-ABC RESULTS:              XNOR cells:     1488
-ABC RESULTS:        internal signals:    15548
+ABC RESULTS:               NOR cells:      694
+ABC RESULTS:            ANDNOT cells:     5535
+ABC RESULTS:               XOR cells:     4299
+ABC RESULTS:              XNOR cells:     1510
+ABC RESULTS:        internal signals:    15600
 ABC RESULTS:           input signals:      768
 ABC RESULTS:          output signals:      512
 Removing temp directory.
@@ -841,7 +843,7 @@ Removed a total of 0 cells.
 
 13.24.4. Executing OPT_CLEAN pass (remove unused cells and wires).
 Finding unused cells or wires in module \systolic..
-Removed 0 unused cells and 3394 unused wires.
+Removed 0 unused cells and 3411 unused wires.
 <suppressed ~1 debug messages>
 
 13.24.5. Finished fast OPT passes.
@@ -859,25 +861,25 @@ Removed 0 unused modules.
 
 === systolic ===
 
-   Number of wires:              16305
-   Number of wire bits:          21524
+   Number of wires:              16357
+   Number of wire bits:          21483
    Number of public wires:         157
    Number of public wire bits:    2338
    Number of memories:               0
    Number of memory bits:            0
    Number of processes:              0
-   Number of cells:              17266
-     $_ANDNOT_                    5509
-     $_AND_                        829
-     $_MUX_                          4
-     $_NAND_                       682
-     $_NOR_                        706
-     $_NOT_                        631
+   Number of cells:              17321
+     $_ANDNOT_                    5535
+     $_AND_                        813
+     $_MUX_                          2
+     $_NAND_                       704
+     $_NOR_                        694
+     $_NOT_                        633
      $_ORNOT_                      398
-     $_OR_                        2024
+     $_OR_                        2029
      $_SDFF_PP0_                   704
-     $_XNOR_                      1488
-     $_XOR_                       4291
+     $_XNOR_                      1510
+     $_XOR_                       4299
 
 13.27. Executing CHECK pass (checking for obvious problems).
 Checking module systolic...
@@ -914,7 +916,7 @@ Mapping DFF cells in module `\systolic':
 16. Executing ABC pass (technology mapping using ABC).
 
 16.1. Extracting gate netlist of module `\systolic' to `<abc-temp-dir>/input.blif'..
-Extracted 17266 gates and 18036 wires to a netlist network with 769 inputs and 704 outputs.
+Extracted 17321 gates and 18091 wires to a netlist network with 769 inputs and 704 outputs.
 
 16.1.1. Executing ABC.
 Running ABC command: "<yosys-exe-dir>/yosys-abc" -s -f <abc-temp-dir>/abc.script 2>&1
@@ -944,54 +946,54 @@ ABC: + write_blif <abc-temp-dir>/output.blif
 
 16.1.2. Re-integrating ABC results.
 ABC RESULTS:              MUX2 cells:        1
-ABC RESULTS:             NAND3 cells:      159
-ABC RESULTS:               OR2 cells:      527
-ABC RESULTS:               INV cells:      634
-ABC RESULTS:             OAI21 cells:     1367
-ABC RESULTS:              XOR2 cells:     2504
-ABC RESULTS:             AOI21 cells:     1101
-ABC RESULTS:             NAND2 cells:     2831
-ABC RESULTS:             XNOR2 cells:     2967
-ABC RESULTS:              NOR2 cells:     2051
-ABC RESULTS:              AND2 cells:      617
-ABC RESULTS:              NOR3 cells:      273
-ABC RESULTS:        internal signals:    16563
+ABC RESULTS:             NAND3 cells:      143
+ABC RESULTS:               OR2 cells:      581
+ABC RESULTS:               INV cells:      641
+ABC RESULTS:             OAI21 cells:     1361
+ABC RESULTS:              XOR2 cells:     2556
+ABC RESULTS:              AND2 cells:      615
+ABC RESULTS:              NOR3 cells:      296
+ABC RESULTS:             NAND2 cells:     2800
+ABC RESULTS:             AOI21 cells:     1079
+ABC RESULTS:             XNOR2 cells:     2925
+ABC RESULTS:              NOR2 cells:     2080
+ABC RESULTS:        internal signals:    16618
 ABC RESULTS:           input signals:      769
 ABC RESULTS:          output signals:      704
 Removing temp directory.
 
 17. Executing OPT_CLEAN pass (remove unused cells and wires).
 Finding unused cells or wires in module \systolic..
-Removed 0 unused cells and 17749 unused wires.
+Removed 0 unused cells and 17801 unused wires.
 <suppressed ~129 debug messages>
 
 18. Printing statistics.
 
 === systolic ===
 
-   Number of wires:              15061
-   Number of wire bits:          15802
+   Number of wires:              15107
+   Number of wire bits:          15848
    Number of public wires:          29
    Number of public wire bits:     770
    Number of memories:               0
    Number of memory bits:            0
    Number of processes:              0
-   Number of cells:              15736
-     AND2                          617
-     AOI21                        1101
+   Number of cells:              15782
+     AND2                          615
+     AOI21                        1079
      DFF                           704
-     INV                           634
+     INV                           641
      MUX2                            1
-     NAND2                        2831
-     NAND3                         159
-     NOR2                         2051
-     NOR3                          273
-     OAI21                        1367
-     OR2                           527
-     XNOR2                        2967
-     XOR2                         2504
+     NAND2                        2800
+     NAND3                         143
+     NOR2                         2080
+     NOR3                          296
+     OAI21                        1361
+     OR2                           581
+     XNOR2                        2925
+     XOR2                         2556
 
-   Chip area for module '\systolic': 26062.190000
+   Chip area for module '\systolic': 26117.780000
 
 19. Executing Verilog backend.
 
@@ -1003,6 +1005,6 @@ Dumping module `\systolic'.
 20. Executing JSON backend.
 
 Warnings: 2 unique messages, 2 total
-End of script. Logfile hash: 0970a6211e, CPU: user 5.52s system 0.06s, MEM: 89.57 MB peak
+End of script. Logfile hash: 6696e720a6, CPU: user 4.96s system 0.05s, MEM: 90.59 MB peak
 Yosys 0.33 (git sha1 2584903a060)
-Time spent: 42% 2x abc (3 sec), 15% 17x opt_expr (1 sec), ...
+Time spent: 45% 2x abc (3 sec), 15% 17x opt_expr (1 sec), ...

@@ -1,0 +1,35 @@
+== 1. the 4-bit adder through the flow (written with '+')
+cells 17, area 26.7 NAND2-equivalents, cell types {'AND2': 1, 'AOI21': 1, 'NAND2': 3, 'NOR2': 2, 'OAI21': 2, 'OR2': 1, 'XNOR2': 4, 'XOR2': 3}
+critical path 0.57 ns, 4 gates deep, ends at output s
+
+the netlist (out/add_w4_net.v), reduced to its gates:
+   NAND2 .A(a[0]), .B(b[0]), .Y(_00_)
+   NAND2 .A(a[1]), .B(b[1]), .Y(_01_)
+   NOR2 .A(a[1]), .B(b[1]), .Y(_02_)
+   XOR2 .A(a[1]), .B(b[1]), .Y(_03_)
+   XNOR2 .A(_00_), .B(_03_), .Y(s[1])
+   OAI21 .A(_00_), .B(_02_), .C(_01_), .Y(_04_)
+   AND2 .A(a[2]), .B(b[2]), .Y(_05_)
+   OR2 .A(a[2]), .B(b[2]), .Y(_06_)
+   XNOR2 .A(a[2]), .B(b[2]), .Y(_07_)
+   XNOR2 .A(_04_), .B(_07_), .Y(s[2])
+   AOI21 .A(_04_), .B(_06_), .C(_05_), .Y(_08_)
+   NAND2 .A(a[3]), .B(b[3]), .Y(_09_)
+   NOR2 .A(a[3]), .B(b[3]), .Y(_10_)
+   XOR2 .A(a[3]), .B(b[3]), .Y(_11_)
+   XNOR2 .A(_08_), .B(_11_), .Y(s[3])
+   XOR2 .A(a[0]), .B(b[0]), .Y(s[0])
+   OAI21 .A(_08_), .B(_10_), .C(_09_), .Y(s[4])
+
+== 2. delay and area against width, three styles; critical path in ns from the static timing analyzer (gate depth in brackets)
+   W |   '+' ns (gates) area |  ripple ns (gates) area | Kogge-Stone ns (gates) area
+   4 |   0.57 ( 4)     27 |   0.57 ( 4)     27 |   0.57 ( 4)     27
+   8 |   1.01 ( 8)     59 |   1.01 ( 8)     59 |   1.01 ( 8)     59
+  16 |   1.89 (16)    123 |   1.89 (16)    123 |   1.76 (14)    148
+  32 |   3.65 (32)    251 |   3.65 (32)    251 |   2.30 (19)    364
+  64 |   7.13 (64)    506 |   7.17 (64)    507 |   2.22 (19)    923
+
+from 4 to 64 bits (16x wider): ripple delay x12.6, area x19.0;  tool '+' delay x12.5, area x19.0;  Kogge-Stone delay x3.9, area x34.6.
+at 64 bits Kogge-Stone is 3.2x faster than the ripple chain and 1.8x its area.
+OBSERVATION: Yosys's default flow turned '+' into a ripple chain (the '+' and ripple columns agree to within rounding). A faster adder has to be asked for or written; the tool does not pick one on its own here.
+a ripple chain's delay is proportional to its width (the carry passes through every stage, Chapter 1); a prefix adder's grows with log2(width), at the price of area.

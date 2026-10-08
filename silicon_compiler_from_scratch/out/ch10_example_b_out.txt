@@ -1,0 +1,26 @@
+== 1. correctness: both two-stage requantizers against the golden vectors used for the combinational one in Chapter 3 (one-cycle latency)
+  requant_p2_tb   Icarus     PASS: the two-stage requantizer matches the golden model on all 201808 cases (exit status 0) (exit 0)
+  requant_p2_tb   Verilator  PASS: the two-stage requantizer matches the golden model on all 201808 cases (exit status 0) (exit 0)
+  requant_p2k_tb  Icarus     PASS: the two-stage requantizer with a prefix adder matches the golden model on all 201808 cases (exit status 0) (exit 0)
+  requant_p2k_tb  Verilator  PASS: the two-stage requantizer with a prefix adder matches the golden model on all 201808 cases (exit status 0) (exit 0)
+
+== 2. timing and area, measured in the toy library (areas in NAND2 equivalents; delays in ns; every critical path includes the library's 0.30 ns clock-to-q and 0.10 ns setup where registers are involved)
+design                                cells  area (GE)  flip-flops  critical path  gate depth  max clock
+combinational requant (Ch. 3)          5403       7881           0        9.87 ns          79     101 MHz
+  stage 1 alone: abs + multiply        4412       6451           0        8.23 ns          64     122 MHz
+  stage 2 alone: round, shift, clamp    829       1266           0        8.39 ns          72     119 MHz
+  stage 2 with prefix adder            1044       1599           0        4.76 ns          38     210 MHz
+two stages, cut after multiply         5353       7991          64        8.90 ns          71     112 MHz
+two stages + prefix adder              5466       8188          64        7.82 ns          61     128 MHz
+
+step 1, cut after the multiplier: 9.87 -> 8.90 ns, only 1.11x. The cut is unbalanced: stage 1 (the multiplier) is 8.23 ns but stage 2 is 8.39 ns, 72 gates deep for what looks like 'an add, a shift and a clamp'.
+        Why: stage 2's 57-bit addition is a RIPPLE chain (Example A: Yosys maps '+' to one), and the carry passes through ~57 gates.
+step 2, replace that adder by a prefix adder: stage 2 falls from 8.39 to 4.76 ns; the whole two-stage design from 8.90 to 7.82 ns, 1.26x faster than the original
+        for 64 flip-flops and +307 GE (+3.9% area) and one cycle of latency. Now stage 1 (8.23 ns, the multiplier) is the limit: to go further the multiplier itself must be pipelined or restructured.
+
+NOTE: ABC maps every synthesis run separately, so a block's delay differs by a few percent between standalone and inside a larger design (stage 1 reads 8.23 ns alone and about 7.7 ns inside requant_p2); read differences of several percent as noise and the large steps as real.
+
+== 3. what this would do to the whole chip (an ESTIMATE from Chapter 10's table of unit timings, not a re-synthesis of the chip)
+the chip's critical path was 10.74 ns through the requantizer (scratchpad read -> requant -> scratchpad write). The next slowest units: the matrix unit at 5.94 ns, the softmax at 5.03 ns.
+With the requantizer at 7.82 ns it is STILL the slowest block in the chip and sets the clock: about 8.51 ns (scaling the chip's path by the unit's improvement), 1.26x faster.
+Reaching the next unit (about 6 ns) would need a third stage inside the multiplier. Chapter 7's cycle model gives RQ n + 2 cycles; each added stage adds one cycle per RQ instruction.

@@ -66,6 +66,7 @@ Generating RTLIL representation for module `\ga2_st'.
 Generating RTLIL representation for module `\ga2_rq'.
 Generating RTLIL representation for module `\ga2_vadd'.
 Generating RTLIL representation for module `\ga2_amax'.
+Generating RTLIL representation for module `\ga2_unp'.
 Successfully finished Verilog frontend.
 
 9. Executing Verilog-2005 frontend: rtl/ga2_sm.v
@@ -108,6 +109,7 @@ Used module:     $paramod\systolic\N=s32'00000000000000000000000000000100
 Used module:         \pe
 Removing unused module `\ga2'.
 Removing unused module `\ga2_sm'.
+Removing unused module `\ga2_unp'.
 Removing unused module `\ga2_amax'.
 Removing unused module `\ga2_vadd'.
 Removing unused module `\ga2_rq'.
@@ -117,7 +119,7 @@ Removing unused module `\exp_lut'.
 Removing unused module `\requant'.
 Removing unused module `\systolic'.
 Removing unused module `\dma'.
-Removed 11 unused modules.
+Removed 12 unused modules.
 
 13. Executing SYNTH pass.
 
@@ -140,9 +142,9 @@ Removed 0 unused modules.
 Cleaned up 0 empty switches.
 
 13.2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 5 switch rules as full_case in process $proc$rtl/ga2_mm.v:36$322 in module ga2_mm.
+Marked 12 switch rules as full_case in process $proc$rtl/ga2_mm.v:23$254 in module ga2_mm.
 Marked 1 switch rules as full_case in process $proc$rtl/systolic.v:6$15 in module pe.
-Marked 5 switch rules as full_case in process $proc$rtl/ga2_mm.v:36$306 in module ga2_mm.
-Marked 12 switch rules as full_case in process $proc$rtl/ga2_mm.v:23$238 in module ga2_mm.
 Removed a total of 0 dead cases.
 
 13.2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
@@ -158,13 +160,8 @@ Converted 0 switches.
 <suppressed ~28 debug messages>
 
 13.2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
-Creating decoders for process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-Creating decoders for process `\pe.$proc$rtl/systolic.v:6$15'.
-     1/3: $0\acc[31:0]
-     2/3: $0\b_out[7:0]
-     3/3: $0\a_out[7:0]
-Creating decoders for process `\ga2_mm.$proc$rtl/ga2_mm.v:0$381'.
-Creating decoders for process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
+Creating decoders for process `\ga2_mm.$proc$rtl/ga2_mm.v:0$397'.
+Creating decoders for process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
      1/26: $0\done[0:0]
      2/26: $0\oaddr[11:0]
      3/26: $0\orow[11:0]
@@ -191,7 +188,7 @@ Creating decoders for process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
     24/26: $0\N[3:0]
     25/26: $0\M[3:0]
     26/26: $0\K[6:0]
-Creating decoders for process `\ga2_mm.$proc$rtl/ga2_mm.v:23$238'.
+Creating decoders for process `\ga2_mm.$proc$rtl/ga2_mm.v:23$254'.
      1/16: $8\bedge[31:24]
      2/16: $8\aedge[31:24]
      3/16: $7\bedge[31:24]
@@ -208,150 +205,155 @@ Creating decoders for process `\ga2_mm.$proc$rtl/ga2_mm.v:23$238'.
     14/16: $2\aedge[7:0]
     15/16: $1\bedge[7:0]
     16/16: $1\aedge[7:0]
+Creating decoders for process `\pe.$proc$rtl/systolic.v:6$15'.
+     1/3: $0\acc[31:0]
+     2/3: $0\b_out[7:0]
+     3/3: $0\a_out[7:0]
+Creating decoders for process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
 
 13.2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[0]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[1]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[2]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[3]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[4]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[5]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[6]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[7]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[8]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[9]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[10]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[11]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[12]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[13]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[14]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[15]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[16]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[17]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[18]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[19]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[0]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[1]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[2]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[3]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[4]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[5]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[6]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[7]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[8]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[9]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[10]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[11]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[12]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[13]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[14]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[15]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[16]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[17]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[18]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[19]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
-No latch inferred for signal `\ga2_mm.\a_rd[0]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:0$381'.
-No latch inferred for signal `\ga2_mm.\a_rd[1]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:0$381'.
-No latch inferred for signal `\ga2_mm.\a_rd[2]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:0$381'.
-No latch inferred for signal `\ga2_mm.\a_rd[3]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:0$381'.
-No latch inferred for signal `\ga2_mm.\b_rd[0]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:0$381'.
-No latch inferred for signal `\ga2_mm.\b_rd[1]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:0$381'.
-No latch inferred for signal `\ga2_mm.\b_rd[2]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:0$381'.
-No latch inferred for signal `\ga2_mm.\b_rd[3]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:0$381'.
-No latch inferred for signal `\ga2_mm.\aedge' from process `\ga2_mm.$proc$rtl/ga2_mm.v:23$238'.
-No latch inferred for signal `\ga2_mm.\bedge' from process `\ga2_mm.$proc$rtl/ga2_mm.v:23$238'.
-No latch inferred for signal `\ga2_mm.\ii' from process `\ga2_mm.$proc$rtl/ga2_mm.v:23$238'.
-No latch inferred for signal `\ga2_mm.\a_ra[0]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:23$238'.
-No latch inferred for signal `\ga2_mm.\a_ra[1]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:23$238'.
-No latch inferred for signal `\ga2_mm.\a_ra[2]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:23$238'.
-No latch inferred for signal `\ga2_mm.\a_ra[3]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:23$238'.
-No latch inferred for signal `\ga2_mm.\b_ra[0]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:23$238'.
-No latch inferred for signal `\ga2_mm.\b_ra[1]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:23$238'.
-No latch inferred for signal `\ga2_mm.\b_ra[2]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:23$238'.
-No latch inferred for signal `\ga2_mm.\b_ra[3]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:23$238'.
+No latch inferred for signal `\ga2_mm.\a_rd[0]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:0$397'.
+No latch inferred for signal `\ga2_mm.\a_rd[1]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:0$397'.
+No latch inferred for signal `\ga2_mm.\a_rd[2]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:0$397'.
+No latch inferred for signal `\ga2_mm.\a_rd[3]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:0$397'.
+No latch inferred for signal `\ga2_mm.\b_rd[0]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:0$397'.
+No latch inferred for signal `\ga2_mm.\b_rd[1]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:0$397'.
+No latch inferred for signal `\ga2_mm.\b_rd[2]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:0$397'.
+No latch inferred for signal `\ga2_mm.\b_rd[3]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:0$397'.
+No latch inferred for signal `\ga2_mm.\aedge' from process `\ga2_mm.$proc$rtl/ga2_mm.v:23$254'.
+No latch inferred for signal `\ga2_mm.\bedge' from process `\ga2_mm.$proc$rtl/ga2_mm.v:23$254'.
+No latch inferred for signal `\ga2_mm.\ii' from process `\ga2_mm.$proc$rtl/ga2_mm.v:23$254'.
+No latch inferred for signal `\ga2_mm.\a_ra[0]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:23$254'.
+No latch inferred for signal `\ga2_mm.\a_ra[1]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:23$254'.
+No latch inferred for signal `\ga2_mm.\a_ra[2]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:23$254'.
+No latch inferred for signal `\ga2_mm.\a_ra[3]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:23$254'.
+No latch inferred for signal `\ga2_mm.\b_ra[0]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:23$254'.
+No latch inferred for signal `\ga2_mm.\b_ra[1]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:23$254'.
+No latch inferred for signal `\ga2_mm.\b_ra[2]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:23$254'.
+No latch inferred for signal `\ga2_mm.\b_ra[3]' from process `\ga2_mm.$proc$rtl/ga2_mm.v:23$254'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[0]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[1]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[2]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[3]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[4]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[5]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[6]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[7]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[8]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[9]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[10]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[11]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[12]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[13]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[14]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[15]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[16]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[17]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[18]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\aw[19]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[0]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[1]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[2]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[3]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[4]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[5]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[6]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[7]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[8]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[9]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[10]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[11]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[12]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[13]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[14]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[15]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[16]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[17]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[18]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
+No latch inferred for signal `$paramod\systolic\N=s32'00000000000000000000000000000100.\bw[19]' from process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
 
 13.2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\ga2_mm.\K' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1023' with positive edge clock.
+Creating register for signal `\ga2_mm.\M' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1024' with positive edge clock.
+Creating register for signal `\ga2_mm.\N' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1025' with positive edge clock.
+Creating register for signal `\ga2_mm.\dst' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1026' with positive edge clock.
+Creating register for signal `\ga2_mm.\busy' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1027' with positive edge clock.
+Creating register for signal `\ga2_mm.\done' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1028' with positive edge clock.
+Creating register for signal `\ga2_mm.\m' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1029' with positive edge clock.
+Creating register for signal `\ga2_mm.\v' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1030' with positive edge clock.
+Creating register for signal `\ga2_mm.\st' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1031' with positive edge clock.
+Creating register for signal `\ga2_mm.\abase' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1032' with positive edge clock.
+Creating register for signal `\ga2_mm.\bbase' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1033' with positive edge clock.
+Creating register for signal `\ga2_mm.\lda' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1034' with positive edge clock.
+Creating register for signal `\ga2_mm.\ldb' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1035' with positive edge clock.
+Creating register for signal `\ga2_mm.\ldc' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1036' with positive edge clock.
+Creating register for signal `\ga2_mm.\tb' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1037' with positive edge clock.
+Creating register for signal `\ga2_mm.\ptr' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1038' with positive edge clock.
+Creating register for signal `\ga2_mm.\rowbase' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1039' with positive edge clock.
+Creating register for signal `\ga2_mm.\n' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1040' with positive edge clock.
+Creating register for signal `\ga2_mm.\k' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1041' with positive edge clock.
+Creating register for signal `\ga2_mm.\iss' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1042' with positive edge clock.
+Creating register for signal `\ga2_mm.\m_d' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1043' with positive edge clock.
+Creating register for signal `\ga2_mm.\n_d' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1044' with positive edge clock.
+Creating register for signal `\ga2_mm.\k_d' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1045' with positive edge clock.
+Creating register for signal `\ga2_mm.\t' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1046' with positive edge clock.
+Creating register for signal `\ga2_mm.\orow' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1047' with positive edge clock.
+Creating register for signal `\ga2_mm.\oaddr' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+  created $dff cell `$procdff$1048' with positive edge clock.
 Creating register for signal `\pe.\a_out' using process `\pe.$proc$rtl/systolic.v:6$15'.
-  created $dff cell `$procdff$994' with positive edge clock.
+  created $dff cell `$procdff$1049' with positive edge clock.
 Creating register for signal `\pe.\b_out' using process `\pe.$proc$rtl/systolic.v:6$15'.
-  created $dff cell `$procdff$995' with positive edge clock.
+  created $dff cell `$procdff$1050' with positive edge clock.
 Creating register for signal `\pe.\acc' using process `\pe.$proc$rtl/systolic.v:6$15'.
-  created $dff cell `$procdff$996' with positive edge clock.
-Creating register for signal `\ga2_mm.\K' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$997' with positive edge clock.
-Creating register for signal `\ga2_mm.\M' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$998' with positive edge clock.
-Creating register for signal `\ga2_mm.\N' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$999' with positive edge clock.
-Creating register for signal `\ga2_mm.\dst' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$1000' with positive edge clock.
-Creating register for signal `\ga2_mm.\busy' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$1001' with positive edge clock.
-Creating register for signal `\ga2_mm.\done' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$1002' with positive edge clock.
-Creating register for signal `\ga2_mm.\m' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$1003' with positive edge clock.
-Creating register for signal `\ga2_mm.\v' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$1004' with positive edge clock.
-Creating register for signal `\ga2_mm.\st' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$1005' with positive edge clock.
-Creating register for signal `\ga2_mm.\abase' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$1006' with positive edge clock.
-Creating register for signal `\ga2_mm.\bbase' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$1007' with positive edge clock.
-Creating register for signal `\ga2_mm.\lda' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$1008' with positive edge clock.
-Creating register for signal `\ga2_mm.\ldb' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$1009' with positive edge clock.
-Creating register for signal `\ga2_mm.\ldc' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$1010' with positive edge clock.
-Creating register for signal `\ga2_mm.\tb' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$1011' with positive edge clock.
-Creating register for signal `\ga2_mm.\ptr' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$1012' with positive edge clock.
-Creating register for signal `\ga2_mm.\rowbase' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$1013' with positive edge clock.
-Creating register for signal `\ga2_mm.\n' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$1014' with positive edge clock.
-Creating register for signal `\ga2_mm.\k' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$1015' with positive edge clock.
-Creating register for signal `\ga2_mm.\iss' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$1016' with positive edge clock.
-Creating register for signal `\ga2_mm.\m_d' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$1017' with positive edge clock.
-Creating register for signal `\ga2_mm.\n_d' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$1018' with positive edge clock.
-Creating register for signal `\ga2_mm.\k_d' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$1019' with positive edge clock.
-Creating register for signal `\ga2_mm.\t' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$1020' with positive edge clock.
-Creating register for signal `\ga2_mm.\orow' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$1021' with positive edge clock.
-Creating register for signal `\ga2_mm.\oaddr' using process `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-  created $dff cell `$procdff$1022' with positive edge clock.
+  created $dff cell `$procdff$1051' with positive edge clock.
 
 13.2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
 
 13.2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
-Removing empty process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$539'.
+Removing empty process `ga2_mm.$proc$rtl/ga2_mm.v:0$397'.
+Found and cleaned up 15 empty switches in `\ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+Removing empty process `ga2_mm.$proc$rtl/ga2_mm.v:36$322'.
+Found and cleaned up 12 empty switches in `\ga2_mm.$proc$rtl/ga2_mm.v:23$254'.
+Removing empty process `ga2_mm.$proc$rtl/ga2_mm.v:23$254'.
 Found and cleaned up 1 empty switch in `\pe.$proc$rtl/systolic.v:6$15'.
 Removing empty process `pe.$proc$rtl/systolic.v:6$15'.
-Removing empty process `ga2_mm.$proc$rtl/ga2_mm.v:0$381'.
-Found and cleaned up 15 empty switches in `\ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-Removing empty process `ga2_mm.$proc$rtl/ga2_mm.v:36$306'.
-Found and cleaned up 12 empty switches in `\ga2_mm.$proc$rtl/ga2_mm.v:23$238'.
-Removing empty process `ga2_mm.$proc$rtl/ga2_mm.v:23$238'.
+Removing empty process `$paramod\systolic\N=s32'00000000000000000000000000000100.$proc$rtl/systolic.v:0$568'.
 Cleaned up 28 empty switches.
 
 13.2.12. Executing OPT_EXPR pass (perform const folding).
-Optimizing module $paramod\systolic\N=s32'00000000000000000000000000000100.
-Optimizing module pe.
 Optimizing module ga2_mm.
 <suppressed ~2 debug messages>
+Optimizing module pe.
+Optimizing module $paramod\systolic\N=s32'00000000000000000000000000000100.
 
 13.3. Executing FLATTEN pass (flatten design).
-Deleting now unused module $paramod\systolic\N=s32'00000000000000000000000000000100.
 Deleting now unused module pe.
+Deleting now unused module $paramod\systolic\N=s32'00000000000000000000000000000100.
 <suppressed ~17 debug messages>
 
 13.4. Executing OPT_EXPR pass (perform const folding).
@@ -381,30 +383,30 @@ Removed a total of 77 cells.
 Running muxtree optimizer on module \ga2_mm..
   Creating internal representation of mux trees.
   Evaluating internal representation of mux trees.
-      Replacing known input bits on port A of cell $procmux$659: \iss -> 1'0
-      Replacing known input bits on port A of cell $procmux$657: \iss -> 1'1
-      Replacing known input bits on port A of cell $procmux$655: \iss -> 1'1
-      Replacing known input bits on port A of cell $procmux$668: \iss -> 1'0
-      Replacing known input bits on port A of cell $procmux$666: \iss -> 1'1
-      Replacing known input bits on port A of cell $procmux$664: \iss -> 1'1
-      Replacing known input bits on port A of cell $procmux$890: \busy -> 1'0
-      Replacing known input bits on port A of cell $procmux$888: \busy -> 1'1
+      Replacing known input bits on port A of cell $procmux$679: \iss -> 1'0
+      Replacing known input bits on port A of cell $procmux$677: \iss -> 1'1
+      Replacing known input bits on port A of cell $procmux$675: \iss -> 1'1
+      Replacing known input bits on port A of cell $procmux$688: \iss -> 1'0
+      Replacing known input bits on port A of cell $procmux$686: \iss -> 1'1
+      Replacing known input bits on port A of cell $procmux$684: \iss -> 1'1
+      Replacing known input bits on port A of cell $procmux$910: \busy -> 1'0
+      Replacing known input bits on port A of cell $procmux$908: \busy -> 1'1
   Analyzing evaluation results.
-    dead port 2/2 on $mux $procmux$926.
-    dead port 2/2 on $mux $procmux$932.
-    dead port 2/2 on $mux $procmux$944.
-    dead port 2/2 on $mux $procmux$950.
-    dead port 2/2 on $mux $procmux$962.
-    dead port 2/2 on $mux $procmux$968.
-    dead port 2/2 on $mux $procmux$980.
-    dead port 2/2 on $mux $procmux$986.
+    dead port 2/2 on $mux $procmux$1000.
+    dead port 2/2 on $mux $procmux$1006.
+    dead port 2/2 on $mux $procmux$946.
+    dead port 2/2 on $mux $procmux$952.
+    dead port 2/2 on $mux $procmux$964.
+    dead port 2/2 on $mux $procmux$970.
+    dead port 2/2 on $mux $procmux$982.
+    dead port 2/2 on $mux $procmux$988.
 Removed 8 multiplexer ports.
 <suppressed ~76 debug messages>
 
 13.7.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
   Optimizing cells in module \ga2_mm.
-    New ctrl vector for $pmux cell $procmux$610: $auto$opt_reduce.cc:134:opt_pmux$1024
-    New ctrl vector for $pmux cell $procmux$854: $auto$opt_reduce.cc:134:opt_pmux$1026
+    New ctrl vector for $pmux cell $procmux$630: $auto$opt_reduce.cc:134:opt_pmux$1053
+    New ctrl vector for $pmux cell $procmux$874: $auto$opt_reduce.cc:134:opt_pmux$1055
   Optimizing cells in module \ga2_mm.
 Performed a total of 2 changes.
 
@@ -458,37 +460,37 @@ Found FSM state register ga2_mm.st.
 
 13.8.2. Executing FSM_EXTRACT pass (extracting FSM from design).
 Extracting FSM `\st' from module `\ga2_mm'.
-  found $dff cell for state register: $procdff$1005
+  found $dff cell for state register: $procdff$1031
   root of input selection tree: $0\st[2:0]
   found reset state: 3'000 (guessed from mux tree)
   found ctrl input: \rst
-  found ctrl input: $logic_and$rtl/ga2_mm.v:39$308_Y
+  found ctrl input: $logic_and$rtl/ga2_mm.v:39$324_Y
   found ctrl input: \busy
-  found ctrl input: $procmux$550_CMP
+  found ctrl input: $procmux$570_CMP
   found ctrl input: \we
-  found ctrl input: $eq$rtl/ga2_mm.v:27$241_Y
+  found ctrl input: $eq$rtl/ga2_mm.v:27$257_Y
   found ctrl input: \arr.clr
-  found ctrl input: $eq$rtl/ga2_mm.v:17$353_Y
-  found ctrl input: $eq$rtl/ga2_mm.v:16$349_Y
+  found ctrl input: $eq$rtl/ga2_mm.v:17$369_Y
+  found ctrl input: $eq$rtl/ga2_mm.v:16$365_Y
   found state code: 3'000
-  found ctrl input: $eq$rtl/ga2_mm.v:56$322_Y
-  found ctrl input: $eq$rtl/ga2_mm.v:48$315_Y
+  found ctrl input: $eq$rtl/ga2_mm.v:56$338_Y
+  found ctrl input: $eq$rtl/ga2_mm.v:48$331_Y
   found state code: 3'110
-  found ctrl input: $eq$rtl/ga2_mm.v:64$339_Y
+  found ctrl input: $eq$rtl/ga2_mm.v:64$355_Y
   found state code: 3'101
   found state code: 3'100
-  found ctrl input: $logic_and$rtl/ga2_mm.v:51$320_Y
+  found ctrl input: $logic_and$rtl/ga2_mm.v:51$336_Y
   found state code: 3'011
   found state code: 3'010
   found state code: 3'001
-  found ctrl output: $procmux$550_CMP
+  found ctrl output: $procmux$570_CMP
   found ctrl output: \arr.clr
-  found ctrl output: $eq$rtl/ga2_mm.v:27$241_Y
+  found ctrl output: $eq$rtl/ga2_mm.v:27$257_Y
   found ctrl output: \we
-  found ctrl output: $eq$rtl/ga2_mm.v:16$349_Y
-  found ctrl output: $eq$rtl/ga2_mm.v:17$353_Y
-  ctrl inputs: { $eq$rtl/ga2_mm.v:64$339_Y $eq$rtl/ga2_mm.v:56$322_Y $logic_and$rtl/ga2_mm.v:51$320_Y $eq$rtl/ga2_mm.v:48$315_Y $logic_and$rtl/ga2_mm.v:39$308_Y \busy \rst }
-  ctrl outputs: { \arr.clr $eq$rtl/ga2_mm.v:17$353_Y $eq$rtl/ga2_mm.v:16$349_Y $eq$rtl/ga2_mm.v:27$241_Y $0\st[2:0] $procmux$550_CMP \we }
+  found ctrl output: $eq$rtl/ga2_mm.v:16$365_Y
+  found ctrl output: $eq$rtl/ga2_mm.v:17$369_Y
+  ctrl inputs: { $eq$rtl/ga2_mm.v:64$355_Y $eq$rtl/ga2_mm.v:56$338_Y $logic_and$rtl/ga2_mm.v:51$336_Y $eq$rtl/ga2_mm.v:48$331_Y $logic_and$rtl/ga2_mm.v:39$324_Y \busy \rst }
+  ctrl outputs: { \arr.clr $eq$rtl/ga2_mm.v:17$369_Y $eq$rtl/ga2_mm.v:16$365_Y $eq$rtl/ga2_mm.v:27$257_Y $0\st[2:0] $procmux$570_CMP \we }
   transition:      3'000 7'----000 ->      3'000 9'000000000
   transition:      3'000 7'----010 ->      3'000 9'000000000
   transition:      3'000 7'----1-0 ->      3'001 9'000000100
@@ -524,7 +526,7 @@ Extracting FSM `\st' from module `\ga2_mm'.
   transition:      3'011 7'------1 ->      3'000 9'100000000
 
 13.8.3. Executing FSM_OPT pass (simple optimizations of FSMs).
-Optimizing FSM `$fsm$\st$1027' from module `\ga2_mm'.
+Optimizing FSM `$fsm$\st$1056' from module `\ga2_mm'.
   Merging pattern 7'----000 and 7'----010 from group (0 0 9'000000000).
   Merging pattern 7'----010 and 7'----000 from group (0 0 9'000000000).
 
@@ -534,13 +536,13 @@ Removed 16 unused cells and 16 unused wires.
 <suppressed ~17 debug messages>
 
 13.8.5. Executing FSM_OPT pass (simple optimizations of FSMs).
-Optimizing FSM `$fsm$\st$1027' from module `\ga2_mm'.
+Optimizing FSM `$fsm$\st$1056' from module `\ga2_mm'.
   Removing unused output signal $0\st[2:0] [0].
   Removing unused output signal $0\st[2:0] [1].
   Removing unused output signal $0\st[2:0] [2].
 
 13.8.6. Executing FSM_RECODE pass (re-assigning FSM state encoding).
-Recoding FSM `$fsm$\st$1027' from module `\ga2_mm' using `auto' encoding:
+Recoding FSM `$fsm$\st$1056' from module `\ga2_mm' using `auto' encoding:
   mapping auto encoding to `one-hot` for this FSM.
   000 -> ------1
   100 -> -----1-
@@ -552,10 +554,10 @@ Recoding FSM `$fsm$\st$1027' from module `\ga2_mm' using `auto' encoding:
 
 13.8.7. Executing FSM_INFO pass (dumping all available information on FSM cells).
 
-FSM `$fsm$\st$1027' from module `ga2_mm':
+FSM `$fsm$\st$1056' from module `ga2_mm':
 -------------------------------------
 
-  Information on FSM $fsm$\st$1027 (\st):
+  Information on FSM $fsm$\st$1056 (\st):
 
   Number of input signals:    7
   Number of output signals:   6
@@ -564,18 +566,18 @@ FSM `$fsm$\st$1027' from module `ga2_mm':
   Input signals:
     0: \rst
     1: \busy
-    2: $logic_and$rtl/ga2_mm.v:39$308_Y
-    3: $eq$rtl/ga2_mm.v:48$315_Y
-    4: $logic_and$rtl/ga2_mm.v:51$320_Y
-    5: $eq$rtl/ga2_mm.v:56$322_Y
-    6: $eq$rtl/ga2_mm.v:64$339_Y
+    2: $logic_and$rtl/ga2_mm.v:39$324_Y
+    3: $eq$rtl/ga2_mm.v:48$331_Y
+    4: $logic_and$rtl/ga2_mm.v:51$336_Y
+    5: $eq$rtl/ga2_mm.v:56$338_Y
+    6: $eq$rtl/ga2_mm.v:64$355_Y
 
   Output signals:
     0: \we
-    1: $procmux$550_CMP
-    2: $eq$rtl/ga2_mm.v:27$241_Y
-    3: $eq$rtl/ga2_mm.v:16$349_Y
-    4: $eq$rtl/ga2_mm.v:17$353_Y
+    1: $procmux$570_CMP
+    2: $eq$rtl/ga2_mm.v:27$257_Y
+    3: $eq$rtl/ga2_mm.v:16$365_Y
+    4: $eq$rtl/ga2_mm.v:17$369_Y
     5: \arr.clr
 
   State encoding:
@@ -624,7 +626,7 @@ FSM `$fsm$\st$1027' from module `ga2_mm':
 -------------------------------------
 
 13.8.8. Executing FSM_MAP pass (mapping FSMs to basic logic).
-Mapping FSM `$fsm$\st$1027' from module `\ga2_mm'.
+Mapping FSM `$fsm$\st$1056' from module `\ga2_mm'.
 
 13.9. Executing OPT pass (performing simple optimizations).
 
@@ -654,74 +656,74 @@ Finding identical cells in module `\ga2_mm'.
 Removed a total of 0 cells.
 
 13.9.6. Executing OPT_DFF pass (perform DFF optimizations).
-Adding EN signal on $procdff$999 ($dff) from module ga2_mm (D = \ins [25:22], Q = \N).
-Adding EN signal on $procdff$998 ($dff) from module ga2_mm (D = \ins [41:38], Q = \M).
-Adding EN signal on $procdff$997 ($dff) from module ga2_mm (D = \ins [36:30], Q = \K).
-Adding EN signal on $procdff$1022 ($dff) from module ga2_mm (D = $procmux$563_Y, Q = \oaddr).
-Adding EN signal on $procdff$1021 ($dff) from module ga2_mm (D = $procmux$580_Y, Q = \orow).
-Adding EN signal on $procdff$1020 ($dff) from module ga2_mm (D = $procmux$595_Y, Q = \t).
-Adding EN signal on $procdff$1019 ($dff) from module ga2_mm (D = \k, Q = \k_d).
-Adding EN signal on $procdff$1018 ($dff) from module ga2_mm (D = \n, Q = \n_d).
-Adding EN signal on $procdff$1017 ($dff) from module ga2_mm (D = \m, Q = \m_d).
-Adding EN signal on $procdff$1016 ($dff) from module ga2_mm (D = $procmux$676_Y, Q = \iss).
-Adding SRST signal on $auto$ff.cc:266:slice$1191 ($dffe) from module ga2_mm (D = $procmux$673_Y, Q = \iss, rval = 1'1).
-Adding EN signal on $procdff$1015 ($dff) from module ga2_mm (D = $procmux$703_Y, Q = \k).
-Adding SRST signal on $auto$ff.cc:266:slice$1201 ($dffe) from module ga2_mm (D = $procmux$700_Y, Q = \k, rval = 7'0000000).
-Adding EN signal on $procdff$1014 ($dff) from module ga2_mm (D = $procmux$712_Y, Q = \n).
-Adding EN signal on $procdff$1013 ($dff) from module ga2_mm (D = $procmux$756_Y, Q = \rowbase).
-Adding EN signal on $procdff$1012 ($dff) from module ga2_mm (D = $procmux$783_Y, Q = \ptr).
-Adding EN signal on $procdff$1011 ($dff) from module ga2_mm (D = \ins [18], Q = \tb).
-Adding EN signal on $procdff$1010 ($dff) from module ga2_mm (D = \ins [11:0], Q = \ldc).
-Adding EN signal on $procdff$1009 ($dff) from module ga2_mm (D = \ins [75:64], Q = \ldb).
-Adding EN signal on $procdff$1008 ($dff) from module ga2_mm (D = \ins [63:52], Q = \lda).
-Adding EN signal on $procdff$1007 ($dff) from module ga2_mm (D = \ins [87:76], Q = \bbase).
-Adding SRST signal on $procdff$1004 ($dff) from module ga2_mm (D = $procmux$857_Y, Q = \v, rval = 1'0).
-Adding EN signal on $auto$ff.cc:266:slice$1287 ($sdff) from module ga2_mm (D = \iss, Q = \v).
-Adding EN signal on $procdff$1003 ($dff) from module ga2_mm (D = $procmux$883_Y, Q = \m).
-Adding SRST signal on $auto$ff.cc:266:slice$1293 ($dffe) from module ga2_mm (D = $procmux$880_Y, Q = \m, rval = 4'0000).
-Adding SRST signal on $procdff$1002 ($dff) from module ga2_mm (D = $procmux$549_Y, Q = \done, rval = 1'0).
-Adding SRST signal on $procdff$1001 ($dff) from module ga2_mm (D = $procmux$893_Y, Q = \busy, rval = 1'0).
-Adding EN signal on $procdff$1000 ($dff) from module ga2_mm (D = \ins [119:108], Q = \dst).
-Adding SRST signal on $flatten\arr.\row[3].col[3].u.$procdff$996 ($dff) from module ga2_mm (D = $flatten\arr.\row[3].col[3].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[3].col[3].u.acc, rval = 0).
-Adding SRST signal on $flatten\arr.\row[3].col[2].u.$procdff$996 ($dff) from module ga2_mm (D = $flatten\arr.\row[3].col[2].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[3].col[2].u.acc, rval = 0).
-Adding SRST signal on $flatten\arr.\row[3].col[2].u.$procdff$994 ($dff) from module ga2_mm (D = \arr.row[3].col[1].u.a_out, Q = \arr.row[3].col[2].u.a_out, rval = 8'00000000).
-Adding SRST signal on $flatten\arr.\row[3].col[1].u.$procdff$996 ($dff) from module ga2_mm (D = $flatten\arr.\row[3].col[1].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[3].col[1].u.acc, rval = 0).
-Adding SRST signal on $flatten\arr.\row[3].col[1].u.$procdff$994 ($dff) from module ga2_mm (D = \arr.row[3].col[0].u.a_out, Q = \arr.row[3].col[1].u.a_out, rval = 8'00000000).
-Adding SRST signal on $flatten\arr.\row[3].col[0].u.$procdff$996 ($dff) from module ga2_mm (D = $flatten\arr.\row[3].col[0].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[3].col[0].u.acc, rval = 0).
-Adding SRST signal on $flatten\arr.\row[3].col[0].u.$procdff$994 ($dff) from module ga2_mm (D = \arr.row[3].col[0].u.a_in, Q = \arr.row[3].col[0].u.a_out, rval = 8'00000000).
-Adding SRST signal on $flatten\arr.\row[2].col[3].u.$procdff$996 ($dff) from module ga2_mm (D = $flatten\arr.\row[2].col[3].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[2].col[3].u.acc, rval = 0).
-Adding SRST signal on $flatten\arr.\row[2].col[3].u.$procdff$995 ($dff) from module ga2_mm (D = \arr.row[1].col[3].u.b_out, Q = \arr.row[2].col[3].u.b_out, rval = 8'00000000).
-Adding SRST signal on $flatten\arr.\row[2].col[2].u.$procdff$996 ($dff) from module ga2_mm (D = $flatten\arr.\row[2].col[2].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[2].col[2].u.acc, rval = 0).
-Adding SRST signal on $flatten\arr.\row[2].col[2].u.$procdff$995 ($dff) from module ga2_mm (D = \arr.row[1].col[2].u.b_out, Q = \arr.row[2].col[2].u.b_out, rval = 8'00000000).
-Adding SRST signal on $flatten\arr.\row[2].col[2].u.$procdff$994 ($dff) from module ga2_mm (D = \arr.row[2].col[1].u.a_out, Q = \arr.row[2].col[2].u.a_out, rval = 8'00000000).
-Adding SRST signal on $flatten\arr.\row[2].col[1].u.$procdff$996 ($dff) from module ga2_mm (D = $flatten\arr.\row[2].col[1].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[2].col[1].u.acc, rval = 0).
-Adding SRST signal on $flatten\arr.\row[2].col[1].u.$procdff$995 ($dff) from module ga2_mm (D = \arr.row[1].col[1].u.b_out, Q = \arr.row[2].col[1].u.b_out, rval = 8'00000000).
-Adding SRST signal on $flatten\arr.\row[2].col[1].u.$procdff$994 ($dff) from module ga2_mm (D = \arr.row[2].col[0].u.a_out, Q = \arr.row[2].col[1].u.a_out, rval = 8'00000000).
-Adding SRST signal on $flatten\arr.\row[2].col[0].u.$procdff$996 ($dff) from module ga2_mm (D = $flatten\arr.\row[2].col[0].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[2].col[0].u.acc, rval = 0).
-Adding SRST signal on $flatten\arr.\row[2].col[0].u.$procdff$995 ($dff) from module ga2_mm (D = \arr.row[1].col[0].u.b_out, Q = \arr.row[2].col[0].u.b_out, rval = 8'00000000).
-Adding SRST signal on $flatten\arr.\row[2].col[0].u.$procdff$994 ($dff) from module ga2_mm (D = \arr.row[2].col[0].u.a_in, Q = \arr.row[2].col[0].u.a_out, rval = 8'00000000).
-Adding SRST signal on $flatten\arr.\row[1].col[3].u.$procdff$996 ($dff) from module ga2_mm (D = $flatten\arr.\row[1].col[3].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[1].col[3].u.acc, rval = 0).
-Adding SRST signal on $flatten\arr.\row[1].col[3].u.$procdff$995 ($dff) from module ga2_mm (D = \arr.row[0].col[3].u.b_out, Q = \arr.row[1].col[3].u.b_out, rval = 8'00000000).
-Adding SRST signal on $flatten\arr.\row[1].col[2].u.$procdff$996 ($dff) from module ga2_mm (D = $flatten\arr.\row[1].col[2].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[1].col[2].u.acc, rval = 0).
-Adding SRST signal on $flatten\arr.\row[1].col[2].u.$procdff$995 ($dff) from module ga2_mm (D = \arr.row[0].col[2].u.b_out, Q = \arr.row[1].col[2].u.b_out, rval = 8'00000000).
-Adding SRST signal on $flatten\arr.\row[1].col[2].u.$procdff$994 ($dff) from module ga2_mm (D = \arr.row[1].col[1].u.a_out, Q = \arr.row[1].col[2].u.a_out, rval = 8'00000000).
-Adding SRST signal on $flatten\arr.\row[1].col[1].u.$procdff$996 ($dff) from module ga2_mm (D = $flatten\arr.\row[1].col[1].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[1].col[1].u.acc, rval = 0).
-Adding SRST signal on $flatten\arr.\row[1].col[1].u.$procdff$995 ($dff) from module ga2_mm (D = \arr.row[0].col[1].u.b_out, Q = \arr.row[1].col[1].u.b_out, rval = 8'00000000).
-Adding SRST signal on $flatten\arr.\row[1].col[1].u.$procdff$994 ($dff) from module ga2_mm (D = \arr.row[1].col[0].u.a_out, Q = \arr.row[1].col[1].u.a_out, rval = 8'00000000).
-Adding SRST signal on $flatten\arr.\row[1].col[0].u.$procdff$996 ($dff) from module ga2_mm (D = $flatten\arr.\row[1].col[0].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[1].col[0].u.acc, rval = 0).
-Adding SRST signal on $flatten\arr.\row[1].col[0].u.$procdff$995 ($dff) from module ga2_mm (D = \arr.row[0].col[0].u.b_out, Q = \arr.row[1].col[0].u.b_out, rval = 8'00000000).
-Adding SRST signal on $flatten\arr.\row[1].col[0].u.$procdff$994 ($dff) from module ga2_mm (D = \arr.row[1].col[0].u.a_in, Q = \arr.row[1].col[0].u.a_out, rval = 8'00000000).
-Adding SRST signal on $flatten\arr.\row[0].col[3].u.$procdff$996 ($dff) from module ga2_mm (D = $flatten\arr.\row[0].col[3].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[0].col[3].u.acc, rval = 0).
-Adding SRST signal on $flatten\arr.\row[0].col[3].u.$procdff$995 ($dff) from module ga2_mm (D = \arr.row[0].col[3].u.b_in, Q = \arr.row[0].col[3].u.b_out, rval = 8'00000000).
-Adding SRST signal on $flatten\arr.\row[0].col[2].u.$procdff$996 ($dff) from module ga2_mm (D = $flatten\arr.\row[0].col[2].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[0].col[2].u.acc, rval = 0).
-Adding SRST signal on $flatten\arr.\row[0].col[2].u.$procdff$995 ($dff) from module ga2_mm (D = \arr.row[0].col[2].u.b_in, Q = \arr.row[0].col[2].u.b_out, rval = 8'00000000).
-Adding SRST signal on $flatten\arr.\row[0].col[2].u.$procdff$994 ($dff) from module ga2_mm (D = \arr.row[0].col[1].u.a_out, Q = \arr.row[0].col[2].u.a_out, rval = 8'00000000).
-Adding SRST signal on $flatten\arr.\row[0].col[1].u.$procdff$996 ($dff) from module ga2_mm (D = $flatten\arr.\row[0].col[1].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[0].col[1].u.acc, rval = 0).
-Adding SRST signal on $flatten\arr.\row[0].col[1].u.$procdff$995 ($dff) from module ga2_mm (D = \arr.row[0].col[1].u.b_in, Q = \arr.row[0].col[1].u.b_out, rval = 8'00000000).
-Adding SRST signal on $flatten\arr.\row[0].col[1].u.$procdff$994 ($dff) from module ga2_mm (D = \arr.row[0].col[0].u.a_out, Q = \arr.row[0].col[1].u.a_out, rval = 8'00000000).
-Adding SRST signal on $flatten\arr.\row[0].col[0].u.$procdff$996 ($dff) from module ga2_mm (D = $flatten\arr.\row[0].col[0].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[0].col[0].u.acc, rval = 0).
-Adding SRST signal on $flatten\arr.\row[0].col[0].u.$procdff$995 ($dff) from module ga2_mm (D = \arr.row[0].col[0].u.b_in, Q = \arr.row[0].col[0].u.b_out, rval = 8'00000000).
-Adding SRST signal on $flatten\arr.\row[0].col[0].u.$procdff$994 ($dff) from module ga2_mm (D = \arr.row[0].col[0].u.a_in, Q = \arr.row[0].col[0].u.a_out, rval = 8'00000000).
+Adding EN signal on $procdff$1048 ($dff) from module ga2_mm (D = $procmux$583_Y, Q = \oaddr).
+Adding EN signal on $procdff$1047 ($dff) from module ga2_mm (D = $procmux$600_Y, Q = \orow).
+Adding EN signal on $procdff$1046 ($dff) from module ga2_mm (D = $procmux$615_Y, Q = \t).
+Adding EN signal on $procdff$1045 ($dff) from module ga2_mm (D = \k, Q = \k_d).
+Adding EN signal on $procdff$1044 ($dff) from module ga2_mm (D = \n, Q = \n_d).
+Adding EN signal on $procdff$1043 ($dff) from module ga2_mm (D = \m, Q = \m_d).
+Adding EN signal on $procdff$1042 ($dff) from module ga2_mm (D = $procmux$696_Y, Q = \iss).
+Adding SRST signal on $auto$ff.cc:266:slice$1205 ($dffe) from module ga2_mm (D = $procmux$693_Y, Q = \iss, rval = 1'1).
+Adding EN signal on $procdff$1041 ($dff) from module ga2_mm (D = $procmux$723_Y, Q = \k).
+Adding SRST signal on $auto$ff.cc:266:slice$1215 ($dffe) from module ga2_mm (D = $procmux$720_Y, Q = \k, rval = 7'0000000).
+Adding EN signal on $procdff$1040 ($dff) from module ga2_mm (D = $procmux$732_Y, Q = \n).
+Adding EN signal on $procdff$1039 ($dff) from module ga2_mm (D = $procmux$776_Y, Q = \rowbase).
+Adding EN signal on $procdff$1038 ($dff) from module ga2_mm (D = $procmux$803_Y, Q = \ptr).
+Adding EN signal on $procdff$1037 ($dff) from module ga2_mm (D = \ins [18], Q = \tb).
+Adding EN signal on $procdff$1036 ($dff) from module ga2_mm (D = \ins [11:0], Q = \ldc).
+Adding EN signal on $procdff$1035 ($dff) from module ga2_mm (D = \ins [75:64], Q = \ldb).
+Adding EN signal on $procdff$1034 ($dff) from module ga2_mm (D = \ins [63:52], Q = \lda).
+Adding EN signal on $procdff$1033 ($dff) from module ga2_mm (D = \ins [87:76], Q = \bbase).
+Adding SRST signal on $procdff$1030 ($dff) from module ga2_mm (D = $procmux$877_Y, Q = \v, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1301 ($sdff) from module ga2_mm (D = \iss, Q = \v).
+Adding EN signal on $procdff$1029 ($dff) from module ga2_mm (D = $procmux$903_Y, Q = \m).
+Adding SRST signal on $auto$ff.cc:266:slice$1307 ($dffe) from module ga2_mm (D = $procmux$900_Y, Q = \m, rval = 4'0000).
+Adding SRST signal on $procdff$1028 ($dff) from module ga2_mm (D = $procmux$569_Y, Q = \done, rval = 1'0).
+Adding SRST signal on $procdff$1027 ($dff) from module ga2_mm (D = $procmux$913_Y, Q = \busy, rval = 1'0).
+Adding EN signal on $procdff$1026 ($dff) from module ga2_mm (D = \ins [119:108], Q = \dst).
+Adding EN signal on $procdff$1025 ($dff) from module ga2_mm (D = \ins [25:22], Q = \N).
+Adding EN signal on $procdff$1024 ($dff) from module ga2_mm (D = \ins [41:38], Q = \M).
+Adding EN signal on $procdff$1023 ($dff) from module ga2_mm (D = \ins [36:30], Q = \K).
+Adding SRST signal on $flatten\arr.\row[3].col[3].u.$procdff$1051 ($dff) from module ga2_mm (D = $flatten\arr.\row[3].col[3].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[3].col[3].u.acc, rval = 0).
+Adding SRST signal on $flatten\arr.\row[3].col[2].u.$procdff$1051 ($dff) from module ga2_mm (D = $flatten\arr.\row[3].col[2].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[3].col[2].u.acc, rval = 0).
+Adding SRST signal on $flatten\arr.\row[3].col[2].u.$procdff$1049 ($dff) from module ga2_mm (D = \arr.row[3].col[1].u.a_out, Q = \arr.row[3].col[2].u.a_out, rval = 8'00000000).
+Adding SRST signal on $flatten\arr.\row[3].col[1].u.$procdff$1051 ($dff) from module ga2_mm (D = $flatten\arr.\row[3].col[1].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[3].col[1].u.acc, rval = 0).
+Adding SRST signal on $flatten\arr.\row[3].col[1].u.$procdff$1049 ($dff) from module ga2_mm (D = \arr.row[3].col[0].u.a_out, Q = \arr.row[3].col[1].u.a_out, rval = 8'00000000).
+Adding SRST signal on $flatten\arr.\row[3].col[0].u.$procdff$1051 ($dff) from module ga2_mm (D = $flatten\arr.\row[3].col[0].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[3].col[0].u.acc, rval = 0).
+Adding SRST signal on $flatten\arr.\row[3].col[0].u.$procdff$1049 ($dff) from module ga2_mm (D = \arr.row[3].col[0].u.a_in, Q = \arr.row[3].col[0].u.a_out, rval = 8'00000000).
+Adding SRST signal on $flatten\arr.\row[2].col[3].u.$procdff$1051 ($dff) from module ga2_mm (D = $flatten\arr.\row[2].col[3].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[2].col[3].u.acc, rval = 0).
+Adding SRST signal on $flatten\arr.\row[2].col[3].u.$procdff$1050 ($dff) from module ga2_mm (D = \arr.row[1].col[3].u.b_out, Q = \arr.row[2].col[3].u.b_out, rval = 8'00000000).
+Adding SRST signal on $flatten\arr.\row[2].col[2].u.$procdff$1051 ($dff) from module ga2_mm (D = $flatten\arr.\row[2].col[2].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[2].col[2].u.acc, rval = 0).
+Adding SRST signal on $flatten\arr.\row[2].col[2].u.$procdff$1050 ($dff) from module ga2_mm (D = \arr.row[1].col[2].u.b_out, Q = \arr.row[2].col[2].u.b_out, rval = 8'00000000).
+Adding SRST signal on $flatten\arr.\row[2].col[2].u.$procdff$1049 ($dff) from module ga2_mm (D = \arr.row[2].col[1].u.a_out, Q = \arr.row[2].col[2].u.a_out, rval = 8'00000000).
+Adding SRST signal on $flatten\arr.\row[2].col[1].u.$procdff$1051 ($dff) from module ga2_mm (D = $flatten\arr.\row[2].col[1].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[2].col[1].u.acc, rval = 0).
+Adding SRST signal on $flatten\arr.\row[2].col[1].u.$procdff$1050 ($dff) from module ga2_mm (D = \arr.row[1].col[1].u.b_out, Q = \arr.row[2].col[1].u.b_out, rval = 8'00000000).
+Adding SRST signal on $flatten\arr.\row[2].col[1].u.$procdff$1049 ($dff) from module ga2_mm (D = \arr.row[2].col[0].u.a_out, Q = \arr.row[2].col[1].u.a_out, rval = 8'00000000).
+Adding SRST signal on $flatten\arr.\row[2].col[0].u.$procdff$1051 ($dff) from module ga2_mm (D = $flatten\arr.\row[2].col[0].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[2].col[0].u.acc, rval = 0).
+Adding SRST signal on $flatten\arr.\row[2].col[0].u.$procdff$1050 ($dff) from module ga2_mm (D = \arr.row[1].col[0].u.b_out, Q = \arr.row[2].col[0].u.b_out, rval = 8'00000000).
+Adding SRST signal on $flatten\arr.\row[2].col[0].u.$procdff$1049 ($dff) from module ga2_mm (D = \arr.row[2].col[0].u.a_in, Q = \arr.row[2].col[0].u.a_out, rval = 8'00000000).
+Adding SRST signal on $flatten\arr.\row[1].col[3].u.$procdff$1051 ($dff) from module ga2_mm (D = $flatten\arr.\row[1].col[3].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[1].col[3].u.acc, rval = 0).
+Adding SRST signal on $flatten\arr.\row[1].col[3].u.$procdff$1050 ($dff) from module ga2_mm (D = \arr.row[0].col[3].u.b_out, Q = \arr.row[1].col[3].u.b_out, rval = 8'00000000).
+Adding SRST signal on $flatten\arr.\row[1].col[2].u.$procdff$1051 ($dff) from module ga2_mm (D = $flatten\arr.\row[1].col[2].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[1].col[2].u.acc, rval = 0).
+Adding SRST signal on $flatten\arr.\row[1].col[2].u.$procdff$1050 ($dff) from module ga2_mm (D = \arr.row[0].col[2].u.b_out, Q = \arr.row[1].col[2].u.b_out, rval = 8'00000000).
+Adding SRST signal on $flatten\arr.\row[1].col[2].u.$procdff$1049 ($dff) from module ga2_mm (D = \arr.row[1].col[1].u.a_out, Q = \arr.row[1].col[2].u.a_out, rval = 8'00000000).
+Adding SRST signal on $flatten\arr.\row[1].col[1].u.$procdff$1051 ($dff) from module ga2_mm (D = $flatten\arr.\row[1].col[1].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[1].col[1].u.acc, rval = 0).
+Adding SRST signal on $flatten\arr.\row[1].col[1].u.$procdff$1050 ($dff) from module ga2_mm (D = \arr.row[0].col[1].u.b_out, Q = \arr.row[1].col[1].u.b_out, rval = 8'00000000).
+Adding SRST signal on $flatten\arr.\row[1].col[1].u.$procdff$1049 ($dff) from module ga2_mm (D = \arr.row[1].col[0].u.a_out, Q = \arr.row[1].col[1].u.a_out, rval = 8'00000000).
+Adding SRST signal on $flatten\arr.\row[1].col[0].u.$procdff$1051 ($dff) from module ga2_mm (D = $flatten\arr.\row[1].col[0].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[1].col[0].u.acc, rval = 0).
+Adding SRST signal on $flatten\arr.\row[1].col[0].u.$procdff$1050 ($dff) from module ga2_mm (D = \arr.row[0].col[0].u.b_out, Q = \arr.row[1].col[0].u.b_out, rval = 8'00000000).
+Adding SRST signal on $flatten\arr.\row[1].col[0].u.$procdff$1049 ($dff) from module ga2_mm (D = \arr.row[1].col[0].u.a_in, Q = \arr.row[1].col[0].u.a_out, rval = 8'00000000).
+Adding SRST signal on $flatten\arr.\row[0].col[3].u.$procdff$1051 ($dff) from module ga2_mm (D = $flatten\arr.\row[0].col[3].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[0].col[3].u.acc, rval = 0).
+Adding SRST signal on $flatten\arr.\row[0].col[3].u.$procdff$1050 ($dff) from module ga2_mm (D = \arr.row[0].col[3].u.b_in, Q = \arr.row[0].col[3].u.b_out, rval = 8'00000000).
+Adding SRST signal on $flatten\arr.\row[0].col[2].u.$procdff$1051 ($dff) from module ga2_mm (D = $flatten\arr.\row[0].col[2].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[0].col[2].u.acc, rval = 0).
+Adding SRST signal on $flatten\arr.\row[0].col[2].u.$procdff$1050 ($dff) from module ga2_mm (D = \arr.row[0].col[2].u.b_in, Q = \arr.row[0].col[2].u.b_out, rval = 8'00000000).
+Adding SRST signal on $flatten\arr.\row[0].col[2].u.$procdff$1049 ($dff) from module ga2_mm (D = \arr.row[0].col[1].u.a_out, Q = \arr.row[0].col[2].u.a_out, rval = 8'00000000).
+Adding SRST signal on $flatten\arr.\row[0].col[1].u.$procdff$1051 ($dff) from module ga2_mm (D = $flatten\arr.\row[0].col[1].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[0].col[1].u.acc, rval = 0).
+Adding SRST signal on $flatten\arr.\row[0].col[1].u.$procdff$1050 ($dff) from module ga2_mm (D = \arr.row[0].col[1].u.b_in, Q = \arr.row[0].col[1].u.b_out, rval = 8'00000000).
+Adding SRST signal on $flatten\arr.\row[0].col[1].u.$procdff$1049 ($dff) from module ga2_mm (D = \arr.row[0].col[0].u.a_out, Q = \arr.row[0].col[1].u.a_out, rval = 8'00000000).
+Adding SRST signal on $flatten\arr.\row[0].col[0].u.$procdff$1051 ($dff) from module ga2_mm (D = $flatten\arr.\row[0].col[0].u.$add$rtl/systolic.v:8$17_Y, Q = \arr.row[0].col[0].u.acc, rval = 0).
+Adding SRST signal on $flatten\arr.\row[0].col[0].u.$procdff$1050 ($dff) from module ga2_mm (D = \arr.row[0].col[0].u.b_in, Q = \arr.row[0].col[0].u.b_out, rval = 8'00000000).
+Adding SRST signal on $flatten\arr.\row[0].col[0].u.$procdff$1049 ($dff) from module ga2_mm (D = \arr.row[0].col[0].u.a_in, Q = \arr.row[0].col[0].u.a_out, rval = 8'00000000).
 
 13.9.7. Executing OPT_CLEAN pass (remove unused cells and wires).
 Finding unused cells or wires in module \ga2_mm..
@@ -790,68 +792,68 @@ Optimizing module ga2_mm.
 13.9.23. Finished OPT passes. (There is nothing left to do.)
 
 13.10. Executing WREDUCE pass (reducing word size of cells).
-Removed top 2 bits (of 4) from port B of cell ga2_mm.$auto$fsm_map.cc:77:implement_pattern_cache$1105 ($eq).
-Removed top 3 bits (of 4) from port B of cell ga2_mm.$auto$opt_dff.cc:195:make_patterns_logic$1195 ($ne).
-Removed top 1 bits (of 3) from port B of cell ga2_mm.$auto$fsm_map.cc:77:implement_pattern_cache$1059 ($eq).
-Removed top 2 bits (of 4) from port B of cell ga2_mm.$auto$fsm_map.cc:77:implement_pattern_cache$1055 ($eq).
-Removed top 31 bits (of 32) from port A of cell ga2_mm.$lt$rtl/ga2_mm.v:28$242 ($lt).
-Removed top 31 bits (of 32) from port B of cell ga2_mm.$ge$rtl/ga2_mm.v:28$243 ($ge).
-Removed top 24 bits (of 32) from port A of cell ga2_mm.$lt$rtl/ga2_mm.v:28$246 ($lt).
-Removed top 31 bits (of 32) from port A of cell ga2_mm.$lt$rtl/ga2_mm.v:29$248 ($lt).
-Removed top 2 bits (of 4) from port B of cell ga2_mm.$auto$fsm_map.cc:77:implement_pattern_cache$1090 ($eq).
-Removed top 5 bits (of 6) from port B of cell ga2_mm.$sub$rtl/ga2_mm.v:26$254 ($sub).
-Removed top 31 bits (of 32) from port A of cell ga2_mm.$lt$rtl/ga2_mm.v:28$257 ($lt).
-Removed top 31 bits (of 32) from port B of cell ga2_mm.$ge$rtl/ga2_mm.v:28$258 ($ge).
-Removed top 31 bits (of 32) from port B of cell ga2_mm.$sub$rtl/ga2_mm.v:28$260 ($sub).
-Removed top 23 bits (of 32) from port Y of cell ga2_mm.$sub$rtl/ga2_mm.v:28$260 ($sub).
-Removed top 31 bits (of 32) from port A of cell ga2_mm.$lt$rtl/ga2_mm.v:29$263 ($lt).
-Removed top 4 bits (of 6) from port B of cell ga2_mm.$sub$rtl/ga2_mm.v:26$269 ($sub).
-Removed top 30 bits (of 32) from port A of cell ga2_mm.$lt$rtl/ga2_mm.v:28$272 ($lt).
-Removed top 30 bits (of 32) from port B of cell ga2_mm.$ge$rtl/ga2_mm.v:28$273 ($ge).
-Removed top 30 bits (of 32) from port B of cell ga2_mm.$sub$rtl/ga2_mm.v:28$275 ($sub).
-Removed top 23 bits (of 32) from port Y of cell ga2_mm.$sub$rtl/ga2_mm.v:28$275 ($sub).
-Removed top 30 bits (of 32) from port A of cell ga2_mm.$lt$rtl/ga2_mm.v:29$278 ($lt).
-Removed top 4 bits (of 6) from port B of cell ga2_mm.$sub$rtl/ga2_mm.v:26$284 ($sub).
-Removed top 30 bits (of 32) from port A of cell ga2_mm.$lt$rtl/ga2_mm.v:28$287 ($lt).
-Removed top 30 bits (of 32) from port B of cell ga2_mm.$ge$rtl/ga2_mm.v:28$288 ($ge).
-Removed top 30 bits (of 32) from port B of cell ga2_mm.$sub$rtl/ga2_mm.v:28$290 ($sub).
-Removed top 23 bits (of 32) from port Y of cell ga2_mm.$sub$rtl/ga2_mm.v:28$290 ($sub).
-Removed top 30 bits (of 32) from port A of cell ga2_mm.$lt$rtl/ga2_mm.v:29$293 ($lt).
-Removed top 26 bits (of 32) from port A of cell ga2_mm.$add$rtl/ga2_mm.v:35$302 ($add).
-Removed top 25 bits (of 32) from port Y of cell ga2_mm.$add$rtl/ga2_mm.v:35$302 ($add).
-Removed top 19 bits (of 32) from port B of cell ga2_mm.$shiftx$rtl/ga2_mm.v:0$305 ($shiftx).
-Removed top 31 bits (of 32) from port B of cell ga2_mm.$sub$rtl/ga2_mm.v:48$309 ($sub).
-Removed top 24 bits (of 32) from port Y of cell ga2_mm.$sub$rtl/ga2_mm.v:48$309 ($sub).
-Removed top 31 bits (of 32) from port B of cell ga2_mm.$add$rtl/ga2_mm.v:48$311 ($add).
-Removed top 28 bits (of 32) from port Y of cell ga2_mm.$add$rtl/ga2_mm.v:48$311 ($add).
-Removed top 31 bits (of 32) from port B of cell ga2_mm.$sub$rtl/ga2_mm.v:48$314 ($sub).
-Removed top 27 bits (of 32) from port Y of cell ga2_mm.$sub$rtl/ga2_mm.v:48$314 ($sub).
-Removed top 31 bits (of 32) from port B of cell ga2_mm.$add$rtl/ga2_mm.v:49$316 ($add).
-Removed top 25 bits (of 32) from port Y of cell ga2_mm.$add$rtl/ga2_mm.v:49$316 ($add).
-Removed top 31 bits (of 32) from port B of cell ga2_mm.$add$rtl/ga2_mm.v:49$317 ($add).
-Removed top 20 bits (of 32) from port Y of cell ga2_mm.$add$rtl/ga2_mm.v:49$317 ($add).
-Removed top 31 bits (of 32) from port B of cell ga2_mm.$sub$rtl/ga2_mm.v:56$321 ($sub).
-Removed top 27 bits (of 32) from port Y of cell ga2_mm.$sub$rtl/ga2_mm.v:56$321 ($sub).
-Removed top 31 bits (of 32) from port B of cell ga2_mm.$add$rtl/ga2_mm.v:57$330 ($add).
-Removed top 28 bits (of 32) from port Y of cell ga2_mm.$add$rtl/ga2_mm.v:57$330 ($add).
-Removed top 31 bits (of 32) from port B of cell ga2_mm.$add$rtl/ga2_mm.v:63$335 ($add).
-Removed top 24 bits (of 32) from port Y of cell ga2_mm.$add$rtl/ga2_mm.v:63$335 ($add).
-Removed top 24 bits (of 32) from port Y of cell ga2_mm.$add$rtl/ga2_mm.v:64$336 ($add).
-Removed top 24 bits (of 32) from port A of cell ga2_mm.$add$rtl/ga2_mm.v:64$337 ($add).
-Removed top 23 bits (of 32) from port Y of cell ga2_mm.$add$rtl/ga2_mm.v:64$337 ($add).
-Removed top 23 bits (of 32) from port A of cell ga2_mm.$sub$rtl/ga2_mm.v:64$338 ($sub).
-Removed top 30 bits (of 32) from port B of cell ga2_mm.$sub$rtl/ga2_mm.v:64$338 ($sub).
-Removed top 22 bits (of 32) from port Y of cell ga2_mm.$sub$rtl/ga2_mm.v:64$338 ($sub).
-Removed top 31 bits (of 32) from port B of cell ga2_mm.$add$rtl/ga2_mm.v:70$348 ($add).
-Removed top 20 bits (of 32) from port Y of cell ga2_mm.$add$rtl/ga2_mm.v:70$348 ($add).
-Removed top 3 bits (of 4) from port B of cell ga2_mm.$eq$rtl/ga2_mm.v:16$359 ($eq).
-Removed top 3 bits (of 4) from port B of cell ga2_mm.$eq$rtl/ga2_mm.v:17$363 ($eq).
-Removed top 2 bits (of 4) from port B of cell ga2_mm.$eq$rtl/ga2_mm.v:16$367 ($eq).
-Removed top 2 bits (of 4) from port B of cell ga2_mm.$eq$rtl/ga2_mm.v:17$371 ($eq).
-Removed top 2 bits (of 4) from port B of cell ga2_mm.$eq$rtl/ga2_mm.v:16$375 ($eq).
-Removed top 2 bits (of 4) from port B of cell ga2_mm.$eq$rtl/ga2_mm.v:17$379 ($eq).
-Removed top 1 bits (of 7) from FF cell ga2_mm.$auto$ff.cc:266:slice$1170 ($dffe).
-Removed top 4 bits (of 5) from port B of cell ga2_mm.$auto$opt_dff.cc:195:make_patterns_logic$1305 ($ne).
+Removed top 2 bits (of 4) from port B of cell ga2_mm.$auto$fsm_map.cc:77:implement_pattern_cache$1134 ($eq).
+Removed top 1 bits (of 3) from port B of cell ga2_mm.$auto$fsm_map.cc:77:implement_pattern_cache$1088 ($eq).
+Removed top 2 bits (of 4) from port B of cell ga2_mm.$auto$fsm_map.cc:77:implement_pattern_cache$1084 ($eq).
+Removed top 31 bits (of 32) from port A of cell ga2_mm.$lt$rtl/ga2_mm.v:28$258 ($lt).
+Removed top 31 bits (of 32) from port B of cell ga2_mm.$ge$rtl/ga2_mm.v:28$259 ($ge).
+Removed top 24 bits (of 32) from port A of cell ga2_mm.$lt$rtl/ga2_mm.v:28$262 ($lt).
+Removed top 31 bits (of 32) from port A of cell ga2_mm.$lt$rtl/ga2_mm.v:29$264 ($lt).
+Removed top 2 bits (of 4) from port B of cell ga2_mm.$auto$fsm_map.cc:77:implement_pattern_cache$1119 ($eq).
+Removed top 5 bits (of 6) from port B of cell ga2_mm.$sub$rtl/ga2_mm.v:26$270 ($sub).
+Removed top 31 bits (of 32) from port A of cell ga2_mm.$lt$rtl/ga2_mm.v:28$273 ($lt).
+Removed top 31 bits (of 32) from port B of cell ga2_mm.$ge$rtl/ga2_mm.v:28$274 ($ge).
+Removed top 31 bits (of 32) from port B of cell ga2_mm.$sub$rtl/ga2_mm.v:28$276 ($sub).
+Removed top 23 bits (of 32) from port Y of cell ga2_mm.$sub$rtl/ga2_mm.v:28$276 ($sub).
+Removed top 31 bits (of 32) from port A of cell ga2_mm.$lt$rtl/ga2_mm.v:29$279 ($lt).
+Removed top 3 bits (of 4) from port B of cell ga2_mm.$auto$opt_dff.cc:195:make_patterns_logic$1209 ($ne).
+Removed top 4 bits (of 6) from port B of cell ga2_mm.$sub$rtl/ga2_mm.v:26$285 ($sub).
+Removed top 30 bits (of 32) from port A of cell ga2_mm.$lt$rtl/ga2_mm.v:28$288 ($lt).
+Removed top 30 bits (of 32) from port B of cell ga2_mm.$ge$rtl/ga2_mm.v:28$289 ($ge).
+Removed top 30 bits (of 32) from port B of cell ga2_mm.$sub$rtl/ga2_mm.v:28$291 ($sub).
+Removed top 23 bits (of 32) from port Y of cell ga2_mm.$sub$rtl/ga2_mm.v:28$291 ($sub).
+Removed top 30 bits (of 32) from port A of cell ga2_mm.$lt$rtl/ga2_mm.v:29$294 ($lt).
+Removed top 4 bits (of 6) from port B of cell ga2_mm.$sub$rtl/ga2_mm.v:26$300 ($sub).
+Removed top 30 bits (of 32) from port A of cell ga2_mm.$lt$rtl/ga2_mm.v:28$303 ($lt).
+Removed top 30 bits (of 32) from port B of cell ga2_mm.$ge$rtl/ga2_mm.v:28$304 ($ge).
+Removed top 30 bits (of 32) from port B of cell ga2_mm.$sub$rtl/ga2_mm.v:28$306 ($sub).
+Removed top 23 bits (of 32) from port Y of cell ga2_mm.$sub$rtl/ga2_mm.v:28$306 ($sub).
+Removed top 30 bits (of 32) from port A of cell ga2_mm.$lt$rtl/ga2_mm.v:29$309 ($lt).
+Removed top 26 bits (of 32) from port A of cell ga2_mm.$add$rtl/ga2_mm.v:35$318 ($add).
+Removed top 25 bits (of 32) from port Y of cell ga2_mm.$add$rtl/ga2_mm.v:35$318 ($add).
+Removed top 19 bits (of 32) from port B of cell ga2_mm.$shiftx$rtl/ga2_mm.v:0$321 ($shiftx).
+Removed top 31 bits (of 32) from port B of cell ga2_mm.$sub$rtl/ga2_mm.v:48$325 ($sub).
+Removed top 24 bits (of 32) from port Y of cell ga2_mm.$sub$rtl/ga2_mm.v:48$325 ($sub).
+Removed top 31 bits (of 32) from port B of cell ga2_mm.$add$rtl/ga2_mm.v:48$327 ($add).
+Removed top 28 bits (of 32) from port Y of cell ga2_mm.$add$rtl/ga2_mm.v:48$327 ($add).
+Removed top 31 bits (of 32) from port B of cell ga2_mm.$sub$rtl/ga2_mm.v:48$330 ($sub).
+Removed top 27 bits (of 32) from port Y of cell ga2_mm.$sub$rtl/ga2_mm.v:48$330 ($sub).
+Removed top 31 bits (of 32) from port B of cell ga2_mm.$add$rtl/ga2_mm.v:49$332 ($add).
+Removed top 25 bits (of 32) from port Y of cell ga2_mm.$add$rtl/ga2_mm.v:49$332 ($add).
+Removed top 31 bits (of 32) from port B of cell ga2_mm.$add$rtl/ga2_mm.v:49$333 ($add).
+Removed top 20 bits (of 32) from port Y of cell ga2_mm.$add$rtl/ga2_mm.v:49$333 ($add).
+Removed top 31 bits (of 32) from port B of cell ga2_mm.$sub$rtl/ga2_mm.v:56$337 ($sub).
+Removed top 27 bits (of 32) from port Y of cell ga2_mm.$sub$rtl/ga2_mm.v:56$337 ($sub).
+Removed top 31 bits (of 32) from port B of cell ga2_mm.$add$rtl/ga2_mm.v:57$346 ($add).
+Removed top 28 bits (of 32) from port Y of cell ga2_mm.$add$rtl/ga2_mm.v:57$346 ($add).
+Removed top 31 bits (of 32) from port B of cell ga2_mm.$add$rtl/ga2_mm.v:63$351 ($add).
+Removed top 24 bits (of 32) from port Y of cell ga2_mm.$add$rtl/ga2_mm.v:63$351 ($add).
+Removed top 24 bits (of 32) from port Y of cell ga2_mm.$add$rtl/ga2_mm.v:64$352 ($add).
+Removed top 24 bits (of 32) from port A of cell ga2_mm.$add$rtl/ga2_mm.v:64$353 ($add).
+Removed top 23 bits (of 32) from port Y of cell ga2_mm.$add$rtl/ga2_mm.v:64$353 ($add).
+Removed top 23 bits (of 32) from port A of cell ga2_mm.$sub$rtl/ga2_mm.v:64$354 ($sub).
+Removed top 30 bits (of 32) from port B of cell ga2_mm.$sub$rtl/ga2_mm.v:64$354 ($sub).
+Removed top 22 bits (of 32) from port Y of cell ga2_mm.$sub$rtl/ga2_mm.v:64$354 ($sub).
+Removed top 31 bits (of 32) from port B of cell ga2_mm.$add$rtl/ga2_mm.v:70$364 ($add).
+Removed top 20 bits (of 32) from port Y of cell ga2_mm.$add$rtl/ga2_mm.v:70$364 ($add).
+Removed top 3 bits (of 4) from port B of cell ga2_mm.$eq$rtl/ga2_mm.v:16$375 ($eq).
+Removed top 3 bits (of 4) from port B of cell ga2_mm.$eq$rtl/ga2_mm.v:17$379 ($eq).
+Removed top 2 bits (of 4) from port B of cell ga2_mm.$eq$rtl/ga2_mm.v:16$383 ($eq).
+Removed top 2 bits (of 4) from port B of cell ga2_mm.$eq$rtl/ga2_mm.v:17$387 ($eq).
+Removed top 2 bits (of 4) from port B of cell ga2_mm.$eq$rtl/ga2_mm.v:16$391 ($eq).
+Removed top 2 bits (of 4) from port B of cell ga2_mm.$eq$rtl/ga2_mm.v:17$395 ($eq).
+Removed top 1 bits (of 7) from FF cell ga2_mm.$auto$ff.cc:266:slice$1184 ($dffe).
+Removed top 4 bits (of 5) from port B of cell ga2_mm.$auto$opt_dff.cc:195:make_patterns_logic$1319 ($ne).
 Removed top 16 bits (of 32) from port Y of cell ga2_mm.$flatten\arr.\row[3].col[3].u.$mul$rtl/systolic.v:8$16 ($mul).
 Removed top 16 bits (of 32) from port Y of cell ga2_mm.$flatten\arr.\row[3].col[2].u.$mul$rtl/systolic.v:8$16 ($mul).
 Removed top 16 bits (of 32) from port Y of cell ga2_mm.$flatten\arr.\row[3].col[1].u.$mul$rtl/systolic.v:8$16 ($mul).
@@ -868,38 +870,40 @@ Removed top 16 bits (of 32) from port Y of cell ga2_mm.$flatten\arr.\row[0].col[
 Removed top 16 bits (of 32) from port Y of cell ga2_mm.$flatten\arr.\row[0].col[2].u.$mul$rtl/systolic.v:8$16 ($mul).
 Removed top 16 bits (of 32) from port Y of cell ga2_mm.$flatten\arr.\row[0].col[1].u.$mul$rtl/systolic.v:8$16 ($mul).
 Removed top 16 bits (of 32) from port Y of cell ga2_mm.$flatten\arr.\row[0].col[0].u.$mul$rtl/systolic.v:8$16 ($mul).
-Removed top 20 bits (of 32) from wire ga2_mm.$add$rtl/ga2_mm.v:0$304_Y.
-Removed top 28 bits (of 32) from wire ga2_mm.$add$rtl/ga2_mm.v:48$311_Y.
-Removed top 25 bits (of 32) from wire ga2_mm.$add$rtl/ga2_mm.v:49$316_Y.
-Removed top 20 bits (of 32) from wire ga2_mm.$add$rtl/ga2_mm.v:49$317_Y.
-Removed top 28 bits (of 32) from wire ga2_mm.$add$rtl/ga2_mm.v:57$330_Y.
-Removed top 24 bits (of 32) from wire ga2_mm.$add$rtl/ga2_mm.v:63$335_Y.
-Removed top 23 bits (of 32) from wire ga2_mm.$add$rtl/ga2_mm.v:64$337_Y.
-Removed top 20 bits (of 32) from wire ga2_mm.$add$rtl/ga2_mm.v:70$348_Y.
+Removed top 20 bits (of 32) from wire ga2_mm.$add$rtl/ga2_mm.v:0$320_Y.
+Removed top 28 bits (of 32) from wire ga2_mm.$add$rtl/ga2_mm.v:48$327_Y.
+Removed top 25 bits (of 32) from wire ga2_mm.$add$rtl/ga2_mm.v:49$332_Y.
+Removed top 20 bits (of 32) from wire ga2_mm.$add$rtl/ga2_mm.v:49$333_Y.
+Removed top 28 bits (of 32) from wire ga2_mm.$add$rtl/ga2_mm.v:57$346_Y.
+Removed top 24 bits (of 32) from wire ga2_mm.$add$rtl/ga2_mm.v:63$351_Y.
+Removed top 24 bits (of 32) from wire ga2_mm.$add$rtl/ga2_mm.v:64$352_Y.
+Removed top 23 bits (of 32) from wire ga2_mm.$add$rtl/ga2_mm.v:64$353_Y.
+Removed top 20 bits (of 32) from wire ga2_mm.$add$rtl/ga2_mm.v:70$364_Y.
 Removed top 1 bits (of 7) from wire ga2_mm.k_d.
+Removed top 7 bits (of 12) from wire ga2_mm.oaddr.
 
 13.11. Executing PEEPOPT pass (run peephole optimizers).
 
 13.12. Executing OPT_CLEAN pass (remove unused cells and wires).
 Finding unused cells or wires in module \ga2_mm..
-Removed 0 unused cells and 10 unused wires.
+Removed 0 unused cells and 12 unused wires.
 <suppressed ~1 debug messages>
 
 13.13. Executing ALUMACC pass (create $alu and $macc cells).
 Extracting $alu and $macc cells in module ga2_mm:
-  creating $macc model for $add$rtl/ga2_mm.v:35$302 ($add).
-  creating $macc model for $add$rtl/ga2_mm.v:48$311 ($add).
-  creating $macc model for $add$rtl/ga2_mm.v:48$312 ($add).
-  creating $macc model for $add$rtl/ga2_mm.v:49$316 ($add).
-  creating $macc model for $add$rtl/ga2_mm.v:49$317 ($add).
-  creating $macc model for $add$rtl/ga2_mm.v:56$325 ($add).
-  creating $macc model for $add$rtl/ga2_mm.v:57$330 ($add).
-  creating $macc model for $add$rtl/ga2_mm.v:57$331 ($add).
-  creating $macc model for $add$rtl/ga2_mm.v:63$335 ($add).
-  creating $macc model for $add$rtl/ga2_mm.v:64$336 ($add).
-  creating $macc model for $add$rtl/ga2_mm.v:64$337 ($add).
-  creating $macc model for $add$rtl/ga2_mm.v:68$343 ($add).
-  creating $macc model for $add$rtl/ga2_mm.v:70$348 ($add).
+  creating $macc model for $add$rtl/ga2_mm.v:35$318 ($add).
+  creating $macc model for $add$rtl/ga2_mm.v:48$327 ($add).
+  creating $macc model for $add$rtl/ga2_mm.v:48$328 ($add).
+  creating $macc model for $add$rtl/ga2_mm.v:49$332 ($add).
+  creating $macc model for $add$rtl/ga2_mm.v:49$333 ($add).
+  creating $macc model for $add$rtl/ga2_mm.v:56$341 ($add).
+  creating $macc model for $add$rtl/ga2_mm.v:57$346 ($add).
+  creating $macc model for $add$rtl/ga2_mm.v:57$347 ($add).
+  creating $macc model for $add$rtl/ga2_mm.v:63$351 ($add).
+  creating $macc model for $add$rtl/ga2_mm.v:64$352 ($add).
+  creating $macc model for $add$rtl/ga2_mm.v:64$353 ($add).
+  creating $macc model for $add$rtl/ga2_mm.v:68$359 ($add).
+  creating $macc model for $add$rtl/ga2_mm.v:70$364 ($add).
   creating $macc model for $flatten\arr.\row[0].col[0].u.$add$rtl/systolic.v:8$17 ($add).
   creating $macc model for $flatten\arr.\row[0].col[0].u.$mul$rtl/systolic.v:8$16 ($mul).
   creating $macc model for $flatten\arr.\row[0].col[1].u.$add$rtl/systolic.v:8$17 ($add).
@@ -932,26 +936,26 @@ Extracting $alu and $macc cells in module ga2_mm:
   creating $macc model for $flatten\arr.\row[3].col[2].u.$mul$rtl/systolic.v:8$16 ($mul).
   creating $macc model for $flatten\arr.\row[3].col[3].u.$add$rtl/systolic.v:8$17 ($add).
   creating $macc model for $flatten\arr.\row[3].col[3].u.$mul$rtl/systolic.v:8$16 ($mul).
-  creating $macc model for $sub$rtl/ga2_mm.v:26$254 ($sub).
-  creating $macc model for $sub$rtl/ga2_mm.v:26$269 ($sub).
-  creating $macc model for $sub$rtl/ga2_mm.v:26$284 ($sub).
-  creating $macc model for $sub$rtl/ga2_mm.v:28$260 ($sub).
-  creating $macc model for $sub$rtl/ga2_mm.v:28$275 ($sub).
-  creating $macc model for $sub$rtl/ga2_mm.v:28$290 ($sub).
-  creating $macc model for $sub$rtl/ga2_mm.v:48$309 ($sub).
-  creating $macc model for $sub$rtl/ga2_mm.v:48$314 ($sub).
-  creating $macc model for $sub$rtl/ga2_mm.v:56$321 ($sub).
-  creating $macc model for $sub$rtl/ga2_mm.v:64$338 ($sub).
-  merging $macc model for $add$rtl/ga2_mm.v:64$337 into $sub$rtl/ga2_mm.v:64$338.
-  merging $macc model for $add$rtl/ga2_mm.v:64$336 into $sub$rtl/ga2_mm.v:64$338.
-  creating $alu model for $macc $sub$rtl/ga2_mm.v:48$314.
-  creating $alu model for $macc $sub$rtl/ga2_mm.v:48$309.
-  creating $alu model for $macc $sub$rtl/ga2_mm.v:28$290.
-  creating $alu model for $macc $sub$rtl/ga2_mm.v:28$275.
-  creating $alu model for $macc $sub$rtl/ga2_mm.v:28$260.
-  creating $alu model for $macc $sub$rtl/ga2_mm.v:26$284.
-  creating $alu model for $macc $sub$rtl/ga2_mm.v:26$269.
-  creating $alu model for $macc $sub$rtl/ga2_mm.v:26$254.
+  creating $macc model for $sub$rtl/ga2_mm.v:26$270 ($sub).
+  creating $macc model for $sub$rtl/ga2_mm.v:26$285 ($sub).
+  creating $macc model for $sub$rtl/ga2_mm.v:26$300 ($sub).
+  creating $macc model for $sub$rtl/ga2_mm.v:28$276 ($sub).
+  creating $macc model for $sub$rtl/ga2_mm.v:28$291 ($sub).
+  creating $macc model for $sub$rtl/ga2_mm.v:28$306 ($sub).
+  creating $macc model for $sub$rtl/ga2_mm.v:48$325 ($sub).
+  creating $macc model for $sub$rtl/ga2_mm.v:48$330 ($sub).
+  creating $macc model for $sub$rtl/ga2_mm.v:56$337 ($sub).
+  creating $macc model for $sub$rtl/ga2_mm.v:64$354 ($sub).
+  merging $macc model for $add$rtl/ga2_mm.v:64$353 into $sub$rtl/ga2_mm.v:64$354.
+  merging $macc model for $add$rtl/ga2_mm.v:64$352 into $sub$rtl/ga2_mm.v:64$354.
+  creating $alu model for $macc $sub$rtl/ga2_mm.v:48$330.
+  creating $alu model for $macc $sub$rtl/ga2_mm.v:48$325.
+  creating $alu model for $macc $sub$rtl/ga2_mm.v:28$306.
+  creating $alu model for $macc $sub$rtl/ga2_mm.v:28$291.
+  creating $alu model for $macc $sub$rtl/ga2_mm.v:28$276.
+  creating $alu model for $macc $sub$rtl/ga2_mm.v:26$300.
+  creating $alu model for $macc $sub$rtl/ga2_mm.v:26$285.
+  creating $alu model for $macc $sub$rtl/ga2_mm.v:26$270.
   creating $alu model for $macc $flatten\arr.\row[3].col[3].u.$add$rtl/systolic.v:8$17.
   creating $alu model for $macc $flatten\arr.\row[3].col[2].u.$add$rtl/systolic.v:8$17.
   creating $alu model for $macc $flatten\arr.\row[3].col[1].u.$add$rtl/systolic.v:8$17.
@@ -968,103 +972,103 @@ Extracting $alu and $macc cells in module ga2_mm:
   creating $alu model for $macc $flatten\arr.\row[0].col[2].u.$add$rtl/systolic.v:8$17.
   creating $alu model for $macc $flatten\arr.\row[0].col[1].u.$add$rtl/systolic.v:8$17.
   creating $alu model for $macc $flatten\arr.\row[0].col[0].u.$add$rtl/systolic.v:8$17.
-  creating $alu model for $macc $add$rtl/ga2_mm.v:70$348.
-  creating $alu model for $macc $add$rtl/ga2_mm.v:68$343.
-  creating $alu model for $macc $sub$rtl/ga2_mm.v:56$321.
-  creating $alu model for $macc $add$rtl/ga2_mm.v:63$335.
-  creating $alu model for $macc $add$rtl/ga2_mm.v:57$331.
-  creating $alu model for $macc $add$rtl/ga2_mm.v:57$330.
-  creating $alu model for $macc $add$rtl/ga2_mm.v:56$325.
-  creating $alu model for $macc $add$rtl/ga2_mm.v:49$317.
-  creating $alu model for $macc $add$rtl/ga2_mm.v:49$316.
-  creating $alu model for $macc $add$rtl/ga2_mm.v:48$312.
-  creating $alu model for $macc $add$rtl/ga2_mm.v:48$311.
-  creating $alu model for $macc $add$rtl/ga2_mm.v:35$302.
-  creating $macc cell for $flatten\arr.\row[0].col[1].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1371
-  creating $macc cell for $flatten\arr.\row[2].col[0].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1372
-  creating $macc cell for $flatten\arr.\row[0].col[0].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1373
-  creating $macc cell for $flatten\arr.\row[3].col[1].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1374
-  creating $macc cell for $flatten\arr.\row[1].col[2].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1375
-  creating $macc cell for $flatten\arr.\row[3].col[2].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1376
-  creating $macc cell for $flatten\arr.\row[2].col[2].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1377
-  creating $macc cell for $sub$rtl/ga2_mm.v:64$338: $auto$alumacc.cc:365:replace_macc$1378
-  creating $macc cell for $flatten\arr.\row[3].col[3].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1379
-  creating $macc cell for $flatten\arr.\row[1].col[1].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1380
-  creating $macc cell for $flatten\arr.\row[2].col[1].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1381
-  creating $macc cell for $flatten\arr.\row[1].col[0].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1382
-  creating $macc cell for $flatten\arr.\row[2].col[3].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1383
-  creating $macc cell for $flatten\arr.\row[0].col[3].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1384
-  creating $macc cell for $flatten\arr.\row[1].col[3].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1385
-  creating $macc cell for $flatten\arr.\row[0].col[2].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1386
-  creating $macc cell for $flatten\arr.\row[3].col[0].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1387
-  creating $alu model for $ge$rtl/ga2_mm.v:28$243 ($ge): new $alu
-  creating $alu model for $ge$rtl/ga2_mm.v:28$258 ($ge): new $alu
-  creating $alu model for $ge$rtl/ga2_mm.v:28$273 ($ge): new $alu
-  creating $alu model for $ge$rtl/ga2_mm.v:28$288 ($ge): new $alu
-  creating $alu model for $lt$rtl/ga2_mm.v:28$242 ($lt): new $alu
-  creating $alu model for $lt$rtl/ga2_mm.v:28$246 ($lt): new $alu
-  creating $alu model for $lt$rtl/ga2_mm.v:28$257 ($lt): new $alu
-  creating $alu model for $lt$rtl/ga2_mm.v:28$261 ($lt): new $alu
-  creating $alu model for $lt$rtl/ga2_mm.v:28$272 ($lt): new $alu
-  creating $alu model for $lt$rtl/ga2_mm.v:28$276 ($lt): new $alu
-  creating $alu model for $lt$rtl/ga2_mm.v:28$287 ($lt): new $alu
-  creating $alu model for $lt$rtl/ga2_mm.v:28$291 ($lt): new $alu
-  creating $alu model for $lt$rtl/ga2_mm.v:29$248 ($lt): new $alu
-  creating $alu model for $lt$rtl/ga2_mm.v:29$263 ($lt): new $alu
-  creating $alu model for $lt$rtl/ga2_mm.v:29$278 ($lt): new $alu
-  creating $alu model for $lt$rtl/ga2_mm.v:29$293 ($lt): new $alu
-  creating $alu cell for $lt$rtl/ga2_mm.v:29$293: $auto$alumacc.cc:485:replace_alu$1404
-  creating $alu cell for $lt$rtl/ga2_mm.v:29$278: $auto$alumacc.cc:485:replace_alu$1409
-  creating $alu cell for $lt$rtl/ga2_mm.v:29$263: $auto$alumacc.cc:485:replace_alu$1414
-  creating $alu cell for $lt$rtl/ga2_mm.v:29$248: $auto$alumacc.cc:485:replace_alu$1419
-  creating $alu cell for $lt$rtl/ga2_mm.v:28$291: $auto$alumacc.cc:485:replace_alu$1424
-  creating $alu cell for $lt$rtl/ga2_mm.v:28$287: $auto$alumacc.cc:485:replace_alu$1435
-  creating $alu cell for $lt$rtl/ga2_mm.v:28$276: $auto$alumacc.cc:485:replace_alu$1440
-  creating $alu cell for $lt$rtl/ga2_mm.v:28$272: $auto$alumacc.cc:485:replace_alu$1451
-  creating $alu cell for $lt$rtl/ga2_mm.v:28$261: $auto$alumacc.cc:485:replace_alu$1456
-  creating $alu cell for $lt$rtl/ga2_mm.v:28$257: $auto$alumacc.cc:485:replace_alu$1467
-  creating $alu cell for $lt$rtl/ga2_mm.v:28$246: $auto$alumacc.cc:485:replace_alu$1472
-  creating $alu cell for $lt$rtl/ga2_mm.v:28$242: $auto$alumacc.cc:485:replace_alu$1483
-  creating $alu cell for $ge$rtl/ga2_mm.v:28$288: $auto$alumacc.cc:485:replace_alu$1488
-  creating $alu cell for $ge$rtl/ga2_mm.v:28$273: $auto$alumacc.cc:485:replace_alu$1497
-  creating $alu cell for $ge$rtl/ga2_mm.v:28$243: $auto$alumacc.cc:485:replace_alu$1506
-  creating $alu cell for $add$rtl/ga2_mm.v:35$302: $auto$alumacc.cc:485:replace_alu$1515
-  creating $alu cell for $add$rtl/ga2_mm.v:48$311: $auto$alumacc.cc:485:replace_alu$1518
-  creating $alu cell for $add$rtl/ga2_mm.v:48$312: $auto$alumacc.cc:485:replace_alu$1521
-  creating $alu cell for $add$rtl/ga2_mm.v:49$316: $auto$alumacc.cc:485:replace_alu$1524
-  creating $alu cell for $add$rtl/ga2_mm.v:49$317: $auto$alumacc.cc:485:replace_alu$1527
-  creating $alu cell for $add$rtl/ga2_mm.v:56$325: $auto$alumacc.cc:485:replace_alu$1530
-  creating $alu cell for $add$rtl/ga2_mm.v:57$330: $auto$alumacc.cc:485:replace_alu$1533
-  creating $alu cell for $add$rtl/ga2_mm.v:57$331: $auto$alumacc.cc:485:replace_alu$1536
-  creating $alu cell for $ge$rtl/ga2_mm.v:28$258: $auto$alumacc.cc:485:replace_alu$1539
-  creating $alu cell for $add$rtl/ga2_mm.v:63$335: $auto$alumacc.cc:485:replace_alu$1548
-  creating $alu cell for $sub$rtl/ga2_mm.v:56$321: $auto$alumacc.cc:485:replace_alu$1551
-  creating $alu cell for $add$rtl/ga2_mm.v:68$343: $auto$alumacc.cc:485:replace_alu$1554
-  creating $alu cell for $add$rtl/ga2_mm.v:70$348: $auto$alumacc.cc:485:replace_alu$1557
-  creating $alu cell for $flatten\arr.\row[0].col[0].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1560
-  creating $alu cell for $flatten\arr.\row[0].col[1].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1563
-  creating $alu cell for $flatten\arr.\row[0].col[2].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1566
-  creating $alu cell for $flatten\arr.\row[0].col[3].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1569
-  creating $alu cell for $flatten\arr.\row[1].col[0].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1572
-  creating $alu cell for $flatten\arr.\row[1].col[1].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1575
-  creating $alu cell for $flatten\arr.\row[1].col[2].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1578
-  creating $alu cell for $flatten\arr.\row[1].col[3].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1581
-  creating $alu cell for $flatten\arr.\row[2].col[0].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1584
-  creating $alu cell for $flatten\arr.\row[2].col[1].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1587
-  creating $alu cell for $flatten\arr.\row[2].col[2].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1590
-  creating $alu cell for $flatten\arr.\row[2].col[3].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1593
-  creating $alu cell for $flatten\arr.\row[3].col[0].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1596
-  creating $alu cell for $flatten\arr.\row[3].col[1].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1599
-  creating $alu cell for $flatten\arr.\row[3].col[2].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1602
-  creating $alu cell for $flatten\arr.\row[3].col[3].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1605
-  creating $alu cell for $sub$rtl/ga2_mm.v:26$254: $auto$alumacc.cc:485:replace_alu$1608
-  creating $alu cell for $sub$rtl/ga2_mm.v:26$269: $auto$alumacc.cc:485:replace_alu$1611
-  creating $alu cell for $sub$rtl/ga2_mm.v:26$284: $auto$alumacc.cc:485:replace_alu$1614
-  creating $alu cell for $sub$rtl/ga2_mm.v:28$260: $auto$alumacc.cc:485:replace_alu$1617
-  creating $alu cell for $sub$rtl/ga2_mm.v:28$275: $auto$alumacc.cc:485:replace_alu$1620
-  creating $alu cell for $sub$rtl/ga2_mm.v:28$290: $auto$alumacc.cc:485:replace_alu$1623
-  creating $alu cell for $sub$rtl/ga2_mm.v:48$309: $auto$alumacc.cc:485:replace_alu$1626
-  creating $alu cell for $sub$rtl/ga2_mm.v:48$314: $auto$alumacc.cc:485:replace_alu$1629
+  creating $alu model for $macc $add$rtl/ga2_mm.v:70$364.
+  creating $alu model for $macc $add$rtl/ga2_mm.v:68$359.
+  creating $alu model for $macc $sub$rtl/ga2_mm.v:56$337.
+  creating $alu model for $macc $add$rtl/ga2_mm.v:63$351.
+  creating $alu model for $macc $add$rtl/ga2_mm.v:57$347.
+  creating $alu model for $macc $add$rtl/ga2_mm.v:57$346.
+  creating $alu model for $macc $add$rtl/ga2_mm.v:56$341.
+  creating $alu model for $macc $add$rtl/ga2_mm.v:49$333.
+  creating $alu model for $macc $add$rtl/ga2_mm.v:49$332.
+  creating $alu model for $macc $add$rtl/ga2_mm.v:48$328.
+  creating $alu model for $macc $add$rtl/ga2_mm.v:48$327.
+  creating $alu model for $macc $add$rtl/ga2_mm.v:35$318.
+  creating $macc cell for $flatten\arr.\row[0].col[1].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1402
+  creating $macc cell for $flatten\arr.\row[2].col[0].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1403
+  creating $macc cell for $flatten\arr.\row[0].col[0].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1404
+  creating $macc cell for $flatten\arr.\row[3].col[1].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1405
+  creating $macc cell for $flatten\arr.\row[1].col[2].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1406
+  creating $macc cell for $flatten\arr.\row[3].col[2].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1407
+  creating $macc cell for $flatten\arr.\row[2].col[2].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1408
+  creating $macc cell for $sub$rtl/ga2_mm.v:64$354: $auto$alumacc.cc:365:replace_macc$1409
+  creating $macc cell for $flatten\arr.\row[3].col[3].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1410
+  creating $macc cell for $flatten\arr.\row[1].col[1].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1411
+  creating $macc cell for $flatten\arr.\row[2].col[1].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1412
+  creating $macc cell for $flatten\arr.\row[1].col[0].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1413
+  creating $macc cell for $flatten\arr.\row[2].col[3].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1414
+  creating $macc cell for $flatten\arr.\row[0].col[3].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1415
+  creating $macc cell for $flatten\arr.\row[1].col[3].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1416
+  creating $macc cell for $flatten\arr.\row[0].col[2].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1417
+  creating $macc cell for $flatten\arr.\row[3].col[0].u.$mul$rtl/systolic.v:8$16: $auto$alumacc.cc:365:replace_macc$1418
+  creating $alu model for $ge$rtl/ga2_mm.v:28$259 ($ge): new $alu
+  creating $alu model for $ge$rtl/ga2_mm.v:28$274 ($ge): new $alu
+  creating $alu model for $ge$rtl/ga2_mm.v:28$289 ($ge): new $alu
+  creating $alu model for $ge$rtl/ga2_mm.v:28$304 ($ge): new $alu
+  creating $alu model for $lt$rtl/ga2_mm.v:28$258 ($lt): new $alu
+  creating $alu model for $lt$rtl/ga2_mm.v:28$262 ($lt): new $alu
+  creating $alu model for $lt$rtl/ga2_mm.v:28$273 ($lt): new $alu
+  creating $alu model for $lt$rtl/ga2_mm.v:28$277 ($lt): new $alu
+  creating $alu model for $lt$rtl/ga2_mm.v:28$288 ($lt): new $alu
+  creating $alu model for $lt$rtl/ga2_mm.v:28$292 ($lt): new $alu
+  creating $alu model for $lt$rtl/ga2_mm.v:28$303 ($lt): new $alu
+  creating $alu model for $lt$rtl/ga2_mm.v:28$307 ($lt): new $alu
+  creating $alu model for $lt$rtl/ga2_mm.v:29$264 ($lt): new $alu
+  creating $alu model for $lt$rtl/ga2_mm.v:29$279 ($lt): new $alu
+  creating $alu model for $lt$rtl/ga2_mm.v:29$294 ($lt): new $alu
+  creating $alu model for $lt$rtl/ga2_mm.v:29$309 ($lt): new $alu
+  creating $alu cell for $lt$rtl/ga2_mm.v:29$309: $auto$alumacc.cc:485:replace_alu$1435
+  creating $alu cell for $lt$rtl/ga2_mm.v:29$294: $auto$alumacc.cc:485:replace_alu$1440
+  creating $alu cell for $lt$rtl/ga2_mm.v:29$279: $auto$alumacc.cc:485:replace_alu$1445
+  creating $alu cell for $lt$rtl/ga2_mm.v:29$264: $auto$alumacc.cc:485:replace_alu$1450
+  creating $alu cell for $lt$rtl/ga2_mm.v:28$307: $auto$alumacc.cc:485:replace_alu$1455
+  creating $alu cell for $lt$rtl/ga2_mm.v:28$303: $auto$alumacc.cc:485:replace_alu$1466
+  creating $alu cell for $lt$rtl/ga2_mm.v:28$292: $auto$alumacc.cc:485:replace_alu$1471
+  creating $alu cell for $lt$rtl/ga2_mm.v:28$288: $auto$alumacc.cc:485:replace_alu$1482
+  creating $alu cell for $lt$rtl/ga2_mm.v:28$277: $auto$alumacc.cc:485:replace_alu$1487
+  creating $alu cell for $lt$rtl/ga2_mm.v:28$273: $auto$alumacc.cc:485:replace_alu$1498
+  creating $alu cell for $lt$rtl/ga2_mm.v:28$262: $auto$alumacc.cc:485:replace_alu$1503
+  creating $alu cell for $lt$rtl/ga2_mm.v:28$258: $auto$alumacc.cc:485:replace_alu$1514
+  creating $alu cell for $ge$rtl/ga2_mm.v:28$304: $auto$alumacc.cc:485:replace_alu$1519
+  creating $alu cell for $ge$rtl/ga2_mm.v:28$289: $auto$alumacc.cc:485:replace_alu$1528
+  creating $alu cell for $ge$rtl/ga2_mm.v:28$259: $auto$alumacc.cc:485:replace_alu$1537
+  creating $alu cell for $add$rtl/ga2_mm.v:35$318: $auto$alumacc.cc:485:replace_alu$1546
+  creating $alu cell for $add$rtl/ga2_mm.v:48$327: $auto$alumacc.cc:485:replace_alu$1549
+  creating $alu cell for $add$rtl/ga2_mm.v:48$328: $auto$alumacc.cc:485:replace_alu$1552
+  creating $alu cell for $add$rtl/ga2_mm.v:49$332: $auto$alumacc.cc:485:replace_alu$1555
+  creating $alu cell for $add$rtl/ga2_mm.v:49$333: $auto$alumacc.cc:485:replace_alu$1558
+  creating $alu cell for $add$rtl/ga2_mm.v:56$341: $auto$alumacc.cc:485:replace_alu$1561
+  creating $alu cell for $add$rtl/ga2_mm.v:57$346: $auto$alumacc.cc:485:replace_alu$1564
+  creating $alu cell for $add$rtl/ga2_mm.v:57$347: $auto$alumacc.cc:485:replace_alu$1567
+  creating $alu cell for $ge$rtl/ga2_mm.v:28$274: $auto$alumacc.cc:485:replace_alu$1570
+  creating $alu cell for $add$rtl/ga2_mm.v:63$351: $auto$alumacc.cc:485:replace_alu$1579
+  creating $alu cell for $sub$rtl/ga2_mm.v:56$337: $auto$alumacc.cc:485:replace_alu$1582
+  creating $alu cell for $add$rtl/ga2_mm.v:68$359: $auto$alumacc.cc:485:replace_alu$1585
+  creating $alu cell for $add$rtl/ga2_mm.v:70$364: $auto$alumacc.cc:485:replace_alu$1588
+  creating $alu cell for $flatten\arr.\row[0].col[0].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1591
+  creating $alu cell for $flatten\arr.\row[0].col[1].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1594
+  creating $alu cell for $flatten\arr.\row[0].col[2].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1597
+  creating $alu cell for $flatten\arr.\row[0].col[3].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1600
+  creating $alu cell for $flatten\arr.\row[1].col[0].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1603
+  creating $alu cell for $flatten\arr.\row[1].col[1].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1606
+  creating $alu cell for $flatten\arr.\row[1].col[2].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1609
+  creating $alu cell for $flatten\arr.\row[1].col[3].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1612
+  creating $alu cell for $flatten\arr.\row[2].col[0].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1615
+  creating $alu cell for $flatten\arr.\row[2].col[1].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1618
+  creating $alu cell for $flatten\arr.\row[2].col[2].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1621
+  creating $alu cell for $flatten\arr.\row[2].col[3].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1624
+  creating $alu cell for $flatten\arr.\row[3].col[0].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1627
+  creating $alu cell for $flatten\arr.\row[3].col[1].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1630
+  creating $alu cell for $flatten\arr.\row[3].col[2].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1633
+  creating $alu cell for $flatten\arr.\row[3].col[3].u.$add$rtl/systolic.v:8$17: $auto$alumacc.cc:485:replace_alu$1636
+  creating $alu cell for $sub$rtl/ga2_mm.v:26$270: $auto$alumacc.cc:485:replace_alu$1639
+  creating $alu cell for $sub$rtl/ga2_mm.v:26$285: $auto$alumacc.cc:485:replace_alu$1642
+  creating $alu cell for $sub$rtl/ga2_mm.v:26$300: $auto$alumacc.cc:485:replace_alu$1645
+  creating $alu cell for $sub$rtl/ga2_mm.v:28$276: $auto$alumacc.cc:485:replace_alu$1648
+  creating $alu cell for $sub$rtl/ga2_mm.v:28$291: $auto$alumacc.cc:485:replace_alu$1651
+  creating $alu cell for $sub$rtl/ga2_mm.v:28$306: $auto$alumacc.cc:485:replace_alu$1654
+  creating $alu cell for $sub$rtl/ga2_mm.v:48$325: $auto$alumacc.cc:485:replace_alu$1657
+  creating $alu cell for $sub$rtl/ga2_mm.v:48$330: $auto$alumacc.cc:485:replace_alu$1660
   created 52 $alu and 17 $macc cells.
 
 13.14. Executing SHARE pass (SAT-based resource sharing).
@@ -1174,7 +1178,7 @@ Finding identical cells in module `\ga2_mm'.
 Removed a total of 5 cells.
 
 13.18.3. Executing OPT_DFF pass (perform DFF optimizations).
-Adding SRST signal on $auto$ff.cc:266:slice$1161 ($dffe) from module ga2_mm (D = $add$rtl/ga2_mm.v:63$335_Y, Q = \t, rval = 8'00000000).
+Adding SRST signal on $auto$ff.cc:266:slice$1175 ($dffe) from module ga2_mm (D = $add$rtl/ga2_mm.v:63$351_Y, Q = \t, rval = 8'00000000).
 
 13.18.4. Executing OPT_CLEAN pass (remove unused cells and wires).
 Finding unused cells or wires in module \ga2_mm..
@@ -1218,8 +1222,8 @@ Removed 0 multiplexer ports.
 
 13.20.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
   Optimizing cells in module \ga2_mm.
-    New ctrl vector for $pmux cell $procmux$712: $auto$opt_reduce.cc:134:opt_pmux$1656
-    New ctrl vector for $pmux cell $procmux$869: \st [1]
+    New ctrl vector for $pmux cell $procmux$732: $auto$opt_reduce.cc:134:opt_pmux$1687
+    New ctrl vector for $pmux cell $procmux$889: \st [1]
   Optimizing cells in module \ga2_mm.
 Performed a total of 2 changes.
 
@@ -1230,8 +1234,8 @@ Removed a total of 0 cells.
 13.20.6. Executing OPT_SHARE pass.
 
 13.20.7. Executing OPT_DFF pass (perform DFF optimizations).
-Adding SRST signal on $auto$ff.cc:266:slice$1310 ($sdffce) from module ga2_mm (D = $add$rtl/ga2_mm.v:48$311_Y, Q = \m, rval = 4'0000).
-Adding SRST signal on $auto$ff.cc:266:slice$1217 ($dffe) from module ga2_mm (D = $add$rtl/ga2_mm.v:57$330_Y, Q = \n, rval = 4'0000).
+Adding SRST signal on $auto$ff.cc:266:slice$1324 ($sdffce) from module ga2_mm (D = $add$rtl/ga2_mm.v:48$327_Y, Q = \m, rval = 4'0000).
+Adding SRST signal on $auto$ff.cc:266:slice$1231 ($dffe) from module ga2_mm (D = $add$rtl/ga2_mm.v:57$346_Y, Q = \n, rval = 4'0000).
 
 13.20.8. Executing OPT_CLEAN pass (remove unused cells and wires).
 Finding unused cells or wires in module \ga2_mm..
@@ -1303,18 +1307,17 @@ Successfully finished Verilog frontend.
 
 13.21.2. Continuing TECHMAP pass.
 Using extmapper simplemap for cells of type $mux.
-Using extmapper simplemap for cells of type $eq.
 Using extmapper simplemap for cells of type $reduce_or.
+Using extmapper simplemap for cells of type $not.
 Using extmapper simplemap for cells of type $and.
 Using extmapper simplemap for cells of type $reduce_and.
-Using extmapper simplemap for cells of type $ne.
-Using template $paramod$d1615bf4e5e328245ffd1550e5fe105901cda77b\_90_alu for cells of type $alu.
+Using extmapper simplemap for cells of type $eq.
 Using extmapper simplemap for cells of type $or.
-Using extmapper simplemap for cells of type $not.
-Using extmapper simplemap for cells of type $logic_not.
-Using extmapper simplemap for cells of type $sdffce.
-Using extmapper simplemap for cells of type $dffe.
 Using extmapper simplemap for cells of type $reduce_bool.
+Using extmapper simplemap for cells of type $sdffce.
+Using extmapper simplemap for cells of type $ne.
+Using extmapper simplemap for cells of type $logic_not.
+Using extmapper simplemap for cells of type $dffe.
 Using template $paramod$821d2886e47353e724eaca46af4992e9c3e6ac1d\_90_alu for cells of type $alu.
 Using template $paramod$0ae6dcbc606d0267ec97d3ccf20343286af3366c\_90_alu for cells of type $alu.
 Using extmapper simplemap for cells of type $logic_and.
@@ -1322,16 +1325,17 @@ Using template $paramod$32a7b7b86c07519b7537abc18e96f0331f97914d\_90_alu for cel
 Using template $paramod$5f9e462653ca3a1c8273276171a305d6ae686424\_90_alu for cells of type $alu.
 Using template $paramod$fdd20cfde6eff5e426e814d02912ca76c51febc9\_90_alu for cells of type $alu.
 Using template $paramod$dc04b7d98e503a7bab16fce2df70e6e2c5ca34d6\_90_alu for cells of type $alu.
-Using extmapper maccmap for cells of type $macc.
-  add \arr.row[0].col[0].u.a_out * \arr.row[0].col[1].u.b_in (8x8 bits, signed)
 Using template $paramod$dfca81329cbbac01700318224209a5f2318c7128\_90_alu for cells of type $alu.
 Using template $paramod$c3cd1564c35d873179656addd6052d7ea8b6d991\_90_alu for cells of type $alu.
 Using template $paramod$0cb8c8207ef60c40f3d931234779bbc53d5f6b86\_90_alu for cells of type $alu.
 Using template $paramod$7af24cf7f572852703f08ef7a936c59efa2c57af\_90_alu for cells of type $alu.
+Using extmapper maccmap for cells of type $macc.
+  add \arr.row[0].col[0].u.a_out * \arr.row[0].col[1].u.b_in (8x8 bits, signed)
 Using template $paramod$75108d6e8d490ab2eec24aee458e87cb2a6c124c\_90_alu for cells of type $alu.
 Using template $paramod$19189243523493d505a4933d1bad417c570ea8a6\_90_alu for cells of type $alu.
 Using template $paramod$f85408ed1aa3d09e465edae8a7bf590332ae9f7b\_90_alu for cells of type $alu.
 Using template $paramod$a950948e19702336540a1f557d0a91306bdb9188\_90_alu for cells of type $alu.
+Using template $paramod$d1615bf4e5e328245ffd1550e5fe105901cda77b\_90_alu for cells of type $alu.
 Using template $paramod$constmap:55437ebb71a0da5680403471c5368d2a6949dcbc$paramod$f37c14c07d56ba14f1a126f9cac4f012ce5ef0b0\_90_shift_shiftx for cells of type $shiftx.
 Using template $paramod$dde52db7035cb02b3cc5e73865788532339e3bcb\_90_alu for cells of type $alu.
 Using template $paramod$ee3d784672cdb1cb32d9a801a3af776716f16b74\_90_alu for cells of type $alu.
@@ -1363,16 +1367,16 @@ Using template $paramod$a04dd9d4d8b430140c4ff94b50470fb380fda2a0\_90_alu for cel
   add \arr.row[2].col[0].u.a_in * \arr.row[1].col[0].u.b_out (8x8 bits, signed)
   add \arr.row[3].col[0].u.a_out * \arr.row[2].col[1].u.b_out (8x8 bits, signed)
 Using extmapper simplemap for cells of type $pos.
-Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000000110 for cells of type $lcu.
-Using extmapper simplemap for cells of type $xor.
-Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000000011 for cells of type $lcu.
-Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000001000 for cells of type $lcu.
 Using template $paramod\_90_fa\WIDTH=32'00000000000000000000000000010000 for cells of type $fa.
-Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000000101 for cells of type $lcu.
 Using template $paramod$6df0329addda9228fcc2546de2aaf14ad26c98e1\_90_alu for cells of type $alu.
-Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000000100 for cells of type $lcu.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000001000 for cells of type $lcu.
+Using extmapper simplemap for cells of type $xor.
 Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000100000 for cells of type $lcu.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000000101 for cells of type $lcu.
 Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000001001 for cells of type $lcu.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000000100 for cells of type $lcu.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000000011 for cells of type $lcu.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000000110 for cells of type $lcu.
 Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000000010 for cells of type $lcu.
 Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000001100 for cells of type $lcu.
 Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000000111 for cells of type $lcu.
@@ -1387,26 +1391,26 @@ No more expansions possible.
 
 13.22.1. Executing OPT_EXPR pass (perform const folding).
 Optimizing module ga2_mm.
-<suppressed ~8547 debug messages>
+<suppressed ~8530 debug messages>
 
 13.22.2. Executing OPT_MERGE pass (detect identical cells).
 Finding identical cells in module `\ga2_mm'.
-<suppressed ~7425 debug messages>
-Removed a total of 2475 cells.
+<suppressed ~7428 debug messages>
+Removed a total of 2476 cells.
 
 13.22.3. Executing OPT_DFF pass (perform DFF optimizations).
 
 13.22.4. Executing OPT_CLEAN pass (remove unused cells and wires).
 Finding unused cells or wires in module \ga2_mm..
-Removed 7799 unused cells and 4375 unused wires.
-<suppressed ~7800 debug messages>
+Removed 7786 unused cells and 4365 unused wires.
+<suppressed ~7787 debug messages>
 
 13.22.5. Finished fast OPT passes.
 
 13.23. Executing ABC pass (technology mapping using ABC).
 
 13.23.1. Extracting gate netlist of module `\ga2_mm' to `<abc-temp-dir>/input.blif'..
-Extracted 12782 gates and 13731 wires to a netlist network with 946 inputs and 728 outputs.
+Extracted 12811 gates and 13760 wires to a netlist network with 946 inputs and 728 outputs.
 
 13.23.1.1. Executing ABC.
 Running ABC command: "<yosys-exe-dir>/yosys-abc" -s -f <abc-temp-dir>/abc.script 2>&1
@@ -1421,17 +1425,17 @@ ABC: + map
 ABC: + write_blif <abc-temp-dir>/output.blif 
 
 13.23.1.2. Re-integrating ABC results.
-ABC RESULTS:             ORNOT cells:      498
-ABC RESULTS:                OR cells:     2160
-ABC RESULTS:               NOR cells:     1295
-ABC RESULTS:              XNOR cells:     1081
-ABC RESULTS:               NOT cells:      619
-ABC RESULTS:               MUX cells:      628
-ABC RESULTS:              NAND cells:      258
-ABC RESULTS:               AND cells:      743
-ABC RESULTS:            ANDNOT cells:     3381
-ABC RESULTS:               XOR cells:     2444
-ABC RESULTS:        internal signals:    12057
+ABC RESULTS:             ORNOT cells:      504
+ABC RESULTS:                OR cells:     2163
+ABC RESULTS:               NOR cells:     1301
+ABC RESULTS:              XNOR cells:     1077
+ABC RESULTS:               NOT cells:      623
+ABC RESULTS:               MUX cells:      627
+ABC RESULTS:              NAND cells:      260
+ABC RESULTS:               AND cells:      740
+ABC RESULTS:            ANDNOT cells:     3390
+ABC RESULTS:               XOR cells:     2458
+ABC RESULTS:        internal signals:    12086
 ABC RESULTS:           input signals:      946
 ABC RESULTS:          output signals:      728
 Removing temp directory.
@@ -1451,7 +1455,7 @@ Removed a total of 12 cells.
 
 13.24.4. Executing OPT_CLEAN pass (remove unused cells and wires).
 Finding unused cells or wires in module \ga2_mm..
-Removed 0 unused cells and 4952 unused wires.
+Removed 0 unused cells and 4962 unused wires.
 <suppressed ~2 debug messages>
 
 13.24.5. Finished fast OPT passes.
@@ -1469,31 +1473,31 @@ Removed 0 unused modules.
 
 === ga2_mm ===
 
-   Number of wires:              12706
-   Number of wire bits:          16956
+   Number of wires:              12742
+   Number of wire bits:          16985
    Number of public wires:         212
-   Number of public wire bits:    3451
+   Number of public wire bits:    3444
    Number of memories:               0
    Number of memory bits:            0
    Number of processes:              0
-   Number of cells:              13978
-     $_ANDNOT_                    3381
-     $_AND_                        743
+   Number of cells:              14014
+     $_ANDNOT_                    3390
+     $_AND_                        740
      $_DFFE_PP_                    138
      $_DFF_P_                        6
-     $_MUX_                        628
-     $_NAND_                       257
-     $_NOR_                       1285
-     $_NOT_                        619
-     $_ORNOT_                      497
-     $_OR_                        2160
+     $_MUX_                        627
+     $_NAND_                       259
+     $_NOR_                       1292
+     $_NOT_                        623
+     $_ORNOT_                      502
+     $_OR_                        2163
      $_SDFFCE_PN0P_                  8
      $_SDFFCE_PP0P_                 15
      $_SDFFCE_PP1P_                  1
      $_SDFFE_PP0P_                   1
      $_SDFF_PP0_                   706
-     $_XNOR_                      1081
-     $_XOR_                       2444
+     $_XNOR_                      1077
+     $_XOR_                       2458
      rowmem                          8
 
 13.27. Executing CHECK pass (checking for obvious problems).
@@ -1531,7 +1535,7 @@ Mapping DFF cells in module `\ga2_mm':
 16. Executing ABC pass (technology mapping using ABC).
 
 16.1. Extracting gate netlist of module `\ga2_mm' to `<abc-temp-dir>/input.blif'..
-Extracted 13989 gates and 15019 wires to a netlist network with 1028 inputs and 931 outputs.
+Extracted 14025 gates and 15055 wires to a netlist network with 1028 inputs and 931 outputs.
 
 16.1.1. Executing ABC.
 Running ABC command: "<yosys-exe-dir>/yosys-abc" -s -f <abc-temp-dir>/abc.script 2>&1
@@ -1560,58 +1564,58 @@ ABC: + &put
 ABC: + write_blif <abc-temp-dir>/output.blif 
 
 16.1.2. Re-integrating ABC results.
-ABC RESULTS:              MUX2 cells:      638
-ABC RESULTS:               INV cells:      593
-ABC RESULTS:              NOR3 cells:      299
-ABC RESULTS:               OR2 cells:      264
-ABC RESULTS:             NAND3 cells:      321
-ABC RESULTS:             AOI21 cells:      744
-ABC RESULTS:             NAND2 cells:     1944
-ABC RESULTS:             OAI21 cells:      800
-ABC RESULTS:              XOR2 cells:     1292
-ABC RESULTS:             XNOR2 cells:     1859
-ABC RESULTS:              AND2 cells:      770
-ABC RESULTS:              NOR2 cells:     1761
-ABC RESULTS:        internal signals:    13060
+ABC RESULTS:              MUX2 cells:      640
+ABC RESULTS:               INV cells:      562
+ABC RESULTS:               OR2 cells:      293
+ABC RESULTS:              NOR3 cells:      278
+ABC RESULTS:             NAND3 cells:      297
+ABC RESULTS:             AOI21 cells:      761
+ABC RESULTS:             NAND2 cells:     1918
+ABC RESULTS:             OAI21 cells:      783
+ABC RESULTS:              XOR2 cells:     1327
+ABC RESULTS:             XNOR2 cells:     1871
+ABC RESULTS:              AND2 cells:      758
+ABC RESULTS:              NOR2 cells:     1763
+ABC RESULTS:        internal signals:    13096
 ABC RESULTS:           input signals:     1028
 ABC RESULTS:          output signals:      931
 Removing temp directory.
 
 17. Executing OPT_CLEAN pass (remove unused cells and wires).
 Finding unused cells or wires in module \ga2_mm..
-Removed 0 unused cells and 14606 unused wires.
+Removed 0 unused cells and 14642 unused wires.
 <suppressed ~143 debug messages>
 
 18. Printing statistics.
 
 === ga2_mm ===
 
-   Number of wires:              11307
-   Number of wire bits:          12398
+   Number of wires:              11273
+   Number of wire bits:          12364
    Number of public wires:          70
    Number of public wire bits:    1161
    Number of memories:               0
    Number of memory bits:            0
    Number of processes:              0
-   Number of cells:              12168
-     AND2                          770
-     AOI21                         744
+   Number of cells:              12134
+     AND2                          758
+     AOI21                         761
      DFF                           875
-     INV                           593
-     MUX2                          638
-     NAND2                        1944
-     NAND3                         321
-     NOR2                         1761
-     NOR3                          299
-     OAI21                         800
-     OR2                           264
-     XNOR2                        1859
-     XOR2                         1292
+     INV                           562
+     MUX2                          640
+     NAND2                        1918
+     NAND3                         297
+     NOR2                         1763
+     NOR3                          278
+     OAI21                         783
+     OR2                           293
+     XNOR2                        1871
+     XOR2                         1327
      rowmem                          8
 
    Area for cell type \rowmem is unknown!
 
-   Chip area for module '\ga2_mm': 21149.550000
+   Chip area for module '\ga2_mm': 21158.550000
 
 19. Executing Verilog backend.
 
@@ -1623,6 +1627,6 @@ Dumping module `\ga2_mm'.
 20. Executing JSON backend.
 
 Warnings: 2 unique messages, 2 total
-End of script. Logfile hash: df3307fb0a, CPU: user 7.54s system 0.09s, MEM: 121.93 MB peak
+End of script. Logfile hash: 12583471cf, CPU: user 7.22s system 0.08s, MEM: 121.29 MB peak
 Yosys 0.33 (git sha1 2584903a060)
-Time spent: 32% 2x abc (3 sec), 18% 45x opt_expr (1 sec), ...
+Time spent: 31% 2x abc (3 sec), 21% 45x opt_expr (2 sec), ...

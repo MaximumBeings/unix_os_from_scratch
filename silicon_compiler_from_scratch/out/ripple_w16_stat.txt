@@ -1,0 +1,24 @@
+
+9. Printing statistics.
+
+=== ripple_w16 ===
+
+   Number of wires:                 63
+   Number of wire bits:            109
+   Number of public wires:           3
+   Number of public wire bits:      49
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                 77
+     AND2                            7
+     AOI21                           7
+     NAND2                           9
+     NOR2                            8
+     OAI21                           8
+     OR2                             7
+     XNOR2                          22
+     XOR2                            9
+
+   Chip area for module '\ripple_w16': 122.670000
+

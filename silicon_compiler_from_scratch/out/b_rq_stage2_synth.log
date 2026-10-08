@@ -1,0 +1,680 @@
+
+ /----------------------------------------------------------------------------\
+ |                                                                            |
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |                                                                            |
+ |  Copyright (C) 2012 - 2020  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |                                                                            |
+ |  Permission to use, copy, modify, and/or distribute this software for any  |
+ |  purpose with or without fee is hereby granted, provided that the above    |
+ |  copyright notice and this permission notice appear in all copies.         |
+ |                                                                            |
+ |  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES  |
+ |  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF          |
+ |  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR   |
+ |  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    |
+ |  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN     |
+ |  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF   |
+ |  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.            |
+ |                                                                            |
+ \----------------------------------------------------------------------------/
+
+ Yosys 0.33 (git sha1 2584903a060)
+
+
+-- Running command `read_verilog -sv rtl/demo_add.v rtl/requant.v rtl/requant_p2.v; hierarchy -top rq_stage2; synth -flatten -top rq_stage2; dfflegalize -cell $_DFF_P_ x; dfflibmap -liberty lib/toy.lib; abc -liberty lib/toy.lib; opt_clean -purge; tee -o out/b_rq_stage2_stat.txt stat -liberty lib/toy.lib; write_verilog -noattr out/b_rq_stage2_net.v; write_json out/b_rq_stage2_net.json' --
+
+1. Executing Verilog-2005 frontend: rtl/demo_add.v
+Parsing SystemVerilog input from `rtl/demo_add.v' to AST representation.
+Generating RTLIL representation for module `\demo_add'.
+Generating RTLIL representation for module `\demo_ripple'.
+Generating RTLIL representation for module `\demo_kogge'.
+Successfully finished Verilog frontend.
+
+2. Executing Verilog-2005 frontend: rtl/requant.v
+Parsing SystemVerilog input from `rtl/requant.v' to AST representation.
+Generating RTLIL representation for module `\requant'.
+Successfully finished Verilog frontend.
+
+3. Executing Verilog-2005 frontend: rtl/requant_p2.v
+Parsing SystemVerilog input from `rtl/requant_p2.v' to AST representation.
+Generating RTLIL representation for module `\rq_stage1'.
+Generating RTLIL representation for module `\rq_stage2'.
+Generating RTLIL representation for module `\requant_p2'.
+Generating RTLIL representation for module `\rq_stage2k'.
+Generating RTLIL representation for module `\requant_p2k'.
+Successfully finished Verilog frontend.
+
+4. Executing HIERARCHY pass (managing design hierarchy).
+
+4.1. Analyzing design hierarchy..
+Top module:  \rq_stage2
+
+4.2. Analyzing design hierarchy..
+Top module:  \rq_stage2
+Removing unused module `\requant_p2k'.
+Removing unused module `\rq_stage2k'.
+Removing unused module `\requant_p2'.
+Removing unused module `\rq_stage1'.
+Removing unused module `\requant'.
+Removing unused module `\demo_kogge'.
+Removing unused module `\demo_ripple'.
+Removing unused module `\demo_add'.
+Removed 8 unused modules.
+
+5. Executing SYNTH pass.
+
+5.1. Executing HIERARCHY pass (managing design hierarchy).
+
+5.1.1. Analyzing design hierarchy..
+Top module:  \rq_stage2
+
+5.1.2. Analyzing design hierarchy..
+Top module:  \rq_stage2
+Removed 0 unused modules.
+
+5.2. Executing PROC pass (convert processes to netlists).
+
+5.2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+5.2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Removed a total of 0 dead cases.
+
+5.2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 0 assignments to connections.
+
+5.2.4. Executing PROC_INIT pass (extract init attributes).
+
+5.2.5. Executing PROC_ARST pass (detect async resets in processes).
+
+5.2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+
+5.2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+
+5.2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+5.2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+
+5.2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+5.2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+5.2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module rq_stage2.
+<suppressed ~1 debug messages>
+
+5.3. Executing FLATTEN pass (flatten design).
+
+5.4. Executing OPT_EXPR pass (perform const folding).
+Optimizing module rq_stage2.
+
+5.5. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \rq_stage2..
+Removed 0 unused cells and 6 unused wires.
+<suppressed ~1 debug messages>
+
+5.6. Executing CHECK pass (checking for obvious problems).
+Checking module rq_stage2...
+Found and reported 0 problems.
+
+5.7. Executing OPT pass (performing simple optimizations).
+
+5.7.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module rq_stage2.
+
+5.7.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\rq_stage2'.
+Removed a total of 0 cells.
+
+5.7.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \rq_stage2..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~4 debug messages>
+
+5.7.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \rq_stage2.
+Performed a total of 0 changes.
+
+5.7.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\rq_stage2'.
+Removed a total of 0 cells.
+
+5.7.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.7.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \rq_stage2..
+
+5.7.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module rq_stage2.
+
+5.7.9. Finished OPT passes. (There is nothing left to do.)
+
+5.8. Executing FSM pass (extract and optimize FSM).
+
+5.8.1. Executing FSM_DETECT pass (finding FSMs in design).
+
+5.8.2. Executing FSM_EXTRACT pass (extracting FSM from design).
+
+5.8.3. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+5.8.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \rq_stage2..
+
+5.8.5. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+5.8.6. Executing FSM_RECODE pass (re-assigning FSM state encoding).
+
+5.8.7. Executing FSM_INFO pass (dumping all available information on FSM cells).
+
+5.8.8. Executing FSM_MAP pass (mapping FSMs to basic logic).
+
+5.9. Executing OPT pass (performing simple optimizations).
+
+5.9.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module rq_stage2.
+
+5.9.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\rq_stage2'.
+Removed a total of 0 cells.
+
+5.9.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \rq_stage2..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~4 debug messages>
+
+5.9.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \rq_stage2.
+Performed a total of 0 changes.
+
+5.9.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\rq_stage2'.
+Removed a total of 0 cells.
+
+5.9.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.9.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \rq_stage2..
+
+5.9.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module rq_stage2.
+
+5.9.9. Finished OPT passes. (There is nothing left to do.)
+
+5.10. Executing WREDUCE pass (reducing word size of cells).
+Removed top 5 bits (of 6) from port B of cell rq_stage2.$sub$rtl/requant_p2.v:9$132 ($sub).
+Removed top 55 bits (of 56) from port A of cell rq_stage2.$shl$rtl/requant_p2.v:9$133 ($shl).
+Removed top 1 bits (of 57) from port A of cell rq_stage2.$add$rtl/requant_p2.v:10$135 ($add).
+Removed top 1 bits (of 57) from port B of cell rq_stage2.$add$rtl/requant_p2.v:10$135 ($add).
+Removed top 50 bits (of 57) from port B of cell rq_stage2.$gt$rtl/requant_p2.v:12$137 ($gt).
+Converting cell rq_stage2.$neg$rtl/requant_p2.v:13$139 ($neg) from signed to unsigned.
+Removed top 1 bits (of 8) from port A of cell rq_stage2.$neg$rtl/requant_p2.v:13$139 ($neg).
+
+5.11. Executing PEEPOPT pass (run peephole optimizers).
+
+5.12. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \rq_stage2..
+
+5.13. Executing ALUMACC pass (create $alu and $macc cells).
+Extracting $alu and $macc cells in module rq_stage2:
+  creating $macc model for $add$rtl/requant_p2.v:10$135 ($add).
+  creating $macc model for $neg$rtl/requant_p2.v:13$139 ($neg).
+  creating $macc model for $sub$rtl/requant_p2.v:9$132 ($sub).
+  creating $alu model for $macc $sub$rtl/requant_p2.v:9$132.
+  creating $alu model for $macc $neg$rtl/requant_p2.v:13$139.
+  creating $alu model for $macc $add$rtl/requant_p2.v:10$135.
+  creating $alu model for $gt$rtl/requant_p2.v:12$137 ($gt): new $alu
+  creating $alu cell for $gt$rtl/requant_p2.v:12$137: $auto$alumacc.cc:485:replace_alu$157
+  creating $alu cell for $add$rtl/requant_p2.v:10$135: $auto$alumacc.cc:485:replace_alu$162
+  creating $alu cell for $neg$rtl/requant_p2.v:13$139: $auto$alumacc.cc:485:replace_alu$165
+  creating $alu cell for $sub$rtl/requant_p2.v:9$132: $auto$alumacc.cc:485:replace_alu$168
+  created 4 $alu and 0 $macc cells.
+
+5.14. Executing SHARE pass (SAT-based resource sharing).
+Found 2 cells in module rq_stage2 that may be considered for resource sharing.
+  Analyzing resource sharing options for $shr$rtl/requant_p2.v:11$136 ($shr):
+    Cell is always active. Therefore no sharing is possible.
+  Analyzing resource sharing options for $shl$rtl/requant_p2.v:9$133 ($shl):
+    Found 2 activation_patterns using ctrl signal { $auto$rtlil.cc:2401:Not$161 $eq$rtl/requant_p2.v:9$131_Y }.
+    No candidates found.
+
+5.15. Executing OPT pass (performing simple optimizations).
+
+5.15.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module rq_stage2.
+<suppressed ~1 debug messages>
+
+5.15.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\rq_stage2'.
+Removed a total of 0 cells.
+
+5.15.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \rq_stage2..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~4 debug messages>
+
+5.15.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \rq_stage2.
+Performed a total of 0 changes.
+
+5.15.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\rq_stage2'.
+Removed a total of 0 cells.
+
+5.15.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.15.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \rq_stage2..
+Removed 1 unused cells and 2 unused wires.
+<suppressed ~2 debug messages>
+
+5.15.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module rq_stage2.
+
+5.15.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+5.15.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \rq_stage2..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~4 debug messages>
+
+5.15.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \rq_stage2.
+Performed a total of 0 changes.
+
+5.15.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\rq_stage2'.
+Removed a total of 0 cells.
+
+5.15.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.15.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \rq_stage2..
+
+5.15.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module rq_stage2.
+
+5.15.16. Finished OPT passes. (There is nothing left to do.)
+
+5.16. Executing MEMORY pass.
+
+5.16.1. Executing OPT_MEM pass (optimize memories).
+Performed a total of 0 transformations.
+
+5.16.2. Executing OPT_MEM_PRIORITY pass (removing unnecessary memory write priority relations).
+Performed a total of 0 transformations.
+
+5.16.3. Executing OPT_MEM_FEEDBACK pass (finding memory read-to-write feedback paths).
+
+5.16.4. Executing MEMORY_BMUX2ROM pass (converting muxes to ROMs).
+
+5.16.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).
+
+5.16.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \rq_stage2..
+
+5.16.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
+
+5.16.8. Executing OPT_MEM_WIDEN pass (optimize memories where all ports are wide).
+Performed a total of 0 transformations.
+
+5.16.9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \rq_stage2..
+
+5.16.10. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+5.17. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \rq_stage2..
+
+5.18. Executing OPT pass (performing simple optimizations).
+
+5.18.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module rq_stage2.
+<suppressed ~1 debug messages>
+
+5.18.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\rq_stage2'.
+Removed a total of 0 cells.
+
+5.18.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.18.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \rq_stage2..
+Removed 7 unused cells and 7 unused wires.
+<suppressed ~8 debug messages>
+
+5.18.5. Finished fast OPT passes.
+
+5.19. Executing MEMORY_MAP pass (converting memories to logic and flip-flops).
+
+5.20. Executing OPT pass (performing simple optimizations).
+
+5.20.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module rq_stage2.
+
+5.20.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\rq_stage2'.
+Removed a total of 0 cells.
+
+5.20.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \rq_stage2..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~4 debug messages>
+
+5.20.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \rq_stage2.
+Performed a total of 0 changes.
+
+5.20.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\rq_stage2'.
+Removed a total of 0 cells.
+
+5.20.6. Executing OPT_SHARE pass.
+
+5.20.7. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.20.8. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \rq_stage2..
+
+5.20.9. Executing OPT_EXPR pass (perform const folding).
+Optimizing module rq_stage2.
+
+5.20.10. Finished OPT passes. (There is nothing left to do.)
+
+5.21. Executing TECHMAP pass (map to technology primitives).
+
+5.21.1. Executing Verilog-2005 frontend: /usr/bin/../share/yosys/techmap.v
+Parsing Verilog input from `/usr/bin/../share/yosys/techmap.v' to AST representation.
+Generating RTLIL representation for module `\_90_simplemap_bool_ops'.
+Generating RTLIL representation for module `\_90_simplemap_reduce_ops'.
+Generating RTLIL representation for module `\_90_simplemap_logic_ops'.
+Generating RTLIL representation for module `\_90_simplemap_compare_ops'.
+Generating RTLIL representation for module `\_90_simplemap_various'.
+Generating RTLIL representation for module `\_90_simplemap_registers'.
+Generating RTLIL representation for module `\_90_shift_ops_shr_shl_sshl_sshr'.
+Generating RTLIL representation for module `\_90_shift_shiftx'.
+Generating RTLIL representation for module `\_90_fa'.
+Generating RTLIL representation for module `\_90_lcu'.
+Generating RTLIL representation for module `\_90_alu'.
+Generating RTLIL representation for module `\_90_macc'.
+Generating RTLIL representation for module `\_90_alumacc'.
+Generating RTLIL representation for module `\$__div_mod_u'.
+Generating RTLIL representation for module `\$__div_mod_trunc'.
+Generating RTLIL representation for module `\_90_div'.
+Generating RTLIL representation for module `\_90_mod'.
+Generating RTLIL representation for module `\$__div_mod_floor'.
+Generating RTLIL representation for module `\_90_divfloor'.
+Generating RTLIL representation for module `\_90_modfloor'.
+Generating RTLIL representation for module `\_90_pow'.
+Generating RTLIL representation for module `\_90_pmux'.
+Generating RTLIL representation for module `\_90_demux'.
+Generating RTLIL representation for module `\_90_lut'.
+Successfully finished Verilog frontend.
+
+5.21.2. Continuing TECHMAP pass.
+Using extmapper simplemap for cells of type $logic_not.
+Using template $paramod$a04dd9d4d8b430140c4ff94b50470fb380fda2a0\_90_alu for cells of type $alu.
+Using template $paramod$constmap:cc1228abbe79c96bcec4e792e251eee53e5e0e20$paramod$3db80fb83f6f80ae1f917276f15cabee7c59542e\_90_shift_ops_shr_shl_sshl_sshr for cells of type $shl.
+Using template $paramod$c9d98d2d0793a6d8797b9c088dbedb26a7be7121\_90_alu for cells of type $alu.
+Using template $paramod$7b4c50e08b477d476837e23c2abdce9e43ffbdfd\_90_alu for cells of type $alu.
+Using template $paramod$constmap:3763da8df22caeb9bb140b32f51ce71ccd883ea1$paramod$726267894d6f60d827aea2badc71285548deb07f\_90_shift_ops_shr_shl_sshl_sshr for cells of type $shr.
+Using template $paramod$e5fd9f673f47dbb5739c87bf382b22e808c83a1e\_90_alu for cells of type $alu.
+Using extmapper simplemap for cells of type $logic_and.
+Using extmapper simplemap for cells of type $not.
+Using extmapper simplemap for cells of type $pos.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000000110 for cells of type $lcu.
+Using extmapper simplemap for cells of type $and.
+Using extmapper simplemap for cells of type $xor.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000001000 for cells of type $lcu.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000111001 for cells of type $lcu.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000110010 for cells of type $lcu.
+Using extmapper simplemap for cells of type $or.
+No more expansions possible.
+<suppressed ~2787 debug messages>
+
+5.22. Executing OPT pass (performing simple optimizations).
+
+5.22.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module rq_stage2.
+<suppressed ~488 debug messages>
+
+5.22.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\rq_stage2'.
+Removed a total of 0 cells.
+
+5.22.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.22.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \rq_stage2..
+Removed 155 unused cells and 280 unused wires.
+<suppressed ~156 debug messages>
+
+5.22.5. Finished fast OPT passes.
+
+5.23. Executing ABC pass (technology mapping using ABC).
+
+5.23.1. Extracting gate netlist of module `\rq_stage2' to `<abc-temp-dir>/input.blif'..
+Extracted 1106 gates and 1172 wires to a netlist network with 64 inputs and 8 outputs.
+
+5.23.1.1. Executing ABC.
+Running ABC command: "<yosys-exe-dir>/yosys-abc" -s -f <abc-temp-dir>/abc.script 2>&1
+ABC: ABC command line: "source <abc-temp-dir>/abc.script".
+ABC: 
+ABC: + read_blif <abc-temp-dir>/input.blif 
+ABC: + read_library <abc-temp-dir>/stdcells.genlib 
+ABC: Entered genlib library with 13 gates from file "<abc-temp-dir>/stdcells.genlib".
+ABC: + strash 
+ABC: + dretime 
+ABC: + map 
+ABC: + write_blif <abc-temp-dir>/output.blif 
+
+5.23.1.2. Re-integrating ABC results.
+ABC RESULTS:              NAND cells:       31
+ABC RESULTS:               NOR cells:       53
+ABC RESULTS:              XNOR cells:       49
+ABC RESULTS:               NOT cells:       81
+ABC RESULTS:             ORNOT cells:       55
+ABC RESULTS:               AND cells:       13
+ABC RESULTS:                OR cells:      248
+ABC RESULTS:               XOR cells:       77
+ABC RESULTS:               MUX cells:      308
+ABC RESULTS:            ANDNOT cells:      244
+ABC RESULTS:        internal signals:     1100
+ABC RESULTS:           input signals:       64
+ABC RESULTS:          output signals:        8
+Removing temp directory.
+
+5.24. Executing OPT pass (performing simple optimizations).
+
+5.24.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module rq_stage2.
+<suppressed ~16 debug messages>
+
+5.24.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\rq_stage2'.
+<suppressed ~6 debug messages>
+Removed a total of 2 cells.
+
+5.24.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.24.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \rq_stage2..
+Removed 2 unused cells and 358 unused wires.
+<suppressed ~8 debug messages>
+
+5.24.5. Finished fast OPT passes.
+
+5.25. Executing HIERARCHY pass (managing design hierarchy).
+
+5.25.1. Analyzing design hierarchy..
+Top module:  \rq_stage2
+
+5.25.2. Analyzing design hierarchy..
+Top module:  \rq_stage2
+Removed 0 unused modules.
+
+5.26. Printing statistics.
+
+=== rq_stage2 ===
+
+   Number of wires:               1152
+   Number of wire bits:           1219
+   Number of public wires:           5
+   Number of public wire bits:      72
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:               1155
+     $_ANDNOT_                     244
+     $_AND_                         13
+     $_MUX_                        308
+     $_NAND_                        31
+     $_NOR_                         51
+     $_NOT_                         79
+     $_ORNOT_                       55
+     $_OR_                         248
+     $_XNOR_                        49
+     $_XOR_                         77
+
+5.27. Executing CHECK pass (checking for obvious problems).
+Checking module rq_stage2...
+Found and reported 0 problems.
+
+6. Executing DFFLEGALIZE pass (convert FFs to types supported by the target).
+
+7. Executing DFFLIBMAP pass (mapping DFF cells to sequential cells from liberty file).
+  cell DFF (noninv, pins=3, area=5.00) is a direct match for cell type $_DFF_P_.
+  final dff cell mappings:
+    unmapped dff cell: $_DFF_N_
+    \DFF _DFF_P_ (.CK( C), .D( D), .Q( Q));
+    unmapped dff cell: $_DFF_NN0_
+    unmapped dff cell: $_DFF_NN1_
+    unmapped dff cell: $_DFF_NP0_
+    unmapped dff cell: $_DFF_NP1_
+    unmapped dff cell: $_DFF_PN0_
+    unmapped dff cell: $_DFF_PN1_
+    unmapped dff cell: $_DFF_PP0_
+    unmapped dff cell: $_DFF_PP1_
+    unmapped dff cell: $_DFFSR_NNN_
+    unmapped dff cell: $_DFFSR_NNP_
+    unmapped dff cell: $_DFFSR_NPN_
+    unmapped dff cell: $_DFFSR_NPP_
+    unmapped dff cell: $_DFFSR_PNN_
+    unmapped dff cell: $_DFFSR_PNP_
+    unmapped dff cell: $_DFFSR_PPN_
+    unmapped dff cell: $_DFFSR_PPP_
+
+7.1. Executing DFFLEGALIZE pass (convert FFs to types supported by the target).
+Mapping DFF cells in module `\rq_stage2':
+
+8. Executing ABC pass (technology mapping using ABC).
+
+8.1. Extracting gate netlist of module `\rq_stage2' to `<abc-temp-dir>/input.blif'..
+Extracted 1155 gates and 1219 wires to a netlist network with 64 inputs and 8 outputs.
+
+8.1.1. Executing ABC.
+Running ABC command: "<yosys-exe-dir>/yosys-abc" -s -f <abc-temp-dir>/abc.script 2>&1
+ABC: ABC command line: "source <abc-temp-dir>/abc.script".
+ABC: 
+ABC: + read_blif <abc-temp-dir>/input.blif 
+ABC: + read_lib -w /home/user/unix_os_from_scratch/silicon_compiler_from_scratch/lib/toy.lib 
+ABC: Parsing finished successfully.  Parsing time =     0.00 sec
+ABC: Warning: Templates are not defined.
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "DFF".
+ABC: Library "toy" from "/home/user/unix_os_from_scratch/silicon_compiler_from_scratch/lib/toy.lib" has 13 cells (1 skipped: 1 seq; 0 tri-state; 0 no func; 0 dont_use).  Time =     0.00 sec
+ABC: Memory =    0.05 MB. Time =     0.00 sec
+ABC: + strash 
+ABC: + &get -n 
+ABC: + &fraig -x 
+ABC: + &put 
+ABC: + scorr 
+ABC: Warning: The network is combinational (run "fraig" or "fraig_sweep").
+ABC: + dc2 
+ABC: + dretime 
+ABC: + strash 
+ABC: + &get -n 
+ABC: + &dch -f 
+ABC: + &nf 
+ABC: + &put 
+ABC: + write_blif <abc-temp-dir>/output.blif 
+
+8.1.2. Re-integrating ABC results.
+ABC RESULTS:             XNOR2 cells:       70
+ABC RESULTS:               INV cells:       51
+ABC RESULTS:              AND2 cells:       34
+ABC RESULTS:             NAND3 cells:       55
+ABC RESULTS:              MUX2 cells:      119
+ABC RESULTS:               OR2 cells:       21
+ABC RESULTS:             AOI21 cells:       90
+ABC RESULTS:             NAND2 cells:      117
+ABC RESULTS:             OAI21 cells:       88
+ABC RESULTS:              XOR2 cells:       46
+ABC RESULTS:              NOR2 cells:      109
+ABC RESULTS:              NOR3 cells:       29
+ABC RESULTS:        internal signals:     1147
+ABC RESULTS:           input signals:       64
+ABC RESULTS:          output signals:        8
+Removing temp directory.
+
+9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \rq_stage2..
+Removed 0 unused cells and 1219 unused wires.
+<suppressed ~1 debug messages>
+
+10. Printing statistics.
+
+=== rq_stage2 ===
+
+   Number of wires:                826
+   Number of wire bits:            893
+   Number of public wires:           5
+   Number of public wire bits:      72
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                829
+     AND2                           34
+     AOI21                          90
+     INV                            51
+     MUX2                          119
+     NAND2                         117
+     NAND3                          55
+     NOR2                          109
+     NOR3                           29
+     OAI21                          88
+     OR2                            21
+     XNOR2                          70
+     XOR2                           46
+
+   Chip area for module '\rq_stage2': 1265.850000
+
+11. Executing Verilog backend.
+
+11.1. Executing BMUXMAP pass.
+
+11.2. Executing DEMUXMAP pass.
+Dumping module `\rq_stage2'.
+
+12. Executing JSON backend.
+
+End of script. Logfile hash: 96e738037d, CPU: user 0.55s system 0.02s, MEM: 26.82 MB peak
+Yosys 0.33 (git sha1 2584903a060)
+Time spent: 39% 2x abc (0 sec), 15% 26x opt_expr (0 sec), ...

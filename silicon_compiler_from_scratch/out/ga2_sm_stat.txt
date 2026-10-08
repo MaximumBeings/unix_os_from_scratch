@@ -3,27 +3,27 @@
 
 === ga2_sm ===
 
-   Number of wires:               4511
-   Number of wire bits:           5069
+   Number of wires:               4522
+   Number of wire bits:           5080
    Number of public wires:          30
    Number of public wire bits:     588
    Number of memories:               0
    Number of memory bits:            0
    Number of processes:              0
-   Number of cells:               4832
-     AND2                          174
-     AOI21                         391
+   Number of cells:               4843
+     AND2                          172
+     AOI21                         398
      DFF                           309
-     INV                           292
-     MUX2                          211
-     NAND2                        1025
-     NAND3                         110
-     NOR2                          635
-     NOR3                          112
-     OAI21                         394
-     OR2                            91
-     XNOR2                         636
-     XOR2                          452
+     INV                           291
+     MUX2                          214
+     NAND2                        1046
+     NAND3                         115
+     NOR2                          634
+     NOR3                           98
+     OAI21                         391
+     OR2                            90
+     XNOR2                         634
+     XOR2                          451
 
-   Chip area for module '\ga2_sm': 8064.670000
+   Chip area for module '\ga2_sm': 8074.180000
 

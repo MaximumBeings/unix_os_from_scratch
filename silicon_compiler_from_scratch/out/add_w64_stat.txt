@@ -1,0 +1,24 @@
+
+9. Printing statistics.
+
+=== add_w64 ===
+
+   Number of wires:                255
+   Number of wire bits:            445
+   Number of public wires:           3
+   Number of public wire bits:     193
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                317
+     AND2                           30
+     AOI21                          31
+     NAND2                          35
+     NOR2                           32
+     OAI21                          32
+     OR2                            30
+     XNOR2                          93
+     XOR2                           34
+
+   Chip area for module '\add_w64': 506.010000
+

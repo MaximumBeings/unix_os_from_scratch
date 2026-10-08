@@ -3,27 +3,27 @@
 
 === ga2_vadd ===
 
-   Number of wires:                495
-   Number of wire bits:            781
+   Number of wires:                497
+   Number of wire bits:            783
    Number of public wires:          20
    Number of public wire bits:     306
    Number of memories:               0
    Number of memory bits:            0
    Number of processes:              0
-   Number of cells:                594
-     AND2                           25
-     AOI21                          40
+   Number of cells:                596
+     AND2                           27
+     AOI21                          38
      DFF                            93
      INV                            34
      MUX2                           74
      NAND2                          75
-     NAND3                          14
+     NAND3                          17
      NOR2                           70
-     NOR3                           31
-     OAI21                          33
-     OR2                            11
+     NOR3                           29
+     OAI21                          36
+     OR2                            10
      XNOR2                          74
-     XOR2                           20
+     XOR2                           19
 
-   Chip area for module '\ga2_vadd': 1230.490000
+   Chip area for module '\ga2_vadd': 1232.990000
 

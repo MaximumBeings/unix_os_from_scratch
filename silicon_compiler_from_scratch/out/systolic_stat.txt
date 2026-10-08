@@ -3,27 +3,27 @@
 
 === systolic ===
 
-   Number of wires:              15061
-   Number of wire bits:          15802
+   Number of wires:              15107
+   Number of wire bits:          15848
    Number of public wires:          29
    Number of public wire bits:     770
    Number of memories:               0
    Number of memory bits:            0
    Number of processes:              0
-   Number of cells:              15736
-     AND2                          617
-     AOI21                        1101
+   Number of cells:              15782
+     AND2                          615
+     AOI21                        1079
      DFF                           704
-     INV                           634
+     INV                           641
      MUX2                            1
-     NAND2                        2831
-     NAND3                         159
-     NOR2                         2051
-     NOR3                          273
-     OAI21                        1367
-     OR2                           527
-     XNOR2                        2967
-     XOR2                         2504
+     NAND2                        2800
+     NAND3                         143
+     NOR2                         2080
+     NOR3                          296
+     OAI21                        1361
+     OR2                           581
+     XNOR2                        2925
+     XOR2                         2556
 
-   Chip area for module '\systolic': 26062.190000
+   Chip area for module '\systolic': 26117.780000
 

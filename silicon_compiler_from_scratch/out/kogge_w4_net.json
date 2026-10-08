@@ -1,0 +1,346 @@
+{
+  "creator": "Yosys 0.33 (git sha1 2584903a060)",
+  "modules": {
+    "kogge_w4": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "out/kogge_w4.v:1.1-1.100"
+      },
+      "ports": {
+        "a": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5 ]
+        },
+        "b": {
+          "direction": "input",
+          "bits": [ 6, 7, 8, 9 ]
+        },
+        "s": {
+          "direction": "output",
+          "bits": [ 10, 11, 12, 13, 14 ]
+        }
+      },
+      "cells": {
+        "$abc$256$auto$blifparse.cc:386:parse_blif$257": {
+          "hide_name": 1,
+          "type": "NAND2",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 9 ],
+            "B": [ 5 ],
+            "Y": [ 15 ]
+          }
+        },
+        "$abc$256$auto$blifparse.cc:386:parse_blif$258": {
+          "hide_name": 1,
+          "type": "AND2",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 8 ],
+            "B": [ 4 ],
+            "Y": [ 16 ]
+          }
+        },
+        "$abc$256$auto$blifparse.cc:386:parse_blif$259": {
+          "hide_name": 1,
+          "type": "OR2",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 8 ],
+            "B": [ 4 ],
+            "Y": [ 17 ]
+          }
+        },
+        "$abc$256$auto$blifparse.cc:386:parse_blif$260": {
+          "hide_name": 1,
+          "type": "XNOR2",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 8 ],
+            "B": [ 4 ],
+            "Y": [ 18 ]
+          }
+        },
+        "$abc$256$auto$blifparse.cc:386:parse_blif$261": {
+          "hide_name": 1,
+          "type": "NAND2",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 7 ],
+            "B": [ 3 ],
+            "Y": [ 19 ]
+          }
+        },
+        "$abc$256$auto$blifparse.cc:386:parse_blif$262": {
+          "hide_name": 1,
+          "type": "NAND2",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 6 ],
+            "B": [ 2 ],
+            "Y": [ 20 ]
+          }
+        },
+        "$abc$256$auto$blifparse.cc:386:parse_blif$263": {
+          "hide_name": 1,
+          "type": "NOR2",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 7 ],
+            "B": [ 3 ],
+            "Y": [ 21 ]
+          }
+        },
+        "$abc$256$auto$blifparse.cc:386:parse_blif$264": {
+          "hide_name": 1,
+          "type": "XOR2",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 7 ],
+            "B": [ 3 ],
+            "Y": [ 22 ]
+          }
+        },
+        "$abc$256$auto$blifparse.cc:386:parse_blif$265": {
+          "hide_name": 1,
+          "type": "OAI21",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 20 ],
+            "B": [ 21 ],
+            "C": [ 19 ],
+            "Y": [ 23 ]
+          }
+        },
+        "$abc$256$auto$blifparse.cc:386:parse_blif$266": {
+          "hide_name": 1,
+          "type": "AOI21",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 17 ],
+            "B": [ 23 ],
+            "C": [ 16 ],
+            "Y": [ 24 ]
+          }
+        },
+        "$abc$256$auto$blifparse.cc:386:parse_blif$267": {
+          "hide_name": 1,
+          "type": "NOR2",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 9 ],
+            "B": [ 5 ],
+            "Y": [ 25 ]
+          }
+        },
+        "$abc$256$auto$blifparse.cc:386:parse_blif$268": {
+          "hide_name": 1,
+          "type": "XOR2",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 9 ],
+            "B": [ 5 ],
+            "Y": [ 26 ]
+          }
+        },
+        "$abc$256$auto$blifparse.cc:386:parse_blif$269": {
+          "hide_name": 1,
+          "type": "OAI21",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 24 ],
+            "B": [ 25 ],
+            "C": [ 15 ],
+            "Y": [ 14 ]
+          }
+        },
+        "$abc$256$auto$blifparse.cc:386:parse_blif$270": {
+          "hide_name": 1,
+          "type": "XNOR2",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 20 ],
+            "B": [ 22 ],
+            "Y": [ 11 ]
+          }
+        },
+        "$abc$256$auto$blifparse.cc:386:parse_blif$271": {
+          "hide_name": 1,
+          "type": "XNOR2",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 18 ],
+            "B": [ 23 ],
+            "Y": [ 12 ]
+          }
+        },
+        "$abc$256$auto$blifparse.cc:386:parse_blif$272": {
+          "hide_name": 1,
+          "type": "XNOR2",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 24 ],
+            "B": [ 26 ],
+            "Y": [ 13 ]
+          }
+        },
+        "$abc$256$auto$blifparse.cc:386:parse_blif$273": {
+          "hide_name": 1,
+          "type": "XOR2",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 6 ],
+            "B": [ 2 ],
+            "Y": [ 10 ]
+          }
+        }
+      },
+      "netnames": {
+        "$abc$256$new_n14_": {
+          "hide_name": 1,
+          "bits": [ 15 ],
+          "attributes": {
+          }
+        },
+        "$abc$256$new_n15_": {
+          "hide_name": 1,
+          "bits": [ 16 ],
+          "attributes": {
+          }
+        },
+        "$abc$256$new_n16_": {
+          "hide_name": 1,
+          "bits": [ 17 ],
+          "attributes": {
+          }
+        },
+        "$abc$256$new_n17_": {
+          "hide_name": 1,
+          "bits": [ 18 ],
+          "attributes": {
+          }
+        },
+        "$abc$256$new_n18_": {
+          "hide_name": 1,
+          "bits": [ 19 ],
+          "attributes": {
+          }
+        },
+        "$abc$256$new_n19_": {
+          "hide_name": 1,
+          "bits": [ 20 ],
+          "attributes": {
+          }
+        },
+        "$abc$256$new_n20_": {
+          "hide_name": 1,
+          "bits": [ 21 ],
+          "attributes": {
+          }
+        },
+        "$abc$256$new_n21_": {
+          "hide_name": 1,
+          "bits": [ 22 ],
+          "attributes": {
+          }
+        },
+        "$abc$256$new_n22_": {
+          "hide_name": 1,
+          "bits": [ 23 ],
+          "attributes": {
+          }
+        },
+        "$abc$256$new_n23_": {
+          "hide_name": 1,
+          "bits": [ 24 ],
+          "attributes": {
+          }
+        },
+        "$abc$256$new_n24_": {
+          "hide_name": 1,
+          "bits": [ 25 ],
+          "attributes": {
+          }
+        },
+        "$abc$256$new_n25_": {
+          "hide_name": 1,
+          "bits": [ 26 ],
+          "attributes": {
+          }
+        },
+        "a": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+            "src": "out/kogge_w4.v:1.29-1.30"
+          }
+        },
+        "b": {
+          "hide_name": 0,
+          "bits": [ 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "out/kogge_w4.v:1.44-1.45"
+          }
+        },
+        "s": {
+          "hide_name": 0,
+          "bits": [ 10, 11, 12, 13, 14 ],
+          "attributes": {
+            "src": "out/kogge_w4.v:1.60-1.61"
+          }
+        }
+      }
+    }
+  }
+}

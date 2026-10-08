@@ -1,0 +1,28 @@
+
+10. Printing statistics.
+
+=== rq_stage2k ===
+
+   Number of wires:               1041
+   Number of wire bits:           1108
+   Number of public wires:           5
+   Number of public wire bits:      72
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:               1044
+     AND2                           31
+     AOI21                         119
+     INV                            48
+     MUX2                          155
+     NAND2                         145
+     NAND3                          61
+     NOR2                          151
+     NOR3                           38
+     OAI21                         146
+     OR2                            34
+     XNOR2                          63
+     XOR2                           53
+
+   Chip area for module '\rq_stage2k': 1598.810000
+

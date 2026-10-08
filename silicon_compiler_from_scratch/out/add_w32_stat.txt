@@ -1,0 +1,24 @@
+
+9. Printing statistics.
+
+=== add_w32 ===
+
+   Number of wires:                127
+   Number of wire bits:            221
+   Number of public wires:           3
+   Number of public wire bits:      97
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                157
+     AND2                           15
+     AOI21                          15
+     NAND2                          17
+     NOR2                           16
+     OAI21                          16
+     OR2                            15
+     XNOR2                          46
+     XOR2                           17
+
+   Chip area for module '\add_w32': 250.670000
+

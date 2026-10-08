@@ -3,27 +3,27 @@
 
 === ga2_amax ===
 
-   Number of wires:                473
-   Number of wire bits:            759
+   Number of wires:                472
+   Number of wire bits:            758
    Number of public wires:          17
    Number of public wire bits:     303
    Number of memories:               0
    Number of memory bits:            0
    Number of processes:              0
-   Number of cells:                576
+   Number of cells:                575
      AND2                           14
      AOI21                          34
      DFF                           108
      INV                            50
      MUX2                           82
-     NAND2                          60
+     NAND2                          58
      NAND3                          13
-     NOR2                           69
+     NOR2                           68
      NOR3                           34
-     OAI21                          30
+     OAI21                          32
      OR2                             8
      XNOR2                          48
      XOR2                           26
 
-   Chip area for module '\ga2_amax': 1248.200000
+   Chip area for module '\ga2_amax': 1248.540000
 

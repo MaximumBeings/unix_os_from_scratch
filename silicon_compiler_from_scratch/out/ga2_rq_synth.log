@@ -66,6 +66,7 @@ Generating RTLIL representation for module `\ga2_st'.
 Generating RTLIL representation for module `\ga2_rq'.
 Generating RTLIL representation for module `\ga2_vadd'.
 Generating RTLIL representation for module `\ga2_amax'.
+Generating RTLIL representation for module `\ga2_unp'.
 Successfully finished Verilog frontend.
 
 9. Executing Verilog-2005 frontend: rtl/ga2_sm.v
@@ -97,6 +98,7 @@ Used module:     \requant
 Removing unused module `\ga2'.
 Removing unused module `\ga2_mm'.
 Removing unused module `\ga2_sm'.
+Removing unused module `\ga2_unp'.
 Removing unused module `\ga2_amax'.
 Removing unused module `\ga2_vadd'.
 Removing unused module `\ga2_st'.
@@ -105,7 +107,7 @@ Removing unused module `\exp_lut'.
 Removing unused module `\systolic'.
 Removing unused module `\pe'.
 Removing unused module `\dma'.
-Removed 11 unused modules.
+Removed 12 unused modules.
 
 13. Executing SYNTH pass.
 
@@ -159,27 +161,27 @@ Creating decoders for process `\ga2_rq.$proc$rtl/ga2_vec.v:27$122'.
 
 13.2.9. Executing PROC_DFF pass (convert process syncs to FFs).
 Creating register for signal `\ga2_rq.\src' using process `\ga2_rq.$proc$rtl/ga2_vec.v:27$122'.
-  created $dff cell `$procdff$567' with positive edge clock.
+  created $dff cell `$procdff$596' with positive edge clock.
 Creating register for signal `\ga2_rq.\dst' using process `\ga2_rq.$proc$rtl/ga2_vec.v:27$122'.
-  created $dff cell `$procdff$568' with positive edge clock.
+  created $dff cell `$procdff$597' with positive edge clock.
 Creating register for signal `\ga2_rq.\len' using process `\ga2_rq.$proc$rtl/ga2_vec.v:27$122'.
-  created $dff cell `$procdff$569' with positive edge clock.
+  created $dff cell `$procdff$598' with positive edge clock.
 Creating register for signal `\ga2_rq.\busy' using process `\ga2_rq.$proc$rtl/ga2_vec.v:27$122'.
-  created $dff cell `$procdff$570' with positive edge clock.
+  created $dff cell `$procdff$599' with positive edge clock.
 Creating register for signal `\ga2_rq.\done' using process `\ga2_rq.$proc$rtl/ga2_vec.v:27$122'.
-  created $dff cell `$procdff$571' with positive edge clock.
+  created $dff cell `$procdff$600' with positive edge clock.
 Creating register for signal `\ga2_rq.\m' using process `\ga2_rq.$proc$rtl/ga2_vec.v:27$122'.
-  created $dff cell `$procdff$572' with positive edge clock.
+  created $dff cell `$procdff$601' with positive edge clock.
 Creating register for signal `\ga2_rq.\s' using process `\ga2_rq.$proc$rtl/ga2_vec.v:27$122'.
-  created $dff cell `$procdff$573' with positive edge clock.
+  created $dff cell `$procdff$602' with positive edge clock.
 Creating register for signal `\ga2_rq.\relu' using process `\ga2_rq.$proc$rtl/ga2_vec.v:27$122'.
-  created $dff cell `$procdff$574' with positive edge clock.
+  created $dff cell `$procdff$603' with positive edge clock.
 Creating register for signal `\ga2_rq.\i' using process `\ga2_rq.$proc$rtl/ga2_vec.v:27$122'.
-  created $dff cell `$procdff$575' with positive edge clock.
+  created $dff cell `$procdff$604' with positive edge clock.
 Creating register for signal `\ga2_rq.\j' using process `\ga2_rq.$proc$rtl/ga2_vec.v:27$122'.
-  created $dff cell `$procdff$576' with positive edge clock.
+  created $dff cell `$procdff$605' with positive edge clock.
 Creating register for signal `\ga2_rq.\v' using process `\ga2_rq.$proc$rtl/ga2_vec.v:27$122'.
-  created $dff cell `$procdff$577' with positive edge clock.
+  created $dff cell `$procdff$606' with positive edge clock.
 
 13.2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
 
@@ -224,9 +226,9 @@ Running muxtree optimizer on module \ga2_rq..
   Creating internal representation of mux trees.
   Evaluating internal representation of mux trees.
       Replacing known input bits on port A of cell $flatten\rqu.$ternary$rtl/requant.v:7$85: \rd -> { 1'0 \rd [30:0] }
-      Replacing known input bits on port A of cell $procmux$541: \busy -> 1'0
-      Replacing known input bits on port A of cell $procmux$539: \busy -> 1'1
-      Replacing known input bits on port A of cell $procmux$537: \busy -> 1'1
+      Replacing known input bits on port A of cell $procmux$570: \busy -> 1'0
+      Replacing known input bits on port A of cell $procmux$568: \busy -> 1'1
+      Replacing known input bits on port A of cell $procmux$566: \busy -> 1'1
   Analyzing evaluation results.
 Removed 0 multiplexer ports.
 <suppressed ~16 debug messages>
@@ -322,20 +324,20 @@ Finding identical cells in module `\ga2_rq'.
 Removed a total of 0 cells.
 
 13.9.6. Executing OPT_DFF pass (perform DFF optimizations).
-Adding SRST signal on $procdff$577 ($dff) from module ga2_rq (D = $procmux$491_Y, Q = \v, rval = 1'0).
-Adding EN signal on $auto$ff.cc:266:slice$578 ($sdff) from module ga2_rq (D = $procmux$489_Y, Q = \v).
-Adding EN signal on $procdff$576 ($dff) from module ga2_rq (D = $procmux$504_Y, Q = \j).
-Adding SRST signal on $auto$ff.cc:266:slice$582 ($dffe) from module ga2_rq (D = $procmux$501_Y, Q = \j, rval = 12'000000000000).
-Adding EN signal on $procdff$575 ($dff) from module ga2_rq (D = $procmux$514_Y, Q = \i).
-Adding SRST signal on $auto$ff.cc:266:slice$592 ($dffe) from module ga2_rq (D = $procmux$511_Y, Q = \i, rval = 12'000000000000).
-Adding EN signal on $procdff$574 ($dff) from module ga2_rq (D = \ins [18], Q = \relu).
-Adding EN signal on $procdff$573 ($dff) from module ga2_rq (D = \ins [51:46], Q = \s).
-Adding EN signal on $procdff$572 ($dff) from module ga2_rq (D = \ins [75:52], Q = \m).
-Adding SRST signal on $procdff$571 ($dff) from module ga2_rq (D = $procmux$475_Y, Q = \done, rval = 1'0).
-Adding SRST signal on $procdff$570 ($dff) from module ga2_rq (D = $procmux$544_Y, Q = \busy, rval = 1'0).
-Adding EN signal on $procdff$569 ($dff) from module ga2_rq (D = \ins [87:76], Q = \len).
-Adding EN signal on $procdff$568 ($dff) from module ga2_rq (D = \ins [119:108], Q = \dst).
-Adding EN signal on $procdff$567 ($dff) from module ga2_rq (D = \ins [103:92], Q = \src).
+Adding SRST signal on $procdff$606 ($dff) from module ga2_rq (D = $procmux$520_Y, Q = \v, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$607 ($sdff) from module ga2_rq (D = $procmux$518_Y, Q = \v).
+Adding EN signal on $procdff$605 ($dff) from module ga2_rq (D = $procmux$533_Y, Q = \j).
+Adding SRST signal on $auto$ff.cc:266:slice$611 ($dffe) from module ga2_rq (D = $procmux$530_Y, Q = \j, rval = 12'000000000000).
+Adding EN signal on $procdff$604 ($dff) from module ga2_rq (D = $procmux$543_Y, Q = \i).
+Adding SRST signal on $auto$ff.cc:266:slice$621 ($dffe) from module ga2_rq (D = $procmux$540_Y, Q = \i, rval = 12'000000000000).
+Adding EN signal on $procdff$603 ($dff) from module ga2_rq (D = \ins [18], Q = \relu).
+Adding EN signal on $procdff$602 ($dff) from module ga2_rq (D = \ins [51:46], Q = \s).
+Adding EN signal on $procdff$601 ($dff) from module ga2_rq (D = \ins [75:52], Q = \m).
+Adding SRST signal on $procdff$600 ($dff) from module ga2_rq (D = $procmux$504_Y, Q = \done, rval = 1'0).
+Adding SRST signal on $procdff$599 ($dff) from module ga2_rq (D = $procmux$573_Y, Q = \busy, rval = 1'0).
+Adding EN signal on $procdff$598 ($dff) from module ga2_rq (D = \ins [87:76], Q = \len).
+Adding EN signal on $procdff$597 ($dff) from module ga2_rq (D = \ins [119:108], Q = \dst).
+Adding EN signal on $procdff$596 ($dff) from module ga2_rq (D = \ins [103:92], Q = \src).
 
 13.9.7. Executing OPT_CLEAN pass (remove unused cells and wires).
 Finding unused cells or wires in module \ga2_rq..
@@ -412,8 +414,8 @@ Removed top 1 bits (of 57) from port B of cell ga2_rq.$flatten\rqu.$add$rtl/requ
 Removed top 50 bits (of 57) from port B of cell ga2_rq.$flatten\rqu.$gt$rtl/requant.v:13$93 ($gt).
 Converting cell ga2_rq.$flatten\rqu.$neg$rtl/requant.v:14$95 ($neg) from signed to unsigned.
 Removed top 1 bits (of 8) from port A of cell ga2_rq.$flatten\rqu.$neg$rtl/requant.v:14$95 ($neg).
-Removed top 2 bits (of 3) from port B of cell ga2_rq.$auto$opt_dff.cc:195:make_patterns_logic$586 ($ne).
-Removed top 2 bits (of 3) from port B of cell ga2_rq.$auto$opt_dff.cc:195:make_patterns_logic$596 ($ne).
+Removed top 2 bits (of 3) from port B of cell ga2_rq.$auto$opt_dff.cc:195:make_patterns_logic$615 ($ne).
+Removed top 2 bits (of 3) from port B of cell ga2_rq.$auto$opt_dff.cc:195:make_patterns_logic$625 ($ne).
 Removed top 31 bits (of 32) from port B of cell ga2_rq.$add$rtl/ga2_vec.v:32$127 ($add).
 Removed top 20 bits (of 32) from port Y of cell ga2_rq.$add$rtl/ga2_vec.v:32$127 ($add).
 Removed top 31 bits (of 32) from port B of cell ga2_rq.$add$rtl/ga2_vec.v:33$128 ($add).
@@ -451,19 +453,19 @@ Extracting $alu and $macc cells in module ga2_rq:
   creating $alu model for $macc $add$rtl/ga2_vec.v:32$127.
   creating $alu model for $macc $add$rtl/ga2_vec.v:26$121.
   creating $alu model for $macc $add$rtl/ga2_vec.v:26$120.
-  creating $macc cell for $flatten\rqu.$add$rtl/requant.v:10$91: $auto$alumacc.cc:365:replace_macc$642
+  creating $macc cell for $flatten\rqu.$add$rtl/requant.v:10$91: $auto$alumacc.cc:365:replace_macc$671
   creating $alu model for $flatten\rqu.$gt$rtl/requant.v:13$93 ($gt): new $alu
   creating $alu model for $lt$rtl/ga2_vec.v:32$125 ($lt): new $alu
-  creating $alu cell for $lt$rtl/ga2_vec.v:32$125: $auto$alumacc.cc:485:replace_alu$645
-  creating $alu cell for $flatten\rqu.$gt$rtl/requant.v:13$93: $auto$alumacc.cc:485:replace_alu$650
-  creating $alu cell for $add$rtl/ga2_vec.v:26$120: $auto$alumacc.cc:485:replace_alu$655
-  creating $alu cell for $add$rtl/ga2_vec.v:26$121: $auto$alumacc.cc:485:replace_alu$658
-  creating $alu cell for $add$rtl/ga2_vec.v:32$127: $auto$alumacc.cc:485:replace_alu$661
-  creating $alu cell for $add$rtl/ga2_vec.v:33$128: $auto$alumacc.cc:485:replace_alu$664
-  creating $alu cell for $flatten\rqu.$add$rtl/requant.v:7$84: $auto$alumacc.cc:485:replace_alu$667
-  creating $alu cell for $sub$rtl/ga2_vec.v:33$129: $auto$alumacc.cc:485:replace_alu$670
-  creating $alu cell for $flatten\rqu.$neg$rtl/requant.v:14$95: $auto$alumacc.cc:485:replace_alu$673
-  creating $alu cell for $flatten\rqu.$sub$rtl/requant.v:9$88: $auto$alumacc.cc:485:replace_alu$676
+  creating $alu cell for $lt$rtl/ga2_vec.v:32$125: $auto$alumacc.cc:485:replace_alu$674
+  creating $alu cell for $flatten\rqu.$gt$rtl/requant.v:13$93: $auto$alumacc.cc:485:replace_alu$679
+  creating $alu cell for $add$rtl/ga2_vec.v:26$120: $auto$alumacc.cc:485:replace_alu$684
+  creating $alu cell for $add$rtl/ga2_vec.v:26$121: $auto$alumacc.cc:485:replace_alu$687
+  creating $alu cell for $add$rtl/ga2_vec.v:32$127: $auto$alumacc.cc:485:replace_alu$690
+  creating $alu cell for $add$rtl/ga2_vec.v:33$128: $auto$alumacc.cc:485:replace_alu$693
+  creating $alu cell for $flatten\rqu.$add$rtl/requant.v:7$84: $auto$alumacc.cc:485:replace_alu$696
+  creating $alu cell for $sub$rtl/ga2_vec.v:33$129: $auto$alumacc.cc:485:replace_alu$699
+  creating $alu cell for $flatten\rqu.$neg$rtl/requant.v:14$95: $auto$alumacc.cc:485:replace_alu$702
+  creating $alu cell for $flatten\rqu.$sub$rtl/requant.v:9$88: $auto$alumacc.cc:485:replace_alu$705
   created 10 $alu and 1 $macc cells.
 
 13.14. Executing SHARE pass (SAT-based resource sharing).
@@ -471,7 +473,7 @@ Found 3 cells in module ga2_rq that may be considered for resource sharing.
   Analyzing resource sharing options for $flatten\rqu.$shr$rtl/requant.v:11$92 ($shr):
     Cell is always active. Therefore no sharing is possible.
   Analyzing resource sharing options for $flatten\rqu.$shl$rtl/requant.v:9$89 ($shl):
-    Found 2 activation_patterns using ctrl signal { $flatten\rqu.$eq$rtl/requant.v:9$87_Y $auto$rtlil.cc:2401:Not$654 }.
+    Found 2 activation_patterns using ctrl signal { $flatten\rqu.$eq$rtl/requant.v:9$87_Y $auto$rtlil.cc:2401:Not$683 }.
     No candidates found.
   Analyzing resource sharing options for $flatten\rqu.$mul$rtl/requant.v:8$86 ($mul):
     Found cell that is never activated: $flatten\rqu.$mul$rtl/requant.v:8$86
@@ -936,6 +938,6 @@ Dumping module `\ga2_rq'.
 20. Executing JSON backend.
 
 Warnings: 2 unique messages, 2 total
-End of script. Logfile hash: 07b5b2d6d3, CPU: user 2.17s system 0.01s, MEM: 49.29 MB peak
+End of script. Logfile hash: f2e373c456, CPU: user 2.07s system 0.06s, MEM: 48.88 MB peak
 Yosys 0.33 (git sha1 2584903a060)
-Time spent: 49% 2x abc (1 sec), 14% 35x opt_expr (0 sec), ...
+Time spent: 52% 2x abc (2 sec), 14% 35x opt_expr (0 sec), ...

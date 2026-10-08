@@ -3,27 +3,27 @@
 
 === divu ===
 
-   Number of wires:               1019
-   Number of wire bits:           1337
+   Number of wires:               1018
+   Number of wire bits:           1336
    Number of public wires:          14
    Number of public wire bits:     332
    Number of memories:               0
    Number of memory bits:            0
    Number of processes:              0
-   Number of cells:               1254
-     AND2                           11
-     AOI21                          46
+   Number of cells:               1253
+     AND2                           13
+     AOI21                          44
      DFF                           249
      INV                            71
      MUX2                          121
      NAND2                         381
      NAND3                          63
-     NOR2                           62
+     NOR2                           61
      NOR3                           18
-     OAI21                         127
-     OR2                            20
+     OAI21                         128
+     OR2                            19
      XNOR2                          42
      XOR2                           43
 
-   Chip area for module '\divu': 2639.140000
+   Chip area for module '\divu': 2637.800000
 

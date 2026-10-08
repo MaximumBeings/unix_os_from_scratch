@@ -1,0 +1,24 @@
+
+9. Printing statistics.
+
+=== ripple_w4 ===
+
+   Number of wires:                 15
+   Number of wire bits:             25
+   Number of public wires:           3
+   Number of public wire bits:      13
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                 17
+     AND2                            1
+     AOI21                           1
+     NAND2                           3
+     NOR2                            2
+     OAI21                           2
+     OR2                             1
+     XNOR2                           4
+     XOR2                            3
+
+   Chip area for module '\ripple_w4': 26.670000
+

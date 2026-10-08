@@ -66,6 +66,7 @@ Generating RTLIL representation for module `\ga2_st'.
 Generating RTLIL representation for module `\ga2_rq'.
 Generating RTLIL representation for module `\ga2_vadd'.
 Generating RTLIL representation for module `\ga2_amax'.
+Generating RTLIL representation for module `\ga2_unp'.
 Successfully finished Verilog frontend.
 
 9. Executing Verilog-2005 frontend: rtl/ga2_sm.v
@@ -95,6 +96,7 @@ Top module:  \requant
 Removing unused module `\ga2'.
 Removing unused module `\ga2_mm'.
 Removing unused module `\ga2_sm'.
+Removing unused module `\ga2_unp'.
 Removing unused module `\ga2_amax'.
 Removing unused module `\ga2_vadd'.
 Removing unused module `\ga2_rq'.
@@ -104,7 +106,7 @@ Removing unused module `\exp_lut'.
 Removing unused module `\systolic'.
 Removing unused module `\pe'.
 Removing unused module `\dma'.
-Removed 12 unused modules.
+Removed 13 unused modules.
 
 13. Executing SYNTH pass.
 
@@ -281,12 +283,12 @@ Extracting $alu and $macc cells in module requant:
   creating $alu model for $macc $neg$rtl/requant.v:14$95.
   creating $alu model for $macc $sub$rtl/requant.v:9$88.
   creating $alu model for $macc $add$rtl/requant.v:7$84.
-  creating $macc cell for $add$rtl/requant.v:10$91: $auto$alumacc.cc:365:replace_macc$475
+  creating $macc cell for $add$rtl/requant.v:10$91: $auto$alumacc.cc:365:replace_macc$504
   creating $alu model for $gt$rtl/requant.v:13$93 ($gt): new $alu
-  creating $alu cell for $gt$rtl/requant.v:13$93: $auto$alumacc.cc:485:replace_alu$477
-  creating $alu cell for $add$rtl/requant.v:7$84: $auto$alumacc.cc:485:replace_alu$482
-  creating $alu cell for $sub$rtl/requant.v:9$88: $auto$alumacc.cc:485:replace_alu$485
-  creating $alu cell for $neg$rtl/requant.v:14$95: $auto$alumacc.cc:485:replace_alu$488
+  creating $alu cell for $gt$rtl/requant.v:13$93: $auto$alumacc.cc:485:replace_alu$506
+  creating $alu cell for $add$rtl/requant.v:7$84: $auto$alumacc.cc:485:replace_alu$511
+  creating $alu cell for $sub$rtl/requant.v:9$88: $auto$alumacc.cc:485:replace_alu$514
+  creating $alu cell for $neg$rtl/requant.v:14$95: $auto$alumacc.cc:485:replace_alu$517
   created 4 $alu and 1 $macc cells.
 
 13.14. Executing SHARE pass (SAT-based resource sharing).
@@ -294,7 +296,7 @@ Found 3 cells in module requant that may be considered for resource sharing.
   Analyzing resource sharing options for $shr$rtl/requant.v:11$92 ($shr):
     Cell is always active. Therefore no sharing is possible.
   Analyzing resource sharing options for $shl$rtl/requant.v:9$89 ($shl):
-    Found 2 activation_patterns using ctrl signal { $auto$rtlil.cc:2401:Not$481 $eq$rtl/requant.v:9$87_Y }.
+    Found 2 activation_patterns using ctrl signal { $auto$rtlil.cc:2401:Not$510 $eq$rtl/requant.v:9$87_Y }.
     No candidates found.
   Analyzing resource sharing options for $mul$rtl/requant.v:8$86 ($mul):
     Found cell that is never activated: $mul$rtl/requant.v:8$86
@@ -738,6 +740,6 @@ Dumping module `\requant'.
 20. Executing JSON backend.
 
 Warnings: 2 unique messages, 2 total
-End of script. Logfile hash: 54562c92f1, CPU: user 1.89s system 0.04s, MEM: 44.83 MB peak
+End of script. Logfile hash: d84f2c5622, CPU: user 1.83s system 0.01s, MEM: 43.98 MB peak
 Yosys 0.33 (git sha1 2584903a060)
-Time spent: 54% 2x abc (2 sec), 14% 28x opt_expr (0 sec), ...
+Time spent: 52% 2x abc (1 sec), 15% 28x opt_expr (0 sec), ...

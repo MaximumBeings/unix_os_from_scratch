@@ -66,6 +66,7 @@ Generating RTLIL representation for module `\ga2_st'.
 Generating RTLIL representation for module `\ga2_rq'.
 Generating RTLIL representation for module `\ga2_vadd'.
 Generating RTLIL representation for module `\ga2_amax'.
+Generating RTLIL representation for module `\ga2_unp'.
 Successfully finished Verilog frontend.
 
 9. Executing Verilog-2005 frontend: rtl/ga2_sm.v
@@ -95,6 +96,7 @@ Top module:  \ga2_vadd
 Removing unused module `\ga2'.
 Removing unused module `\ga2_mm'.
 Removing unused module `\ga2_sm'.
+Removing unused module `\ga2_unp'.
 Removing unused module `\ga2_amax'.
 Removing unused module `\ga2_rq'.
 Removing unused module `\ga2_st'.
@@ -104,7 +106,7 @@ Removing unused module `\requant'.
 Removing unused module `\systolic'.
 Removing unused module `\pe'.
 Removing unused module `\dma'.
-Removed 12 unused modules.
+Removed 13 unused modules.
 
 13. Executing SYNTH pass.
 
@@ -156,27 +158,27 @@ Creating decoders for process `\ga2_vadd.$proc$rtl/ga2_vec.v:46$141'.
 
 13.2.9. Executing PROC_DFF pass (convert process syncs to FFs).
 Creating register for signal `\ga2_vadd.\dst' using process `\ga2_vadd.$proc$rtl/ga2_vec.v:46$141'.
-  created $dff cell `$procdff$573' with positive edge clock.
+  created $dff cell `$procdff$602' with positive edge clock.
 Creating register for signal `\ga2_vadd.\len' using process `\ga2_vadd.$proc$rtl/ga2_vec.v:46$141'.
-  created $dff cell `$procdff$574' with positive edge clock.
+  created $dff cell `$procdff$603' with positive edge clock.
 Creating register for signal `\ga2_vadd.\busy' using process `\ga2_vadd.$proc$rtl/ga2_vec.v:46$141'.
-  created $dff cell `$procdff$575' with positive edge clock.
+  created $dff cell `$procdff$604' with positive edge clock.
 Creating register for signal `\ga2_vadd.\done' using process `\ga2_vadd.$proc$rtl/ga2_vec.v:46$141'.
-  created $dff cell `$procdff$576' with positive edge clock.
+  created $dff cell `$procdff$605' with positive edge clock.
 Creating register for signal `\ga2_vadd.\cnt' using process `\ga2_vadd.$proc$rtl/ga2_vec.v:46$141'.
-  created $dff cell `$procdff$577' with positive edge clock.
+  created $dff cell `$procdff$606' with positive edge clock.
 Creating register for signal `\ga2_vadd.\j' using process `\ga2_vadd.$proc$rtl/ga2_vec.v:46$141'.
-  created $dff cell `$procdff$578' with positive edge clock.
+  created $dff cell `$procdff$607' with positive edge clock.
 Creating register for signal `\ga2_vadd.\v' using process `\ga2_vadd.$proc$rtl/ga2_vec.v:46$141'.
-  created $dff cell `$procdff$579' with positive edge clock.
+  created $dff cell `$procdff$608' with positive edge clock.
 Creating register for signal `\ga2_vadd.\s1' using process `\ga2_vadd.$proc$rtl/ga2_vec.v:46$141'.
-  created $dff cell `$procdff$580' with positive edge clock.
+  created $dff cell `$procdff$609' with positive edge clock.
 Creating register for signal `\ga2_vadd.\s2' using process `\ga2_vadd.$proc$rtl/ga2_vec.v:46$141'.
-  created $dff cell `$procdff$581' with positive edge clock.
+  created $dff cell `$procdff$610' with positive edge clock.
 Creating register for signal `\ga2_vadd.\par' using process `\ga2_vadd.$proc$rtl/ga2_vec.v:46$141'.
-  created $dff cell `$procdff$582' with positive edge clock.
+  created $dff cell `$procdff$611' with positive edge clock.
 Creating register for signal `\ga2_vadd.\x' using process `\ga2_vadd.$proc$rtl/ga2_vec.v:46$141'.
-  created $dff cell `$procdff$583' with positive edge clock.
+  created $dff cell `$procdff$612' with positive edge clock.
 
 13.2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
 
@@ -216,9 +218,9 @@ Removed a total of 2 cells.
 Running muxtree optimizer on module \ga2_vadd..
   Creating internal representation of mux trees.
   Evaluating internal representation of mux trees.
-      Replacing known input bits on port A of cell $procmux$553: \busy -> 1'0
-      Replacing known input bits on port A of cell $procmux$551: \busy -> 1'1
-      Replacing known input bits on port A of cell $procmux$549: \busy -> 1'1
+      Replacing known input bits on port A of cell $procmux$582: \busy -> 1'0
+      Replacing known input bits on port A of cell $procmux$580: \busy -> 1'1
+      Replacing known input bits on port A of cell $procmux$578: \busy -> 1'1
   Analyzing evaluation results.
 Removed 0 multiplexer ports.
 <suppressed ~13 debug messages>
@@ -314,20 +316,20 @@ Finding identical cells in module `\ga2_vadd'.
 Removed a total of 0 cells.
 
 13.9.6. Executing OPT_DFF pass (perform DFF optimizations).
-Adding EN signal on $procdff$583 ($dff) from module ga2_vadd (D = \rd [7:0], Q = \x).
-Adding EN signal on $procdff$582 ($dff) from module ga2_vadd (D = \cnt [0], Q = \par).
-Adding EN signal on $procdff$581 ($dff) from module ga2_vadd (D = \ins [87:76], Q = \s2).
-Adding EN signal on $procdff$580 ($dff) from module ga2_vadd (D = \ins [103:92], Q = \s1).
-Adding SRST signal on $procdff$579 ($dff) from module ga2_vadd (D = $procmux$521_Y, Q = \v, rval = 1'0).
-Adding EN signal on $auto$ff.cc:266:slice$608 ($sdff) from module ga2_vadd (D = $procmux$519_Y, Q = \v).
-Adding EN signal on $procdff$578 ($dff) from module ga2_vadd (D = $procmux$534_Y, Q = \j).
-Adding SRST signal on $auto$ff.cc:266:slice$612 ($dffe) from module ga2_vadd (D = $procmux$531_Y, Q = \j, rval = 12'000000000000).
-Adding EN signal on $procdff$577 ($dff) from module ga2_vadd (D = $procmux$544_Y, Q = \cnt).
-Adding SRST signal on $auto$ff.cc:266:slice$622 ($dffe) from module ga2_vadd (D = $procmux$541_Y, Q = \cnt, rval = 17'00000000000000000).
-Adding SRST signal on $procdff$576 ($dff) from module ga2_vadd (D = $procmux$475_Y, Q = \done, rval = 1'0).
-Adding SRST signal on $procdff$575 ($dff) from module ga2_vadd (D = $procmux$556_Y, Q = \busy, rval = 1'0).
-Adding EN signal on $procdff$574 ($dff) from module ga2_vadd (D = \ins [67:52], Q = \len).
-Adding EN signal on $procdff$573 ($dff) from module ga2_vadd (D = \ins [119:108], Q = \dst).
+Adding EN signal on $procdff$612 ($dff) from module ga2_vadd (D = \rd [7:0], Q = \x).
+Adding EN signal on $procdff$611 ($dff) from module ga2_vadd (D = \cnt [0], Q = \par).
+Adding EN signal on $procdff$610 ($dff) from module ga2_vadd (D = \ins [87:76], Q = \s2).
+Adding EN signal on $procdff$609 ($dff) from module ga2_vadd (D = \ins [103:92], Q = \s1).
+Adding SRST signal on $procdff$608 ($dff) from module ga2_vadd (D = $procmux$550_Y, Q = \v, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$637 ($sdff) from module ga2_vadd (D = $procmux$548_Y, Q = \v).
+Adding EN signal on $procdff$607 ($dff) from module ga2_vadd (D = $procmux$563_Y, Q = \j).
+Adding SRST signal on $auto$ff.cc:266:slice$641 ($dffe) from module ga2_vadd (D = $procmux$560_Y, Q = \j, rval = 12'000000000000).
+Adding EN signal on $procdff$606 ($dff) from module ga2_vadd (D = $procmux$573_Y, Q = \cnt).
+Adding SRST signal on $auto$ff.cc:266:slice$651 ($dffe) from module ga2_vadd (D = $procmux$570_Y, Q = \cnt, rval = 17'00000000000000000).
+Adding SRST signal on $procdff$605 ($dff) from module ga2_vadd (D = $procmux$504_Y, Q = \done, rval = 1'0).
+Adding SRST signal on $procdff$604 ($dff) from module ga2_vadd (D = $procmux$585_Y, Q = \busy, rval = 1'0).
+Adding EN signal on $procdff$603 ($dff) from module ga2_vadd (D = \ins [67:52], Q = \len).
+Adding EN signal on $procdff$602 ($dff) from module ga2_vadd (D = \ins [119:108], Q = \dst).
 
 13.9.7. Executing OPT_CLEAN pass (remove unused cells and wires).
 Finding unused cells or wires in module \ga2_vadd..
@@ -396,8 +398,8 @@ Optimizing module ga2_vadd.
 13.9.23. Finished OPT passes. (There is nothing left to do.)
 
 13.10. Executing WREDUCE pass (reducing word size of cells).
-Removed top 2 bits (of 3) from port B of cell ga2_vadd.$auto$opt_dff.cc:195:make_patterns_logic$626 ($ne).
-Removed top 1 bits (of 3) from port B of cell ga2_vadd.$auto$opt_dff.cc:195:make_patterns_logic$614 ($ne).
+Removed top 2 bits (of 3) from port B of cell ga2_vadd.$auto$opt_dff.cc:195:make_patterns_logic$655 ($ne).
+Removed top 1 bits (of 3) from port B of cell ga2_vadd.$auto$opt_dff.cc:195:make_patterns_logic$643 ($ne).
 Removed top 4 bits (of 16) from mux cell ga2_vadd.$ternary$rtl/ga2_vec.v:42$133 ($mux).
 Removed top 1 bits (of 9) from port B of cell ga2_vadd.$gt$rtl/ga2_vec.v:44$135 ($gt).
 Removed top 1 bits (of 9) from port B of cell ga2_vadd.$lt$rtl/ga2_vec.v:44$136 ($lt).
@@ -443,16 +445,16 @@ Extracting $alu and $macc cells in module ga2_vadd:
   creating $alu model for $gt$rtl/ga2_vec.v:44$135 ($gt): new $alu
   creating $alu model for $lt$rtl/ga2_vec.v:44$136 ($lt): new $alu
   creating $alu model for $lt$rtl/ga2_vec.v:51$144 ($lt): new $alu
-  creating $alu cell for $lt$rtl/ga2_vec.v:51$144: $auto$alumacc.cc:485:replace_alu$658
-  creating $alu cell for $lt$rtl/ga2_vec.v:44$136: $auto$alumacc.cc:485:replace_alu$663
-  creating $alu cell for $gt$rtl/ga2_vec.v:44$135: $auto$alumacc.cc:485:replace_alu$676
-  creating $alu cell for $add$rtl/ga2_vec.v:42$131: $auto$alumacc.cc:485:replace_alu$683
-  creating $alu cell for $add$rtl/ga2_vec.v:42$132: $auto$alumacc.cc:485:replace_alu$686
-  creating $alu cell for $add$rtl/ga2_vec.v:43$134: $auto$alumacc.cc:485:replace_alu$689
-  creating $alu cell for $add$rtl/ga2_vec.v:45$140: $auto$alumacc.cc:485:replace_alu$692
-  creating $alu cell for $add$rtl/ga2_vec.v:51$146: $auto$alumacc.cc:485:replace_alu$695
-  creating $alu cell for $add$rtl/ga2_vec.v:53$150: $auto$alumacc.cc:485:replace_alu$698
-  creating $alu cell for $sub$rtl/ga2_vec.v:53$151: $auto$alumacc.cc:485:replace_alu$701
+  creating $alu cell for $lt$rtl/ga2_vec.v:51$144: $auto$alumacc.cc:485:replace_alu$687
+  creating $alu cell for $lt$rtl/ga2_vec.v:44$136: $auto$alumacc.cc:485:replace_alu$692
+  creating $alu cell for $gt$rtl/ga2_vec.v:44$135: $auto$alumacc.cc:485:replace_alu$705
+  creating $alu cell for $add$rtl/ga2_vec.v:42$131: $auto$alumacc.cc:485:replace_alu$712
+  creating $alu cell for $add$rtl/ga2_vec.v:42$132: $auto$alumacc.cc:485:replace_alu$715
+  creating $alu cell for $add$rtl/ga2_vec.v:43$134: $auto$alumacc.cc:485:replace_alu$718
+  creating $alu cell for $add$rtl/ga2_vec.v:45$140: $auto$alumacc.cc:485:replace_alu$721
+  creating $alu cell for $add$rtl/ga2_vec.v:51$146: $auto$alumacc.cc:485:replace_alu$724
+  creating $alu cell for $add$rtl/ga2_vec.v:53$150: $auto$alumacc.cc:485:replace_alu$727
+  creating $alu cell for $sub$rtl/ga2_vec.v:53$151: $auto$alumacc.cc:485:replace_alu$730
   created 10 $alu and 0 $macc cells.
 
 13.14. Executing SHARE pass (SAT-based resource sharing).
@@ -600,8 +602,8 @@ Removed a total of 0 cells.
 
 13.20.6. Executing OPT_SHARE pass.
     Found cells that share an operand and can be merged by moving the $mux $ternary$rtl/ga2_vec.v:42$133 in front of them:
-        $auto$alumacc.cc:485:replace_alu$683
-        $auto$alumacc.cc:485:replace_alu$686
+        $auto$alumacc.cc:485:replace_alu$712
+        $auto$alumacc.cc:485:replace_alu$715
 
 13.20.7. Executing OPT_DFF pass (perform DFF optimizations).
 
@@ -732,8 +734,8 @@ Using extmapper simplemap for cells of type $eq.
 Using extmapper simplemap for cells of type $pos.
 Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000010000 for cells of type $lcu.
 Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000001001 for cells of type $lcu.
-Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000010001 for cells of type $lcu.
 Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000001100 for cells of type $lcu.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000010001 for cells of type $lcu.
 Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000001000 for cells of type $lcu.
 Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000000010 for cells of type $lcu.
 No more expansions possible.
@@ -777,13 +779,13 @@ ABC: + map
 ABC: + write_blif <abc-temp-dir>/output.blif 
 
 13.23.1.2. Re-integrating ABC results.
-ABC RESULTS:               NOT cells:       17
-ABC RESULTS:               AND cells:       17
-ABC RESULTS:                OR cells:       67
+ABC RESULTS:               NOT cells:       18
+ABC RESULTS:               AND cells:       16
 ABC RESULTS:              XNOR cells:       30
+ABC RESULTS:                OR cells:       68
 ABC RESULTS:              NAND cells:       34
-ABC RESULTS:               NOR cells:       46
-ABC RESULTS:            ANDNOT cells:      148
+ABC RESULTS:               NOR cells:       45
+ABC RESULTS:            ANDNOT cells:      149
 ABC RESULTS:               XOR cells:      102
 ABC RESULTS:             ORNOT cells:       18
 ABC RESULTS:               MUX cells:       17
@@ -800,14 +802,14 @@ Optimizing module ga2_vadd.
 
 13.24.2. Executing OPT_MERGE pass (detect identical cells).
 Finding identical cells in module `\ga2_vadd'.
-<suppressed ~21 debug messages>
-Removed a total of 7 cells.
+<suppressed ~18 debug messages>
+Removed a total of 6 cells.
 
 13.24.3. Executing OPT_DFF pass (perform DFF optimizations).
 
 13.24.4. Executing OPT_CLEAN pass (remove unused cells and wires).
 Finding unused cells or wires in module \ga2_vadd..
-Removed 1 unused cells and 409 unused wires.
+Removed 1 unused cells and 408 unused wires.
 <suppressed ~3 debug messages>
 
 13.24.5. Finished fast OPT passes.
@@ -825,23 +827,23 @@ Removed 0 unused modules.
 
 === ga2_vadd ===
 
-   Number of wires:                458
-   Number of wire bits:            805
+   Number of wires:                460
+   Number of wire bits:            807
    Number of public wires:          21
    Number of public wire bits:     314
    Number of memories:               0
    Number of memory bits:            0
    Number of processes:              0
-   Number of cells:                581
-     $_ANDNOT_                     147
-     $_AND_                         17
+   Number of cells:                583
+     $_ANDNOT_                     149
+     $_AND_                         16
      $_DFFE_PP_                     61
      $_MUX_                         17
      $_NAND_                        34
-     $_NOR_                         46
-     $_NOT_                         16
+     $_NOR_                         45
+     $_NOT_                         17
      $_ORNOT_                       18
-     $_OR_                          61
+     $_OR_                          62
      $_SDFFCE_PP0P_                 29
      $_SDFFE_PP0P_                   1
      $_SDFF_PP0_                     2
@@ -883,7 +885,7 @@ Mapping DFF cells in module `\ga2_vadd':
 16. Executing ABC pass (technology mapping using ABC).
 
 16.1. Extracting gate netlist of module `\ga2_vadd' to `<abc-temp-dir>/input.blif'..
-Extracted 611 gates and 766 wires to a netlist network with 154 inputs and 126 outputs.
+Extracted 613 gates and 768 wires to a netlist network with 154 inputs and 126 outputs.
 
 16.1.1. Executing ABC.
 Running ABC command: "<yosys-exe-dir>/yosys-abc" -s -f <abc-temp-dir>/abc.script 2>&1
@@ -912,55 +914,55 @@ ABC: + &put
 ABC: + write_blif <abc-temp-dir>/output.blif 
 
 16.1.2. Re-integrating ABC results.
-ABC RESULTS:               INV cells:       34
-ABC RESULTS:              XOR2 cells:       20
-ABC RESULTS:              AND2 cells:       25
+ABC RESULTS:               OR2 cells:       10
+ABC RESULTS:              XOR2 cells:       19
+ABC RESULTS:              AND2 cells:       27
 ABC RESULTS:             NAND2 cells:       75
-ABC RESULTS:              NOR3 cells:       31
+ABC RESULTS:               INV cells:       34
+ABC RESULTS:              NOR3 cells:       29
 ABC RESULTS:             XNOR2 cells:       74
-ABC RESULTS:             OAI21 cells:       33
-ABC RESULTS:             NAND3 cells:       14
-ABC RESULTS:             AOI21 cells:       40
 ABC RESULTS:              NOR2 cells:       70
-ABC RESULTS:               OR2 cells:       11
+ABC RESULTS:             NAND3 cells:       17
+ABC RESULTS:             AOI21 cells:       38
+ABC RESULTS:             OAI21 cells:       36
 ABC RESULTS:              MUX2 cells:       74
-ABC RESULTS:        internal signals:      486
+ABC RESULTS:        internal signals:      488
 ABC RESULTS:           input signals:      154
 ABC RESULTS:          output signals:      126
 Removing temp directory.
 
 17. Executing OPT_CLEAN pass (remove unused cells and wires).
 Finding unused cells or wires in module \ga2_vadd..
-Removed 0 unused cells and 741 unused wires.
+Removed 0 unused cells and 743 unused wires.
 <suppressed ~2 debug messages>
 
 18. Printing statistics.
 
 === ga2_vadd ===
 
-   Number of wires:                495
-   Number of wire bits:            781
+   Number of wires:                497
+   Number of wire bits:            783
    Number of public wires:          20
    Number of public wire bits:     306
    Number of memories:               0
    Number of memory bits:            0
    Number of processes:              0
-   Number of cells:                594
-     AND2                           25
-     AOI21                          40
+   Number of cells:                596
+     AND2                           27
+     AOI21                          38
      DFF                            93
      INV                            34
      MUX2                           74
      NAND2                          75
-     NAND3                          14
+     NAND3                          17
      NOR2                           70
-     NOR3                           31
-     OAI21                          33
-     OR2                            11
+     NOR3                           29
+     OAI21                          36
+     OR2                            10
      XNOR2                          74
-     XOR2                           20
+     XOR2                           19
 
-   Chip area for module '\ga2_vadd': 1230.490000
+   Chip area for module '\ga2_vadd': 1232.990000
 
 19. Executing Verilog backend.
 
@@ -972,6 +974,6 @@ Dumping module `\ga2_vadd'.
 20. Executing JSON backend.
 
 Warnings: 2 unique messages, 2 total
-End of script. Logfile hash: 999f727544, CPU: user 0.44s system 0.01s, MEM: 44.96 MB peak
+End of script. Logfile hash: 829c05d8a8, CPU: user 0.43s system 0.02s, MEM: 44.79 MB peak
 Yosys 0.33 (git sha1 2584903a060)
-Time spent: 34% 2x abc (0 sec), 14% 31x opt_expr (0 sec), ...
+Time spent: 35% 2x abc (0 sec), 14% 31x opt_expr (0 sec), ...
