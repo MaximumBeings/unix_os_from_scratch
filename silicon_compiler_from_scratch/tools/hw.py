@@ -31,7 +31,7 @@ def synth_stats(files, top, script=None, root=ROOT):
     for m in re.finditer(r"^\s+(\$?\w+)\s+(\d+)\s*$", sec.split("design hierarchy")[0] if "design hierarchy" in sec else sec, re.M): cells[m.group(1)] = int(m.group(2))
     m = re.search(r"(\d+)\s+cells", sec) or re.search(r"Number of cells:\s+(\d+)", sec)
     return {"cells": cells, "total": int(m.group(1)) if m else sum(cells.values()), "log": out}
-def mutate(mutants, files, top, tb_files, root=ROOT, workers=4, title="", simulator="icarus", extra_files=()):
+def mutate(mutants, files, top, tb_files, root=ROOT, workers=4, title="", simulator="icarus", extra_files=(), defines=()):
     """mutants: list of (file, label, old, new); each `old` must occur exactly once in `file`. Returns (caught, total, lines)."""
     lines = []
     def one(i):
@@ -41,7 +41,7 @@ def mutate(mutants, files, top, tb_files, root=ROOT, workers=4, title="", simula
         p = os.path.join(d, fn); s = open(p).read()
         if s.count(old) != 1: shutil.rmtree(d, ignore_errors=True); return label, "BAD ANCHOR (%d occurrences)" % s.count(old), None
         open(p, "w").write(s.replace(old, new)); fs = list(files) + list(tb_files) + list(extra_files)
-        rc, out = (sim_icarus if simulator == "icarus" else sim_verilator)(fs, top, root=d); shutil.rmtree(d, ignore_errors=True)
+        rc, out = (sim_icarus if simulator == "icarus" else sim_verilator)(fs, top, root=d, defines=defines); shutil.rmtree(d, ignore_errors=True)
         if rc == 99: return label, "DID NOT BUILD", out
         return label, ("caught" if rc != 0 or "PASS" not in out else "NOT CAUGHT"), out
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as pool:

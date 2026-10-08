@@ -1,0 +1,22 @@
+NOTE: this script deliberately breaks copies of the RTL. 'caught' lines are EXPECTED: they show the testbench can detect the mistake.
+pe: the product is subtracted: caught   [3x3,K=5: caught; 4x4,K=7: caught]
+pe: the product is computed unsigned: caught   [3x3,K=5: caught; 4x4,K=7: caught]
+pe: the product is cut to 16 bits and zero-extended: caught   [3x3,K=5: caught; 4x4,K=7: caught]
+pe: a is passed on unchanged but b is replaced by a: caught   [3x3,K=5: caught; 4x4,K=7: caught]
+pe: a is not passed on: caught   [3x3,K=5: caught; 4x4,K=7: caught]
+pe: b is not passed on: caught   [3x3,K=5: caught; 4x4,K=7: caught]
+pe: the accumulator does not clear on clr: caught   [3x3,K=5: caught; 4x4,K=7: caught]
+pe: clr does not clear the pass-through a register: caught   [3x3,K=5: caught; 4x4,K=7: caught]
+pe: clr does not clear the pass-through b register: caught   [3x3,K=5: caught; 4x4,K=7: caught]
+pe: the product is multiplied twice (acc adds it two times): caught   [3x3,K=5: caught; 4x4,K=7: caught]
+array: the rows of A enter in reverse order: caught   [3x3,K=5: caught; 4x4,K=7: caught]
+array: the columns of B enter in reverse order: caught   [3x3,K=5: caught; 4x4,K=7: caught]
+array: the top edge is fed from the a bus: caught   [3x3,K=5: caught; 4x4,K=7: caught]
+array: the result matrix is transposed: caught   [3x3,K=5: caught; 4x4,K=7: caught]
+array: b is passed down to the wrong column: caught   [3x3,K=5: caught; 4x4,K=7: caught]
+array: a is passed to the wrong row: caught   [3x3,K=5: caught; 4x4,K=7: caught]
+
+systolic array: 16 of 16 broken circuits caught
+
+A change that looks like a bug and is not:
+EQUIVALENT: the sum is written product-first (addition commutes): NOT CAUGHT
