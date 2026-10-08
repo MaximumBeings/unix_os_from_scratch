@@ -1428,6 +1428,6 @@ Dumping module `\exp_lut'.
 20. Executing JSON backend.
 
 Warnings: 2 unique messages, 2 total
-End of script. Logfile hash: b6d9f1b013, CPU: user 0.28s system 0.01s, MEM: 15.93 MB peak
+End of script. Logfile hash: b6d9f1b013, CPU: user 0.32s system 0.02s, MEM: 16.11 MB peak
 Yosys 0.33 (git sha1 2584903a060)
-Time spent: 43% 2x abc (0 sec), 13% 14x read_verilog (0 sec), ...
+Time spent: 37% 2x abc (0 sec), 16% 14x read_verilog (0 sec), ...

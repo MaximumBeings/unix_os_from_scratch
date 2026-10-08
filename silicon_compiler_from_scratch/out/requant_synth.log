@@ -740,6 +740,6 @@ Dumping module `\requant'.
 20. Executing JSON backend.
 
 Warnings: 2 unique messages, 2 total
-End of script. Logfile hash: d84f2c5622, CPU: user 1.83s system 0.01s, MEM: 43.98 MB peak
+End of script. Logfile hash: d84f2c5622, CPU: user 1.39s system 0.01s, MEM: 44.21 MB peak
 Yosys 0.33 (git sha1 2584903a060)
-Time spent: 52% 2x abc (1 sec), 15% 28x opt_expr (0 sec), ...
+Time spent: 55% 2x abc (1 sec), 13% 28x opt_expr (0 sec), ...

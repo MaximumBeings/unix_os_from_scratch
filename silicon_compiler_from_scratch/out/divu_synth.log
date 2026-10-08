@@ -870,6 +870,6 @@ Dumping module `\divu'.
 20. Executing JSON backend.
 
 Warnings: 2 unique messages, 2 total
-End of script. Logfile hash: 6aa2577dcc, CPU: user 0.45s system 0.01s, MEM: 19.02 MB peak
+End of script. Logfile hash: 6aa2577dcc, CPU: user 0.41s system 0.02s, MEM: 18.88 MB peak
 Yosys 0.33 (git sha1 2584903a060)
-Time spent: 39% 2x abc (0 sec), 11% 23x opt_expr (0 sec), ...
+Time spent: 38% 2x abc (0 sec), 11% 23x opt_expr (0 sec), ...

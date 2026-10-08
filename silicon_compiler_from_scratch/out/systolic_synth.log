@@ -1005,6 +1005,6 @@ Dumping module `\systolic'.
 20. Executing JSON backend.
 
 Warnings: 2 unique messages, 2 total
-End of script. Logfile hash: 6696e720a6, CPU: user 4.96s system 0.05s, MEM: 90.59 MB peak
+End of script. Logfile hash: 6696e720a6, CPU: user 4.00s system 0.06s, MEM: 90.78 MB peak
 Yosys 0.33 (git sha1 2584903a060)
-Time spent: 45% 2x abc (3 sec), 15% 17x opt_expr (1 sec), ...
+Time spent: 48% 2x abc (3 sec), 14% 17x opt_expr (0 sec), ...
