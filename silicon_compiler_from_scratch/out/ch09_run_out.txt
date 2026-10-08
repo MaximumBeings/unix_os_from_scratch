@@ -1,0 +1,35 @@
+== 1. batch invariance (Python): each sequence's result and cache are identical whether it is decoded alone or in a batch of 2, 3, 4, or in a ragged batch
+problems: none
+
+== 2. batched decode steps on the circuit: B sequences, all at their 16th token, then a ragged batch (lengths 3, 9, 1, 14)
+  Icarus    PASS: 5 programs match the Python reference (memory and all five cycle counters), 33460 cycles in total (exit status 0) (exit 0)
+  Verilator PASS: 5 programs match the Python reference (memory and all five cycle counters), 33460 cycles in total (exit status 0) (exit 0)
+
+== 3. cycles, traffic and the roofline.  Peak compute = 16 MAC/cycle (a 4x4 array). Memory = 1 word per cycle once a transfer is under way (one word = one int8 element).
+batch                       cycles per token   MACs  words  MAC/word  achieved  ceiling of ceiling  if loads overlapped
+B=1 (all at token 16)         3827      3827   1280   1312      0.98     0.334     0.98      34.3%            1.55x faster
+B=2 (all at token 16)         5777      2888   2560   1856      1.38     0.443     1.38      32.1%            1.50x faster
+B=3 (all at token 16)         7727      2576   3840   2400      1.60     0.497     1.60      31.1%            1.48x faster
+B=4 (all at token 16)         9677      2419   5120   2944      1.74     0.529     1.74      30.4%            1.47x faster
+B=4 ragged (3, 9, 1, 14)      6452      1613   3936   1760      2.24     0.610     2.24      27.3%            1.41x faster
+
+   ('per token' = cycles / number of sequences in the batch; 'achieved' = MACs / cycles; 'ceiling' = min(peak, MAC/word x words/cycle); the last column is the best case if every load ran in the shadow of compute, derived from the counters, not built)
+
+== 4. what batching can and cannot share (one step, L = 16 tokens per sequence; words from the programs, MACs counted from the MM instructions)
+shared by the batch  : weights 768 words; projections 768 MACs per sequence (these reuse the weights)
+per sequence         : cache and I/O 544 words; attention 512 MACs
+  batch       1:  0.98 MAC/word
+  batch       2:  1.38 MAC/word
+  batch       4:  1.74 MAC/word
+  batch      16:  2.16 MAC/word
+  batch      64:  2.30 MAC/word
+  batch 1000000:  2.35 MAC/word
+  limit as the batch grows: 2.35 MAC/word at L = 16;  as L grows the limit tends to 1: every cached word is used once per step.
+
+== 5. derived, for a 7B-class model (7e9 weights; int8 cache of 256 KiB per token, 4096-token context = 1.07e9 bytes per sequence), ASSUMING a chip with 1 TB/s of memory bandwidth and ignoring compute and overheads
+   tokens per second per chip = B x BW / (weight bytes + B x cache bytes)
+weights           bytes      B=1      B=4     B=16     B=64    B=256   cache = weights at B
+fp16             14.0GB       66      219      513      774      886                   13.0
+int8              7.0GB      124      354      662      845      908                    6.5
+int4              3.5GB      219      513      774      886      920                    3.3
+   upper limit as B grows (cache-bound): 931 tokens/s per chip at a 4096-token int8 cache

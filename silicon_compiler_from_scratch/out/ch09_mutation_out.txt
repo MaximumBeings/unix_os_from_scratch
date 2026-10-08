@@ -1,0 +1,20 @@
+NOTE: this script deliberately breaks copies of the batched program builder. 'caught' is EXPECTED: it shows batch invariance notices the mistake.
+                                                                             full check  no ragged batch
+projection runs on one row (M = 1) instead of the whole batch                    caught           caught
+projection results are stored with row stride 4, not d                           caught           caught
+every new key is taken from row 0 of the projection                              caught           caught
+every new value is taken from row 0 of the projection                            caught           caught
+every sequence's cache lives in batch slot 0                                     caught           caught
+the value caches of all sequences overlap                                        caught           caught
+sequence j attends with the query of row 0                                       caught           caught
+hidden states are all loaded into slot 0                                         caught           caught
+every sequence reads the hidden state of sequence 0                              caught           caught
+outputs are all stored in sequence 0's output slot                               caught           caught
+the new key is appended at the first sequence's position                         caught       NOT CAUGHT
+the value cache is loaded from the key cache                                     caught           caught
+the new value is appended to the key cache in external memory                    caught           caught
+attention length of every sequence is the first sequence's                       caught       NOT CAUGHT
+the q requantization covers only one row                                         caught           caught
+a sequence's cache is loaded with the first sequence's length                    caught       NOT CAUGHT
+
+batched builder: 16 of 16 broken programs caught by the full check; 13 of 16 if the ragged batch (different lengths in one step) is left out
