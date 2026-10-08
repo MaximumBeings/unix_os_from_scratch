@@ -149,3 +149,27 @@ Worked answer: the bug where `start` is not ignored while the unit is busy, so a
 **5. The table is zero from `d = 189`. What does that do to a vector with 200 equal low scores and one high score?**
 
 Worked answer: the high score gets `e = 65535`, and each of the 200 low scores (if more than 11.8 below it) gets 0, so the sum is 65535, `r = 2^38 / 65535`, and the high score's probability is 65536 (1.0) and every other element's is 0. The true softmax would give the 200 together a mass of up to `200 * 7.4e-6 = 1.5e-3`; the unit loses it. That is the intended trade for a 16-bit table, and it only matters if many tiny terms add up to something comparable to the large one. The Chapter 6 study shows the same effect in its largest error (N=64, one big score, 63 small ones).
+
+---
+
+## Chapter 7
+
+**1. `MM dst=100 A=0 B=64 M=2 K=5 N=3 tb=1 lda=5 ldb=5 ldc=3`: where in the scratchpad is `B[k][n]` and where is `C[m][n]`?**
+
+Worked answer: with `tb = 1`, B is stored as N rows of K elements, so `B[k][n]` is at `B + n*ldb + k = 64 + 5n + k`. `C[m][n]` is at `dst + m*ldc + n = 100 + 3m + n`. (`A[m][k]` is at `0 + 5m + k`.)
+
+**2. How many busy cycles does the model give for that instruction? Which part is arithmetic and which is data movement?**
+
+Worked answer: `M*K + K*N + (K+M+N-2) + M*N + 7 = 10 + 15 + 8 + 6 + 7 = 46` (the calibration table shows 46 measured). Only the streaming term (8 cycles, the `K+M+N-2` of Chapter 4) is arithmetic in the array; staging the operands (25 cycles), writing the result (6) and control (7) are data movement and overhead: arithmetic is 8 of 46 cycles, about 17%.
+
+**3. Why does the ISA forbid partially overlapping operand regions for `SM`?**
+
+Worked answer: the unit is pipelined: it writes output `j` while it is still reading later inputs. With identical regions that is safe (output `j` goes where input `j` was, already read) and with disjoint regions it cannot interfere, but with a partial overlap an output can overwrite an input not yet read, so the result depends on the pipeline. The reference simulator reads everything first, so the two disagree. The first random-program generator produced such a case and the test failed because of it, not because of a chip bug.
+
+**4. A mutant changes the load's source-address field from 16 bits to 12. Why did no test catch it, and what would catch it?**
+
+Worked answer: the test's external memory has 2048 words, so every address fits in 12 bits; the upper four bits are always zero in every test. Only a program that addresses external memory above 4095 can tell the two apart, which needs a bigger memory model (and a golden model for it). The mutant is equivalent within the tested range, not in general.
+
+**5. Why is the cycle model's constant for `MM` (7) bigger than the ones for the vector units (2 to 6)? Name two things in `ga2_mm.v` that it contains.**
+
+Worked answer: the matrix unit has more phases, and each phase has a pipeline edge and a state change: after loading A there is a cycle to drain the last read and switch state, the same after loading B, there is the PRE cycle that clears the array, the transition from streaming to storing, and the FIN state that raises done. Any two of these (read off the state machine, not separately measured): the idle cycle between LA and LB, the PRE (clear) cycle, the FIN cycle.

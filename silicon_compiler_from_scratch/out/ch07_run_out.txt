@@ -1,0 +1,45 @@
+== 1. an example program, assembled
+ld   dst=0   src=0 len=12            ; A (2x3) and B (3x2) from external memory
+mm   dst=100 A=0 B=6 M=2 K=3 N=2 lda=3 ldb=2 ldc=2     ; C = A x B, int32
+rq   dst=110 src=100 len=4 m=8388608 s=23 relu=1       ; requantize: 2^23 / 2^23 = 1.0, so int8 = clamp(C), relu
+amax dst=120 src=110 len=4                  ; which of the four results is largest
+st   src=100 dst=20 len=4                   ; C
+st   src=110 dst=24 len=4                   ; int8 results
+st   src=120 dst=28 len=1                   ; the index
+halt
+
+machine code (128 bits each):
+  100000000000c0000000000000000000  LD   dst=0 src=0 len=12
+  300640000000600200300080c0800002  MM   dst=100 A=0 B=6 M=2 K=3 N=2 tb=0 lda=3 ldb=2 ldc=2
+  4006e006400048000005c00000040000  RQ   dst=110 src=100 len=4 m=8388608 s=23 relu=1
+  70078006e00040000000000000000000  AMAX dst=120 src=110 len=4
+  20064001400040000000000000000000  ST   src=100 dst=20 len=4
+  2006e001800040000000000000000000  ST   src=110 dst=24 len=4
+  20078001c00010000000000000000000  ST   src=120 dst=28 len=1
+  00000000000000000000000000000000  HALT
+
+the reference simulator says: C = [4, 5, 10, 11]  int8 = [4, 5, 10, 11]  argmax = 3  cycles [total, mm, dma, vec, n]: [93, 28, 36, 13, 7]
+  the circuit, Icarus    PASS: 1 programs match the Python reference (memory and all five cycle counters), 93 cycles in total (exit status 0) (exit 0)
+  the circuit, Verilator PASS: 1 programs match the Python reference (memory and all five cycle counters), 93 cycles in total (exit status 0) (exit 0)
+
+== 2. the program suite: 18 directed programs + 60 random ones (seed 1)
+78 programs written to out/ga2_programs.hex (18 directed, 60 random)
+  Icarus    PASS: 78 programs match the Python reference (memory and all five cycle counters), 219583 cycles in total (exit status 0) (exit 0)
+  Verilator PASS: 78 programs match the Python reference (memory and all five cycle counters), 219583 cycles in total (exit status 0) (exit 0)
+
+== 3. a larger run: 200 fresh random programs (seed 7), Icarus
+218 programs written to out/ga2_programs.hex (18 directed, 200 random)
+  PASS: 218 programs match the Python reference (memory and all five cycle counters), 710814 cycles in total (exit status 0) (exit 0)
+
+== 4. a different memory latency (LAT=20 instead of 8): the cycle model changes by one constant (LD costs len + LAT + 1)
+  PASS: 48 programs match the Python reference (memory and all five cycle counters), 126768 cycles in total (exit status 0) (exit 0)
+
+== 5. Yosys: what the pieces cost
+unit        generic gates  iCE40 cells  flip-flops  block RAMs
+ga2_st                358          228          67           0
+ga2_rq               5832         3025          94           0
+ga2_vadd              473          352          93           0
+ga2_amax              485          315         108           0
+ga2_sm               4533         2364         309           0
+ga2_mm              23330        12294        3957           2
+ga2        n/a (scratchpad)        21266        5063          34

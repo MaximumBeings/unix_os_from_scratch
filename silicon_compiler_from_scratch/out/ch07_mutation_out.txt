@@ -1,0 +1,58 @@
+NOTE: this script deliberately breaks copies of the RTL. 'caught' lines are EXPECTED: they show the testbench can detect the mistake.
+sequencer: the program counter skips an instruction: caught
+sequencer: the instruction counter adds two: caught
+sequencer: stores are counted as vector time, not DMA time: caught
+sequencer: the fetch cycle is not counted: caught
+sequencer: the VADD and AMAX write-data ports are swapped: caught
+sequencer: RQ reads through the softmax unit's address: caught
+sequencer: the matrix unit's write enable is dropped: caught
+sequencer: the load length field is 8 bits wide: caught
+ST: the external address follows the read index: caught
+ST: reads one word too high: caught
+ST: the destination is taken from the source field: caught
+RQ: results are zero-extended, not sign-extended: caught
+RQ: the relu flag is read from the wrong bit: caught
+RQ: the shift field is off by one bit: caught
+RQ: the mantissa loses its top bit: caught
+RQ: the write address follows the read index: caught
+VADD: the lower clamp is -128: caught
+VADD: the upper clamp is 126: caught
+VADD: no clamp at all: caught
+VADD: writes on the wrong half of the cycle pair: caught
+VADD: the length field is 8 bits wide: caught
+AMAX: returns the last maximum, not the first: caught
+AMAX: compares unsigned: caught
+AMAX: writes the maximum value instead of its index: caught
+SM: the maximum starts at 0, not -128: caught
+SM: the sum is not cleared between rows: caught
+SM: no rounding constant: caught
+SM: the output slice is one bit low: caught
+SM: the stored exponential keeps only 8 bits: caught
+SM: pass 3 reads the source, not the stored exponentials: caught
+SM: the reciprocal numerator is 2^37: caught
+SM: the maximum is found with an unsigned compare: caught
+SM: the output is written in every pass: caught
+SM: destination and source fields are swapped: caught
+MM: transposed B ignores tb in the inner step: caught
+MM: the k step of B uses ldb even when transposed: caught
+MM: B's row step uses N instead of ldb: caught
+MM: A's row step uses K instead of lda: caught
+MM: C's row step uses N instead of ldc: caught
+MM: the stream is one cycle short: caught
+MM: the stream is one cycle long: caught
+MM: the array is not cleared before a product: caught
+MM: the result is stored transposed: caught
+MM: K is a 6-bit field: caught
+MM: M is a 2-bit field: caught
+MM: B's column memories are written in reverse: caught
+MM: A's row memories are written in reverse: caught
+MM: the b edge takes its values from the A memories: caught
+MM: B is fed one cycle late: caught
+
+GA-2: 49 of 49 broken circuits caught
+
+Changes that look like bugs and are not:
+EQUIVALENT within the ISA: M is a 3-bit field (every legal M, 1 to 4, fits in three bits): NOT CAUGHT
+EQUIVALENT within the tested range: the load source address is 12 bits wide (the test memory has 2048 words): NOT CAUGHT
+EQUIVALENT: VADD reads its two sources in the other order (addition commutes): NOT CAUGHT
+EQUIVALENT: rows of A beyond M are not masked off (PE(i,j) depends only on row i and column j): NOT CAUGHT

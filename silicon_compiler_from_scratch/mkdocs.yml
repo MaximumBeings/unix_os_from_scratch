@@ -57,4 +57,5 @@ nav:
   - "4. The Systolic Array: N x N Multiplies Per Cycle, and the Schedule That Makes It Work": part04/04-systolic-array.md
   - "5. The Scratchpad, the DMA Engine, and Double Buffering": part05/05-scratchpad-dma.md
   - "6. The Vector Unit: A Lookup-Table Exponential, a Divider, and Fixed-Point Softmax": part06/06-vector-unit-softmax.md
+  - "7. GA-2: An Instruction Set, a Sequencer, and the Whole Chip": part07/07-the-whole-chip.md
   - Answers to the Self-Check Questions: answers.md
