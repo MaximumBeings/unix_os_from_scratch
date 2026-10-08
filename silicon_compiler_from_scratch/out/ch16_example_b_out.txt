@@ -1,0 +1,33 @@
+== 1. measured: 32 tokens of the structured model; plain decoding = 268,346 cycles. Cells: acceptance rate (accepted guesses / guesses) and speedup over plain decoding. Draft quality is the noise added to the draft's logits (0 = perfect).
+ noise            k=1            k=2            k=3            k=4            k=5
+     0  100%  1.47x      100%  1.69x      100%  1.93x      100%  1.59x      100%  1.64x    
+     3   94%  1.38x       83%  1.56x       96%  1.69x       78%  1.42x       80%  1.43x    
+     4   74%  1.23x       47%  1.09x       40%  1.01x       30%  0.74x       31%  0.76x    
+     5   43%  1.02x       29%  0.88x       25%  0.80x       24%  0.66x       19%  0.58x    
+     6   32%  0.94x       22%  0.81x       14%  0.66x       11%  0.48x        9%  0.43x    
+   every run produced exactly the plain decoder's 32 tokens
+
+== 2. a model of the speedup: cost per block = k * t_draft + t_verify(k+1); tokens per block = 1 + accepted. Measured unit costs (cycles, from the programs):
+   one draft step: 810 cycles;  one plain target step: 8385 cycles on average (tiny_lm programs); verifier of m rows against the cache sizes seen:
+      cache  4, m = 4: 12330 cycles
+      cache 12, m = 4: 14410 cycles
+      cache 24, m = 4: 17530 cycles
+   the geometric model: with an independent acceptance chance a per guess, the expected tokens per block is (1 - a^(k+1)) / (1 - a); speedup = tokens per block * t_plain / (k * t_draft + t_verify). Prediction against measurement (cache around 12 for t_plain and t_verify):
+ noise   k  alpha  predicted  measured
+     0   3   1.00      1.92x     1.93x
+     3   3   0.96      1.82x     1.69x
+     4   3   0.40      0.78x     1.01x
+   the model is good when acceptance is high (1.92 predicted, 1.93 measured) and rough when it is not: at noise 4 it under-predicts (0.78 against 1.01) because acceptance is not independent from guess to guess: some positions are easy for the draft and some are hard, and speculation does better on the easy ones than the average suggests. It also ignores the shorter first blocks and the overshoot at the end of the run
+
+== 3. serving arithmetic (DERIVED, ASSUMED): 7B target at 7 GB (int8), draft with c = t_draft / t_target of its weight traffic; at batch 1 both are bandwidth-bound, so t is proportional to weight bytes; the verifier reads the target's weights once for k+1 rows (the extra rows' cache reads and compute are neglected)
+ accept a   k     c=0.01     c=0.05     c=0.15
+      0.6   2      1.92x      1.78x      1.51x
+      0.6   4      2.22x      1.92x      1.44x
+      0.6   8      2.29x      1.77x      1.12x
+      0.8   2      2.39x      2.22x      1.88x
+      0.8   4      3.23x      2.80x      2.10x
+      0.8   8      4.01x      3.09x      1.97x
+      0.9   2      2.66x      2.46x      2.08x
+      0.9   4      3.94x      3.41x      2.56x
+      0.9   8      5.67x      4.38x      2.78x
+   speedup = E[tokens per block] / (1 + k c). For a given acceptance there is a best k: more guesses give more tokens per block but cost k draft steps and lose to a wrong guess (a rejected guess wastes everything after it)

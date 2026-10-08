@@ -562,6 +562,49 @@ Worked answer: the contiguous scheme reserves 2,048 rows for each of 4 requests 
 5. Reverse the order of pages in `trim`: `rows()` would then read the wrong pages: the shadow comparison should catch it; if it does not, add a case.
 ---
 
+## Chapter 16
+
+**1. Guesses `[7, 2, 5]`, choices `[7, 2, 9, 4]`.**
+
+Worked answer: guess 0 (7) equals choice 0, guess 1 (2) equals choice 1, guess 2 (5) differs from choice 2 (9). Two guesses are accepted. The emitted tokens are the accepted guesses and the target's choice at the first disagreement: `[7, 2, 9]`. The cache rows kept are rows 0, 1 and 2 of the block (the rows of the last committed token and the two accepted guesses); row 3, which saw the rejected guess, is dropped.
+
+**2. Why the output does not depend on the draft; what a poor draft cannot break.**
+
+Worked answer: each emitted token is a guess the target itself chose at that position, or the target's own choice, and each was computed from a prefix of already-accepted tokens, so the sequence is the target's greedy sequence. A poor draft only reduces the number of accepted guesses per block. The argument would break if the verifier let a row see a guess that was later rejected (a non-causal block): then a row's choice would depend on a token that is not in the output.
+
+**3. `k = 4` and 100% acceptance; why not `k = 5`?**
+
+Worked answer: each block yields k + 1 = 5 tokens, so 32 tokens need 7 blocks (35 tokens, 3 are overshoot). In Example B `k = 5` yields 6 tokens per block and needs 6 blocks (36 tokens), and the verifier's cost grows with the rows, so the gain from one more guess is smaller than the loss from the overshoot and the wider verifier. `k = 3` gives 4 tokens per block: 8 blocks, exactly 32 tokens, no overshoot.
+
+**4. Why a view, and why no concatenation?**
+
+Worked answer: a slice of rows is a contiguous range of the source's buffer, so its address is the source's address plus an offset; nothing needs to be copied. A concatenation needs its inputs placed next to each other in one buffer; a slice lives inside its source's buffer, which fixes its place, so it cannot also be placed next to another tensor (that would require a copy, which the compiler does not do for views).
+
+**5. Expected tokens for `k = 2`.**
+
+Worked answer: a block always yields 1 token (the target's choice at the first disagreement or after the last guess). The first guess is accepted with probability a, giving a second token; the second is accepted with probability a squared (both must be right), giving a third. By linearity of expectation E = 1 + a + a squared.
+
+**6. `a = 0.8`, `k = 4`, `c = 0.05`.**
+
+Worked answer: E = (1 - 0.8^5) / (1 - 0.8) = (1 - 0.32768) / 0.2 = 3.36. The cost of a block is 1 + 4 * 0.05 = 1.2 target steps. Speedup = 3.36 / 1.2 = 2.80.
+
+**7. Why a sharp-attention model for the causality test?**
+
+Worked answer: in the structured model the attention scores are tiny, so the attention weights are nearly uniform over the visible rows and the output barely depends on which rows are visible; a change to a later token in a non-causal block would change a row's output by less than the integer rounding. Multiplying the query and key weights by 4 makes the attention patterns peaked so that a row's output depends strongly on the rows it can see.
+
+**8. Why did "bonus token not appended" survive, and what caught it?**
+
+Worked answer: if the bonus token is dropped, the next block starts from the last accepted guess instead; the verifier recomputes the target's choice after it, which is the very token that was dropped. The output tokens are the same; only a block was wasted. The check that finally caught it is the accounting one: tokens emitted must equal accepted guesses plus the number of blocks, and the cache length must equal the tokens emitted.
+
+## Chapter 16 -- hints for the exercises
+
+1. A 256-entry table indexed by (previous token, token before it): `Wd` cannot represent it with one embedding, so the draft becomes a lookup done on the host; measure acceptance only, or give the draft a two-token embedding.
+2. Compute `E`, `t_draft` and `t_verify(k + 1)` for each k and take the maximum of `E * t_plain / (k * t_draft + t_verify)`; compare it with the measured grid.
+3. With two alternatives for the first guess the verifier needs the rows of both chains; each row sees the cache, the shared prefix and only its own chain, which is a list of row ranges, not a prefix. Capra's `slice_rows` gives contiguous ranges only; you would concatenate the visible pieces, which costs copies.
+4. Accept with probability `min(1, p_target(x) / p_draft(x))`; on rejection sample from `max(0, p_target - p_draft)` normalized. This keeps the distribution of the output equal to the target's.
+5. Try making the draft's argmax tie-break differently (lowest index versus highest): the output cannot change, so the tests cannot catch it; it is an equivalent mutant for exactness and a quality difference for the acceptance rate.
+---
+
 ## Chapter 1 (additional questions)
 
 **6. In the ripple example the `sum` bus shows `6, 4, 0, 8` after 7 + 1. Why are there wrong values at all, and how long after the inputs change is the answer valid?**

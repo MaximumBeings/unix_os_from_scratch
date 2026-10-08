@@ -35,8 +35,8 @@ def random_graph(seed, wbits=8):
     if len(pool) > 2 and R.random() < 0.3 and pool[1] not in in_concat: g.output(pool[1], "mid")
     return g, names
 def sample_inputs(names, R): return {nm: [[R.gauss(0, sd) for _ in range(c)] for _ in range(r)] for nm, ((r, c), sd) in names.items()}
-def check_graph(seed, bound=0.16, wbits=8):
-    problems = []; g, names = random_graph(seed, wbits); R = random.Random(seed * 7 + 1)
+def check_graph(seed, bound=0.16, wbits=8, build=None):
+    problems = []; g, names = (build or random_graph)(seed, wbits); R = random.Random(seed * 7 + 1)
     calib = [sample_inputs(names, R) for _ in range(30)]; test = sample_inputs(names, R)
     try: P1 = C.compile_graph(g, calib, reuse=True); P0 = C.compile_graph(g, calib, reuse=False)
     except C.CompileError as e: return [f"seed {seed}: compile error: {e}"], None
@@ -58,6 +58,39 @@ def check_graph(seed, bound=0.16, wbits=8):
         worst = max(worst, num / den)
     if worst > bound: problems.append(f"seed {seed}: (e) error {worst:.3f} over the bound {bound}")
     return problems, worst
+def random_slice_graph(seed, wbits=8):
+    """Chapter 16: graphs built around slice_rows: slices of a product, of a concatenation and of a slice, feeding matmuls, softmaxes, adds and argmax."""
+    R = random.Random(seed); g = C.Graph(); rows = R.randrange(4, 10); cols = R.randrange(3, 14); names = {}
+    def new_input(shape): nm = f"in{len(names)}"; names[nm] = (shape, 1.0); return g.input(nm, shape)
+    def weight(r, c): return g.weight(f"w{len(g.nodes)}", [[R.gauss(0, 1 / math.sqrt(r)) for _ in range(c)] for _ in range(r)], bits=wbits)
+    x = new_input((rows, cols)); y = g.matmul(x, weight(cols, R.randrange(3, 9)))
+    extra = new_input((R.randrange(1, 4), g.nodes[y].shape[1])); cat = g.concat_rows(y, extra); total = g.nodes[cat].shape[0]; wsl = weight(R.randrange(3, 8), R.randrange(2, 6)); sources = [(cat, total), (y, rows), (x, rows), (wsl, g.nodes[wsl].shape[0])]; outs = []
+    for k in range(R.randrange(2, 5)):
+        src, r = R.choice(sources); start = R.randrange(0, r); count = R.randrange(1, r - start + 1); sl = g.slice_rows(src, start, count)
+        if R.random() < 0.3 and count > 1: sl2 = g.slice_rows(sl, R.randrange(0, count), 1) if False else g.slice_rows(sl, 0, R.randrange(1, count + 1)); sl = sl2
+        c = g.nodes[sl].shape[1]; kind = R.choice(["matmul", "softmax", "scores", "argmax"])
+        if kind == "matmul": o = g.matmul(sl, weight(c, R.randrange(2, 7)))
+        elif kind == "softmax": o = g.softmax(g.matmul(sl, weight(c, R.randrange(2, 7)), scale=0.5))
+        elif kind == "scores": o = g.matmul(sl, g.slice_rows(src, 0, r), transpose_b=True, scale=1 / math.sqrt(c))
+        else: o = g.argmax(g.matmul(sl, weight(c, R.randrange(2, 7))))
+        g.output(o, f"o{k}")
+    g.output(cat, "cat"); return g, names
+def check_slices(seeds, bound=0.40, wbits=8):
+    probs = []
+    for s in seeds: p, _ = check_graph(s, bound, wbits, build=random_slice_graph); probs += p
+    return probs
+def check_slice_errors():
+    """slice_rows must REFUSE a range outside the tensor and a slice that feeds a concatenation or a relu. Returns the cases wrongly accepted."""
+    wrong = []
+    def attempt(name, build):
+        try: build(); wrong.append(f"accepted: {name}")
+        except C.CompileError: pass
+    def out_of_range(): g = C.Graph(); x = g.input("x", (3, 4)); g.slice_rows(x, 2, 2)
+    def empty(): g = C.Graph(); x = g.input("x", (3, 4)); g.slice_rows(x, 1, 0)
+    def into_concat():
+        g = C.Graph(); x = g.input("x", (3, 4)); y = g.input("y", (1, 4)); g.output(g.concat_rows(g.slice_rows(x, 0, 2), y), "o"); C.compile_graph(g, [{"x": [[1.0] * 4] * 3, "y": [[1.0] * 4]}])
+    attempt("a slice past the end", out_of_range); attempt("an empty slice", empty); attempt("a slice feeding a concatenation", into_concat)
+    return wrong
 def check_many(seeds, bound=0.16, wbits=8):
     probs = []; worst = 0.0
     for s in seeds:

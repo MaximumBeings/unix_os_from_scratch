@@ -1,0 +1,23 @@
+NOTE: this script deliberately breaks copies of the model. 'caught' is EXPECTED: it shows the checks notice the mistake.
+unbroken model passes: True
+accept rule: one more draft token is accepted than agreed: caught
+accept rule: the first guess is not checked: caught
+accept rule: guess i is compared with the target's choice after row i+1: caught
+accept rule: acceptance stops at the first agreement, not the first disagreement: caught
+bonus token: the draft's token is kept instead of the target's: caught
+bonus token: taken from the previous row: caught
+bonus token: not appended: caught
+cache: the rows of rejected guesses are kept: caught
+cache: the row of the bonus token's input is dropped: caught
+cache: values and keys swapped: caught
+block: the last committed token is left out of the block: caught
+draft chain: every guess is made from the committed token, not the previous guess: caught
+verifier mask: a row may see one later row: caught
+verifier mask: a row cannot see itself: caught
+verifier mask: keys see the prefix but values see everything: caught
+verifier: the query of row i is row 0's: caught
+verifier: the rows of the attention output are concatenated in reverse: caught
+verifier float block: the mask lets row i see the whole block: caught
+draft table: the rule's next token is f(t)+1: caught
+
+speculative decoding: 19 of 19 broken versions caught

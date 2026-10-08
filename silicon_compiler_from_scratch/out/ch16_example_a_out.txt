@@ -1,0 +1,38 @@
+== 1. three blocks of speculative decoding (random target, bigram draft, k = 3); the target's own greedy tokens are the reference
+   target greedy tokens (float): [0, 5, 3, 13, 9, 1, 11, 11, 11, 11, 11, 11, 11, 11] ...
+   block 1: last token 0, draft guesses [5, 3, 13]; target's choice after each of the 4 rows [5, 3, 13, 9]
+            guess 1 agrees, guess 2 agrees, guess 3 agrees  ->  3 accepted, and the target's own token 9 comes free: tokens [5, 3, 13, 9]; cache grows by 4 rows
+   block 2: last token 9, draft guesses [10, 9, 10]; target's choice after each of the 4 rows [1, 11, 10, 11]
+            guess 1 DISAGREES  ->  0 accepted, and the target's own token 1 comes free: tokens [1]; cache grows by 1 rows
+   block 3: last token 1, draft guesses [11, 11, 11]; target's choice after each of the 4 rows [11, 11, 11, 11]
+            guess 1 agrees, guess 2 agrees, guess 3 agrees  ->  3 accepted, and the target's own token 11 comes free: tokens [11, 11, 11, 11]; cache grows by 4 rows
+   tokens so far [0, 5, 3, 13, 9, 1, 11, 11, 11, 11]  == target greedy [0, 5, 3, 13, 9, 1, 11, 11, 11, 11]: True
+
+== 2. the anatomy of one verifier program (cache of 4 rows, block of 4 rows) against four ordinary single-token steps over the same positions
+   verifier (m = 4, c = 4):  {'LD': 10, 'MM': 56, 'RQ': 23, 'SM': 4, 'ST': 5, 'VADD': 2, 'AMAX': 4, 'HALT': 1}
+      words loaded from external memory: 2496;  cycles: 12330  (matrix 7732, DMA 2856, vector 1532)
+   four single-token steps (contexts 5, 6, 7, 8): cycles [7378, 7457, 7536, 7615] = 29986; words loaded: [2448, 2480, 2512, 2544] = 9984
+   so the block costs 0.41 of the four steps: the weights (2304 words) are loaded once, not four times.
+
+== 3. causality in integers: change the LAST token of the block and the integer logits of all earlier rows are identical; change an earlier token and later rows change
+   block [1, 2, 3, 4]: first five integer logits of each row:
+       row 0: [31, 0, 3, -8, -26]
+       row 1: [-37, 22, 39, 5, 6]
+       row 2: [18, 14, -30, -39, -43]
+       row 3: [-3, -2, 24, 12, 14]
+   block [1, 2, 3, 12]: first five integer logits of each row:
+       row 0: [31, 0, 3, -8, -26]
+       row 1: [-37, 22, 39, 5, 6]
+       row 2: [18, 14, -30, -39, -43]
+       row 3: [3, -4, 17, -16, -24]
+   block [1, 2, 9, 4]: first five integer logits of each row:
+       row 0: [31, 0, 3, -8, -26]
+       row 1: [-37, 22, 39, 5, 6]
+       row 2: [-24, 8, 3, 4, -1]
+       row 3: [4, -6, 21, 9, 17]
+   block [5, 2, 3, 4]: first five integer logits of each row:
+       row 0: [-24, 34, 26, -4, -24]
+       row 1: [-35, 32, 35, 3, 6]
+       row 2: [17, 18, -30, -38, -40]
+       row 3: [-3, 1, 20, 13, 18]
+   rows 0-2 of [1,2,3,4] and [1,2,3,12] are identical (the last token is not visible to them); [1,2,9,4] differs from row 2 on; [5,2,3,4] differs from row 0 on.

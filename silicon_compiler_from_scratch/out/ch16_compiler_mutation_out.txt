@@ -1,0 +1,17 @@
+NOTE: this script deliberately breaks copies of the compiler. 'caught' is EXPECTED: it shows the battery notices the mistake.
+unbroken compiler passes: True
+slice: the view starts at the beginning of its source: caught
+slice: the view's offset is counted in words, not rows: caught
+slice: the shape keeps the source's row count: caught
+slice: the interpreter takes one row too many: caught
+slice: the float evaluation takes one row too few: caught
+slice: its scale is not tied to its source's: caught
+slice: a range past the end is accepted: caught
+slice: an empty slice is accepted: caught
+slice: a slice may feed a concatenation: caught
+slice: the source is not loaded before its view is used: caught
+
+slice_rows: 10 of 10 broken compilers caught
+
+A change that looks like a bug and is not:
+EQUIVALENT in effect: a slice is first given a buffer of its own, which the next loop then replaces by the view (an unused buffer entry): NOT CAUGHT

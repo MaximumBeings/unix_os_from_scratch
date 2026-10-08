@@ -114,6 +114,8 @@ To compile and run: `python3 tools/ch11_example_a.py` (pure Python; instant).
 ![concat_rows of a cache and a new row as one buffer written in place by two loads](../assets/fig/ch11-views.svg)
 *Figure 11.5: a concatenation is a view. Both parts are written into the same buffer at the right row offsets, so the concatenation costs no instruction.*
 
+*Later chapters extend the IR.* Chapter 13 adds `weight(..., bits=4)` (packed int4 weights) and Chapter 16 adds `slice_rows`, the reverse of `concat_rows`: a **view** of some rows of a tensor, with no instruction and no copy, which is how a causal mask is built without a mask operation.
+
 ![scratchpad allocation over time for the attention step: buffers as blocks, with the 70-word high-water mark](../assets/fig/ch11-alloc.svg)
 *Figure 11.6: the allocator's events drawn as a memory map. The key-side buffers (left) are freed before the value-side buffers (right) are placed, partly on top of the same addresses.*
 

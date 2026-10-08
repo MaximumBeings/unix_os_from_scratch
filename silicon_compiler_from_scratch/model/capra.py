@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Chapter 11: CAPRA, a compiler from a tensor graph to GA-2 programs (named for the goat genus, Capra).
 PIPELINE.   graph IR  ->  float evaluation (calibration)  ->  scale planning  ->  tiling  ->  scratchpad allocation  ->  instruction emission  ->  a Program that runs on the reference simulator or the RTL.
-THE IR.     Tensors are 2-D (rows, cols). Nodes: input, weight, matmul (optionally with B transposed and a constant factor), softmax (per row), add, relu, concat_rows, argmax (per row), output.
+THE IR.     Tensors are 2-D (rows, cols). Nodes: input, weight, matmul (optionally with B transposed and a constant factor), softmax (per row), add, relu, concat_rows, slice_rows (a view, Chapter 16), argmax (per row), output.
 WHAT THE COMPILER DECIDES FOR THE USER: every tensor's int8 scale (from calibration data), every requantizer's multiplier and shift, how a big matrix product is cut into 4x4 output tiles, where each tensor lives in the scratchpad
 (buffers are reused once their last consumer has run), and where inputs, weights and outputs live in external memory. Limits of the target: a product's inner dimension K <= 64, 4096 words of scratchpad, int8 tensors.
 """
@@ -36,6 +36,11 @@ class Graph:
     def concat_rows(self, a, b):
         if self.nodes[a].shape[1] != self.nodes[b].shape[1]: raise CompileError("concat_rows: widths differ")
         return self._add("concat", [a, b], (self.nodes[a].shape[0] + self.nodes[b].shape[0], self.nodes[a].shape[1]))
+    def slice_rows(self, a, start, count):
+        """Rows start .. start+count-1 of a tensor, as a VIEW: no instruction, no copy (Chapter 16). The slice shares the source's scale and lives inside the source's buffer."""
+        r = self.nodes[a].shape[0]
+        if count < 1 or start < 0 or start + count > r: raise CompileError(f"slice_rows: rows {start}..{start + count - 1} do not lie inside a tensor of {r} rows")
+        return self._add("slice", [a], (count, self.nodes[a].shape[1]), start=start, count=count)
     def argmax(self, a): return self._add("argmax", [a], (self.nodes[a].shape[0], 1))
     def output(self, a, name): return self._add("output", [a], self.nodes[a].shape, name=name)
     def tag(self, a, name): self.nodes[a].attrs["tag"] = name; return a        # a name for a tensor, so that its range can be fixed from outside (see compile_graph(ranges=...))
@@ -55,6 +60,7 @@ def evaluate(g, inputs):
         elif n.op == "add": v[n.id] = [[x + y for x, y in zip(r, s)] for r, s in zip(v[n.ins[0]], v[n.ins[1]])]
         elif n.op == "relu": v[n.id] = [[max(0.0, x) for x in r] for r in v[n.ins[0]]]
         elif n.op == "concat": v[n.id] = [list(r) for r in v[n.ins[0]]] + [list(r) for r in v[n.ins[1]]]
+        elif n.op == "slice": v[n.id] = [list(r) for r in v[n.ins[0]][n.attrs["start"]:n.attrs["start"] + n.attrs["count"]]]
         elif n.op == "argmax": v[n.id] = [[float(r.index(max(r)))] for r in v[n.ins[0]]]
         elif n.op == "output": v[n.id] = v[n.ins[0]]
     return v
@@ -70,6 +76,7 @@ def plan_scales(g, calib, ranges=None):
     for n in g.nodes:
         if n.op == "concat": union(n.ins[0], n.id); union(n.ins[1], n.id)
         elif n.op == "relu": union(n.ins[0], n.id)
+        elif n.op == "slice": union(n.ins[0], n.id)
         elif n.op == "output": union(n.ins[0], n.id)
     rng = {}
     for sample in calib:
@@ -133,7 +140,7 @@ def compile_graph(g, calib, reuse=True, ranges=None):
     bufs = []                                   # buffer id -> dict(size, members)
     def new_buf(size): bufs.append({"size": size, "members": [], "addr": None}); return len(bufs) - 1
     for n in reversed(N):                       # consumers first: a concat's output is placed before its inputs, which become views of it; a fused relu's input shares the relu's place
-        if n.op in ("output", "argmax"): continue
+        if n.op in ("output", "argmax", "slice"): continue
         if n.id not in loc: loc[n.id] = (new_buf(((n.shape[0] * n.shape[1] + 7) // 8) * 8 if n.op == "weight" and n.attrs.get("bits", 8) == 4 else n.shape[0] * n.shape[1]), 0)
         if n.op == "relu":
             if n.ins[0] in loc: raise CompileError(f"node {n.ins[0]} feeds two consumers that need it in different places")
@@ -143,6 +150,10 @@ def compile_graph(g, calib, reuse=True, ranges=None):
             for k, i in enumerate(n.ins):
                 if i in loc: raise CompileError(f"node {i} feeds two concatenations")
                 loc[i] = (b0, off + (0 if k == 0 else N[n.ins[0]].shape[0]))
+    for n in N:
+        if n.op == "slice":                                                            # a view into its source's place (Chapter 16)
+            if any(N[c].op in ("concat", "relu") for c in cons[n.id]): raise CompileError(f"node {n.id}: a slice cannot feed a concatenation or a relu (it would need a copy)")
+            b, off = loc[n.ins[0]]; loc[n.id] = (b, off + n.attrs["start"])
     for n in N:
         if n.op == "argmax": loc[n.id] = (new_buf(n.shape[0]), 0)
     for nid, (b, off) in loc.items(): bufs[b]["members"].append(nid)
@@ -178,6 +189,7 @@ def compile_graph(g, calib, reuse=True, ranges=None):
     P.params = {}
     for n in N:
         if n.op == "input" or n.op == "weight": continue
+        if n.op == "slice": ensure(n.ins[0]); addr_of(n.id); continue
         if n.op == "concat" or n.op == "relu": ensure(n.ins[0]); ensure(n.ins[1]) if n.op == "concat" else None; addr_of(n.id); continue
         ins = [ensure(i) for i in n.ins]
         if n.op == "matmul":
@@ -258,6 +270,7 @@ def interpret(P, inputs):
             ops = [v[i] if (n.id, k) not in P.params else [[requant(x, *P.params[(n.id, k)]) for x in r] for r in v[i]] for k, i in enumerate(n.ins)]
             v[n.id] = [[max(-127, min(127, x + y)) for x, y in zip(r, s)] for r, s in zip(ops[0], ops[1])]
         elif n.op in ("relu", "output"): v[n.id] = v[n.ins[0]]
+        elif n.op == "slice": v[n.id] = [list(r) for r in v[n.ins[0]][n.attrs["start"]:n.attrs["start"] + n.attrs["count"]]]
         elif n.op == "concat": v[n.id] = [list(r) for r in v[n.ins[0]]] + [list(r) for r in v[n.ins[1]]]
         elif n.op == "argmax": v[n.id] = [[r.index(max(r))] for r in v[n.ins[0]]]
     return v
