@@ -8,7 +8,7 @@ MUT = [
  (T, "sequencer: the instruction counter adds two", "n_inst <= n_inst + 1; st <= FETCH;", "n_inst <= n_inst + 2; st <= FETCH;"),
  (T, "sequencer: stores are counted as vector time, not DMA time", "else if (cur == OP_LD || cur == OP_ST) cyc_dma", "else if (cur == OP_LD) cyc_dma"),
  (T, "sequencer: the fetch cycle is not counted", "FETCH: begin ins <= imem_data; st <= ISSUE; cyc_total <= cyc_total + 1; end", "FETCH: begin ins <= imem_data; st <= ISSUE; end"),
- (T, "sequencer: the VADD and AMAX write-data ports are swapped", "(cur == OP_VADD) ? va_wd : am_wd;", "(cur == OP_VADD) ? am_wd : va_wd;"),
+ (T, "sequencer: the VADD and AMAX write-data ports are swapped", "(cur == OP_VADD) ? va_wd : (cur == OP_UNPACK) ? un_wd : am_wd;", "(cur == OP_VADD) ? am_wd : (cur == OP_UNPACK) ? un_wd : va_wd;"),
  (T, "sequencer: RQ reads through the softmax unit's address", "(cur == OP_RQ) ? rq_ra : (cur == OP_SM) ? sm_ra", "(cur == OP_RQ) ? sm_ra : (cur == OP_SM) ? sm_ra"),
  (T, "sequencer: the matrix unit's write enable is dropped", "(cur == OP_MM) ? mm_we : (cur == OP_RQ) ? rq_we", "(cur == OP_MM) ? 1'b0 : (cur == OP_RQ) ? rq_we"),
  (T, "sequencer: the load length field is 8 bits wide", ".len(ins[87:76])", ".len({4'd0, ins[83:76]})"),
