@@ -61,6 +61,18 @@ Worked answer: no. At the limit the clamped value and the unclamped value are th
 
 ---
 
+**7. Convert `1100_1010` and `0011_0111` to decimal by hand. What is their sum as an 8-bit pattern, and what does it mean as a signed number?**
+
+Worked answer: `1100_1010` = -128 + 64 + 8 + 2 = -54. `0011_0111` = 32 + 16 + 4 + 2 + 1 = 55. The unsigned sum of the patterns is `1_0000_0001`; dropping the ninth bit leaves `0000_0001`, which is +1, and -54 + 55 = +1 is the correct signed result. The same adder produced it, which is the reason for two's complement.
+
+**8. In Running example A, what would the accumulator be after cycle 8 if `clr` with `en = 1` loaded zero instead of the product? Which mutant is that, and what catches it?**
+
+Worked answer: 0 instead of 4 after cycle 8, and 100 instead of 104 after cycle 9 (the 10 x 10 product is added to a wrong start). That is the MAC mutant "clr with en loads zero". The golden-model rows that start a sum with `clr = 1, en = 1` and a non-zero product catch it; with `a x b = 0` the mutant would be invisible, which is why the directed rows use non-zero products.
+
+**9. Running example B shows the wrapping MAC reads exactly 0 after 262,144 worst-case products. Why, and why is it worse than garbage?**
+
+Worked answer: 262,144 = 2^18 products of 2^14 sum to 2^32, and a 32-bit register holds sums modulo 2^32, so the register reads 0, the same as an empty sum. Garbage would look wrong; this looks plausible and cannot be told from a correct run by inspecting the result. That is the case for saturation (or for proving the sum cannot reach the limit).
+
 ## Chapter 3
 
 **1. Why does the scheme avoid -128, and what would break if it were allowed?**

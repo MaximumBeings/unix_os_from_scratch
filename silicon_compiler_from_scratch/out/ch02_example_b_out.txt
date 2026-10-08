@@ -1,0 +1,35 @@
+== 1. derived: the width of a sum of K products, worst case |p| = 128*128 = 16384 = 2^14
+   K products need ceil(log2(K * 2^14 + 1)) + 1 bits (the +1 is the sign). 32 bits hold 2^31 - 1 = 2147483647.
+   K =       1: worst-case sum       16384  needs 16 bits  fits in 32
+   K =      16: worst-case sum      262144  needs 20 bits  fits in 32
+   K =     256: worst-case sum     4194304  needs 24 bits  fits in 32
+   K =    4096: worst-case sum    67108864  needs 28 bits  fits in 32
+   K =   65536: worst-case sum  1073741824  needs 32 bits  fits in 32
+   K =  131071: worst-case sum  2147467264  needs 32 bits  fits in 32
+   K =  131072: worst-case sum  2147483648  needs 33 bits  DOES NOT FIT
+   so the largest K that always fits is floor((2^31 - 1) / 16384) = 131071; the 131072nd worst-case product is the first that overflows
+
+== 2. the circuits: Icarus on rtl/mac.v (SAT=0, wrap) and mac_sat (SAT=1), against Python
+   products added | wrap acc (circuit) | sat acc (circuit) | wrap (Python) | sat (Python) | agree
+                1 |              16384 |             16384 |         16384 |        16384 | yes
+             1000 |           16384000 |          16384000 |      16384000 |     16384000 | yes
+           131071 |         2147467264 |        2147467264 |    2147467264 |   2147467264 | yes
+           131072 |        -2147483648 |        2147483647 |   -2147483648 |   2147483647 | yes
+           131073 |        -2147467264 |        2147483647 |   -2147467264 |   2147483647 | yes
+           131074 |        -2147450880 |        2147483647 |   -2147450880 |   2147483647 | yes
+           262143 |             -16384 |        2147483647 |        -16384 |   2147483647 | yes
+           262144 |                  0 |        2147483647 |             0 |   2147483647 | yes
+           262145 |              16384 |        2147483647 |         16384 |   2147483647 | yes
+   look at row 131072: the wrapping unit has jumped from +2147467264 to -2147483648 (a huge positive sum became a huge NEGATIVE one);
+   the saturating unit sits at +2147483647. Both are wrong in the strict sense (the true sum is 2147483648), but one is wrong by 1 and the other by 4.3 billion.
+
+== 3. measured: a REAL dot product of random int8 vectors, seed 5, 2000 trials per length (200 for the two longest)
+   length K | largest |sum| seen | worst case K*16384 | ratio    | any overflow of 32 bits?
+         64 |            147731 |            1048576 | 0.14089 | no
+        256 |            327991 |            4194304 | 0.07820 | no
+       1024 |            681492 |           16777216 | 0.04062 | no
+       4096 |           1428317 |           67108864 | 0.02128 | no
+      16384 |           2039896 |          268435456 | 0.00760 | no
+      65536 |           4870015 |         1073741824 | 0.00454 | no
+   Random data grows like sqrt(K), the worst case like K: the typical sum stays about 1/sqrt(K) of the bound. Overflow needs ADVERSARIAL or very structured data;
+   this is why 32-bit accumulators are the industry norm for int8, and why the MAC still has to define what happens (a rare event in a safety-critical system is still an event).
