@@ -52,4 +52,5 @@ nav:
   - Home: index.md
   - Getting Started: getting-started.md
   - "1. The Flow: One Circuit Through Four Tools, and a Way to Test the Tests": part01/01-the-flow.md
+  - "2. The MAC and Number Formats: Two's Complement, Overflow, and the Tests That Found Three Holes": part02/02-mac-and-number-formats.md
   - Answers to the Self-Check Questions: answers.md

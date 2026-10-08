@@ -1,0 +1,29 @@
+NOTE: this script deliberately breaks copies of the RTL. 'caught' lines are EXPECTED: they show the testbenches can detect the mistake.
+mul8_sa: the sign row is added instead of subtracted: caught
+mul8_sa: row 3 is shifted by 2: caught
+mul8_sa: row 5 is left out of the sum: caught
+mul8_sa: row 5 is selected by bit 6: caught
+mul8_sa: a is zero-extended instead of sign-extended: caught
+mul8_sa: the sign row ignores the sign bit: caught
+mul8_beh: the operands are treated as unsigned: caught
+mul8_beh: the top bit of the product is lost: caught
+
+multipliers: 8 of 8 broken circuits caught
+
+mac: the product is subtracted: caught
+mac: clr with en loads the product without sign extension: caught
+mac: clr with en loads zero: caught
+mac: en takes priority over clr, so clr only works when en is 0: caught
+mac: the upper clamp is one too low: caught
+mac: the lower clamp is one too high: caught
+mac: the SAT parameter is inverted: caught
+mac: the wrapped sum drops bit 31: caught
+mac: reset loads 1: caught
+mac: en is ignored: caught
+mac: the sum is only 32 bits wide, so overflow cannot be seen: caught
+
+MAC: 11 of 11 broken circuits caught
+
+Two changes that look like bugs and are not:
+EQUIVALENT: the upper clamp triggers at the limit itself (>=): NOT CAUGHT
+EQUIVALENT: the lower clamp triggers at the limit itself (<=): NOT CAUGHT

@@ -1,0 +1,25 @@
+== 1. the golden models write their vectors
+65536 pairs written to out/mul8_vectors.hex
+3039 clock cycles written to out/mac_vectors.hex
+
+== 2. mul8_tb in Icarus Verilog
+PASS: both multipliers match the golden model on all 65536 input pairs (exit status 0)
+
+== 2. mul8_tb in Verilator
+PASS: both multipliers match the golden model on all 65536 input pairs (exit status 0)
+
+== 2. mac_tb in Icarus Verilog
+PASS: wrapping and saturating MACs match the golden model at all 3039 checkpoints (exit status 0)
+
+== 2. mac_tb in Verilator
+PASS: wrapping and saturating MACs match the golden model at all 3039 checkpoints (exit status 0)
+
+== 3. Yosys: what each multiplier costs
+mul8_beh  generic gates   401 {'$_ANDNOT_': 8, '$_AND_': 80, '$_MUX_': 2, '$_NAND_': 171, '$_NOT_': 1, '$_ORNOT_': 1, '$_OR_': 2, '$_XNOR_': 8, '$_XOR_': 128}
+          iCE40 cells    191 {'SB_CARRY': 10, 'SB_LUT4': 181}
+mul8_sa   generic gates   398 {'$_ANDNOT_': 1, '$_AND_': 62, '$_MUX_': 1, '$_NAND_': 197, '$_NOT_': 1, '$_ORNOT_': 1, '$_XNOR_': 14, '$_XOR_': 121}
+          iCE40 cells    192 {'SB_CARRY': 11, 'SB_LUT4': 181}
+mac       generic gates   725 {'$_ANDNOT_': 8, '$_AND_': 146, '$_MUX_': 3, '$_NAND_': 282, '$_NOR_': 31, '$_NOT_': 1, '$_ORNOT_': 5, '$_OR_': 40, '$_SDFFE_PP0P_': 32, '$_XNOR_': 43, '$_XOR_': 134}
+          iCE40 cells    322 {'SB_CARRY': 42, 'SB_DFFESR': 32, 'SB_LUT4': 248}
+mac_sat   generic gates   753 {'$_ANDNOT_': 8, '$_AND_': 147, '$_MUX_': 2, '$_NAND_': 261, '$_NOR_': 8, '$_ORNOT_': 5, '$_OR_': 93, '$_SDFFE_PP0P_': 32, '$_XNOR_': 67, '$_XOR_': 130}
+          iCE40 cells    435 {'SB_CARRY': 75, 'SB_DFFESR': 32, 'SB_LUT4': 328}
