@@ -1,0 +1,16 @@
+A is 8x8, B is 8x8, random int8 (seed 4). C = A B has 64 elements and takes 512 multiply-accumulates.
+
+array 4 x 4 (16 PEs): 4 tile(s), each 8+2*4-2 = 14 cycles -> 56 cycles total (measured by the testbench); result equals the Python product: True
+   perfect utilization would need 32 cycles; this takes 56; utilization = 512 / (56 x 16) = 0.571
+array 8 x 8 (64 PEs): 1 tile(s), each 8+2*8-2 = 22 cycles -> 22 cycles total (measured by the testbench); result equals the Python product: True
+   perfect utilization would need 8 cycles; this takes 22; utilization = 512 / (22 x 64) = 0.364
+
+so the four-times-smaller array is only 2.55x slower, and its PEs are busier (0.571 vs 0.364): each PE idles less because the fill and drain (2N-2 = 6 cycles per tile) cost less when N is small.
+the larger array has 4x the PEs; the product is 22 cycles instead of 56. The throughput-per-PE of the small array is better here. A bigger K would narrow the gap (below).
+
+utilization of an N x N array on ONE tile, K/(K+2N-2)  (derived from the schedule; the N=4, K=8 and N=8, K=8 entries match the runs above):
+      K:      1      4      8     16     64    256   1024
+  N=  4:  0.143  0.400  0.571  0.727  0.914  0.977  0.994
+  N=  8:  0.067  0.222  0.364  0.533  0.821  0.948  0.987
+  N= 16:  0.032  0.118  0.211  0.348  0.681  0.895  0.972
+  N=128:  0.004  0.016  0.031  0.059  0.201  0.502  0.801

@@ -95,11 +95,9 @@ Worked answer: with `s = 0` the expression `1 << (s - 1)` evaluates `1 << 63` in
 
 Worked answer: 100 GB/s / 7 GB = about 14 tokens per second, assuming every weight is read once per token (batch size 1), nothing is cached on chip, the KV cache and activations are negligible, and the memory system sustains its peak. Batching several sequences reuses each weight read, which is the subject of Chapter 9.
 
----
-
 **6. Quantize `[0.5, -2.0, 1.0, 0.0]` by hand.**
 
-Worked answer: `scale = 2.0 / 127 = 0.015748`. Then 0.5 / 0.015748 = 31.75 -> 32; -2.0 -> -127; 1.0 / 0.015748 = 63.5 exactly, a tie, which rounds away from zero to 64; 0 -> 0. Dequantized: 32 x 0.015748 = 0.5039, -2.0000, 64 x 0.015748 = 1.0079, 0. The tie case shows why the rounding rule must be fixed: a round-to-even rule would give 64 here too, but -63.5 would round differently on the negative side for odd neighbours, and the chip and the reference must agree.
+Worked answer: `scale = 2.0 / 127 = 0.015748`. Then 0.5 / 0.015748 = 31.75 -> 32; -2.0 -> -127; 1.0 / 0.015748 = 63.5 exactly, a tie, which rounds away from zero to 64; 0 -> 0. Dequantized: 32 x 0.015748 = 0.5039, -2.0000, 64 x 0.015748 = 1.0079, 0. The tie case shows why the rounding rule must be fixed: round-half-away and round-half-even agree here (64 is even), but would differ on a neighbour such as 62.5 (63 versus 62), so the reference and the circuit must use the same rule.
 
 **7. Verify `m / 2^s` for Example A, and say what `s = 30` would do.**
 
@@ -108,6 +106,8 @@ Worked answer: M = 0.006871868289; m / 2^31 = 0.006871868391; the relative diffe
 **8. Why does the per-column error not change with `f` while the per-tensor error does?**
 
 Worked answer: the number that changes is the *scale*. Per-column, each column's scale is its own max/127, so an outlier in column 0 does not touch column 1's scale. Per-tensor, there is one scale = (largest value anywhere)/127, so the outlier sets the step for every column, and the step grows in proportion to `f`.
+
+---
 
 ## Chapter 4
 
@@ -130,6 +130,18 @@ Worked answer: the three `clr` mutants (accumulator not cleared, either pass-thr
 **5. A 128 x 128 array multiplies matrices with K = 64. What is the utilization, and what does that suggest about small batches?**
 
 Worked answer: 64 / (64 + 254) = 0.201, about 20%. The array spends most of its time filling and draining. It suggests keeping the array busy by making K long, or by streaming several products back to back (without draining between them), or by batching requests, which is Chapter 9.
+
+**6. PE(1,2) holds 2 after edge 5 and 3 after edge 6: which products?**
+
+Worked answer: after edge t, PE(1,2) holds the sum over `k <= t - 1 - 2 = t - 3`. With A[1] = [0, -1, 2, 1] and column 2 of B = [2, 0, 1, 1] the products are 0, 0, 2, 1. After edge 5 the sum covers k <= 2: 0 + 0 + 2 = 2. After edge 6 it covers k <= 3: 2 + 1 = 3. Edge 6 is `i + j + K - 1 = 1 + 2 + 3`, the cycle PE(1,2) finishes.
+
+**7. A 4 x 4 array, a 4 x 16 by 16 x 4 product: cycles and utilization; versus sixteen K = 1 products.**
+
+Worked answer: one tile with K = 16 takes 16 + 2 x 4 - 2 = 22 cycles; utilization 16 / 22 = 0.727. Sixteen separate K = 1 products each take 1 + 6 = 7 cycles, 112 in all, utilization 1/7 = 0.143, for the same 256 multiply-accumulates. Batching the inner dimension into one product is five times faster here: the fill and drain are paid once instead of sixteen times.
+
+**8. Tile (1, 0) of Example B.**
+
+Worked answer: tile (r, c) covers output rows 4r..4r+3 and columns 4c..4c+3, so tile (1, 0) uses rows 4..7 of A (a 4 x 8 slice) and columns 0..3 of B (an 8 x 4 slice), each with the full K = 8.
 
 ---
 

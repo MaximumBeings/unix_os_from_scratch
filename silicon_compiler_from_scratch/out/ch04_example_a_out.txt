@@ -1,0 +1,22 @@
+A = [[1, 2, 3, 4], [0, -1, 2, 1], [5, 1, -2, 0]]
+B = [[1, 0, 2], [2, 1, 0], [0, -3, 1], [-1, 2, 1]]
+C = A x B = [[1, 1, 9], [-3, -5, 3], [7, 7, 8]]   (ordinary matrix multiplication, in Python)
+
+accumulators after each clock edge t (circuit)   [PE(0,0) PE(0,1) PE(0,2) / PE(1,0) ... / PE(2,2)]    prediction agrees?
+  t=0: [   1    0    0]  [   0    0    0]  [   0    0    0]   yes
+  t=1: [   5    0    0]  [   0    0    0]  [   0    0    0]   yes
+  t=2: [   5    2    2]  [  -2    0    0]  [   5    0    0]   yes
+  t=3: [   1   -7    2]  [  -2   -1    0]  [   7    0    0]   yes
+  t=4: [   1    1    5]  [  -3   -7    0]  [   7    1   10]   yes
+  t=5: [   1    1    9]  [  -3   -5    2]  [   7    7   10]   yes
+  t=6: [   1    1    9]  [  -3   -5    3]  [   7    7    8]   yes
+  t=7: [   1    1    9]  [  -3   -5    3]  [   7    7    8]   yes
+  t=8: [   1    1    9]  [  -3   -5    3]  [   7    7    8]   yes
+  t=9: [   1    1    9]  [  -3   -5    3]  [   7    7    8]   yes
+
+final accumulators equal C: True
+cycle at which each PE finishes (its last product is at t = i + j + K - 1 = i + j + 3):
+   [3, 4, 5]
+   [4, 5, 6]
+   [5, 6, 7]
+PE(0,0) is done at t=3, PE(2,2) at t=7: the product takes K + 2N - 2 = 8 edges (t = 0..7). The two extra frames (t = 8, 9) show the values holding, because zeros keep being fed.
