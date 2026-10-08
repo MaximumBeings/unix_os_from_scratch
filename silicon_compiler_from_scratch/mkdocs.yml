@@ -50,6 +50,7 @@ plugins:
 
 nav:
   - Home: index.md
+  - Introduction (the book at a glance): introduction.md
   - Getting Started: getting-started.md
   - Background (Verilog and the tools): background.md
   - "Part 1 -- Foundations: Numbers, Circuits, and the Test Loop":

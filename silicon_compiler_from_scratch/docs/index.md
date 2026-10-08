@@ -9,6 +9,8 @@
 
 This book builds a small neural-network accelerator the way a chip team would, in the order a chip team would, and then builds the compiler that turns a model into programs for it. Everything runs on a laptop with three open-source tools: **Icarus Verilog** and **Verilator** (two independent simulators) and **Yosys** (synthesis). No vendor tools, no FPGA board, no licences.
 
+**Where to start:** the [Introduction](introduction.md) is a bird's-eye view of the whole book (motivation, objectives, scope, roadmap, how to read it). Then [Getting Started](getting-started.md) installs the tools and [Background](background.md) explains Verilog and what each tool does.
+
 **What you will build**
 
 | Part | Chapters | What you end up with |
