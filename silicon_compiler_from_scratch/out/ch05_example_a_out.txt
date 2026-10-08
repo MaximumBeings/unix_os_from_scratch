@@ -1,0 +1,27 @@
+shape: 4 tiles of 16 words, compute 2 cycles per word, memory latency 4 cycles
+schedule model: load of one tile L = 16+4+3 = 23 cycles, compute of one tile C = 16*2+3 = 35 cycles
+                serial = T*(L+C) = 4*(23+35) = 232;  double-buffered = L + (T-1)*max(L,C) + C = 23 + 3*35 + 35 = 163
+
+== serial: total 232 cycles (model 232: agrees)
+   tile   load start..done   (cycles)    compute start..done   (cycles)
+     0       0 ..   22      ( 22)          23 ..   57       ( 34)
+     1      58 ..   80      ( 22)          81 ..  115       ( 34)
+     2     116 ..  138      ( 22)         139 ..  173       ( 34)
+     3     174 ..  196      ( 22)         197 ..  231       ( 34)
+   timeline (each character = 6 cycles; L = DMA loading, C = compute):
+   DMA     |LLLL     LLLLL     LLLLL     LLLL      |
+   compute |   CCCCCCC   CCCCCCC   CCCCCC   CCCCCCC|
+
+== double-buffered: total 163 cycles (model 163: agrees)
+   tile   load start..done   (cycles)    compute start..done   (cycles)
+     0       0 ..   22      ( 22)          23 ..   57       ( 34)
+     1      23 ..   45      ( 22)          58 ..   92       ( 34)
+     2      58 ..   80      ( 22)          93 ..  127       ( 34)
+     3      93 ..  115      ( 22)         128 ..  162       ( 34)
+   timeline (each character = 6 cycles; L = DMA loading, C = compute):
+   DMA     |LLL#LLLL LLLLL LLLLL        |
+   compute |   CCCCCC#CCCCC#CCCCC#CCCCCC|
+
+measured per-tile durations, counting both the first and the last cycle: load 23 cycles (model L = 23), compute 35 cycles (model C = 35).
+In the double-buffered run, the load of tile 1 starts at cycle 23, while the compute of tile 0 started at 23 and ends at 57: the two overlap for 35 cycles.
+Here C > L, so after the first load the compute unit is never idle between tiles: it starts tile n+1 at cycle 58, the very cycle after tile n ends (57).

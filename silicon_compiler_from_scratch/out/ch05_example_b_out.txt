@@ -1,0 +1,18 @@
+16 tiles, compute 2 cycles per word. Measured on the circuit (Icarus); every run also passed the schedule-model check inside dbuf_tb.
+
+speedup = serial cycles / double-buffered cycles
+  LAT \ TILE        4       8      16      32      64     128    break-even TILE >= LAT/(CPW-1)
+          1       1.65    1.57    1.52    1.49    1.47    1.46      1
+          4       1.88    1.71    1.59    1.53    1.49    1.47      4
+         16       1.44    1.63    1.88    1.68    1.57    1.51      16
+         64       1.14    1.23    1.39    1.61    1.88    1.67      64
+
+who sets the pace (L = load time, C = compute time, from the model): 'C' = compute-bound, 'L' = load-bound
+  LAT \ TILE        4       8      16      32      64     128
+          1          C       C       C       C       C       C
+          4          C       C       C       C       C       C
+         16          L       L       C       C       C       C
+         64          L       L       L       L       C       C
+
+reading it: with a long latency (64) and small tiles, the load of one tile takes much longer than its compute (L = tile + 67 against C = 2*tile + 3), so the DMA sets the pace and double buffering gains little: the speedup is only 1.14 at TILE = 4 and 1.39 at TILE = 16.
+The gain peaks exactly at the break-even tile (1.88 at TILE = LAT, where L = C) and falls again when compute dominates (toward 1.5 here, because the serial schedule is also mostly compute). The fix for a slow memory is a BIGGER TILE, until C >= L: that is the break-even column.

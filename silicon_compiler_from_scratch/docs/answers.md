@@ -59,8 +59,6 @@ Worked answer: Icarus is four-state, so reading past the end of the vector memor
 
 Worked answer: no. At the limit the clamped value and the unclamped value are the same number, so the two circuits agree on every input: the mutant is equivalent and no test could separate them. It is reported and set aside, as opposed to the three real gaps in the first version, where an input existed that distinguished the mutant and the test had not tried it.
 
----
-
 **7. Convert `1100_1010` and `0011_0111` to decimal by hand. What is their sum as an 8-bit pattern, and what does it mean as a signed number?**
 
 Worked answer: `1100_1010` = -128 + 64 + 8 + 2 = -54. `0011_0111` = 32 + 16 + 4 + 2 + 1 = 55. The unsigned sum of the patterns is `1_0000_0001`; dropping the ninth bit leaves `0000_0001`, which is +1, and -54 + 55 = +1 is the correct signed result. The same adder produced it, which is the reason for two's complement.
@@ -72,6 +70,8 @@ Worked answer: 0 instead of 4 after cycle 8, and 100 instead of 104 after cycle 
 **9. Running example B shows the wrapping MAC reads exactly 0 after 262,144 worst-case products. Why, and why is it worse than garbage?**
 
 Worked answer: 262,144 = 2^18 products of 2^14 sum to 2^32, and a 32-bit register holds sums modulo 2^32, so the register reads 0, the same as an empty sum. Garbage would look wrong; this looks plausible and cannot be told from a correct run by inspecting the result. That is the case for saturation (or for proving the sum cannot reach the limit).
+
+---
 
 ## Chapter 3
 
@@ -166,6 +166,18 @@ Worked answer: the overwrite bug. In serial mode a load starts only when nothing
 **5. A real DRAM has a latency of about 100 cycles and returns 64 bytes per request. What would you change in the DMA engine so that a tile of 1 KB is loaded efficiently?**
 
 Worked answer: request in bursts of 64 bytes (16 requests for 1 KB, each returning many words) instead of one request per 4-byte word; make the engine accept wide data (64 bytes = 16 words) and write it to the scratchpad with a wide write port or several narrow ones; keep enough requests in flight to cover the 100-cycle latency (bandwidth x latency, the *bandwidth-delay product*); and align tiles to 64-byte boundaries. The engine here issues one single-word request per cycle, which is the right idea at the wrong granularity.
+
+**6. TILE = 32, CPW = 2, LAT = 16.**
+
+Worked answer: L = 32 + 16 + 3 = 51, C = 32 x 2 + 3 = 67. C > L, so the compute sets the pace. For 16 tiles: serial = 16 x (51 + 67) = 1888; double-buffered = 51 + 15 x 67 + 67 = 1123; speedup 1888 / 1123 = 1.68, which is the value in the table of Running example B (LAT = 16, TILE = 32).
+
+**7. LAT = 64, TILE = 16.**
+
+Worked answer: L = 16 + 64 + 3 = 83, C = 16 x 2 + 3 = 35; L > C, so the load sets the pace. The break-even is `TILE >= LAT / (CPW - 1) = 64`: at TILE = 64, L = C = 131; at TILE = 32, L = 99 > C = 67 is still load-bound.
+
+**8. Why does load 2 start at 58 and not 46?**
+
+Worked answer: tile 2 is loaded into bank 0 (tile n goes to bank n % 2), and bank 0 holds tile 0, which is still being computed on until cycle 57. A bank becomes empty only when the compute on it finishes, so the load cannot start until then. The DMA is waiting for the compute unit because compute (35) is slower than load (23).
 
 ---
 
