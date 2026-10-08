@@ -298,3 +298,26 @@ Worked answer: for example "A's row step uses K instead of lda" and "C's row ste
 **5. Which tests in this book would you rerun first after changing the compiler's tiling, and which after changing the requantizer's RTL?**
 
 Worked answer: for the tiling, the compiler's battery of Chapter 11 (the interpreter and every-tensor checks) and then the capstone; for the requantizer RTL, Chapter 3's 201,808-vector comparison and mutation run, then Chapter 7's program suite (which uses `RQ`) and, since the requantizer is the chip's critical path, the gate-level checks of Chapter 10.
+
+---
+
+## Chapter 1 (additional questions)
+
+**6. In the ripple example the `sum` bus shows `6, 4, 0, 8` after 7 + 1. Why are there wrong values at all, and how long after the inputs change is the answer valid?**
+
+Worked answer: every full adder computes its sum from the carry it sees *now*, and the carries have not yet arrived: at the first instant all carries are still 0, so the sum bits are those of 0111 + 0001 without carries, giving 0110 (6). Then carry 1 reaches stage 1 and the sum becomes 0100 (4), carry 2 reaches stage 2 (0000), and carry 3 reaches stage 3 (1000 = 8). With a 1 ns delay per full adder the answer is valid 4 ns after the inputs change: three carry hops plus the last stage's own delay.
+
+**7. Why do clocked blocks use `<=` and not `=`? What goes wrong in a design with two registers that swap their values (`a <= b; b <= a;`) if you write `=`?**
+
+Worked answer: non-blocking assignments sample every right-hand side with the values from before the clock edge and update all the registers together afterwards, as real flip-flops do. With `a = b; b = a;` the first statement overwrites `a` immediately, so the second copies the *new* `a`, and both registers end up holding the old `b`: the swap is lost. With `<=` both read the old values and the registers really exchange them.
+
+**8. The asynchronous-reset mutant of the counter is caught only because the testbench checks `wrap`. Explain why a test that checked only `q` after the clock edge would have missed it.**
+
+Worked answer: the testbench raises `rst` in the middle of a cycle and samples `q` after the next rising edge. By then both the synchronous circuit (which resets at the edge) and the asynchronous one (which reset earlier) show `q = 0`, so they look identical. They differ only in *when* `q` changed, which is visible in the combinational output `wrap = en && q == 15`: in the asynchronous circuit it drops immediately when `rst` rises, in the synchronous one it stays until the edge. Only a check of `wrap` before the edge sees the difference.
+
+## Chapter 1 -- hints for the exercises
+
+1. 65,536 x 2 = 131,072 cases: still exhaustive and still fast; the 8-bit settling time in the delayed model would be 8 stages' worth.
+2. A decade counter's wrap condition is `q == 9`; mutants worth adding: wraps at 10, wraps at 15 (not changed from the original), reset loads 9.
+3. A reasonable priority is rst, then load, then en; the mutants are each swap of that order, and a missing `load` case.
+4. For the 8-bit-input adder there is no input that is not tested; for a 16-bit adder with 1,000 random cases, a mutant that breaks only when `a == 16'hFFFF && b == 16'h0001` is untouched by random testing with overwhelming probability.

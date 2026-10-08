@@ -1,0 +1,21 @@
+== the waveform of ripple_tb (time in ns; each column is 1 ns; '=' means 'unchanged'; # is 1, _ is 0)
+
+                0         1         2            (time, tens)
+ripple_tb.a     0=========7=========F=========
+ripple_tb.b     0=========1===================
+ripple_tb.cin   ______________________________
+ripple_tb.sum   ??0========6408======0========
+ripple_tb.cout  ?____________________#########
+ripple_tb.c     ?0=========26E=======1E========
+
+every change of `sum`: [(2, 0), (11, 6), (12, 4), (13, 0), (14, 8), (21, 0)]
+
+== the same thing worked out by hand: 0111 + 0001, each full adder takes 1 ns (the carry out of a stage and its sum bit both appear 1 ns after its inputs settle)
+  t=10: the inputs change to a=0111, b=0001. Every stage computes at once with the carries it sees NOW (all still 0):
+        stage 0: 1+1+0 -> sum 0, carry 1;  stage 1: 1+0+0 -> sum 1;  stage 2: 1+0+0 -> sum 1;  stage 3: 0+0+0 -> sum 0
+  t=11: those results appear: sum = 0110 (6) -- a WRONG intermediate value. Carry c1 = 1 is now visible to stage 1.
+  t=12: stage 1 redoes its sum with carry-in 1: 1+0+1 -> sum 0, carry 1. sum = 0100 (4). c2 = 1 reaches stage 2.
+  t=13: stage 2: 1+0+1 -> sum 0, carry 1.  sum = 0000 (0). c3 = 1 reaches stage 3.
+  t=14: stage 3: 0+0+1 -> sum 1.  sum = 1000 (8), the correct answer, FOUR nanoseconds after the inputs changed.
+  For 4 ns the output held wrong values: 6, 4, 0, then 8. A circuit whose output is sampled before t=14 (a clock period shorter than the carry chain) would read a wrong one of them.
+  That is what 'timing' means; Chapter 10 measures it for the whole chip.

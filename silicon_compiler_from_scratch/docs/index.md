@@ -13,12 +13,13 @@ This book builds a small neural-network accelerator the way a chip team would, i
 
 | Part | Chapters | What you end up with |
 |---|---|---|
-| The flow | 1 | One circuit through four tools, and a way to test the tests |
-| The arithmetic | 2, 3 | An int8 multiply-accumulate unit, and the quantization arithmetic around it |
-| The datapath | 4, 5, 6 | A systolic array, a scratchpad with a DMA engine, and exp, reciprocal and softmax hardware |
-| The machine | 7, 8 | An instruction set, a sequencer that runs it, and attention with a KV cache |
-| The system | 9, 10 | Batching and a bandwidth (roofline) analysis; synthesis and gate-level simulation |
-| The compiler | 11, 12 | A compiler from a model graph to the chip's instructions, and a transformer decode step run end to end on the simulated silicon |
+| **1. Foundations** | 1-3 | The build-simulate-synthesize-mutate loop on one small circuit; an int8 multiply-accumulate unit with its overflow behaviour; the quantization arithmetic and the requantizer that connects layers |
+| **2. The Compute Engine** | 4-6 | A systolic array; a scratchpad, a DMA engine and double buffering; exp, reciprocal and softmax hardware |
+| **3. The Whole Chip** | 7-9 | An instruction set, a sequencer and a chip that runs programs; attention with a KV cache; batching and a roofline analysis of why decoding is slow |
+| **4. From Verilog to Gates** | 10 | Synthesis to a cell library, a timing analyzer, gate-level simulation, fault grading and equivalence checking |
+| **5. Compilation** | 11-12 | Capra, a compiler from a model graph to the chip's instructions; a tiny transformer decoding tokens on the simulated silicon |
+| **6. Case Studies** *(in progress)* | 13-17 | Industrial techniques built and tested on the stack: int4 weight-only quantization, grouped-query attention, paged KV cache with a sliding window, speculative decoding, mixture-of-experts routing |
+| **Appendices** *(in progress)* | A-G | Primers: digital logic, Verilog, number formats, linear algebra for ML, transformers and LLM inference, memory systems, the EDA flow |
 
 **The rules of the book**
 

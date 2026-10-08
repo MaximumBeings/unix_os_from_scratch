@@ -51,16 +51,21 @@ plugins:
 nav:
   - Home: index.md
   - Getting Started: getting-started.md
-  - "1. The Flow: One Circuit Through Four Tools, and a Way to Test the Tests": part01/01-the-flow.md
-  - "2. The MAC and Number Formats: Two's Complement, Overflow, and the Tests That Found Three Holes": part02/02-mac-and-number-formats.md
-  - "3. Quantization: int8 Numbers, the Requantizer, and What Accuracy It Costs": part03/03-quantization.md
-  - "4. The Systolic Array: N x N Multiplies Per Cycle, and the Schedule That Makes It Work": part04/04-systolic-array.md
-  - "5. The Scratchpad, the DMA Engine, and Double Buffering": part05/05-scratchpad-dma.md
-  - "6. The Vector Unit: A Lookup-Table Exponential, a Divider, and Fixed-Point Softmax": part06/06-vector-unit-softmax.md
-  - "7. GA-2: An Instruction Set, a Sequencer, and the Whole Chip": part07/07-the-whole-chip.md
-  - "8. Attention and the KV Cache: One Decode Step, From Hidden State to Output": part08/08-attention-kv-cache.md
-  - "9. Batching and Bandwidth: Why Decoding Is Slow, and What Helps": part09/09-batching-and-bandwidth.md
-  - "10. Synthesis, Timing and Gate-Level Verification": part10/10-synthesis-and-gate-level.md
-  - "11. Capra, the Compiler: From a Tensor Graph to GA-2 Instructions": part11/11-the-compiler.md
-  - "12. Capstone: A Tiny Transformer Decodes on the Chip": part12/12-capstone.md
+  - "Part 1 -- Foundations: Numbers, Circuits, and the Test Loop":
+      - "1. The Flow: One Circuit Through Four Tools, and a Way to Test the Tests": part01/01-the-flow.md
+      - "2. The MAC and Number Formats: Two's Complement, Overflow, and the Tests That Found Three Holes": part02/02-mac-and-number-formats.md
+      - "3. Quantization: int8 Numbers, the Requantizer, and What Accuracy It Costs": part03/03-quantization.md
+  - "Part 2 -- The Compute Engine: Arrays, Memory and Vectors":
+      - "4. The Systolic Array: N x N Multiplies Per Cycle, and the Schedule That Makes It Work": part04/04-systolic-array.md
+      - "5. The Scratchpad, the DMA Engine, and Double Buffering": part05/05-scratchpad-dma.md
+      - "6. The Vector Unit: A Lookup-Table Exponential, a Divider, and Fixed-Point Softmax": part06/06-vector-unit-softmax.md
+  - "Part 3 -- The Whole Chip: Instructions, Attention and Throughput":
+      - "7. GA-2: An Instruction Set, a Sequencer, and the Whole Chip": part07/07-the-whole-chip.md
+      - "8. Attention and the KV Cache: One Decode Step, From Hidden State to Output": part08/08-attention-kv-cache.md
+      - "9. Batching and Bandwidth: Why Decoding Is Slow, and What Helps": part09/09-batching-and-bandwidth.md
+  - "Part 4 -- From Verilog to Gates: Synthesis and Verification":
+      - "10. Synthesis, Timing and Gate-Level Verification": part10/10-synthesis-and-gate-level.md
+  - "Part 5 -- Compilation: Capra and the Capstone":
+      - "11. Capra, the Compiler: From a Tensor Graph to GA-2 Instructions": part11/11-the-compiler.md
+      - "12. Capstone: A Tiny Transformer Decodes on the Chip": part12/12-capstone.md
   - Answers to the Self-Check Questions: answers.md

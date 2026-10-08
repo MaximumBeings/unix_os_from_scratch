@@ -1,0 +1,48 @@
+== 1. golden model and vectors
+4000 cycles written to out/counter4_vectors.hex
+
+== 2. two simulators
+  Icarus Verilog  PASS: the counter matches the golden model for all 4000 clock cycles (exit status 0) (exit 0)
+  Verilator       PASS: the counter matches the golden model for all 4000 clock cycles (exit status 0) (exit 0)
+
+== 3. a short run as a waveform (clk rising edges at 5, 15, 25, ...; q changes just after an edge)
+time 0-120: reset for two edges, then counting:
+                       0         1         2         3         4         5         6         7         8         9         0         1            (time, tens)
+counter4_wave_tb.clk   _____#####_____#####_____#####_____#####_____#####_____#####_____#####_____#####_____#####_____#####_____#####_____#####
+counter4_wave_tb.rst   ####################____________________________________________________________________________________________________
+counter4_wave_tb.en    ____________________####################################################################################################
+counter4_wave_tb.q     ?====0===================1=========2=========3=========4=========5=========6=========7=========8=========9=========A====
+counter4_wave_tb.wrap  ________________________________________________________________________________________________________________________
+
+time 120-220: the wrap from 15 to 0 (the wrap flag is high during the cycle just BEFORE it), then a hold when enable goes low:
+                       2         3         4         5         6         7         8         9         0         1            (time, tens)
+counter4_wave_tb.clk   _____#####_____#####_____#####_____#####_____#####_____#####_____#####_____#####_____#####_____#####
+counter4_wave_tb.rst   ____________________________________________________________________________________________________
+counter4_wave_tb.en    ######################################################################______________________________
+counter4_wave_tb.q     A====B=========C=========D=========E=========F=========0=========1==================================
+counter4_wave_tb.wrap  _____________________________________________##########_____________________________________________
+
+time 215-300: still holding, counting again, then a reset while enabled (reset wins):
+                            2         3         4         5         6         7         8         9            (time, tens)
+counter4_wave_tb.clk   #####_____#####_____#####_____#####_____#####_____#####_____#####_____#####_____#####
+counter4_wave_tb.rst   _____________________________________________##########______________________________
+counter4_wave_tb.en    _______________######################################################################
+counter4_wave_tb.q     1===================2=========3=========4=========0=========1=========2=========3====
+counter4_wave_tb.wrap  _____________________________________________________________________________________
+
+== 4. what Yosys makes of it
+  generic gates: 13 {'$_ANDNOT_': 2, '$_NAND_': 2, '$_NOT_': 1, '$_OR_': 1, '$_SDFFE_PP0P_': 4, '$_XNOR_': 1, '$_XOR_': 2}
+  iCE40 cells: 13 {'SB_CARRY': 2, 'SB_DFFESR': 4, 'SB_LUT4': 7}
+
+== 5. testing the test: nine broken counters
+  reset is ignored: caught
+  enable is ignored (always counts): caught
+  counts down: caught
+  saturates at 15 instead of wrapping: caught
+  reset loads 1: caught
+  counts by two: caught
+  enable beats reset: caught
+  the wrap flag ignores enable: caught
+  the reset is asynchronous: caught
+
+  9 of 9 broken counters caught
