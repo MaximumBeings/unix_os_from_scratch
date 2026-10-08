@@ -20,7 +20,10 @@ class Graph:
     def __init__(self): self.nodes = []
     def _add(self, op, ins, shape, **a): n = Node(len(self.nodes), op, ins, shape, **a); self.nodes.append(n); return n.id
     def input(self, name, shape): return self._add("input", [], shape, name=name)
-    def weight(self, name, array): return self._add("weight", [], (len(array), len(array[0])), name=name, array=array)
+    def weight(self, name, array, bits=8):
+        """A constant matrix. bits=8: stored as int8, one value per word. bits=4 (Chapter 13): stored as signed 4-bit values packed eight to a 32-bit word in external memory and expanded by an UNPACK instruction after the load."""
+        if bits not in (4, 8): raise CompileError(f"weight {name}: bits must be 4 or 8")
+        return self._add("weight", [], (len(array), len(array[0])), name=name, array=array, bits=bits)
     def matmul(self, a, b, transpose_b=False, scale=1.0):
         (m, k), (k2, n) = self.nodes[a].shape, self.nodes[b].shape[::-1] if transpose_b else self.nodes[b].shape
         if k != k2: raise CompileError(f"matmul shapes {self.nodes[a].shape} x {self.nodes[b].shape}{'^T' if transpose_b else ''}")
@@ -91,6 +94,8 @@ def plan_scales(g, calib, ranges=None):
         r = find(n.id); scale[n.id] = pinned.get(r, (grp_max[r] if grp_max[r] > 0 else 1.0) / 127)
         if r in pinned and rng[n.id] > pinned[r] * 127 * 1.001 and n.op in ("concat", "relu", "input", "weight") and n.id != r:
             notes.append(f"node {n.id} ({n.op}) reaches {rng[n.id]:.3f}, above the {pinned[r]*127:.3f} that its pinned scale can hold: it will saturate")
+    for n in g.nodes:                                      # int4 weights use the range -7..7: the scale is range / 7 (Chapter 13)
+        if n.op == "weight" and n.attrs.get("bits", 8) == 4: scale[n.id] = (rng[n.id] if rng[n.id] > 0 else 1.0) / 7
     return scale, notes
 # ------------------------------------------------------------------ memory allocation
 class Allocator:
@@ -129,7 +134,7 @@ def compile_graph(g, calib, reuse=True, ranges=None):
     def new_buf(size): bufs.append({"size": size, "members": [], "addr": None}); return len(bufs) - 1
     for n in reversed(N):                       # consumers first: a concat's output is placed before its inputs, which become views of it; a fused relu's input shares the relu's place
         if n.op in ("output", "argmax"): continue
-        if n.id not in loc: loc[n.id] = (new_buf(n.shape[0] * n.shape[1]), 0)
+        if n.id not in loc: loc[n.id] = (new_buf(((n.shape[0] * n.shape[1] + 7) // 8) * 8 if n.op == "weight" and n.attrs.get("bits", 8) == 4 else n.shape[0] * n.shape[1]), 0)
         if n.op == "relu":
             if n.ins[0] in loc: raise CompileError(f"node {n.ins[0]} feeds two consumers that need it in different places")
             loc[n.ins[0]] = loc[n.id]
@@ -151,7 +156,9 @@ def compile_graph(g, calib, reuse=True, ranges=None):
     P.ext = {}; ext_top = 0
     # external layout: weights, inputs, outputs
     for n in N:
-        if n.op in ("input", "weight"): P.ext[n.attrs["name"]] = {"addr": ext_top, "shape": n.shape, "node": n.id, "kind": n.op}; ext_top += n.shape[0] * n.shape[1]
+        if n.op in ("input", "weight"):
+            words = (n.shape[0] * n.shape[1] + 7) // 8 if n.op == "weight" and n.attrs.get("bits", 8) == 4 else n.shape[0] * n.shape[1]          # int4 weights are packed eight to a word
+            P.ext[n.attrs["name"]] = {"addr": ext_top, "shape": n.shape, "node": n.id, "kind": n.op, "words": words}; ext_top += words
     for n in N:
         if n.op == "output": P.ext[n.attrs["name"]] = {"addr": ext_top, "shape": n.shape, "node": n.id, "kind": "output"}; ext_top += n.shape[0] * n.shape[1]
     if ext_top > I.EXT: raise CompileError(f"external memory is full ({ext_top} words)")
@@ -163,7 +170,10 @@ def compile_graph(g, calib, reuse=True, ranges=None):
     def ensure(nid):
         n = N[nid]
         if n.op in ("input", "weight") and nid not in loaded:
-            a = addr_of(nid); e = P.ext[n.attrs["name"]]["addr"]; code.append(B("LD", dst=a, src=e, len=n.shape[0] * n.shape[1])); loaded.add(nid)
+            a = addr_of(nid); e = P.ext[n.attrs["name"]]["addr"]; loaded.add(nid)
+            if n.op == "weight" and n.attrs.get("bits", 8) == 4:                       # load the packed words, then expand them into the weight's buffer
+                pw = P.ext[n.attrs["name"]]["words"]; tmp = alloc.alloc(pw); code.append(B("LD", dst=tmp, src=e, len=pw)); code.append(B("UNPACK", dst=a, src=tmp, len=pw)); alloc.release(tmp, pw)
+            else: code.append(B("LD", dst=a, src=e, len=n.shape[0] * n.shape[1]))
         return addr_of(nid)
     P.params = {}
     for n in N:
@@ -212,6 +222,10 @@ def ext_image(P, inputs):
     for name, e in P.ext.items():
         if e["kind"] == "output": continue
         n = G.nodes[e["node"]]; data = n.attrs["array"] if e["kind"] == "weight" else inputs[name]
+        if e["kind"] == "weight" and n.attrs.get("bits", 8) == 4:                          # pack: element 8i + j goes to bits 4j+3..4j of word i
+            flat = [v for row in _q(data, P.scale[n.id]) for v in row]; flat += [0] * (-len(flat) % 8)
+            for i in range(len(flat) // 8): img[e["addr"] + i] = sum((flat[8 * i + j] & 15) << (4 * j) for j in range(8))
+            continue
         for r, row in enumerate(_q(data, P.scale[n.id])):
             for c, v in enumerate(row): img[e["addr"] + r * n.shape[1] + c] = v & 0xFFFFFFFF
     return img
