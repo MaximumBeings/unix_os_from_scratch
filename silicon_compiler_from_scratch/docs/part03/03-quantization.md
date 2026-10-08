@@ -50,7 +50,7 @@ It is combinational (no clock): take the magnitude of `acc`, multiply by `m` (32
 --8<-- "tb/requant_tb.v"
 ```
 
-The key has 201,808 cases: the accumulator at both ends of int32, mantissas at both ends, shifts 0 and 63, **exact ties** at every shift (built so that `acc * m` is exactly `(2k+1) * 2^(s-1)`), results sitting exactly at the clamp limit, and 200,000 random ones, with a third of them having small accumulators so that the interesting rounding region is exercised.
+The key has 201,808 cases: the accumulator at both ends of int32, mantissas at both ends, shifts 0 and 63, **exact ties** at every shift (built so that `acc * m` is exactly `(2k+1) * 2^(s-1)`), results sitting exactly at the clamp limit, and 200,000 random ones, with two thirds of them having small accumulators (below about 2^20 or a few hundred times a power of two) so that the interesting rounding region is exercised.
 
 ## Running it
 
