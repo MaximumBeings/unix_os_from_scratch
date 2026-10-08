@@ -84,4 +84,4 @@ nav:
       - "E. Transformers and LLM Inference": appendix/e-transformers.md
       - "F. Memory Systems and DRAM": appendix/f-memory-systems.md
       - "G. The EDA Flow": appendix/g-eda-flow.md
-  - Answers to the Self-Check Questions: answers.md
+      - "H. Answers to the Self-Check Questions": answers.md

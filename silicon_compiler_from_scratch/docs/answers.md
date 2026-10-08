@@ -1,4 +1,4 @@
-# Answers to the Self-Check Questions
+# Appendix H. Answers to the Self-Check Questions
 
 ![answers](assets/art/answers.svg)
 

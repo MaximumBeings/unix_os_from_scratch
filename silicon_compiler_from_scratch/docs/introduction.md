@@ -93,7 +93,7 @@ The host looks up the token's embedding (the chip has no gather instruction). Th
 | **5. Compilation** | 11 Capra; 12 Capstone | Can a program write the programs? Does the whole stack work together? | a tiny transformer decoding 24 tokens on the chip |
 | **6. Case Studies** | 13 to 17 | How do the techniques of industrial inference (int4 weights, grouped-query attention, paged KV cache, speculative decoding, mixture of experts) fit this stack? | each technique built and tested on the same chip and compiler |
 
-Outside the parts: **Getting Started** (install and verify the tools), **Background** (what Verilog is and what each tool does), the **Appendices** (primers; *in progress*), and the **Answers** to every chapter's self-check questions.
+Outside the parts: **Getting Started** (install and verify the tools), **Background** (what Verilog is and what each tool does), the **Appendices** A to G (primers), and Appendix H, the **Answers** to every chapter's self-check questions.
 
 ## The method: five rules, and the evidence
 
