@@ -173,3 +173,27 @@ Worked answer: the test's external memory has 2048 words, so every address fits 
 **5. Why is the cycle model's constant for `MM` (7) bigger than the ones for the vector units (2 to 6)? Name two things in `ga2_mm.v` that it contains.**
 
 Worked answer: the matrix unit has more phases, and each phase has a pipeline edge and a state change: after loading A there is a cycle to drain the last read and switch state, the same after loading B, there is the PRE cycle that clears the array, the transition from streaming to storing, and the FIN state that raises done. Any two of these (read off the state machine, not separately measured): the idle cycle between LA and LB, the PRE (clear) cycle, the FIN cycle.
+
+---
+
+## Chapter 8
+
+**1. Why does a decode step need no causal mask?**
+
+Worked answer: the cache holds only the tokens generated so far, including the new one. Attention to "later" tokens is impossible because they do not exist yet. A mask is needed when many positions are computed at once (prefill, training), where the rows for later tokens are present in the same matrices and must be hidden.
+
+**2. A model has 24 layers, 16 heads of width 64 and an fp16 cache. How many bytes per token and for a 2,048-token context?**
+
+Worked answer: per token = 2 (K and V) x 24 x 16 x 64 x 2 bytes = 98,304 bytes (96 KiB). For 2,048 tokens: 98,304 x 2,048 = 201,326,592 bytes = 192 MiB per sequence.
+
+**3. In the cached program at L = 32, 12 of the 24 `MM` instructions do not depend on the context length. Which ones, and what is their total cycle cost?**
+
+Worked answer: the projections of the new token: 4 each for q, k and v (output width 16 in blocks of 4, `M = 1, K = 16, N = 4`). Each costs `16 + 64 + 19 + 4 + 7 = 110` busy cycles plus 2 for fetch and issue = 112, so 12 x 112 = 1,344 cycles, about 26% of the 5,251-cycle step. (The other 12 MMs, the score tiles and the output tiles, do depend on L.)
+
+**4. Why does the exact integer reference miss "q requantization scale is 3% too large" while the stage-wise check catches it?**
+
+Worked answer: the reference calls `rq_params` for its scales, just as the builder does, so a bug in `rq_params` changes both outputs identically and they remain equal. The stage-wise check never calls `rq_params`: it recomputes each stage from the real-valued meaning of the scales (q should equal the product of the quantized inputs times scale_x times scale_w divided by scale_q), so a 3% error moves some values by several levels, and it reports them.
+
+**5. Why can no single-step test catch "the new key is never appended to the cache"?**
+
+Worked answer: the append writes the new key to external memory for use by the *following* step; within the step itself the new key is already in the scratchpad, so the output of this step is the same with or without the append. Only a test that runs a second step reading the cache the first step wrote can see it. That is why `sequence()` runs whole decode loops with the external memory persisting from step to step.

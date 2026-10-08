@@ -1,0 +1,19 @@
+== 1. error added by each quantization step (cumulative), L = 16, 60 random examples
+stage                                   mean error    worst
+all floating point                           0.00%    0.00%
++ int8 inputs and weights                    1.69%    4.87%
++ int8 q, k, v                               1.96%    5.74%
++ scores rounded to 1/16 (Q4.4)              2.43%    6.52%
++ integer softmax (table, divider)           2.43%    6.52%
++ int8 attention weights                     3.50%    8.25%
++ int8 output                                3.47%    8.52%
+
+== 2. the real int8 GA-2 pipeline (reference simulator) against floating point, by context length (30 examples each)
+  L  mean error    worst
+  1       1.02%    1.98%
+  2       1.68%    3.81%
+  4       2.36%    7.24%
+  8       2.63%    5.22%
+ 16       3.30%    6.30%
+ 24       4.68%   11.39%
+ 32       4.59%    8.04%

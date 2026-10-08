@@ -4,11 +4,14 @@
 `ifndef MAXPRINT
  `define MAXPRINT 5
 `endif
+`ifndef EXTW
+ `define EXTW 2048
+`endif
 `ifndef LAT
  `define LAT 8
 `endif
 module ga2_tb;
-    localparam EXT = 2048, LAT = `LAT;
+    localparam EXT = `EXTW, LAT = `LAT;
     reg clk = 0, rst = 1, start = 0; wire halted; wire [15:0] imem_addr; wire [127:0] imem_data;
     wire req_valid; wire [15:0] req_addr; wire resp_valid; wire [31:0] resp_data; wire wr_valid; wire [15:0] wr_addr; wire [31:0] wr_data;
     wire [31:0] cyc_total, cyc_mm, cyc_dma, cyc_vec, n_inst;

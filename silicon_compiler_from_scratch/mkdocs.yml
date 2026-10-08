@@ -58,4 +58,5 @@ nav:
   - "5. The Scratchpad, the DMA Engine, and Double Buffering": part05/05-scratchpad-dma.md
   - "6. The Vector Unit: A Lookup-Table Exponential, a Divider, and Fixed-Point Softmax": part06/06-vector-unit-softmax.md
   - "7. GA-2: An Instruction Set, a Sequencer, and the Whole Chip": part07/07-the-whole-chip.md
+  - "8. Attention and the KV Cache: One Decode Step, From Hidden State to Output": part08/08-attention-kv-cache.md
   - Answers to the Self-Check Questions: answers.md

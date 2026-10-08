@@ -1,0 +1,66 @@
+== 1. the 'cached' program for the third token (L = 3), as assembled
+
+  0  LD   dst=0 src=32 len=16
+  1  LD   dst=512 src=512 len=768
+  2  LD   dst=1792 src=2048 len=32
+  3  LD   dst=2304 src=2560 len=32
+  4  MM   dst=2816 A=0 B=512 M=1 K=16 N=4 tb=0 lda=16 ldb=16 ldc=4
+  5  MM   dst=2820 A=0 B=516 M=1 K=16 N=4 tb=0 lda=16 ldb=16 ldc=4
+  6  MM   dst=2824 A=0 B=520 M=1 K=16 N=4 tb=0 lda=16 ldb=16 ldc=4
+  7  MM   dst=2828 A=0 B=524 M=1 K=16 N=4 tb=0 lda=16 ldb=16 ldc=4
+  8  MM   dst=3008 A=0 B=768 M=1 K=16 N=4 tb=0 lda=16 ldb=16 ldc=4
+  9  MM   dst=3012 A=0 B=772 M=1 K=16 N=4 tb=0 lda=16 ldb=16 ldc=4
+ 10  MM   dst=3016 A=0 B=776 M=1 K=16 N=4 tb=0 lda=16 ldb=16 ldc=4
+ 11  MM   dst=3020 A=0 B=780 M=1 K=16 N=4 tb=0 lda=16 ldb=16 ldc=4
+ 12  MM   dst=3024 A=0 B=1024 M=1 K=16 N=4 tb=0 lda=16 ldb=16 ldc=4
+ 13  MM   dst=3028 A=0 B=1028 M=1 K=16 N=4 tb=0 lda=16 ldb=16 ldc=4
+ 14  MM   dst=3032 A=0 B=1032 M=1 K=16 N=4 tb=0 lda=16 ldb=16 ldc=4
+ 15  MM   dst=3036 A=0 B=1036 M=1 K=16 N=4 tb=0 lda=16 ldb=16 ldc=4
+ 16  RQ   dst=2832 src=2816 len=16 m=14805262 s=31 relu=0
+ 17  RQ   dst=1824 src=3008 len=16 m=14169786 s=31 relu=0
+ 18  RQ   dst=2336 src=3024 len=16 m=10052026 s=31 relu=0
+ 19  ST   src=1824 dst=2080 len=16
+ 20  ST   src=2336 dst=2592 len=16
+ 21  MM   dst=2848 A=2832 B=1792 M=1 K=16 N=3 tb=1 lda=16 ldb=16 ldc=4
+ 22  RQ   dst=2880 src=2848 len=3 m=8883301 s=33 relu=0
+ 23  SM   dst=2912 src=2880 len=3
+ 24  RQ   dst=2944 src=2912 len=3 m=16646144 s=33 relu=0
+ 25  MM   dst=2976 A=2944 B=2304 M=1 K=3 N=4 tb=0 lda=3 ldb=16 ldc=4
+ 26  MM   dst=2980 A=2944 B=2308 M=1 K=3 N=4 tb=0 lda=3 ldb=16 ldc=4
+ 27  MM   dst=2984 A=2944 B=2312 M=1 K=3 N=4 tb=0 lda=3 ldb=16 ldc=4
+ 28  MM   dst=2988 A=2944 B=2316 M=1 K=3 N=4 tb=0 lda=3 ldb=16 ldc=4
+ 29  RQ   dst=2992 src=2976 len=16 m=8670777 s=29 relu=0
+ 30  ST   src=2992 dst=3072 len=16
+ 31  HALT
+
+32 instructions; the same step without a cache ('recompute') is 28.
+
+== 2. both programs for L = 2, 4, 8, 16, 32 on the circuit (the last step of a decode loop, example seed 1), against the reference simulator
+  Icarus    PASS: 10 programs match the Python reference (memory and all five cycle counters), 53292 cycles in total (exit status 0) (exit 0)
+  Verilator PASS: 10 programs match the Python reference (memory and all five cycle counters), 53292 cycles in total (exit status 0) (exit 0)
+
+== 3. what the KV cache saves (cycle counters read from the circuit; the two programs give identical outputs at every step)
+  L program    instr   total  matrix    DMA  vector    cycles saved by the cache
+  2 cached        31    2601    1498    906     133    1.05x faster than recompute
+  2 recompute     27    2723    1666    836     165                             
+  4 cached        31    2759    1582    970     143    1.18x faster than recompute
+  4 recompute     27    3249    2086    868     239                             
+  8 cached        32    3115    1788   1098     163    1.63x faster than recompute
+  8 recompute     36    5069    3676    932     387                             
+ 16 cached        34    3827    2200   1354     203    2.28x faster than recompute
+ 16 recompute     54    8709    6856   1060     683                             
+ 32 cached        38    5251    3024   1866     283    3.04x faster than recompute
+ 32 recompute     90   15989   13216   1316    1275                             
+
+== 4. where the cycles go in one cached step at L = 32 (from the cycle model, whose totals match the circuit's counters above)
+  MM     24 instructions   3072 cycles  58.5%
+  LD      4 instructions   1820 cycles  34.7%
+  RQ      6 instructions    152 cycles   2.9%
+  SM      1 instructions    145 cycles   2.8%
+  ST      3 instructions     60 cycles   1.1%
+  total 5249 cycles
+
+== 5. how big is a KV cache? (derived arithmetic, not measured)
+GA-2 head: 2 (K and V) x 16 (head width) x 1 byte (int8) = 32 bytes per token; a 32-token context holds 1024 bytes.
+a 7B-class transformer (32 layers x 32 heads x 128), fp16: 524,288 bytes per token = 512 KiB; a 4096-token context = 2.00 GiB
+the same with an int8 cache: 262,144 bytes per token = 256 KiB; a 4096-token context = 1.00 GiB

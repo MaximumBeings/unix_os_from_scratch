@@ -19,7 +19,8 @@ import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from quant import requant
 from softmax_gold import softmax_fixed
-SPAD, EXT = 4096, 2048
+SPAD = 4096
+EXT = int(os.environ.get("GA2_EXT", "2048"))      # external memory words; Chapter 7's tests use 2048, the attention programs of Chapter 8 use 8192
 OPS = {"HALT": 0, "LD": 1, "ST": 2, "MM": 3, "RQ": 4, "SM": 5, "VADD": 6, "AMAX": 7}
 NAMES = {v: k for k, v in OPS.items()}
 FIELDS = {"a": (123, 16), "b": (107, 16), "c": (91, 16), "d": (75, 24), "e": (51, 6), "f": (45, 8), "g": (37, 8), "h": (29, 8), "fl": (21, 4), "x": (17, 18)}

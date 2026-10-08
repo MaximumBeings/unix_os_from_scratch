@@ -1,0 +1,31 @@
+NOTE: this script deliberately breaks copies of the program builder. 'caught' is EXPECTED: it shows the checks notice the mistake.
+                                                                    (b) accuracy   (c) exact  (d) stagewise
+scores: the 1/sqrt(d) factor is left out                                  caught  NOT CAUGHT         caught
+scores: the factor 16 (Q4.4 input of the softmax) is left out             caught  NOT CAUGHT         caught
+weights: the factor 127 is left out                                       caught  NOT CAUGHT         caught
+output: the scale leaves out the 127                                      caught  NOT CAUGHT         caught
+output: uses the key scale instead of the value scale                     caught  NOT CAUGHT         caught
+q projection is requantized with the key weights' scale                   caught  NOT CAUGHT         caught
+q requantization scale is 3% too large                                NOT CAUGHT  NOT CAUGHT         caught
+output requantization scale is 2% too large                           NOT CAUGHT  NOT CAUGHT         caught
+keys are read without the transpose                                       caught      caught         caught
+values are read transposed                                                caught      caught         caught
+the value matrix stride is 4 instead of d                                 caught      caught         caught
+score tiles step through the keys by 4 words, not 4 rows                  caught      caught         caught
+the new key is written one row past the cache end                         caught      caught         caught
+the new key is never appended to the cache                                caught      caught         caught
+the new value is appended to the key cache                                caught      caught         caught
+the key cache load is one row short                                       caught      caught         caught
+the new token's hidden state is read from row 0                           caught      caught         caught
+the softmax covers one position too few                                   caught      caught         caught
+the weights are requantized with the scores' parameters                   caught      caught         caught
+the q projection uses the K weights                                       caught      caught         caught
+recompute: V is projected with the K weights                              caught      caught         caught
+the output requantization covers 8 of 16 values                           caught      caught         caught
+the output is stored from the int32 accumulators                          caught      caught     NOT CAUGHT
+
+caught: (b) accuracy bound 21 of 23;  (c) exact integer reference 15 of 23;  (d) stage-wise real-number check 22 of 23;  by any of them 23 of 23
+
+Changes that look like bugs and are not:
+EQUIVALENT: the last score tile always computes 4 positions (extra scores are never read): NOT CAUGHT
+EQUIVALENT: the last projection block always computes 4 rows (extra rows are never read): NOT CAUGHT
