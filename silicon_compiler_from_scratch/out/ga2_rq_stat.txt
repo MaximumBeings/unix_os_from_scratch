@@ -1,0 +1,29 @@
+
+18. Printing statistics.
+
+=== ga2_rq ===
+
+   Number of wires:               5751
+   Number of wire bits:           6045
+   Number of public wires:          19
+   Number of public wire bits:     313
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:               5858
+     AND2                          212
+     AOI21                         385
+     DFF                            94
+     INV                           358
+     MUX2                          212
+     NAND2                        1315
+     NAND3                         235
+     NOR2                          678
+     NOR3                          111
+     OAI21                         455
+     OR2                           131
+     XNOR2                         970
+     XOR2                          702
+
+   Chip area for module '\ga2_rq': 8918.810000
+

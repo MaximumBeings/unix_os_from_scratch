@@ -1,0 +1,42 @@
+== 1. the toy cell library (lib/toy.lib, made by tools/gen_toylib.py): area in NAND2 equivalents, delay in ns
+  BUF    area   1.0   delay 0.08 ns
+  INV    area  0.67   delay 0.04 ns
+  NAND2  area   1.0   delay 0.07 ns
+  NOR2   area   1.0   delay 0.09 ns
+  AND2   area  1.33   delay 0.11 ns
+  OR2    area  1.33   delay 0.13 ns
+  XOR2   area   2.0   delay 0.16 ns
+  XNOR2  area   2.0   delay 0.16 ns
+  NAND3  area   1.5   delay 0.1 ns
+  NOR3   area   1.5   delay 0.13 ns
+  AOI21  area  1.67   delay 0.11 ns
+  OAI21  area  1.67   delay 0.11 ns
+  MUX2   area  2.33   delay 0.18 ns
+  DFF    area   5.0   delay 0.3 ns
+
+== 2. is the timing analyzer right? a hand-built circuit: y = INV(NAND2(INV(a), a)); q = DFF(NAND2(...)); z = INV(q)
+  by hand: y path 0.04+0.07+0.04 = 0.15, +0.10 setup = 0.25; flop path 0.11+0.10 = 0.21; clock-to-q 0.30 + INV 0.04 + 0.10 = 0.44 -> worst 0.44 ns at output z
+  analyzer: 0.44 ns at output z
+
+== 3. synthesize every unit and the whole chip (memories stay as macros)
+unit         cells  area (GE)  flip-flops  critical path  gate depth  max clock  critical endpoint
+exp_lut        376        522           0        1.16 ns           8     862 MHz  output e
+divu          1254       2639         249        2.06 ns          14     485 MHz  $auto$ff.cc:266:slice$865.D
+requant       5403       7881           0        9.87 ns          79     101 MHz  output q
+systolic     15736      26062         704        5.22 ns          40     192 MHz  $auto$ff.cc:266:slice$1027.D
+ga2_st         427        884          67        2.11 ns          16     474 MHz  $auto$ff.cc:266:slice$769.D
+ga2_rq        5858       8919          94        9.92 ns          80     101 MHz  output wd
+ga2_vadd       594       1230          93        2.31 ns          17     433 MHz  output ra
+ga2_amax       576       1248         108        2.06 ns          16     485 MHz  output ra
+ga2_sm        4832       8065         309        5.03 ns          39     199 MHz  $auto$ff.cc:266:slice$2800.D
+ga2_mm       12168      21150         875        5.94 ns          45     168 MHz  $auto$ff.cc:266:slice$3915.D
+ga2          30997      52334        1899       10.74 ns          83      93 MHz  sp.wdata
+
+== 4. gate-level simulation of the whole chip: the SAME testbench and program suite, now driving the netlist of toy cells (memories as behavioural macros)
+78 programs written to out/ga2_programs.hex (18 directed, 60 random) (78 programs)
+  Verilator, netlist, all 78 programs        : PASS: 78 programs match the Python reference (memory and all five cycle counters), 219583 cycles in total (exit status 0) (exit 0)
+30 programs written to out/ga2_programs.hex (18 directed, 12 random) (30 programs, for the slower runs below)
+  Icarus (4-state), flip-flops start as x     : MISMATCH program 0 ext[1024]: got 0 want fffffff9 (exit 1)
+  Icarus (4-state), flip-flops start at 0     : PASS: 30 programs match the Python reference (memory and all five cycle counters), 60832 cycles in total (exit status 0) (exit 0)
+  Verilator, random power-up state, seed 1  : PASS: 30 programs match the Python reference (memory and all five cycle counters), 60832 cycles in total (exit status 0) (exit 0)
+  Verilator, random power-up state, seed 2  : PASS: 30 programs match the Python reference (memory and all five cycle counters), 60832 cycles in total (exit status 0) (exit 0)

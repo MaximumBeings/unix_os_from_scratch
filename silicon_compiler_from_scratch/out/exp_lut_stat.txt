@@ -1,0 +1,28 @@
+
+18. Printing statistics.
+
+=== exp_lut ===
+
+   Number of wires:                362
+   Number of wire bits:            384
+   Number of public wires:           2
+   Number of public wire bits:      24
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                376
+     AND2                           14
+     AOI21                          49
+     INV                             9
+     MUX2                           23
+     NAND2                          75
+     NAND3                          27
+     NOR2                           61
+     NOR3                           41
+     OAI21                          58
+     OR2                            16
+     XNOR2                           1
+     XOR2                            2
+
+   Chip area for module '\exp_lut': 522.210000
+

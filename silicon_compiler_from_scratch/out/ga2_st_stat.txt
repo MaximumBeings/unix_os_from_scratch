@@ -1,0 +1,29 @@
+
+18. Printing statistics.
+
+=== ga2_st ===
+
+   Number of wires:                349
+   Number of wire bits:            623
+   Number of public wires:          16
+   Number of public wire bits:     279
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                427
+     AND2                           17
+     AOI21                          25
+     DFF                            67
+     INV                            25
+     MUX2                           42
+     NAND2                          38
+     NAND3                          11
+     NOR2                           61
+     NOR3                           25
+     OAI21                          18
+     OR2                            13
+     XNOR2                          59
+     XOR2                           26
+
+   Chip area for module '\ga2_st': 884.320000
+

@@ -13,11 +13,11 @@ def lib_delays():
     for m in re.finditer(r"cell\((\w+)\) \{(.*?)\n  \}", txt, re.S):
         v = re.search(r'cell_rise\(scalar\) \{ values\("([\d.]+)"\)', m.group(2)); d[m.group(1)] = float(v.group(1)) if v else None
     return d
-def synth(files, top, tag, memories=()):
+def synth(files, top, tag, memories=(), lib="lib/toy.lib"):
     out = os.path.join(ROOT, "out"); script = []
     if memories: script.append("read_verilog -sv -lib " + " ".join(memories))
-    script += ["read_verilog -sv " + " ".join(files), f"hierarchy -top {top}", f"synth -flatten -top {top}", "dfflegalize -cell $_DFF_P_ x", "dfflibmap -liberty lib/toy.lib", "abc -liberty lib/toy.lib", "opt_clean -purge",
-               f"tee -o out/{tag}_stat.txt stat -liberty lib/toy.lib", f"write_verilog -noattr out/{tag}_net.v", f"write_json out/{tag}_net.json"]
+    script += ["read_verilog -sv " + " ".join(files), f"hierarchy -top {top}", f"synth -flatten -top {top}", "dfflegalize -cell $_DFF_P_ x", f"dfflibmap -liberty {lib}", f"abc -liberty {lib}", "opt_clean -purge",
+               f"tee -o out/{tag}_stat.txt stat -liberty {lib}", f"write_verilog -noattr out/{tag}_net.v", f"write_json out/{tag}_net.json"]
     p = subprocess.run(["yosys", "-q", "-l", f"out/{tag}_synth.log", "-p", "; ".join(script)], cwd=ROOT, capture_output=True, text=True)
     if p.returncode != 0: return {"ok": False, "log": p.stdout + p.stderr}
     stat = open(os.path.join(out, f"{tag}_stat.txt")).read()

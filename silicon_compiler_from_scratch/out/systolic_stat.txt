@@ -1,0 +1,29 @@
+
+18. Printing statistics.
+
+=== systolic ===
+
+   Number of wires:              15061
+   Number of wire bits:          15802
+   Number of public wires:          29
+   Number of public wire bits:     770
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:              15736
+     AND2                          617
+     AOI21                        1101
+     DFF                           704
+     INV                           634
+     MUX2                            1
+     NAND2                        2831
+     NAND3                         159
+     NOR2                         2051
+     NOR3                          273
+     OAI21                        1367
+     OR2                           527
+     XNOR2                        2967
+     XOR2                         2504
+
+   Chip area for module '\systolic': 26062.190000
+

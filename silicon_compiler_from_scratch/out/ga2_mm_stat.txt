@@ -1,0 +1,32 @@
+
+18. Printing statistics.
+
+=== ga2_mm ===
+
+   Number of wires:              11307
+   Number of wire bits:          12398
+   Number of public wires:          70
+   Number of public wire bits:    1161
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:              12168
+     AND2                          770
+     AOI21                         744
+     DFF                           875
+     INV                           593
+     MUX2                          638
+     NAND2                        1944
+     NAND3                         321
+     NOR2                         1761
+     NOR3                          299
+     OAI21                         800
+     OR2                           264
+     XNOR2                        1859
+     XOR2                         1292
+     rowmem                          8
+
+   Area for cell type \rowmem is unknown!
+
+   Chip area for module '\ga2_mm': 21149.550000
+

@@ -1,0 +1,29 @@
+
+18. Printing statistics.
+
+=== ga2_sm ===
+
+   Number of wires:               4511
+   Number of wire bits:           5069
+   Number of public wires:          30
+   Number of public wire bits:     588
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:               4832
+     AND2                          174
+     AOI21                         391
+     DFF                           309
+     INV                           292
+     MUX2                          211
+     NAND2                        1025
+     NAND3                         110
+     NOR2                          635
+     NOR3                          112
+     OAI21                         394
+     OR2                            91
+     XNOR2                         636
+     XOR2                          452
+
+   Chip area for module '\ga2_sm': 8064.670000
+
