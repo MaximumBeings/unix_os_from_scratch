@@ -1,0 +1,25 @@
+program (assembled by hand):
+ld   dst=0   src=0 len=12
+mm   dst=100 A=0 B=6 M=2 K=3 N=2 lda=3 ldb=2 ldc=2
+rq   dst=110 src=100 len=4 m=8388608 s=23 relu=1
+amax dst=120 src=110 len=4
+st   src=110 dst=24 len=4
+st   src=120 dst=28 len=1
+halt
+
+what the circuit's sequencer did (cycle numbers are the circuit's own counter at the start of each state):
+ pc  instruction                                       FETCH  ISSUE   DONE   busy(measured)  busy(model)  agree
+  0  LD   dst=0 src=0 len=12                               0      1     22           21           21    yes
+  1  MM   dst=100 A=0 B=6 M=2 K=3 N=2 tb=0 lda=3 ldb=2 ldc=2   23     24     52           28           28    yes
+  2  RQ   dst=110 src=100 len=4 m=8388608 s=23 relu=1     53     54     60            6            6    yes
+  3  AMAX dst=120 src=110 len=4                           61     62     69            7            7    yes
+  4  ST   src=110 dst=24 len=4                            70     71     77            6            6    yes
+  5  ST   src=120 dst=28 len=1                            78     79     82            3            3    yes
+
+HALT: fetched at cycle 83, issued at 84; the total counter reads 85  (model: 85)
+counters [total, mm, dma, vec, n_inst]  circuit: [85, 28, 30, 13, 6]   model: [85, 28, 30, 13, 6]
+
+external memory after the program (non-zero words at addresses >= 16): circuit {24: 4, 25: 5, 26: 10, 27: 11, 28: 3}  reference {24: 4, 25: 5, 26: 10, 27: 11, 28: 3}  -> identical
+
+reading it: each instruction costs 1 (FETCH) + 1 (ISSUE) + its busy time. The matrix multiply (mm) is 28 cycles for a 2x3 by 3x2 product, of which only K+M+N-2 = 5 are the array computing:
+the rest is staging the tiles in (M*K + K*N = 12 ) and writing the result out (M*N = 4 ), plus control. The load (ld) of 12 words costs 21 = 12 + latency 8 + 1: the memory latency is paid once.

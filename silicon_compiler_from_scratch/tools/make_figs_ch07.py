@@ -38,8 +38,8 @@ f = Fig(900, 300, "Sequencer states"); f.text(450, 22, "Every instruction: FETCH
 for k, (n, s_, fl, st) in enumerate((("IDLE", "start = 0", C["gray2"], C["gray"]), ("FETCH", "read imem[pc]\n1 cycle", C["blue2"], C["blue"]), ("ISSUE", "pulse start to the\nunit named by op\n1 cycle", C["orange2"], C["orange"]), ("WAIT", "until unit_done\nbusy cycles", C["green2"], C["green"]), ("HALT", "op = 0:\nhalted = 1", C["red2"], C["red"]))):
     x = 20 + k * 175; f.box(x, 70, 130, 56, [n], fl, st, 15, True); f.lines(x + 65, 148, s_.split("\n"), 11, C["line"], lh=14)
     if k < 4: f.arrow(x + 132, 98, x + 172, 98, C["ink"], 2.2)
-f.path("M610,70 C610,20 255,20 255,68", "none", C["green"], 2.2, "6 4"); f.poly([(255, 70), (250, 60), (260, 60)], C["green"]); f.text(430, 36, "unit_done: pc <- pc + 1, fetch the next instruction", 12, C["green"], bold=True)
-f.path("M610,126 C610,200 835,200 835,128", "none", C["red"], 2); f.text(722, 214, "op == HALT (issue)", 11.5, C["red"], bold=True)
+f.path("M610,70 C610,36 255,36 255,68", "none", C["green"], 2.2, "6 4"); f.poly([(255, 70), (250, 60), (260, 60)], C["green"]); f.text(432, 62, "unit_done: pc <- pc + 1", 11.5, C["green"], bold=True) if False else f.text(432, 55, "unit_done: pc + 1, next fetch", 12, C["green"], bold=True)
+f.path("M440,128 C440,210 835,210 835,128", "none", C["red"], 2); f.text(640, 224, "op == HALT (issue)", 11.5, C["red"], bold=True)
 f.lines(450, 260, ["total cycles of a program = sum over instructions of (2 + busy time of the unit) + 2 for the final HALT", "(the counters cyc_total, cyc_mm, cyc_dma, cyc_vec and n_inst record exactly this)"], 12, C["ink"], lh=18); f.save(f"{OUT}/ch07-fsm.svg")
 # 7.4 trace timeline (example A)
 rows = A["rows"]; f = Fig(900, 340, "Timeline of Running example A"); f.text(450, 22, f"What the circuit did, instruction by instruction ({A['total']} cycles in all), from the trace", 14, bold=True)
@@ -57,7 +57,7 @@ for nm, c, fl, st in parts: f.box(x, 60, c * sc, 56, [str(c)], fl, st, 16, True,
 f.lines(450, 190, ["staging = M*K + K*N  (copy the two tiles into the operand memories, one scratchpad word per cycle)", "streaming = K+M+N-2  (the skewed schedule of Chapter 4, here for an M x N array region)", "writing = M*N  (one result word per cycle back to the scratchpad)"], 12, C["ink"], lh=19)
 f.text(450, 270, "most of the time is moving data, not multiplying: for large tiles the staging dominates, and this is what Chapter 9's bandwidth analysis measures", 12, C["red"], italic=True); f.save(f"{OUT}/ch07-mm.svg")
 # 7.6 the hand-written MLP: memory map and program
-f = Fig(900, 420, "The hand-written network"); f.text(450, 22, "Running example B: the scratchpad as the programmer laid it out by hand", 14, bold=True)
+f = Fig(900, 470, "The hand-written network"); f.text(450, 22, "Running example B: the scratchpad as the programmer laid it out by hand", 14, bold=True)
 reg = [("X", 0, 16, C["orange2"], C["orange"]), ("W1", 16, 16, C["orange2"], C["orange"]), ("W2", 32, 8, C["orange2"], C["orange"]), ("acc1", 100, 16, C["blue2"], C["blue"]), ("hidden", 120, 16, C["green2"], C["green"]), ("acc2", 140, 8, C["blue2"], C["blue"]), ("scores", 150, 8, C["green2"], C["green"]), ("class", 160, 4, C["yellow2"], C["gray"])]
 x0, sc = 40, 820 / 170
 f.line(x0, 120, x0 + 170 * sc, 120, C["ink"], 1.5)

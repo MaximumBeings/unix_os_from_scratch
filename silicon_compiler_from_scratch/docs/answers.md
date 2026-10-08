@@ -239,6 +239,18 @@ Worked answer: the test's external memory has 2048 words, so every address fits 
 
 Worked answer: the matrix unit has more phases, and each phase has a pipeline edge and a state change: after loading A there is a cycle to drain the last read and switch state, the same after loading B, there is the PRE cycle that clears the array, the transition from streaming to storing, and the FIN state that raises done. Any two of these (read off the state machine, not separately measured): the idle cycle between LA and LB, the PRE (clear) cycle, the FIN cycle.
 
+**6. Where does the cycle between `done` and the next fetch go?**
+
+Worked answer: the sequencer sees `unit_done` in WAIT, advances `pc` and moves to FETCH in the same clock edge; the FETCH state then spends one cycle reading the new instruction word. So the DONE cycle is the last cycle of the unit and the FETCH cycle follows it immediately; what the table calls "FETCH at cycle 23" after "DONE at 22" is simply the next cycle. Over a program, every instruction pays 2 cycles (FETCH and ISSUE) regardless of its unit's work: n instructions cost 2n cycles of overhead, plus 2 for HALT.
+
+**7. Busy cycles and the total of Running example B.**
+
+Worked answer: `ld len=40`: 40 + 8 + 1 = 49. `mm 4x4x4`: 16 + 16 + 10 + 16 + 7 = 65. `rq len=16`: 18. `mm 4x4x2`: 16 + 8 + 8 + 8 + 7 = 47. `rq len=8`: 10. Each `amax len=2`: 5, four of them 20. `st len=4`: 6. The sum of busy times is 49 + 65 + 18 + 47 + 10 + 20 + 6 = 215; ten instructions add 2 x 10 = 20 for fetch and issue; the HALT adds 2: 215 + 20 + 2 = 237, the circuit's count.
+
+**8. A second `ld` for W2.**
+
+Worked answer: an extra instruction costs 2 cycles of fetch and issue and pays the memory latency again (8 + 1): 11 more cycles in total than the single `ld len=40`, which pays the latency once. The words themselves cost the same either way.
+
 ---
 
 ## Chapter 8

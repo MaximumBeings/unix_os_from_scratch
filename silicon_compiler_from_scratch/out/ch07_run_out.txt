@@ -38,8 +38,8 @@ the reference simulator says: C = [4, 5, 10, 11]  int8 = [4, 5, 10, 11]  argmax 
 unit        generic gates  iCE40 cells  flip-flops  block RAMs
 ga2_st                358          228          67           0
 ga2_rq               5832         3025          94           0
-ga2_vadd              473          352          93           0
+ga2_vadd              474          352          93           0
 ga2_amax              485          315         108           0
-ga2_sm               4533         2364         309           0
-ga2_mm              23330        12294        3957           2
-ga2        n/a (scratchpad)        21266        5063          34
+ga2_sm               4527         2348         309           0
+ga2_mm              23337        12294        3957           2
+ga2        n/a (scratchpad)        21543        5151          34

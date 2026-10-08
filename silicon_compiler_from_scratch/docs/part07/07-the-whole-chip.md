@@ -7,28 +7,22 @@
 
 **What you will understand:** how the pieces of Chapters 3-6 become one machine that runs *programs*. You will meet the instruction set (eight instructions, 128 bits each), write an assembler for it, build the execution units and the sequencer that drives them, check the whole chip against a Python reference simulator on 78 programs (memory contents **and** cycle counts, to the cycle), break it 49 ways, and learn what a test generator must never produce.
 
-**What you need to know first:** Chapters 1-6. This chapter is mostly wiring and control, so the arithmetic is already trusted: the matrix unit *is* the Chapter 4 array, the requantizer *is* Chapter 3's circuit, the softmax *is* Chapter 6's algorithm.
+**What you need to know first:** Chapters 1-6. This chapter is mostly wiring and control, so the arithmetic is already trusted: the matrix unit *is* the Chapter 4 array, the requantizer *is* Chapter 3's circuit, the softmax *is* Chapter 6's algorithm. Appendix B (Verilog) covers the state-machine style used by the sequencer.
+
+**What this chapter builds:** `model/ga2_isa.py` (instruction set, assembler, reference simulator, cycle model), `rtl/ga2_vec.v`, `rtl/ga2_sm.v`, `rtl/rowmem.v`, `rtl/ga2_mm.v`, `rtl/ga2.v` (units and sequencer), `model/ga2_progs.py` (program suites), `tb/ga2_tb.v` and `tb/extmem_rw.v`, `tools/ch07_calibrate.py`, `tools/mut_ch07.py`, and for the running examples `tb/ga2_trace_tb.v`, `tools/ch07_example_a.py` and `tools/ch07_example_b.py`.
+
+## From parts to a computer
+
+Chapters 2 to 6 produced parts: a MAC, an array, a requantizer, a scratchpad with a DMA, and a softmax unit. Each works on its own with its own testbench. A chip is more than a bag of parts. Something has to decide *which* part runs *when*, with *which data*, and that something has to be told what to do: a **program**.
+
+This chapter adds exactly three things. An **instruction set** (the contract between the program and the chip: what operations exist and how they are encoded). A **sequencer** (the control circuit that reads one instruction, starts the unit it names, and waits). And a way to **know the chip is right**: a Python simulator of the instruction set that predicts the contents of memory *and the number of clock cycles* for any program.
+
+The design principle is "as simple as can be made correct". Instructions run one at a time. Every value takes a 32-bit word. There is no pipelining between instructions, no caches, no interrupts. This is deliberate: it makes the machine small enough to verify completely in a book, and it makes the cycle count of a program a simple sum, which is the property the compiler of Chapter 11 and the performance analysis of Chapter 9 both rely on. A real accelerator would overlap instructions to hide the waiting; Chapter 9 measures what that would buy.
 
 ## The machine
 
-```text
-                    program ROM  (128-bit instructions)
-                         |
-                  +------+-------+            external memory (DRAM model)
-                  |  sequencer   |            read port: latency LAT, pipelined
-                  | fetch/issue/ |<---------- write port
-                  |    wait      |                   ^   |
-                  +--+--+--+--+--+                   |   |
-          one unit runs at a time                    |   v
-   +-----+-----+------+------+------+------+---------+---------+
-   | LD  | ST  |  MM  |  RQ  |  SM  | VADD |  AMAX             |
-   | DMA | out | 4x4  |requan| soft | sat. | arg-              |
-   |     |     |array |tize  | max  | add  | max               |
-   +--+--+--+--+--+---+--+---+--+---+--+---+--+----------------+
-      |     |     |      |      |      |      |
-      +-----+-----+------+------+------+------+----->  scratchpad: 4096 x 32-bit words
-                                                       (1 read port, 1 write port, 1-cycle read)
-```
+![block diagram of GA-2: program ROM, sequencer, seven units, scratchpad and external memory](../assets/fig/ch07-chip.svg)
+*Figure 7.1: the machine. One sequencer, seven units that take turns, one scratchpad that they share, and DRAM reachable only through LD and ST.*
 
 The design is deliberately **simple**: instructions run one at a time, in order, never overlapped; every value occupies one 32-bit word (an int8 is stored sign-extended). That makes the cycle count of a program the sum of the cycle counts of its instructions, which is what lets this chapter *predict* it exactly. Chapter 9 asks what overlap would buy.
 
@@ -38,7 +32,10 @@ The design is deliberately **simple**: instructions run one at a time, in order,
 --8<-- "model/ga2_isa.py"
 ```
 
-The top of that file is the specification; the rest is the assembler, a reference simulator, and the cycle model. Eight instructions:
+The top of that file is the specification; the rest is the assembler, a reference simulator, and the cycle model.
+
+![the 128-bit instruction word cut into an opcode and ten fields, and how LD, MM and RQ use them](../assets/fig/ch07-word.svg)
+*Figure 7.2: one fixed layout for every instruction. A field means different things to different operations, but it is always in the same place, so the decoder is wiring.* Eight instructions (a ninth, `UNPACK`, is added in Chapter 13 for 4-bit weights and appears in the code listings below, but nothing in Chapters 7 to 12 uses it):
 
 | op | name | does |
 |---|---|---|
@@ -89,13 +86,19 @@ This is Chapter 6's algorithm, rebuilt around the scratchpad: pass 1 finds the m
 --8<-- "rtl/ga2_mm.v"
 ```
 
-The array needs `N` operands of `A` and `N` of `B` every cycle, but the scratchpad delivers one word per cycle. So the unit first **stages** the tiles: A's row `m` into operand memory `m`, B's column `n` into operand memory `n` (that is what `rowmem` is: eight small memories, each with one read address). Then it streams them skewed (memory `i` is read at position `t - i`, exactly the schedule of Chapter 4) through the 4 x 4 array, and finally writes the `M x N` result back, one word per cycle. Its time is `M*K + K*N` (staging) `+ (K+M+N-2)` (streaming) `+ M*N` (writing) plus a few cycles of control. **Most of it is staging**, not arithmetic: a point Chapter 9 returns to.
+The array needs `N` operands of `A` and `N` of `B` every cycle, but the scratchpad delivers one word per cycle. So the unit first **stages** the tiles: A's row `m` into operand memory `m`, B's column `n` into operand memory `n` (that is what `rowmem` is: eight small memories, each with one read address). Then it streams them skewed (memory `i` is read at position `t - i`, exactly the schedule of Chapter 4) through the 4 x 4 array, and finally writes the `M x N` result back, one word per cycle. ![a 2x3 by 3x2 matrix multiply broken into staging, streaming, writing and control cycles](../assets/fig/ch07-mm.svg)
+*Figure 7.4: where the 28 cycles of the example's MM go.*
+
+Its time is `M*K + K*N` (staging) `+ (K+M+N-2)` (streaming) `+ M*N` (writing) plus a few cycles of control. **Most of it is staging**, not arithmetic: a point Chapter 9 returns to.
 
 ### The sequencer: `rtl/ga2.v`
 
 ```verilog
 --8<-- "rtl/ga2.v"
 ```
+
+![the sequencer's states: IDLE, FETCH, ISSUE, WAIT, HALT](../assets/fig/ch07-fsm.svg)
+*Figure 7.3: the sequencer. FETCH and ISSUE take one cycle each; WAIT lasts as long as the unit is busy; an all-zero word is HALT.*
 
 Three states do the work: FETCH (read the instruction at `pc`), ISSUE (start the unit named by the opcode), WAIT (until that unit says `done`). The unit named by the instruction in flight owns the scratchpad ports, selected by `cur`. The five counters are the profile Chapter 9 will use.
 
@@ -158,7 +161,69 @@ Eighteen directed programs (every instruction alone, length-one operands, the la
 - **The example program runs.** Two matrices are loaded, multiplied (`C = [[4,5],[10,11]]`), requantized, the largest result's index found (3), and all stored: 93 cycles in total, split into 28 on the matrix unit, 36 on DMA (loading 12 words costs 21 of them: the memory latency is paid once per load), and 13 on the vector units. The circuit and the reference agree, and the cycle counters match the model's prediction to the cycle.
 - **78 programs, then 200 more, pass in both simulators, memory and counters.** That is 710,814 cycles of random programs checked against the reference.
 - **The same suite passes at a different memory latency** after changing a single constant in the model (`LAT`).
-- **Cost (Yosys, iCE40 mapping):** the whole chip is 21,266 cells with 5,063 flip-flops and 34 block RAMs (32 of them are the 4096 x 32-bit scratchpad). The requantizer is the largest unit by far (5,832 generic gates, mostly the 32 x 24-bit multiplier) and the softmax the second (4,533). The matrix unit's 23,330 gates are mostly the systolic array and the operand memories (3,957 flip-flops, because Yosys mapped most of them to registers). *(Yosys counts; no timing, no area.)*
+- **Cost (Yosys, iCE40 mapping):** the whole chip is 21,543 cells with 5,151 flip-flops and 34 block RAMs (32 of them are the 4096 x 32-bit scratchpad). The requantizer is the largest unit by far (5,832 generic gates, mostly the 32 x 24-bit multiplier) and the softmax the second (4,527). The matrix unit's 23,337 gates are mostly the systolic array and the operand memories (3,957 flip-flops, because Yosys mapped most of them to registers). *(Yosys counts; no timing, no area. The totals include the UNPACK unit added in Chapter 13, which is why they differ slightly from the version of this chapter that preceded it.)*
+
+![bar chart of generic gates per unit: the matrix unit is largest, then the requantizer and the softmax](../assets/fig/ch07-cost.svg)
+*Figure 7.5 (measured): gate counts per unit.*
+
+## Running example A: follow a program through the sequencer
+
+*The point of this example:* the instruction set is a contract; the sequencer is the thing that honours it. This example runs a seven-instruction program on the circuit with a **trace** of the sequencer's state machine (`tb/ga2_trace_tb.v` prints a line at every FETCH, ISSUE and DONE), and puts the measured start, end and busy time of every instruction next to the cycle model's prediction.
+
+```verilog
+--8<-- "tb/ga2_trace_tb.v"
+```
+
+```python
+--8<-- "tools/ch07_example_a.py"
+```
+
+To compile and run: `python3 tools/ch07_example_a.py` (it needs `iverilog`).
+
+**Output (cloud sandbox -- live-executed)**
+
+```text
+--8<-- "out/ch07_example_a_out.txt"
+```
+
+![timeline of the six instructions of the example, drawn from the trace: load, matrix multiply, requantize, argmax and two stores](../assets/fig/ch07-trace.svg)
+*Figure 7.6: the trace as a timeline. Grey squares are the two overhead cycles of every instruction; the coloured bar is the unit working.*
+
+**Walkthrough.**
+
+1. *FETCH, ISSUE, WAIT.* The first instruction is fetched at cycle 0, issued at cycle 1, and its unit (the DMA) works until cycle 22: 21 busy cycles. The next FETCH is at cycle 23: the sequencer takes one cycle after `done` to latch the next instruction word. Every row of the table shows the same pattern.
+2. *The loads.* `ld len=12` takes 21 cycles = 12 words + 8 cycles of memory latency + 1 of control. The latency is paid once, not per word (Chapter 5).
+3. *The matrix unit.* `mm` takes 28 cycles for a 2x3 by 3x2 product. Of those, only K + M + N - 2 = 5 are the array computing; 12 are staging the two tiles into the operand memories and 4 writing the result; 7 are control. For small tiles the overhead dominates, which is the lesson of Chapter 4's utilization formula seen from a different side.
+4. *The vector units.* `rq` takes 6 cycles for 4 words (len + 2), `amax` 7 (len + 3 plus the final compare), the two `st` instructions 6 and 3.
+5. *The totals.* The six instructions plus the final HALT give 85 cycles, and the circuit's counters read `[85, 28, 30, 13, 6]`: total, matrix-unit, DMA, vector-unit cycles and instructions. The model predicts exactly the same, and the external memory afterwards is identical to the reference simulator's. (The instruction list is the one from the original version of this chapter without the extra `st` of the raw int32 result, hence 85 and not 93.)
+6. *What the check proves.* The model's constants were calibrated on single instructions (the table above); this program is a *prediction*, and it is right to the cycle. That is the property the rest of the book leans on.
+
+## Running example B: a neural network written by hand
+
+*The point of this example:* to feel what the chip is like to program, and so to understand why Chapter 11 builds a compiler. The task: a tiny network with four inputs, four hidden units with ReLU, and two outputs, applied to a batch of four samples. The weights are chosen so that the network can be understood: hidden unit 0 measures how much the first two inputs exceed the last two (`x0 + x1 - x2 - x3`), hidden unit 1 is its negative, and the other two are distractors. The task is to classify each sample, and the program does that in ten instructions.
+
+```python
+--8<-- "tools/ch07_example_b.py"
+```
+
+To compile and run: `python3 tools/ch07_example_b.py` (it needs `iverilog`).
+
+**Output (cloud sandbox -- live-executed)**
+
+```text
+--8<-- "out/ch07_example_b_out.txt"
+```
+
+![the scratchpad address map chosen by hand for the network and the ten instructions of the program](../assets/fig/ch07-mlp.svg)
+*Figure 7.7: the memory map the programmer had to invent (inputs and weights at 0 to 39, accumulators at 100, hidden activations at 120, scores at 150, classes at 160) and the program that uses it.*
+
+**Walkthrough.**
+
+1. *The floating-point network.* Computed first in plain Python: hidden activations such as `[1.7, 0, 0.2, 0.3]` and scores such as `[1.65, 0.05]`; the classes are `[0, 1, 1, 0]`.
+2. *Quantizing by hand.* Chapter 3's rules give a scale for each of five quantities (x, W1, hidden, W2, scores), and the two requantizers get mantissa and shift pairs `(8454660, 31)` and `(16019356, 31)`. Each came from `M = scale_a x scale_b / scale_out`. A wrong digit here gives plausible garbage.
+3. *The program.* One `ld` brings in everything (X, W1 and W2 sit next to each other in external memory). The first `mm` is a 4x4x4 product: layer 1. `rq ... relu=1` is the requantizer and the ReLU in one instruction (the fused ReLU of Chapter 3). The second `mm` is 4x4x2: layer 2. The second `rq` makes int8 scores; four `amax` instructions find each sample's class (an argmax over two numbers, repeated); one `st` writes the four answers.
+4. *Result.* The circuit, the reference simulator and the floating-point network all classify the four samples as `[0, 1, 1, 0]`. The program took 237 cycles, with exact agreement between model and circuit: 112 on the matrix unit (47%), 55 on DMA (23%), 48 on vector units (20%).
+5. *What it cost the programmer.* Three address spaces (external memory, scratchpad, and the strides of the matrix multiplies), two scale pairs worked out on paper, and every operand typed by hand. And this network fits one tile: a real one would need dozens of `mm` instructions per layer, each with its own addresses. Getting one address wrong, or the wrong shift, gives a result that is not obviously broken. This is the work the compiler takes over.
 
 ## Testing the tests
 
@@ -188,6 +253,15 @@ Four survivors, each **equivalent** and each of a different kind:
 3. **One mutant was badly designed by the author** ("M is a 3-bit field") and survived because it was not a bug. It was reclassified as equivalent and replaced by a real one (a 2-bit field), which is caught.
 4. **Before adding the 500-1500-element programs** the length-field mutants (8-bit lengths) would have survived, since the random programs only reach length 255. They are the reason the directed suite has long vectors.
 
+## Common mistakes
+
+- **Writing a test program with overlapping operands.** `SM dst=2184 src=2174 len=64` has partially overlapping regions; the units are pipelined, so what happens is undefined and the circuit and the reference legitimately differ. The specification forbids it and the generator avoids it.
+- **Guessing the cycle model's constants.** The first version of the constants was guessed and disagreed on 71 of 72 programs. They were measured on single instructions instead.
+- **Forgetting that an int8 occupies a whole 32-bit word.** Addresses count words; `len=16` is 16 words, not 16 bytes. The bandwidth analysis of Chapter 9 therefore counts bytes of the logical type, not words.
+- **Believing that a field mutant that survives is a gap.** "M is a 3-bit field" survives because every legal M fits in 3 bits. It is equivalent within the ISA; the report says so.
+- **Using `MM` with `K > 64` or `M, N > 4`.** The hardware does not support it; the compiler must tile. The tests never produce it.
+- **Reading the matrix unit's time as the array's time.** In Figure 7.4 the array computes 5 of 28 cycles.
+
 ## What this chapter does and does not establish
 
 - **Verified**: the chip computes what the reference simulator computes, and takes exactly the cycles the model says, on 78 + 218 + 48 program runs, in two simulators (the later two in Icarus only). The reference simulator is itself checked only through this comparison and through the unit-level golden models of Chapters 3-6.
@@ -205,3 +279,15 @@ GA-2 is eight instructions executed one at a time by a sequencer that fetches, s
 3. Why does the ISA forbid partially overlapping operand regions for `SM`?
 4. A mutant changes the load's source-address field from 16 bits to 12. Why did no test catch it, and what would catch it?
 5. Why is the cycle model's constant for `MM` (7) bigger than the ones for the vector units (2 to 6)? Name two things in `ga2_mm.v` that it contains.
+6. In Running example A, instruction 1 (`mm`) is fetched at cycle 23 although instruction 0 finished at cycle 22. Where does the cycle go, and what does it add up to over a long program?
+7. Using the model's formulas, compute the busy cycles of `rq len=16`, `mm M=4 K=4 N=4` and `mm M=4 K=4 N=2`, and check the total 237 of Running example B (do not forget the fetch and issue cycles and the final HALT).
+8. Why would a second `ld` for W2 (instead of one `ld len=40`) cost more cycles? How many more?
+
+## Exercises
+
+1. **Add an instruction to the program.** Append `st src=150 dst=72 len=8` to the program of Running example B (before `halt`), predict the new cycle count with the model, run it, and read the stored scores.
+2. **A different network.** Change `W2` in `ch07_example_b.py` so that hidden unit 2 votes for class 1 instead of 0. Does the classification of any sample change? Is the quantized circuit still in agreement with floating point?
+3. **Stride practice.** Write the `mm` instruction that multiplies rows 2 and 3 of `X` (a 2x4 block starting at scratchpad address 8) by the first two columns of `W1` (a 4x2 block, leaving the rest of its rows untouched). Which of `lda`, `ldb`, `ldc` are not equal to the matrix width?
+4. **Break the contract.** Make `rq` overlap partially with its source (`dst=104 src=100 len=16`), run the circuit and the reference simulator, and compare. What does each produce, and why is this undefined by the ISA?
+5. **Count the overhead.** For Running example B, what fraction of the 237 cycles are FETCH and ISSUE cycles? How would doubling the number of instructions (with the same work) change the total?
+
