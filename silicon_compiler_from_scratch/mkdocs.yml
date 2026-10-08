@@ -28,8 +28,8 @@ theme:
     - toc.follow
     - search.suggest
     - content.code.copy
-  icon:
-    logo: material/chip
+  logo: assets/capra-logo.svg
+  favicon: assets/capra-favicon.svg
 
 markdown_extensions:
   - admonition
