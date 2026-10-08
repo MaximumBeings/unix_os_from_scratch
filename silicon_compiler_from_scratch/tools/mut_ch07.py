@@ -62,8 +62,9 @@ EQUIV = [
 ]
 F = ["rtl/sram.v", "rtl/dma.v", "rtl/systolic.v", "rtl/requant.v", "rtl/exp_lut.v", "rtl/divu.v", "rtl/rowmem.v", "rtl/ga2_vec.v", "rtl/ga2_sm.v", "rtl/ga2_mm.v", "rtl/ga2.v"]
 TB = ["tb/extmem_rw.v", "tb/ga2_tb.v"]
-subprocess.run([sys.executable, "model/ga2_progs.py", "out/ga2_programs.hex", "60", "1"], cwd=hw.ROOT, capture_output=True)
-print("NOTE: this script deliberately breaks copies of the RTL. 'caught' lines are EXPECTED: they show the testbench can detect the mistake.")
-c, n, l = hw.mutate(MUT, F, "ga2_tb", TB, workers=6); print("\n".join(l)); print(f"\nGA-2: {c} of {n} broken circuits caught")
-c2, n2, l2 = hw.mutate(EQUIV, F, "ga2_tb", TB, workers=3); print("\nChanges that look like bugs and are not:"); print("\n".join(l2))
-sys.exit(0 if c == n and c2 == 0 else 1)
+if __name__ == "__main__":
+    subprocess.run([sys.executable, "model/ga2_progs.py", "out/ga2_programs.hex", "60", "1"], cwd=hw.ROOT, capture_output=True)
+    print("NOTE: this script deliberately breaks copies of the RTL. 'caught' lines are EXPECTED: they show the testbench can detect the mistake.")
+    c, n, l = hw.mutate(MUT, F, "ga2_tb", TB, workers=6); print("\n".join(l)); print(f"\nGA-2: {c} of {n} broken circuits caught")
+    c2, n2, l2 = hw.mutate(EQUIV, F, "ga2_tb", TB, workers=3); print("\nChanges that look like bugs and are not:"); print("\n".join(l2))
+    sys.exit(0 if c == n and c2 == 0 else 1)

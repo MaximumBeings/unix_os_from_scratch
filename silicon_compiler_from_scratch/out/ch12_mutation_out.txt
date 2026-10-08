@@ -1,0 +1,10 @@
+NOTE: this script deliberately breaks copies of the RTL. 'caught' is EXPECTED: it shows the workload notices the mistake.
+
+structured model, 24 decode steps: 38 of 49 hardware mutants caught (the 78 purpose-built programs of Chapter 7 caught all 49)
+  missed: AMAX: returns the last maximum, not the first; MM: A's row step uses K instead of lda; MM: C's row step uses N instead of ldc; MM: K is a 6-bit field; MM: M is a 2-bit field; SM: the maximum starts at 0, not -128; SM: the output is written in every pass; VADD: no clamp at all; VADD: the length field is 8 bits wide; VADD: the lower clamp is -128; VADD: the upper clamp is 126
+
+random model, 24 decode steps: 39 of 49 hardware mutants caught (the 78 purpose-built programs of Chapter 7 caught all 49)
+  missed: MM: A's row step uses K instead of lda; MM: C's row step uses N instead of ldc; MM: K is a 6-bit field; MM: M is a 2-bit field; SM: the maximum starts at 0, not -128; SM: the output is written in every pass; VADD: no clamp at all; VADD: the length field is 8 bits wide; VADD: the lower clamp is -128; VADD: the upper clamp is 126
+
+by either workload: 39 of 49
+missed by both: MM: A's row step uses K instead of lda; MM: C's row step uses N instead of ldc; MM: K is a 6-bit field; MM: M is a 2-bit field; SM: the maximum starts at 0, not -128; SM: the output is written in every pass; VADD: no clamp at all; VADD: the length field is 8 bits wide; VADD: the lower clamp is -128; VADD: the upper clamp is 126

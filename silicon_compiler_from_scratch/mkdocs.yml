@@ -62,4 +62,5 @@ nav:
   - "9. Batching and Bandwidth: Why Decoding Is Slow, and What Helps": part09/09-batching-and-bandwidth.md
   - "10. Synthesis, Timing and Gate-Level Verification": part10/10-synthesis-and-gate-level.md
   - "11. The Compiler: From a Tensor Graph to GA-2 Instructions": part11/11-the-compiler.md
+  - "12. Capstone: A Tiny Transformer Decodes on the Chip": part12/12-capstone.md
   - Answers to the Self-Check Questions: answers.md

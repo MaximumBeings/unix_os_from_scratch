@@ -35,6 +35,7 @@ class Graph:
         return self._add("concat", [a, b], (self.nodes[a].shape[0] + self.nodes[b].shape[0], self.nodes[a].shape[1]))
     def argmax(self, a): return self._add("argmax", [a], (self.nodes[a].shape[0], 1))
     def output(self, a, name): return self._add("output", [a], self.nodes[a].shape, name=name)
+    def tag(self, a, name): self.nodes[a].attrs["tag"] = name; return a        # a name for a tensor, so that its range can be fixed from outside (see compile_graph(ranges=...))
 def evaluate(g, inputs):
     """Floating-point evaluation of the graph. inputs: {name: 2-D list}. Returns {node id: 2-D list}."""
     v = {}
@@ -55,7 +56,7 @@ def evaluate(g, inputs):
         elif n.op == "output": v[n.id] = v[n.ins[0]]
     return v
 # ------------------------------------------------------------------ scale planning
-def plan_scales(g, calib):
+def plan_scales(g, calib, ranges=None):
     """Assign one int8 scale to every tensor. Tensors that must share a scale (the parts and the result of a concatenation, input and result of relu) form a group; an add does NOT force one: the compiler rescales an operand whose scale differs from the sum's and get the group's largest calibrated range;
     the input of a softmax is pinned to 1/16 (the softmax unit's Q4.4 input format) and its output to 1/127. Returns (scale per node id, notes)."""
     parent = list(range(len(g.nodes)))
@@ -71,6 +72,8 @@ def plan_scales(g, calib):
     for sample in calib:
         vals = evaluate(g, sample)
         for nid, m in vals.items(): rng[nid] = max(rng.get(nid, 0.0), max(abs(x) for r in m for x in r))
+    for n in g.nodes:                                     # ranges fixed from outside (e.g. so that a KV cache keeps one scale from step to step)
+        if ranges and n.attrs.get("tag") in ranges: rng[n.id] = ranges[n.attrs["tag"]]
     grp_max = {}
     for n in g.nodes:
         if n.op != "argmax": grp_max[find(n.id)] = max(grp_max.get(find(n.id), 0.0), rng[n.id])
@@ -107,9 +110,9 @@ class Allocator:
 # ------------------------------------------------------------------ the compiler
 class Program:
     pass
-def compile_graph(g, calib, reuse=True):
-    """Compile `g` to GA-2 instructions. `calib` is a list of input dicts for calibration. reuse=False keeps every buffer alive (for debugging and for differential testing of the allocator)."""
-    P = Program(); P.graph = g; P.reuse = reuse; scale, P.notes = plan_scales(g, calib); P.scale = scale; N = g.nodes
+def compile_graph(g, calib, reuse=True, ranges=None):
+    """Compile `g` to GA-2 instructions. `calib` is a list of input dicts for calibration; `ranges` optionally fixes the range of tagged tensors. reuse=False keeps every buffer alive (for debugging and for differential testing of the allocator)."""
+    P = Program(); P.graph = g; P.reuse = reuse; scale, P.notes = plan_scales(g, calib, ranges); P.scale = scale; N = g.nodes
     cons = {n.id: [] for n in N}
     for n in N:
         for i in n.ins: cons[i].append(n.id)

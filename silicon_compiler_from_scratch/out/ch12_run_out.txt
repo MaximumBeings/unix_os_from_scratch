@@ -1,0 +1,31 @@
+== 1. the same token sequence three ways (start token 0, 24 steps)
+closed form f(t) = (5t+3) mod 16 : [0, 3, 2, 13, 4, 7, 6, 1, 8, 11, 10, 5, 12, 15, 14, 9, 0, 3, 2, 13, 4, 7, 6, 1, 8]
+floating point                   : [0, 3, 2, 13, 4, 7, 6, 1, 8, 11, 10, 5, 12, 15, 14, 9, 0, 3, 2, 13, 4, 7, 6, 1, 8]
+GA-2 (compiled programs)         : [0, 3, 2, 13, 4, 7, 6, 1, 8, 11, 10, 5, 12, 15, 14, 9, 0, 3, 2, 13, 4, 7, 6, 1, 8]
+all three identical: True
+
+== 2. is the attention/feed-forward path real? (floating point, along this generation)
+attention output / embedding (norm ratio): mean 0.07;  feed-forward output / embedding: mean 0.14
+switching attention and feed-forward OFF changes the logits by 16.1% on average (but not the chosen tokens: they decide the logits' detail, the embeddings decide the token)
+gap between best and second-best logit, as a fraction of the logit range: min 0.81 mean 0.87  (a chip with ~1% quantization noise needs this well above 0.01)
+
+== 3. the 24 decode steps replayed on the RTL (the programs the compiler produced, with the external memory the host prepared)
+  Icarus    PASS: 24 programs match the Python reference (memory and all five cycle counters), 192710 cycles in total (exit status 0) (exit 0)
+  Verilator PASS: 24 programs match the Python reference (memory and all five cycle counters), 192710 cycles in total (exit status 0) (exit 0)
+
+step  context  instr  cycles  matrix    DMA  vector  token
+   1        1     67    7000    4040   2449     375  0 -> 3
+   2        2     69    7101    4082   2499     380  3 -> 2
+   3        3     69    7180    4124   2531     385  2 -> 13
+   4        4     69    7259    4166   2563     390  13 -> 4
+   6        6     70    7457    4288   2627     400  7 -> 6
+  12       12     71    7971    4578   2819     430  5 -> 12
+  18       18     73    8525    4906   3011     460  3 -> 2
+  23       23     74    8960    5154   3171     485  6 -> 1
+  24       24     74    9039    5196   3203     490  1 -> 8
+
+24 tokens: 192710 cycles in all, 8030 per token on average (first step 7000, last 9039).
+At the 10.74 ns critical path of Chapter 10's toy-library timing (93 MHz) that would be 11582 tokens per second -- a toy-library, no-memory-timing figure, quoted only to show the order of magnitude.
+
+== 4. a generic model: random weights, random embeddings (so the answer is not designed). Teacher-forced: both systems see the same tokens; how often does the chip pick the token floating point picks?
+3 models x 16 start tokens x 12 steps = 576 decisions: the chip agrees with floating point on 559 (97.0%); relative logit error: mean 2.3%, worst 6.1%

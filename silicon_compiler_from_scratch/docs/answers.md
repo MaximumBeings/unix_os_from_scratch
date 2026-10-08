@@ -269,3 +269,27 @@ Worked answer: (a). The no-reuse program is correct and the reuse program overwr
 **5. Why is the cancellation graph tested without an accuracy bound, and what bug does it exist to catch?**
 
 Worked answer: with `y` near `-x` the sum is tiny, and an int8 sum at a scale that holds the large operands rounds it to about zero, so even the correct compiler is far from floating point there. The graph exists to catch a compiler that picks the sum's scale from the sum alone: the rescaled operands then clip, and the sum of the clipped values is far from the real-number result, which check (d) reports. Random graphs almost never contain a cancellation, so only a directed case reveals that bug.
+
+---
+
+## Chapter 12
+
+**1. The model's next token is `f(t) = (5t + 3) mod 16` although attention and the feed-forward block are running. Why does the output not depend on them, and what does that imply for what this test can show?**
+
+Worked answer: the embeddings are orthogonal and the output projection is arranged so that the logit of `f(t)` is about 8 for the current token `t` and near 0 for the others; attention and the feed-forward block add small terms (7% and 14% of the embedding's norm) that change the logits' detail but not the winner. The test therefore shows that the *pipeline* (compiler, scales, cache, instructions, chip) computes the graph correctly, because the token and the logits come out as in floating point; it cannot show that attention matters to the model's answer, nor how good the model is.
+
+**2. A decode step costs 7,000 cycles at context 1 and 9,039 at context 24. What does the 7,000 consist of, and what would batching change?**
+
+Worked answer: the part that does not depend on context: loading about 2,304 words of weights (the four attention matrices, the two feed-forward matrices and the output projection) and multiplying the one new row by them (the matrix unit's staging dominates because `M = 1`). Batching several requests would load the weights once and run each projection with `M` equal to the batch, so the per-token cost of this part would fall roughly in proportion; the 2,000 context-dependent cycles (cache loads and attention) would not.
+
+**3. The chip agrees with floating point on 97% of the random model's decisions. Why is the agreement not 100%, and what would you measure on a trained model?**
+
+Worked answer: int8 per-tensor quantization introduces about 2% relative error in the logits; when the two best logits are closer than that error the chip may pick the other one, which happened in 17 of 576 decisions. On a trained model the right measures are task-level: the change in perplexity or accuracy on held-out data, and the agreement of generated text, not agreement with a random model's argmax.
+
+**4. The capstone catches 38-39 of the 49 hardware mutants and Chapter 7's suite catches all of them. Name two mutants the capstone misses and say why they are not bugs for programs the compiler writes.**
+
+Worked answer: for example "A's row step uses K instead of lda" and "C's row step uses N instead of ldc": the compiler always emits `lda = K` and `ldc = N` (dense matrices), so the mutant computes the same addresses. Another: "VADD upper clamp is 126": the residual sums in this model never reach 127, so the clamp never acts. (Also acceptable: the field-width mutants, since the compiler never emits `K = 64` or `M = 4` in a decode step.)
+
+**5. Which tests in this book would you rerun first after changing the compiler's tiling, and which after changing the requantizer's RTL?**
+
+Worked answer: for the tiling, the compiler's battery of Chapter 11 (the interpreter and every-tensor checks) and then the capstone; for the requantizer RTL, Chapter 3's 201,808-vector comparison and mutation run, then Chapter 7's program suite (which uses `RQ`) and, since the requantizer is the chip's critical path, the gate-level checks of Chapter 10.
