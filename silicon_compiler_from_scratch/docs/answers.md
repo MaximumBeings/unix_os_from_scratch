@@ -97,6 +97,18 @@ Worked answer: 100 GB/s / 7 GB = about 14 tokens per second, assuming every weig
 
 ---
 
+**6. Quantize `[0.5, -2.0, 1.0, 0.0]` by hand.**
+
+Worked answer: `scale = 2.0 / 127 = 0.015748`. Then 0.5 / 0.015748 = 31.75 -> 32; -2.0 -> -127; 1.0 / 0.015748 = 63.5 exactly, a tie, which rounds away from zero to 64; 0 -> 0. Dequantized: 32 x 0.015748 = 0.5039, -2.0000, 64 x 0.015748 = 1.0079, 0. The tie case shows why the rounding rule must be fixed: a round-to-even rule would give 64 here too, but -63.5 would round differently on the negative side for odd neighbours, and the chip and the reference must agree.
+
+**7. Verify `m / 2^s` for Example A, and say what `s = 30` would do.**
+
+Worked answer: M = 0.006871868289; m / 2^31 = 0.006871868391; the relative difference is 1.5e-8, below the bound 2^-24 = 6e-8. With `s = 30` and the same `m`, the effective multiplier would be 2M: every output would double (and clamp at +-127), so 77 would become 127 and the whole layer would be saturated. A wrong shift is a gain error of a power of two, which is why the mutation table contains "a shift of 5 bits instead of 6".
+
+**8. Why does the per-column error not change with `f` while the per-tensor error does?**
+
+Worked answer: the number that changes is the *scale*. Per-column, each column's scale is its own max/127, so an outlier in column 0 does not touch column 1's scale. Per-tensor, there is one scale = (largest value anywhere)/127, so the outlier sets the step for every column, and the step grows in proportion to `f`.
+
 ## Chapter 4
 
 **1. At which cycle does PE(2,1) multiply `A[2][3]` by `B[3][1]`?**

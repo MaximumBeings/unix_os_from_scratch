@@ -1,0 +1,43 @@
+== 1. one vector. scale = max|x| / 127 = 2.75 / 127 = 0.021654   (one int8 step is worth 0.021654)
+      x       x/scale   q (rounded)  q*scale   error
+     0.42      19.396       19       0.4114  -0.00858
+    -1.30     -60.036      -60      -1.2992  +0.00079
+     2.75     127.000      127       2.7500  +0.00000
+    -0.08      -3.695       -4      -0.0866  -0.00661
+     1.91      88.207       88       1.9055  -0.00449
+    -2.20    -101.600     -102      -2.2087  -0.00866
+     0.00       0.000        0       0.0000  +0.00000
+     0.66      30.480       30       0.6496  -0.01039
+   largest possible error is half a step = 0.010827; the largest error here is 0.010394.  The value 2.75 (the maximum) is exact by construction.
+
+== 2. a complete tiny layer: Y = X W, X is 2x3, W is 3x2
+   scale_x = 2.0/127 = 0.015748,  scale_w = 1.2/127 = 0.009449
+   Xq = [[32, -64, 95], [127, 16, -48]]
+   Wq = [[127, -42], [-64, 95], [32, -116]]
+   int32 accumulators  acc = Xq Wq = [[11200, -18444], [13569, 1754]]   (exact integer arithmetic, no rounding yet)
+   real value of an accumulator = acc * scale_x * scale_w:
+     row 0 ['1.6666', '-2.7445']  real answer ['1.6500', '-2.7500']
+     row 1 ['2.0191', '0.2610']  real answer ['2.0250', '0.2500']
+
+   the output will be int8 too: scale_out = max|Y| / 127 = 2.7500 / 127 = 0.021654
+   so each accumulator must be multiplied by M = scale_x * scale_w / scale_out = 0.00687187
+   as a mantissa and shift: M ~ m / 2^s with m = 14757225 (a 24-bit number, between 2^23 = 8388608 and 2^24 = 16777216) and s = 31;  m/2^s = 0.00687187
+
+   requantizer, one accumulator at a time: software reference vs the real circuit (Icarus)
+   acc    acc*M      software q   circuit q   real value q*scale_out   real answer
+   11200     76.965        77          77         1.6673                 1.6500
+   -18444   -126.745      -127        -127        -2.7500                -2.7500
+   13569     93.244        93          93         2.0138                 2.0250
+    1754     12.053        12          12         0.2598                 0.2500
+
+   circuit and software agree on all four: True.  Largest error against the real answer: 0.0173 (about 0.80 output steps). Most of it was already present in the accumulators, which came from rounded INPUTS (compare the two lines above); the requantizer itself adds at most half an output step.
+
+== 3. ties and signs: what 'round half away from zero' does (M = 1/2, so acc*M = acc/2; m = 2^23, s = 24)
+   acc   acc*M   away from zero   to nearest even   circuit
+    -5    -2.5           -3               -2            -3
+    -3    -1.5           -2               -2            -2
+    -1    -0.5           -1                0            -1
+     1     0.5            1                0             1
+     3     1.5            2                2             2
+     5     2.5            3                2             3
+   (Python's round() goes to the nearest EVEN number: 0.5 -> 0, 2.5 -> 2. The chip goes AWAY from zero, symmetrically: 0.5 -> 1, -0.5 -> -1, 2.5 -> 3. Both are fine; they must simply be the same everywhere.)

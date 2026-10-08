@@ -1,0 +1,17 @@
+X is 32 x 256, W is 256 x 32, Gaussian, seed 21; column 0 of W is multiplied by f. Error is measured on columns 1..31 only (the normal ones).
+
+   f | per-tensor error | per-column error | distinct int8 levels used by a normal column: per-tensor / per-column
+   1 |            1.30% |            1.15% |  102 /  118
+   2 |            1.42% |            1.15% |   96 /  118
+   4 |            2.32% |            1.15% |   57 /  118
+   8 |            4.32% |            1.15% |   33 /  118
+  16 |            8.93% |            1.15% |   19 /  118
+  32 |           16.77% |            1.15% |   10 /  118
+  64 |           35.35% |            1.15% |    6 /  118
+ 128 |           67.50% |            1.15% |    3 /  118
+
+for f = 32, per-tensor: column 1 has 256 weights and they land on only 10 distinct int8 values, between -4 and 5; with f = 1 they spread over 102 values, -69..96.
+each weight's rounding error is at most half a step; the step is set by the OUTLIER, so it is f times larger than the normal column needs.
+
+reading the sweep: the per-column error stays near 1.2% whatever f is (each column is scaled to itself). The per-tensor error grows about linearly with f once f is large,
+because the step size is about f times coarser than the normal columns need: that is exactly the cost of using one scale for a tensor whose columns differ in size.
