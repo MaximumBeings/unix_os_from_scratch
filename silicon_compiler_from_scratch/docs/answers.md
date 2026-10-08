@@ -519,6 +519,49 @@ Worked answer: logits are dominated by the residual path and the output matrix; 
 5. Calibration range of `v`: halve it. If the checks still pass, either the effect is below the 12% bound (a gap in the check) or the compiler clamps to the range (then equivalent).
 ---
 
+## Chapter 15
+
+**1. 9 rows, pages of 4.**
+
+Worked answer: ceil(9 / 4) = 3 pages; they hold 12 rows, so 3 are unused (all in the last page).
+
+**2. The next step's first row; releasable pages for W = 6, L = 8.**
+
+Worked answer: step L + 1 attends the new token and the W - 1 before it, so it needs rows from (L + 1) - W upward. For W = 6 and L = 8 that is row 3 (it needs rows 3-7 plus the new one). A page is released only if it lies entirely below row 3; page 0 holds rows 0-3, which includes row 3, so nothing can be released yet. (After step 9 the first needed row is 4 and page 0 can go.)
+
+**3. Why reuse freed pages?**
+
+Worked answer: a pool has a fixed number of physical pages. If freed pages were not reused, a request that keeps releasing pages at the front and taking pages at the back would use up the pool even though it holds only two pages at any moment. Reuse is what makes the window's bound on memory real.
+
+**4. A shared page when one owner finishes.**
+
+Worked answer: the reference count falls from 2 to 1; the page stays allocated because the other request still reads it. When the second finishes the count reaches 0 and the page is put on the free list.
+
+**5. Why copy-on-write?**
+
+Worked answer: two requests with a common prefix share the page that holds its tail; if one appends into the free space of that page without copying, the other request's rows (at the same logical positions) change under it. Copying first gives the writer a private page and leaves the other request's data untouched.
+
+**6. Why `W` programs, not one per step?**
+
+Worked answer: a compiled program is specific to the context length `n` of the step (the cache inputs have `n - 1` rows). With a window, `n = min(L, W)` takes only the values 1..W; every later step reuses the program for `W`. That saves compile time and program memory (and, for the chip, the programs never grow).
+
+**7. Why did a bound miss the two wasteful mutants?**
+
+Worked answer: both keep a few more rows or pages than needed. The data they return is correct and the page count stays at or below the loose bound that allows one spare page, so a check on the bound passes. Only a check of the exact expected count can distinguish a leak of one page from correct behaviour.
+
+**8. The 87.5% waste.**
+
+Worked answer: the contiguous scheme reserves 2,048 rows for each of 4 requests = 8,192 rows, of which the requests actually use 1,022. The waste is (8,192 - 1,022) / 8,192 = 0.875.
+
+## Chapter 15 -- hints for the exercises
+
+1. Reserved rows are `pages * page`; with a window of 8 and 32 steps the final request holds 7 rows: page 1 reserves 7, page 2 reserves 8, page 8 reserves 8, page 16 reserves 16. The block table is longest for page 1.
+2. Admit if `free_pages * page >= expected_len`; count the requests that later raise `OutOfPages`.
+3. Gather rows `[0, 1] + [L - W + 2 ... L - 2]`; the context is still `W` rows so no new program is needed.
+4. Pad with dummy rows up to the next multiple of the page size before forking; account for the padding as waste.
+5. Reverse the order of pages in `trim`: `rows()` would then read the wrong pages: the shadow comparison should catch it; if it does not, add a case.
+---
+
 ## Chapter 1 (additional questions)
 
 **6. In the ripple example the `sum` bus shows `6, 4, 0, 8` after 7 + 1. Why are there wrong values at all, and how long after the inputs change is the answer valid?**

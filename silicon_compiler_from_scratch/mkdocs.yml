@@ -73,4 +73,5 @@ nav:
   - "Part 6 -- Case Studies":
       - "13. int4 Weight-Only Quantization": part13/13-int4-weights.md
       - "14. Grouped-Query Attention": part14/14-grouped-query-attention.md
+      - "15. A Paged KV Cache and Sliding-Window Attention": part15/15-paged-cache-and-window.md
   - Answers to the Self-Check Questions: answers.md

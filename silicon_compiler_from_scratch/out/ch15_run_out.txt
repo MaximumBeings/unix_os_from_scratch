@@ -1,0 +1,26 @@
+== 1. software checks (page table vs a shadow model under 2,400 random operations with invariants after every one; exhaustion; exact page counts; paged host == plain host; window semantics)
+  problems: none
+
+== 2. the rule f(t) = 5t+3 mod 16 for 32 tokens, and the pages in use (page = 4 rows)
+  window None: rule ok True; distinct programs compiled 32; pages in use: after step 1 1, 8 2, 16 4, 32 8; peak 8
+  window    8: rule ok True; distinct programs compiled 8; pages in use: after step 1 1, 8 2, 16 2, 32 2; peak 3
+  window    4: rule ok True; distinct programs compiled 4; pages in use: after step 1 1, 8 1, 16 1, 32 1; peak 2
+
+== 3. the decodes replayed on the RTL
+  window None Icarus    PASS: 32 programs match the Python reference (memory and all five cycle counters), 268346 cycles in total (exit status 0) (exit 0)
+  window None Verilator PASS: 32 programs match the Python reference (memory and all five cycle counters), 268346 cycles in total (exit status 0) (exit 0)
+  window    8 Icarus    PASS: 32 programs match the Python reference (memory and all five cycle counters), 241286 cycles in total (exit status 0) (exit 0)
+  window    8 Verilator PASS: 32 programs match the Python reference (memory and all five cycle counters), 241286 cycles in total (exit status 0) (exit 0)
+  window    4 Icarus    PASS: 32 programs match the Python reference (memory and all five cycle counters), 231792 cycles in total (exit status 0) (exit 0)
+  window    4 Verilator PASS: 32 programs match the Python reference (memory and all five cycle counters), 231792 cycles in total (exit status 0) (exit 0)
+
+ step  cycles W=None     cycles W=8     cycles W=4
+    1           7000           7000           7000
+    4           7259           7259           7259
+    8           7615           7615           7259
+    9           7734           7615           7259
+   12           7971           7615           7259
+   16           8327           7615           7259
+   24           9039           7615           7259
+   32           9751           7615           7259
+total         268346         241286         231792

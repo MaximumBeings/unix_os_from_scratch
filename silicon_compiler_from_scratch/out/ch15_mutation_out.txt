@@ -1,0 +1,22 @@
+NOTE: this script deliberately breaks copies of the model. 'caught' is EXPECTED: it shows the checks notice the mistake.
+unbroken model passes: True
+page table: a page freed by its last owner is not returned to the free list: caught
+page table: a freed page is put on the free list while others still share it: caught
+page table: fork does not count the new owner: caught
+page table: no copy before writing into a shared page: caught
+page table: the copy-on-write copy is empty: caught
+page table: the copy keeps the shared page's reference: caught
+page table: a new page is taken from a full page's neighbour (offset uses page+1): caught
+page table: the block-table lookup ignores pages already dropped: caught
+page table: trim releases a page that still holds a needed row: caught
+page table: trim keeps pages that are completely outside the window: caught
+page table: release forgets the request's pages: caught
+page table: exhaustion is not reported: caught
+window: the float reference keeps W rows, not W-1: caught
+window: the chip's context is W+1: caught
+host: the gather starts one row late: caught
+host: the gather returns values where keys belong: caught
+host: pages outside the window are never released: caught
+host: the trim point is one token too late: caught
+
+page table, window and host: 18 of 18 broken versions caught
