@@ -607,6 +607,6 @@ Dumping module `\ripple_w16'.
 
 11. Executing JSON backend.
 
-End of script. Logfile hash: ef9567123c, CPU: user 0.10s system 0.00s, MEM: 13.11 MB peak
+End of script. Logfile hash: ef9567123c, CPU: user 0.09s system 0.00s, MEM: 13.19 MB peak
 Yosys 0.33 (git sha1 2584903a060)
-Time spent: 45% 2x abc (0 sec), 13% 14x opt_expr (0 sec), ...
+Time spent: 43% 2x abc (0 sec), 14% 14x opt_expr (0 sec), ...

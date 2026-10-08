@@ -1,0 +1,62 @@
+== 1. two's complement: n bits hold -2^(n-1) .. 2^(n-1)-1; the same bit pattern read two ways (4 bits)
+  pattern unsigned signed | pattern unsigned signed
+  0000       0      0  | 1000       8     -8
+  0001       1      1  | 1001       9     -7
+  0010       2      2  | 1010      10     -6
+  0011       3      3  | 1011      11     -5
+  0100       4      4  | 1100      12     -4
+  0101       5      5  | 1101      13     -3
+  0110       6      6  | 1110      14     -2
+  0111       7      7  | 1111      15     -1
+  ranges: int4: -8..7; int8: -128..127; int16: -32768..32767; int32: -2147483648..2147483647
+  negate = invert and add one: -5 in 8 bits is 11111011 = 251 unsigned; -(-128) = 128 in 8 bits: the one value that cannot be negated (it is its own negative)
+
+== 2. overflow: wrap-around against saturation (int8)
+    100 +    27 =   127: wrap   127, saturate   127
+    100 +    28 =   128: wrap  -128, saturate   127
+   -100 +   -29 =  -129: wrap   127, saturate  -128
+    127 +   127 =   254: wrap    -2, saturate   127
+
+== 3. fixed point: a real number stored as an integer times a power of two (Qm.n: m integer bits, n fraction bits); quantization error is at most half a step
+  Q1.7 (int8)   step 0.0078125  range -1 .. 0.992188; 0.7071 -> integer 91 -> 0.710938 (error 0.003838 <= 0.00390625)
+  Q4.4 (int8)   step 0.0625     range -8 .. 7.9375; 0.7071 -> integer 11 -> 0.687500 (error 0.019600 <= 0.03125)
+  Q8.8 (int16)  step 0.00390625 range -128 .. 127.996; 0.7071 -> integer 181 -> 0.707031 (error 0.000069 <= 0.00195312)
+
+== 4. rounding: which integer does a .5 go to?  (the choice matters for bias)
+      x  truncate  half up  half away  half even
+    0.5         0        1          1          0
+    1.5         1        2          2          2
+    2.5         2        3          3          2
+    3.5         3        4          4          4
+   -0.5         0        0         -1          0
+   -1.5        -1       -1         -2         -2
+   -2.5        -2       -2         -3         -2
+  the average error of rounding the 100 half-way values -50.5..49.5: half up +0.50, half away from zero +0.00, half even +0.00  (half even has no bias)
+
+== 5. floating point: sign, exponent, mantissa. Decode any format with e exponent bits and m mantissa bits
+  format    bits  exp  mant   largest finite  smallest normal  epsilon (1 to next)
+  fp32        32    8    23      3.40282e+38      1.17549e-38          1.19209e-07
+  fp16        16    5    10            65504      6.10352e-05          0.000976562
+  bf16        16    8     7      3.38953e+38      1.17549e-38            0.0078125
+  fp8 e4m3     8    4     3              240         0.015625                0.125
+  fp8 e5m2     8    5     2            57344      6.10352e-05                 0.25
+  (fp8 e4m3 as used in practice reserves only one code for NaN and so reaches 448; this generic decoder follows the IEEE pattern and gives 240)
+  0.1 in fp32 is 0x3DCCCCCD = 0.10000000149011612; in fp16 0x2E66 = 0.0999755859375; in bf16 (the top 16 bits of fp32) 0x3DCC = 0.099609375
+  decoder check against the hardware encodings: fp32 and fp16 of 1000 values agree: True, True
+  float spacing grows with magnitude: the gap between neighbours near 1, 100 and 10000 in fp16:
+    near        1: 0.000976562
+    near      100: 0.0625
+    near    10000: 8
+
+== 6. accumulating products: why the MAC has a wide accumulator (Chapter 2)
+  an int8 x int8 product needs 16 bits; a sum of n of them needs 16 + ceil(log2 n) bits. The worst case is every product equal to (-128) x (-128) = 16384:
+    n =    1: worst-case sum     16384 (all (-128)x(-128)), needs 16 signed bits; formula 16 + ceil(log2 n) = 16; match: True
+    n =    2: worst-case sum     32768 (all (-128)x(-128)), needs 17 signed bits; formula 16 + ceil(log2 n) = 17; match: True
+    n =    4: worst-case sum     65536 (all (-128)x(-128)), needs 18 signed bits; formula 16 + ceil(log2 n) = 18; match: True
+    n =   16: worst-case sum    262144 (all (-128)x(-128)), needs 20 signed bits; formula 16 + ceil(log2 n) = 20; match: True
+    n =   64: worst-case sum   1048576 (all (-128)x(-128)), needs 22 signed bits; formula 16 + ceil(log2 n) = 22; match: True
+    n =  256: worst-case sum   4194304 (all (-128)x(-128)), needs 24 signed bits; formula 16 + ceil(log2 n) = 24; match: True
+
+== 7. symmetric int8 quantization in three lines (Chapter 3): scale = max|x| / 127; q = round(x / scale)
+  x = [0.62, -0.31, 0.05, 0.93, -0.88]
+  scale = 0.007323; q = [85, -42, 7, 127, -120]; dequantized = [0.6224, -0.3076, 0.0513, 0.93, -0.8787]; largest error 0.00244 <= 0.00366

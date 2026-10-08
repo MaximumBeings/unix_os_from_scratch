@@ -1,0 +1,35 @@
+== 1. the pipeline of one decode step, with the tiny model of Chapter 12 (vocabulary 16, width 16, feed-forward width 32, one layer, one head)
+  token 5 -> embedding row (16 numbers, norm 1.00) -> q, k, v (16 numbers each) -> attention over the cache (1 token so far)
+  -> attention output added to the embedding (residual) -> feed-forward block added again (residual) -> 16 logits -> argmax = token 12 (the designed rule says f(5) = 12)
+
+== 2. count the parameters: a transformer layer has 4 d^2 attention weights and 2 d f feed-forward weights; plus embeddings and the output matrix
+  tiny model, counted: {'Wq': 256, 'Wk': 256, 'Wv': 256, 'Wo': 256, 'W1': 512, 'W2': 512, 'Wout': 256, 'E': 256}; total 2560; formula 4 d^2 + 2 d f + 2 V d = 2560: True
+  model                      layers      d     ffn   vocab    parameters
+  tiny (this book)                1     16      32      16         2,560
+  a 125M-class model             12    768    3072   50000   161,734,656
+  a 7B-class model               32   4096   11008   32000 6,738,149,376
+  (the 7B-class row uses a gated feed-forward block with three matrices, 3 d f, as modern models do; the other rows use two)
+
+== 3. the KV cache: for every token, every layer stores one key and one value vector per KV head
+  bytes per token = 2 (K and V) x layers x kv_heads x head_width x bytes_per_number
+  tiny model, int8                  :        32 bytes per token =       0 KiB; a 4,096-token context:       0.1 MiB
+  7B-class, 32 heads, fp16          :   524,288 bytes per token =     512 KiB; a 4,096-token context:    2048.0 MiB
+  7B-class, 32 heads, int8          :   262,144 bytes per token =     256 KiB; a 4,096-token context:    1024.0 MiB
+  7B-class, 8 KV heads, int8 (GQA)  :    65,536 bytes per token =      64 KiB; a 4,096-token context:     256.0 MiB
+
+== 4. prefill against decode: processing the prompt is a matrix-matrix product (many tokens at once); generating is a matrix-vector product (one token at a time)
+  prefill, prompt of 512 tokens   :    3315.7 G multiply-adds, reads the 6.5 GB of weights once:   512.0 ops per weight byte
+  decode, one token               :       6.5 G multiply-adds, reads the 6.5 GB of weights once:     1.0 ops per weight byte
+  decode does as much memory work as prefill and 1/512 of the arithmetic; this is why decoding is limited by memory bandwidth (Chapter 9) and why batching, speculation and mixtures of experts exist (Chapters 9, 16, 17)
+
+== 5. the decode loop (greedy), as the host runs it in Chapter 12
+  start token 0; each step feeds the last token, appends its key and value to the cache, takes the argmax of the logits: [0, 3, 2, 13, 4, 7, 6, 1, 8, 11, 10]
+  the loop is inherently sequential: token t+1 needs token t
+
+== 6. greedy against sampled decoding: the same logits, two rules
+  logits [3.0, 2.0, 0.5, 0.0] -> probabilities [0.667, 0.245, 0.055, 0.033]; greedy always picks index 0; sampling picks index 0 about 67% of the time:
+  10,000 samples: [67.0, 24.0, 5.4, 3.5] % for indices 0..3
+  (this book decodes greedily: its tests need a deterministic answer)
+
+== 7. layer normalization, which the tiny model leaves out because Capra has no operation for it: x -> (x - mean) / sqrt(variance + eps) * gain
+  [2.0, -1.0, 0.5, 4.5] -> [0.246, -1.231, -0.492, 1.477] (mean +0.0000, variance 1.0000); it needs a reciprocal square root, which is a divider with a table (Chapter 6)

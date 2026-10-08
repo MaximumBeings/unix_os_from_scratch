@@ -1,0 +1,18 @@
+
+8. Printing statistics.
+
+=== vote3_gates ===
+
+   Number of wires:                  6
+   Number of wire bits:              6
+   Number of public wires:           4
+   Number of public wire bits:       4
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                  3
+     NAND2                           2
+     OAI21                           1
+
+   Chip area for module '\vote3_gates': 3.670000
+

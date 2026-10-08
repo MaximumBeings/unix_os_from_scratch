@@ -1,0 +1,27 @@
+
+9. Printing statistics.
+
+=== appx_kogge32 ===
+
+   Number of wires:                227
+   Number of wire bits:            321
+   Number of public wires:           3
+   Number of public wire bits:      97
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                257
+     AND2                           17
+     AOI21                          33
+     INV                             8
+     NAND2                          56
+     NAND3                           8
+     NOR2                           38
+     NOR3                            2
+     OAI21                          35
+     OR2                             9
+     XNOR2                          43
+     XOR2                            8
+
+   Chip area for module '\appx_kogge32': 364.500000
+

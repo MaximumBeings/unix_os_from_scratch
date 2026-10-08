@@ -1,0 +1,46 @@
+== 1. gates are functions of bits: the truth tables of the basic gates
+  a b |  AND   OR  XOR NAND  NOR XNOR
+  0 0 |    0    0    0    1    1    1
+  0 1 |    0    1    1    1    0    0
+  1 0 |    0    1    1    1    0    0
+  1 1 |    1    1    0    0    0    1
+
+== 2. NAND alone is enough (universality): build NOT, AND, OR, XOR from NAND gates only and compare with the real operators on every input
+  NOT = 1 NAND, AND = 2 NANDs, OR = 3 NANDs, XOR = 4 NANDs; all four agree with Python's operators on all inputs: True
+
+== 3. combinational circuits: a full adder from gates, then a 4-bit ripple adder checked on all 512 input combinations
+  512 cases (a, b in 0..15, carry-in 0/1): 512 correct, 0 wrong
+  the carry of bit i depends on the carry of bit i-1: depth of the ripple adder in gate levels: 2 per bit for the carry (AND-OR) + 2 for the last sum:
+     4 bits: about  10 gate levels (ripple);  a lookahead adder needs about  8
+     8 bits: about  18 gate levels (ripple);  a lookahead adder needs about 10
+    16 bits: about  34 gate levels (ripple);  a lookahead adder needs about 12
+    32 bits: about  66 gate levels (ripple);  a lookahead adder needs about 14
+    64 bits: about 130 gate levels (ripple);  a lookahead adder needs about 16
+
+== 4. sequential circuits: a clocked simulator. State changes only on a rising edge, from the values BEFORE the edge
+  4-bit shift register, input stream 1,0,1,1,0,0,1,0 (new bit enters at the right):
+    edge 1: 0001
+    edge 2: 0010
+    edge 3: 0101
+    edge 4: 1011
+    edge 5: 0110
+    edge 6: 1100
+    edge 7: 1001
+    edge 8: 0010
+  a 2-bit counter with enable (counts only when en = 1), reset at start:
+    states: [1, 2, 2, 3, 0, 1, 1, 1, 2]
+
+== 5. finite-state machine: a Moore detector for the pattern 1 0 1 (overlapping allowed)
+  state table (S3 means: the last three bits were 101; output 1 only in S3):
+    S0: on 0 -> S0, on 1 -> S1   output 0
+    S1: on 0 -> S2, on 1 -> S1   output 0
+    S2: on 0 -> S0, on 1 -> S3   output 0
+    S3: on 0 -> S2, on 1 -> S1   output 1
+  input  1101011010101001
+  output 0001010010101000
+  reference (a window over the last three bits) 0001010010101000  -> identical: True
+
+== 6. timing: why a clock has a speed limit (derived arithmetic, ASSUMED delays in ns)
+  a 4-bit ripple adder between registers    : path = clk-to-q 0.3 + logic 2.3 + setup 0.1 = 2.7 ns -> at most   370 MHz
+  a 32-bit ripple adder                     : path = clk-to-q 0.3 + logic 16.3 + setup 0.1 = 16.7 ns -> at most    60 MHz
+  a 32-bit lookahead adder                  : path = clk-to-q 0.3 + logic 4.0 + setup 0.1 = 4.4 ns -> at most   227 MHz

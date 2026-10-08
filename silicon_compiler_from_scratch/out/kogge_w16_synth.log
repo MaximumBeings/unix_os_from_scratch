@@ -600,6 +600,6 @@ Dumping module `\kogge_w16'.
 
 11. Executing JSON backend.
 
-End of script. Logfile hash: 575924de02, CPU: user 0.14s system 0.02s, MEM: 13.48 MB peak
+End of script. Logfile hash: 575924de02, CPU: user 0.13s system 0.01s, MEM: 13.33 MB peak
 Yosys 0.33 (git sha1 2584903a060)
-Time spent: 39% 2x abc (0 sec), 14% 13x opt_expr (0 sec), ...
+Time spent: 35% 2x abc (0 sec), 16% 13x opt_expr (0 sec), ...

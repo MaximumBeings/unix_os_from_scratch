@@ -605,6 +605,6 @@ Dumping module `\ripple_w8'.
 
 11. Executing JSON backend.
 
-End of script. Logfile hash: aa4ab96c3a, CPU: user 0.09s system 0.00s, MEM: 13.02 MB peak
+End of script. Logfile hash: aa4ab96c3a, CPU: user 0.07s system 0.00s, MEM: 13.10 MB peak
 Yosys 0.33 (git sha1 2584903a060)
-Time spent: 46% 2x abc (0 sec), 14% 4x read_verilog (0 sec), ...
+Time spent: 51% 2x abc (0 sec), 12% 4x read_verilog (0 sec), ...

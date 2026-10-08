@@ -1,0 +1,18 @@
+== 1. the testbench in two simulators (Icarus Verilog and Verilator)
+-- Icarus (exit 0)
+   gray counter: 20 steps checked (value = binary ^ binary>>1, exactly one bit changes per step); holds its value for 3 edges with enable low
+   after reset and 20 clock edges: non-blocking swap a=1 b=2 (the pair swaps at every edge, so after an even number of edges it is back at 1,2); blocking swap a=2 b=2 (both ended equal at the first edge)
+   x = 8'h80: sign-extended f80 (-128), zero-extended 080 (128)
+   PASS: appendix B demonstration modules behave as described
+-- Verilator (exit 0)
+   gray counter: 20 steps checked (value = binary ^ binary>>1, exactly one bit changes per step); holds its value for 3 edges with enable low
+   after reset and 20 clock edges: non-blocking swap a=1 b=2 (the pair swaps at every edge, so after an even number of edges it is back at 1,2); blocking swap a=2 b=2 (both ended equal at the first edge)
+   x = 8'h80: sign-extended f80 (-128), zero-extended 080 (128)
+   PASS: appendix B demonstration modules behave as described
+
+== 2. what a forgotten case turns into: Yosys on mux_latch and on the repaired mux_ok (generic cells after 'proc')
+  mux_latch : {'$and': 2, '$dlatch': 1, '$eq': 2, '$logic_not': 1, '$not': 3, '$pmux': 1}
+              -> contains a latch cell: the output remembers a value when sel == 3
+  mux_ok    : {'$eq': 2, '$logic_not': 1, '$pmux': 1}
+  the mux with a default has no latch; the one without has one. A latch in a clocked design is almost always a bug: the tool says so with a warning in the log:
+  Latch inferred for signal `\mux_latch.\y' from process `\mux_latch.$proc$rtl/appx_b.v:18$7': $auto$proc_dlatch.cc:427:proc_dlatch$58

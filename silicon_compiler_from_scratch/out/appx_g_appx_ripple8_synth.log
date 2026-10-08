@@ -22,7 +22,7 @@
  Yosys 0.33 (git sha1 2584903a060)
 
 
--- Running command `read_verilog -sv rtl/demo_add.v out/add_w16.v; hierarchy -top add_w16; synth -flatten -top add_w16; dfflegalize -cell $_DFF_P_ x; dfflibmap -liberty lib/toy.lib; abc -liberty lib/toy.lib; opt_clean -purge; tee -o out/add_w16_stat.txt stat -liberty lib/toy.lib; write_verilog -noattr out/add_w16_net.v; write_json out/add_w16_net.json' --
+-- Running command `read_verilog -sv rtl/demo_add.v out/appx_g_add8.v; hierarchy -top appx_ripple8; synth -flatten -top appx_ripple8; dfflegalize -cell $_DFF_P_ x; dfflibmap -liberty lib/toy.lib; abc -liberty lib/toy.lib; opt_clean -purge; tee -o out/appx_g_appx_ripple8_stat.txt stat -liberty lib/toy.lib; write_verilog -noattr out/appx_g_appx_ripple8_net.v; write_json out/appx_g_appx_ripple8_net.json' --
 
 1. Executing Verilog-2005 frontend: rtl/demo_add.v
 Parsing SystemVerilog input from `rtl/demo_add.v' to AST representation.
@@ -31,45 +31,49 @@ Generating RTLIL representation for module `\demo_ripple'.
 Generating RTLIL representation for module `\demo_kogge'.
 Successfully finished Verilog frontend.
 
-2. Executing Verilog-2005 frontend: out/add_w16.v
-Parsing SystemVerilog input from `out/add_w16.v' to AST representation.
-Generating RTLIL representation for module `\add_w16'.
+2. Executing Verilog-2005 frontend: out/appx_g_add8.v
+Parsing SystemVerilog input from `out/appx_g_add8.v' to AST representation.
+Generating RTLIL representation for module `\appx_add8'.
+Generating RTLIL representation for module `\appx_ripple8'.
+Generating RTLIL representation for module `\appx_kogge8'.
 Successfully finished Verilog frontend.
 
 3. Executing HIERARCHY pass (managing design hierarchy).
 
 3.1. Analyzing design hierarchy..
-Top module:  \add_w16
-Used module:     \demo_add
-Parameter \W = 16
+Top module:  \appx_ripple8
+Used module:     \demo_ripple
+Parameter 1 (\W) = 8
 
-3.2. Executing AST frontend in derive mode using pre-parsed AST for module `\demo_add'.
-Parameter \W = 16
-Generating RTLIL representation for module `$paramod\demo_add\W=s32'00000000000000000000000000010000'.
+3.2. Executing AST frontend in derive mode using pre-parsed AST for module `\demo_ripple'.
+Parameter 1 (\W) = 8
+Generating RTLIL representation for module `$paramod\demo_ripple\W=s32'00000000000000000000000000001000'.
 
 3.3. Analyzing design hierarchy..
-Top module:  \add_w16
-Used module:     $paramod\demo_add\W=s32'00000000000000000000000000010000
+Top module:  \appx_ripple8
+Used module:     $paramod\demo_ripple\W=s32'00000000000000000000000000001000
 
 3.4. Analyzing design hierarchy..
-Top module:  \add_w16
-Used module:     $paramod\demo_add\W=s32'00000000000000000000000000010000
+Top module:  \appx_ripple8
+Used module:     $paramod\demo_ripple\W=s32'00000000000000000000000000001000
+Removing unused module `\appx_kogge8'.
+Removing unused module `\appx_add8'.
 Removing unused module `\demo_kogge'.
 Removing unused module `\demo_ripple'.
 Removing unused module `\demo_add'.
-Removed 3 unused modules.
+Removed 5 unused modules.
 
 4. Executing SYNTH pass.
 
 4.1. Executing HIERARCHY pass (managing design hierarchy).
 
 4.1.1. Analyzing design hierarchy..
-Top module:  \add_w16
-Used module:     $paramod\demo_add\W=s32'00000000000000000000000000010000
+Top module:  \appx_ripple8
+Used module:     $paramod\demo_ripple\W=s32'00000000000000000000000000001000
 
 4.1.2. Analyzing design hierarchy..
-Top module:  \add_w16
-Used module:     $paramod\demo_add\W=s32'00000000000000000000000000010000
+Top module:  \appx_ripple8
+Used module:     $paramod\demo_ripple\W=s32'00000000000000000000000000001000
 Removed 0 unused modules.
 
 4.2. Executing PROC pass (convert processes to netlists).
@@ -103,57 +107,85 @@ Converted 0 switches.
 Cleaned up 0 empty switches.
 
 4.2.12. Executing OPT_EXPR pass (perform const folding).
-Optimizing module add_w16.
-Optimizing module $paramod\demo_add\W=s32'00000000000000000000000000010000.
+Optimizing module $paramod\demo_ripple\W=s32'00000000000000000000000000001000.
+<suppressed ~3 debug messages>
+Optimizing module appx_ripple8.
 
 4.3. Executing FLATTEN pass (flatten design).
-Deleting now unused module $paramod\demo_add\W=s32'00000000000000000000000000010000.
+Deleting now unused module $paramod\demo_ripple\W=s32'00000000000000000000000000001000.
 <suppressed ~1 debug messages>
 
 4.4. Executing OPT_EXPR pass (perform const folding).
-Optimizing module add_w16.
+Optimizing module appx_ripple8.
 
 4.5. Executing OPT_CLEAN pass (remove unused cells and wires).
-Finding unused cells or wires in module \add_w16..
-Removed 0 unused cells and 1 unused wires.
-<suppressed ~1 debug messages>
+Finding unused cells or wires in module \appx_ripple8..
+Removed 1 unused cells and 20 unused wires.
+<suppressed ~2 debug messages>
 
 4.6. Executing CHECK pass (checking for obvious problems).
-Checking module add_w16...
+Checking module appx_ripple8...
 Found and reported 0 problems.
 
 4.7. Executing OPT pass (performing simple optimizations).
 
 4.7.1. Executing OPT_EXPR pass (perform const folding).
-Optimizing module add_w16.
+Optimizing module appx_ripple8.
 
 4.7.2. Executing OPT_MERGE pass (detect identical cells).
-Finding identical cells in module `\add_w16'.
-Removed a total of 0 cells.
+Finding identical cells in module `\appx_ripple8'.
+<suppressed ~21 debug messages>
+Removed a total of 7 cells.
 
 4.7.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
-Running muxtree optimizer on module \add_w16..
+Running muxtree optimizer on module \appx_ripple8..
   Creating internal representation of mux trees.
   No muxes found in this module.
 Removed 0 multiplexer ports.
 
 4.7.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
-  Optimizing cells in module \add_w16.
+  Optimizing cells in module \appx_ripple8.
 Performed a total of 0 changes.
 
 4.7.5. Executing OPT_MERGE pass (detect identical cells).
-Finding identical cells in module `\add_w16'.
+Finding identical cells in module `\appx_ripple8'.
 Removed a total of 0 cells.
 
 4.7.6. Executing OPT_DFF pass (perform DFF optimizations).
 
 4.7.7. Executing OPT_CLEAN pass (remove unused cells and wires).
-Finding unused cells or wires in module \add_w16..
+Finding unused cells or wires in module \appx_ripple8..
+Removed 0 unused cells and 7 unused wires.
+<suppressed ~1 debug messages>
 
 4.7.8. Executing OPT_EXPR pass (perform const folding).
-Optimizing module add_w16.
+Optimizing module appx_ripple8.
 
-4.7.9. Finished OPT passes. (There is nothing left to do.)
+4.7.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+4.7.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \appx_ripple8..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+
+4.7.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \appx_ripple8.
+Performed a total of 0 changes.
+
+4.7.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\appx_ripple8'.
+Removed a total of 0 cells.
+
+4.7.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+4.7.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \appx_ripple8..
+
+4.7.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module appx_ripple8.
+
+4.7.16. Finished OPT passes. (There is nothing left to do.)
 
 4.8. Executing FSM pass (extract and optimize FSM).
 
@@ -164,7 +196,7 @@ Optimizing module add_w16.
 4.8.3. Executing FSM_OPT pass (simple optimizations of FSMs).
 
 4.8.4. Executing OPT_CLEAN pass (remove unused cells and wires).
-Finding unused cells or wires in module \add_w16..
+Finding unused cells or wires in module \appx_ripple8..
 
 4.8.5. Executing FSM_OPT pass (simple optimizations of FSMs).
 
@@ -177,33 +209,33 @@ Finding unused cells or wires in module \add_w16..
 4.9. Executing OPT pass (performing simple optimizations).
 
 4.9.1. Executing OPT_EXPR pass (perform const folding).
-Optimizing module add_w16.
+Optimizing module appx_ripple8.
 
 4.9.2. Executing OPT_MERGE pass (detect identical cells).
-Finding identical cells in module `\add_w16'.
+Finding identical cells in module `\appx_ripple8'.
 Removed a total of 0 cells.
 
 4.9.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
-Running muxtree optimizer on module \add_w16..
+Running muxtree optimizer on module \appx_ripple8..
   Creating internal representation of mux trees.
   No muxes found in this module.
 Removed 0 multiplexer ports.
 
 4.9.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
-  Optimizing cells in module \add_w16.
+  Optimizing cells in module \appx_ripple8.
 Performed a total of 0 changes.
 
 4.9.5. Executing OPT_MERGE pass (detect identical cells).
-Finding identical cells in module `\add_w16'.
+Finding identical cells in module `\appx_ripple8'.
 Removed a total of 0 cells.
 
 4.9.6. Executing OPT_DFF pass (perform DFF optimizations).
 
 4.9.7. Executing OPT_CLEAN pass (remove unused cells and wires).
-Finding unused cells or wires in module \add_w16..
+Finding unused cells or wires in module \appx_ripple8..
 
 4.9.8. Executing OPT_EXPR pass (perform const folding).
-Optimizing module add_w16.
+Optimizing module appx_ripple8.
 
 4.9.9. Finished OPT passes. (There is nothing left to do.)
 
@@ -212,47 +244,44 @@ Optimizing module add_w16.
 4.11. Executing PEEPOPT pass (run peephole optimizers).
 
 4.12. Executing OPT_CLEAN pass (remove unused cells and wires).
-Finding unused cells or wires in module \add_w16..
+Finding unused cells or wires in module \appx_ripple8..
 
 4.13. Executing ALUMACC pass (create $alu and $macc cells).
-Extracting $alu and $macc cells in module add_w16:
-  creating $macc model for $flatten\u.$add$rtl/demo_add.v:3$111 ($add).
-  creating $alu model for $macc $flatten\u.$add$rtl/demo_add.v:3$111.
-  creating $alu cell for $flatten\u.$add$rtl/demo_add.v:3$111: $auto$alumacc.cc:485:replace_alu$112
-  created 1 $alu and 0 $macc cells.
+Extracting $alu and $macc cells in module appx_ripple8:
+  created 0 $alu and 0 $macc cells.
 
 4.14. Executing SHARE pass (SAT-based resource sharing).
 
 4.15. Executing OPT pass (performing simple optimizations).
 
 4.15.1. Executing OPT_EXPR pass (perform const folding).
-Optimizing module add_w16.
+Optimizing module appx_ripple8.
 
 4.15.2. Executing OPT_MERGE pass (detect identical cells).
-Finding identical cells in module `\add_w16'.
+Finding identical cells in module `\appx_ripple8'.
 Removed a total of 0 cells.
 
 4.15.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
-Running muxtree optimizer on module \add_w16..
+Running muxtree optimizer on module \appx_ripple8..
   Creating internal representation of mux trees.
   No muxes found in this module.
 Removed 0 multiplexer ports.
 
 4.15.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
-  Optimizing cells in module \add_w16.
+  Optimizing cells in module \appx_ripple8.
 Performed a total of 0 changes.
 
 4.15.5. Executing OPT_MERGE pass (detect identical cells).
-Finding identical cells in module `\add_w16'.
+Finding identical cells in module `\appx_ripple8'.
 Removed a total of 0 cells.
 
 4.15.6. Executing OPT_DFF pass (perform DFF optimizations).
 
 4.15.7. Executing OPT_CLEAN pass (remove unused cells and wires).
-Finding unused cells or wires in module \add_w16..
+Finding unused cells or wires in module \appx_ripple8..
 
 4.15.8. Executing OPT_EXPR pass (perform const folding).
-Optimizing module add_w16.
+Optimizing module appx_ripple8.
 
 4.15.9. Finished OPT passes. (There is nothing left to do.)
 
@@ -271,7 +300,7 @@ Performed a total of 0 transformations.
 4.16.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).
 
 4.16.6. Executing OPT_CLEAN pass (remove unused cells and wires).
-Finding unused cells or wires in module \add_w16..
+Finding unused cells or wires in module \appx_ripple8..
 
 4.16.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
 
@@ -279,26 +308,26 @@ Finding unused cells or wires in module \add_w16..
 Performed a total of 0 transformations.
 
 4.16.9. Executing OPT_CLEAN pass (remove unused cells and wires).
-Finding unused cells or wires in module \add_w16..
+Finding unused cells or wires in module \appx_ripple8..
 
 4.16.10. Executing MEMORY_COLLECT pass (generating $mem cells).
 
 4.17. Executing OPT_CLEAN pass (remove unused cells and wires).
-Finding unused cells or wires in module \add_w16..
+Finding unused cells or wires in module \appx_ripple8..
 
 4.18. Executing OPT pass (performing simple optimizations).
 
 4.18.1. Executing OPT_EXPR pass (perform const folding).
-Optimizing module add_w16.
+Optimizing module appx_ripple8.
 
 4.18.2. Executing OPT_MERGE pass (detect identical cells).
-Finding identical cells in module `\add_w16'.
+Finding identical cells in module `\appx_ripple8'.
 Removed a total of 0 cells.
 
 4.18.3. Executing OPT_DFF pass (perform DFF optimizations).
 
 4.18.4. Executing OPT_CLEAN pass (remove unused cells and wires).
-Finding unused cells or wires in module \add_w16..
+Finding unused cells or wires in module \appx_ripple8..
 
 4.18.5. Finished fast OPT passes.
 
@@ -307,24 +336,24 @@ Finding unused cells or wires in module \add_w16..
 4.20. Executing OPT pass (performing simple optimizations).
 
 4.20.1. Executing OPT_EXPR pass (perform const folding).
-Optimizing module add_w16.
+Optimizing module appx_ripple8.
 
 4.20.2. Executing OPT_MERGE pass (detect identical cells).
-Finding identical cells in module `\add_w16'.
+Finding identical cells in module `\appx_ripple8'.
 Removed a total of 0 cells.
 
 4.20.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
-Running muxtree optimizer on module \add_w16..
+Running muxtree optimizer on module \appx_ripple8..
   Creating internal representation of mux trees.
   No muxes found in this module.
 Removed 0 multiplexer ports.
 
 4.20.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
-  Optimizing cells in module \add_w16.
+  Optimizing cells in module \appx_ripple8.
 Performed a total of 0 changes.
 
 4.20.5. Executing OPT_MERGE pass (detect identical cells).
-Finding identical cells in module `\add_w16'.
+Finding identical cells in module `\appx_ripple8'.
 Removed a total of 0 cells.
 
 4.20.6. Executing OPT_SHARE pass.
@@ -332,10 +361,10 @@ Removed a total of 0 cells.
 4.20.7. Executing OPT_DFF pass (perform DFF optimizations).
 
 4.20.8. Executing OPT_CLEAN pass (remove unused cells and wires).
-Finding unused cells or wires in module \add_w16..
+Finding unused cells or wires in module \appx_ripple8..
 
 4.20.9. Executing OPT_EXPR pass (perform const folding).
-Optimizing module add_w16.
+Optimizing module appx_ripple8.
 
 4.20.10. Finished OPT passes. (There is nothing left to do.)
 
@@ -370,40 +399,32 @@ Generating RTLIL representation for module `\_90_lut'.
 Successfully finished Verilog frontend.
 
 4.21.2. Continuing TECHMAP pass.
-Using template $paramod$081ba1a4a7201ecdb44563d3c3bd7013d1ebf4eb\_90_alu for cells of type $alu.
 Using extmapper simplemap for cells of type $xor.
-Using extmapper simplemap for cells of type $and.
-Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000010001 for cells of type $lcu.
-Using extmapper simplemap for cells of type $pos.
-Using extmapper simplemap for cells of type $mux.
-Using extmapper simplemap for cells of type $not.
 Using extmapper simplemap for cells of type $or.
+Using extmapper simplemap for cells of type $and.
 No more expansions possible.
-<suppressed ~290 debug messages>
+<suppressed ~110 debug messages>
 
 4.22. Executing OPT pass (performing simple optimizations).
 
 4.22.1. Executing OPT_EXPR pass (perform const folding).
-Optimizing module add_w16.
-<suppressed ~27 debug messages>
+Optimizing module appx_ripple8.
 
 4.22.2. Executing OPT_MERGE pass (detect identical cells).
-Finding identical cells in module `\add_w16'.
+Finding identical cells in module `\appx_ripple8'.
 Removed a total of 0 cells.
 
 4.22.3. Executing OPT_DFF pass (perform DFF optimizations).
 
 4.22.4. Executing OPT_CLEAN pass (remove unused cells and wires).
-Finding unused cells or wires in module \add_w16..
-Removed 16 unused cells and 26 unused wires.
-<suppressed ~17 debug messages>
+Finding unused cells or wires in module \appx_ripple8..
 
 4.22.5. Finished fast OPT passes.
 
 4.23. Executing ABC pass (technology mapping using ABC).
 
-4.23.1. Extracting gate netlist of module `\add_w16' to `<abc-temp-dir>/input.blif'..
-Extracted 110 gates and 142 wires to a netlist network with 32 inputs and 17 outputs.
+4.23.1. Extracting gate netlist of module `\appx_ripple8' to `<abc-temp-dir>/input.blif'..
+Extracted 37 gates and 53 wires to a netlist network with 16 inputs and 9 outputs.
 
 4.23.1.1. Executing ABC.
 Running ABC command: "<yosys-exe-dir>/yosys-abc" -s -f <abc-temp-dir>/abc.script 2>&1
@@ -418,33 +439,31 @@ ABC: + map
 ABC: + write_blif <abc-temp-dir>/output.blif 
 
 4.23.1.2. Re-integrating ABC results.
-ABC RESULTS:             ORNOT cells:        2
-ABC RESULTS:              XNOR cells:       18
-ABC RESULTS:              NAND cells:        8
-ABC RESULTS:               XOR cells:       13
 ABC RESULTS:               AND cells:        8
-ABC RESULTS:               NOR cells:       15
-ABC RESULTS:            ANDNOT cells:       21
-ABC RESULTS:                OR cells:       25
-ABC RESULTS:        internal signals:       93
-ABC RESULTS:           input signals:       32
-ABC RESULTS:          output signals:       17
+ABC RESULTS:            ANDNOT cells:        5
+ABC RESULTS:               NOR cells:        4
+ABC RESULTS:                OR cells:        5
+ABC RESULTS:              XNOR cells:       12
+ABC RESULTS:               XOR cells:        3
+ABC RESULTS:        internal signals:       28
+ABC RESULTS:           input signals:       16
+ABC RESULTS:          output signals:        9
 Removing temp directory.
 
 4.24. Executing OPT pass (performing simple optimizations).
 
 4.24.1. Executing OPT_EXPR pass (perform const folding).
-Optimizing module add_w16.
+Optimizing module appx_ripple8.
 
 4.24.2. Executing OPT_MERGE pass (detect identical cells).
-Finding identical cells in module `\add_w16'.
+Finding identical cells in module `\appx_ripple8'.
 Removed a total of 0 cells.
 
 4.24.3. Executing OPT_DFF pass (perform DFF optimizations).
 
 4.24.4. Executing OPT_CLEAN pass (remove unused cells and wires).
-Finding unused cells or wires in module \add_w16..
-Removed 0 unused cells and 100 unused wires.
+Finding unused cells or wires in module \appx_ripple8..
+Removed 0 unused cells and 46 unused wires.
 <suppressed ~1 debug messages>
 
 4.24.5. Finished fast OPT passes.
@@ -452,35 +471,33 @@ Removed 0 unused cells and 100 unused wires.
 4.25. Executing HIERARCHY pass (managing design hierarchy).
 
 4.25.1. Analyzing design hierarchy..
-Top module:  \add_w16
+Top module:  \appx_ripple8
 
 4.25.2. Analyzing design hierarchy..
-Top module:  \add_w16
+Top module:  \appx_ripple8
 Removed 0 unused modules.
 
 4.26. Printing statistics.
 
-=== add_w16 ===
+=== appx_ripple8 ===
 
-   Number of wires:                 99
-   Number of wire bits:            191
-   Number of public wires:           6
-   Number of public wire bits:      98
+   Number of wires:                 35
+   Number of wire bits:             87
+   Number of public wires:           7
+   Number of public wire bits:      59
    Number of memories:               0
    Number of memory bits:            0
    Number of processes:              0
-   Number of cells:                110
-     $_ANDNOT_                      21
+   Number of cells:                 37
+     $_ANDNOT_                       5
      $_AND_                          8
-     $_NAND_                         8
-     $_NOR_                         15
-     $_ORNOT_                        2
-     $_OR_                          25
-     $_XNOR_                        18
-     $_XOR_                         13
+     $_NOR_                          4
+     $_OR_                           5
+     $_XNOR_                        12
+     $_XOR_                          3
 
 4.27. Executing CHECK pass (checking for obvious problems).
-Checking module add_w16...
+Checking module appx_ripple8...
 Found and reported 0 problems.
 
 5. Executing DFFLEGALIZE pass (convert FFs to types supported by the target).
@@ -508,12 +525,12 @@ Found and reported 0 problems.
     unmapped dff cell: $_DFFSR_PPP_
 
 6.1. Executing DFFLEGALIZE pass (convert FFs to types supported by the target).
-Mapping DFF cells in module `\add_w16':
+Mapping DFF cells in module `\appx_ripple8':
 
 7. Executing ABC pass (technology mapping using ABC).
 
-7.1. Extracting gate netlist of module `\add_w16' to `<abc-temp-dir>/input.blif'..
-Extracted 110 gates and 142 wires to a netlist network with 32 inputs and 17 outputs.
+7.1. Extracting gate netlist of module `\appx_ripple8' to `<abc-temp-dir>/input.blif'..
+Extracted 37 gates and 53 wires to a netlist network with 16 inputs and 9 outputs.
 
 7.1.1. Executing ABC.
 Running ABC command: "<yosys-exe-dir>/yosys-abc" -s -f <abc-temp-dir>/abc.script 2>&1
@@ -542,56 +559,56 @@ ABC: + &put
 ABC: + write_blif <abc-temp-dir>/output.blif 
 
 7.1.2. Re-integrating ABC results.
-ABC RESULTS:              AND2 cells:        7
-ABC RESULTS:               OR2 cells:        7
-ABC RESULTS:             AOI21 cells:        7
-ABC RESULTS:             NAND2 cells:        9
-ABC RESULTS:              NOR2 cells:        8
-ABC RESULTS:             XNOR2 cells:       22
-ABC RESULTS:              XOR2 cells:        9
-ABC RESULTS:             OAI21 cells:        8
-ABC RESULTS:        internal signals:       93
-ABC RESULTS:           input signals:       32
-ABC RESULTS:          output signals:       17
+ABC RESULTS:              AND2 cells:        3
+ABC RESULTS:             NAND2 cells:        5
+ABC RESULTS:               OR2 cells:        3
+ABC RESULTS:              NOR2 cells:        4
+ABC RESULTS:              XOR2 cells:        5
+ABC RESULTS:             AOI21 cells:        3
+ABC RESULTS:             OAI21 cells:        4
+ABC RESULTS:             XNOR2 cells:       10
+ABC RESULTS:        internal signals:       28
+ABC RESULTS:           input signals:       16
+ABC RESULTS:          output signals:        9
 Removing temp directory.
 
 8. Executing OPT_CLEAN pass (remove unused cells and wires).
-Finding unused cells or wires in module \add_w16..
-Removed 0 unused cells and 145 unused wires.
-<suppressed ~4 debug messages>
+Finding unused cells or wires in module \appx_ripple8..
+Removed 0 unused cells and 57 unused wires.
+<suppressed ~5 debug messages>
 
 9. Printing statistics.
 
-=== add_w16 ===
+=== appx_ripple8 ===
 
-   Number of wires:                 63
-   Number of wire bits:            109
+   Number of wires:                 31
+   Number of wire bits:             53
    Number of public wires:           3
-   Number of public wire bits:      49
+   Number of public wire bits:      25
    Number of memories:               0
    Number of memory bits:            0
    Number of processes:              0
-   Number of cells:                 77
-     AND2                            7
-     AOI21                           7
-     NAND2                           9
-     NOR2                            8
-     OAI21                           8
-     OR2                             7
-     XNOR2                          22
-     XOR2                            9
+   Number of cells:                 37
+     AND2                            3
+     AOI21                           3
+     NAND2                           5
+     NOR2                            4
+     OAI21                           4
+     OR2                             3
+     XNOR2                          10
+     XOR2                            5
 
-   Chip area for module '\add_w16': 122.670000
+   Chip area for module '\appx_ripple8': 58.670000
 
 10. Executing Verilog backend.
 
 10.1. Executing BMUXMAP pass.
 
 10.2. Executing DEMUXMAP pass.
-Dumping module `\add_w16'.
+Dumping module `\appx_ripple8'.
 
 11. Executing JSON backend.
 
-End of script. Logfile hash: 35017f62e0, CPU: user 0.11s system 0.00s, MEM: 13.46 MB peak
+End of script. Logfile hash: a88c7432a5, CPU: user 0.06s system 0.00s, MEM: 13.08 MB peak
 Yosys 0.33 (git sha1 2584903a060)
-Time spent: 40% 2x abc (0 sec), 12% 4x read_verilog (0 sec), ...
+Time spent: 50% 2x abc (0 sec), 13% 4x read_verilog (0 sec), ...

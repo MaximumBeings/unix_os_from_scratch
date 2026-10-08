@@ -1,0 +1,12 @@
+Gray: the shift is by 2: caught
+Gray: the output is plain binary: caught
+counter: the enable is ignored: caught
+counter: it counts by two: caught
+counter: reset loads 1: caught
+swap: the non-blocking swap is written with blocking assignments: caught
+swap: the pair is not reset to 1, 2: caught
+extend: the sign extension is a zero extension: caught
+extend: the sign extension replicates the wrong bit: caught
+extend: the zero extension fills with ones: caught
+
+appendix B demonstration modules: 10 of 10 broken circuits caught

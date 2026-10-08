@@ -592,6 +592,6 @@ Dumping module `\add_w8'.
 
 11. Executing JSON backend.
 
-End of script. Logfile hash: fea3210dde, CPU: user 0.07s system 0.00s, MEM: 13.18 MB peak
+End of script. Logfile hash: fea3210dde, CPU: user 0.07s system 0.01s, MEM: 13.01 MB peak
 Yosys 0.33 (git sha1 2584903a060)
-Time spent: 52% 2x abc (0 sec), 12% 4x read_verilog (0 sec), ...
+Time spent: 45% 2x abc (0 sec), 14% 4x read_verilog (0 sec), ...

@@ -1,0 +1,24 @@
+
+9. Printing statistics.
+
+=== appx_ripple8 ===
+
+   Number of wires:                 31
+   Number of wire bits:             53
+   Number of public wires:           3
+   Number of public wire bits:      25
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                 37
+     AND2                            3
+     AOI21                           3
+     NAND2                           5
+     NOR2                            4
+     OAI21                           4
+     OR2                             3
+     XNOR2                          10
+     XOR2                            5
+
+   Chip area for module '\appx_ripple8': 58.670000
+

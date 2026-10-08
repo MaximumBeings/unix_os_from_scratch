@@ -1,0 +1,31 @@
+== 1. the dot product and what it measures
+  a = [1, 2, 3], b = [4, -5, 6]: a.b = 1*4 + 2*-5 + 3*6 = 12
+  |u| = 5.0; cosine of the angle between u = [3.0, 4.0] and v = [4.0, 3.0]: 0.9600 (1 means the same direction, 0 orthogonal, -1 opposite)
+
+== 2. matrix times vector, matrix times matrix, and the shape rule: (m x k) times (k x n) gives (m x n)
+  A is 2x3, B is 3x2: A B = [[58, 64], [139, 154]] (2x2); B A = [[39, 54, 69], [49, 68, 87], [59, 82, 105]] (3x3): matrix products do not commute
+  entry (i, j) of A B is row i of A dotted with column j of B: row 1 [4, 5, 6] . column 0 [7, 9, 11] = 139 = (A B)[1][0] = 139
+  (A B)^T = B^T A^T: True
+
+== 3. three ways to see the same product (all give identical results)
+  row by row (each output row is x W): True;  entry by entry: True;  as a sum of 5 outer products: True
+  the outer-product view is the one a systolic array computes: one column of X meets one row of W per step, and every cell adds its product to its own running sum (Chapter 4)
+
+== 4. counting the work: a matrix product of (m x k) and (k x n) does m*k*n multiply-adds; check by counting
+  4x5 times 5x3: counted 60 multiply-adds = m*k*n = 60;  FLOPs = 2 m k n = 120
+
+== 5. arithmetic intensity: operations per byte moved (int8: one byte per number; inputs read once, result written once). This is the number that decides whether memory or arithmetic limits a computation (Chapter 9)
+  product                     multiply-adds  bytes moved  ops per byte
+  vector x matrix (1x4096 . 4096x4096)     16,777,216   16,785,408           1.0
+  matrix x matrix, batch 8      134,217,728   16,842,752           8.0
+  matrix x matrix, batch 64   1,073,741,824   17,301,504          62.1
+  matrix x matrix, 512x512x512    134,217,728      786,432         170.7
+  a vector times a weight matrix does about 1 multiply-add per byte: decoding one token is bandwidth-limited. Batch 64 reuses each weight 64 times: about 60 per byte
+
+== 6. softmax: turn scores into probabilities (non-negative, sum to 1); subtract the maximum first so the exponentials cannot overflow
+  scores [2.0, 1.0, 0.1, 5.0] -> probabilities [0.0463, 0.017, 0.0069, 0.9298] (sum 1.0000)
+  scores [1000.0, 999.0]: exp(1000) overflows a float, but subtracting the maximum gives [0.7311, 0.2689]
+
+== 7. one attention head in four lines (Chapter 8): scores = q K^T / sqrt(d); weights = softmax(scores); out = weights V
+  3 cached tokens, head width 4: scores [0.516, -0.977, -0.101] -> weights [0.567, 0.127, 0.306] -> output [-0.105, -0.471, -0.727, -0.847]
+  the output is a weighted average of the value rows: its first entry -0.105 lies between -1.869 and 1.045: True

@@ -1,0 +1,113 @@
+{
+  "creator": "Yosys 0.33 (git sha1 2584903a060)",
+  "modules": {
+    "vote3_always": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "rtl/demo_vote3.v:5.1-12.10"
+      },
+      "ports": {
+        "a": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "b": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "c": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "y": {
+          "direction": "output",
+          "bits": [ 5 ]
+        }
+      },
+      "cells": {
+        "$abc$177$auto$blifparse.cc:386:parse_blif$178": {
+          "hide_name": 1,
+          "type": "NOR2",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 3 ],
+            "B": [ 2 ],
+            "Y": [ 6 ]
+          }
+        },
+        "$abc$177$auto$blifparse.cc:386:parse_blif$179": {
+          "hide_name": 1,
+          "type": "AOI21",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 3 ],
+            "B": [ 2 ],
+            "C": [ 4 ],
+            "Y": [ 7 ]
+          }
+        },
+        "$abc$177$auto$blifparse.cc:386:parse_blif$180": {
+          "hide_name": 1,
+          "type": "NOR2",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "connections": {
+            "A": [ 6 ],
+            "B": [ 7 ],
+            "Y": [ 5 ]
+          }
+        }
+      },
+      "netnames": {
+        "$abc$177$new_n5_": {
+          "hide_name": 1,
+          "bits": [ 6 ],
+          "attributes": {
+          }
+        },
+        "$abc$177$new_n6_": {
+          "hide_name": 1,
+          "bits": [ 7 ],
+          "attributes": {
+          }
+        },
+        "a": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "rtl/demo_vote3.v:5.28-5.29"
+          }
+        },
+        "b": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "rtl/demo_vote3.v:5.37-5.38"
+          }
+        },
+        "c": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "rtl/demo_vote3.v:5.46-5.47"
+          }
+        },
+        "y": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "rtl/demo_vote3.v:5.60-5.61"
+          }
+        }
+      }
+    }
+  }
+}

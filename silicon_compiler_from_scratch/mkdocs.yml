@@ -76,4 +76,12 @@ nav:
       - "15. A Paged KV Cache and Sliding-Window Attention": part15/15-paged-cache-and-window.md
       - "16. Speculative Decoding": part16/16-speculative-decoding.md
       - "17. Mixture-of-Experts Routing": part17/17-mixture-of-experts.md
+  - Appendices:
+      - "A. Digital Logic": appendix/a-digital-logic.md
+      - "B. Verilog": appendix/b-verilog.md
+      - "C. Number Formats": appendix/c-number-formats.md
+      - "D. Linear Algebra for ML": appendix/d-linear-algebra.md
+      - "E. Transformers and LLM Inference": appendix/e-transformers.md
+      - "F. Memory Systems and DRAM": appendix/f-memory-systems.md
+      - "G. The EDA Flow": appendix/g-eda-flow.md
   - Answers to the Self-Check Questions: answers.md

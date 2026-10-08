@@ -669,3 +669,207 @@ Worked answer: the testbench raises `rst` in the middle of a cycle and samples `
 2. A decade counter's wrap condition is `q == 9`; mutants worth adding: wraps at 10, wraps at 15 (not changed from the original), reset loads 9.
 3. A reasonable priority is rst, then load, then en; the mutants are each swap of that order, and a missing `load` case.
 4. For the 8-bit-input adder there is no input that is not tested; for a 16-bit adder with 1,000 random cases, a mutant that breaks only when `a == 16'hFFFF && b == 16'h0001` is untouched by random testing with overwhelming probability.
+
+---
+
+## Appendix A
+
+**1. Build XOR from NAND gates only and count them. Check it on all four inputs by hand.**
+
+Worked answer: XOR(a, b) = NAND(NAND(a, n), NAND(b, n)) with n = NAND(a, b): four NAND gates. For a = 0, b = 1: n = 1; NAND(0, 1) = 1; NAND(1, 1) = 0; NAND(1, 0) = 1 = 0 XOR 1. The other three inputs check the same way.
+
+**2. How many input combinations must a test cover to check a full adder exhaustively? A 16-bit adder with carry in?**
+
+Worked answer: A full adder has three inputs, so 2^3 = 8 combinations. A 16-bit adder with carry in has 16 + 16 + 1 = 33 input bits: 2^33, about 8.6 billion combinations, which is why exhaustive testing stops being reasonable beyond about 20 input bits, and why Chapter 1 uses random and directed tests together.
+
+**3. In the shift register example, what is the register after three edges for the input stream 1, 1, 0 starting from 0000?**
+
+Worked answer: Starting from 0000 with the input stream 1, 1, 0: after the first edge 0001, after the second 0011, after the third 0110.
+
+**4. Give the state table of a Moore machine that outputs 1 when the last two bits were both 1 (overlap allowed). How many states does it need?**
+
+Worked answer: Three states: S0 (the last bit was 0, or nothing yet), S1 (the last bit was 1 and the one before was not), S2 (the last two bits were 11; output 1). S0: on 0 -> S0, on 1 -> S1. S1: on 0 -> S0, on 1 -> S2. S2: on 0 -> S0, on 1 -> S2 (overlap: the last 1 can start or continue a run).
+
+**5. A path has clock-to-q 0.3 ns, logic 3.4 ns and setup 0.1 ns. What is the fastest clock? What happens if you clock it faster?**
+
+Worked answer: The period must be at least 0.3 + 3.4 + 0.1 = 3.8 ns, so the fastest clock is about 263 MHz. If it is clocked faster the data has not arrived when the second flip-flop samples it (a setup violation): the flip-flop captures a wrong or undefined value, and the circuit gives wrong answers.
+
+**6. Why can a flip-flop's `d` change between edges without changing `q`?**
+
+Worked answer: The flip-flop only looks at `d` at the rising clock edge; between edges its output `q` is held by the stored bit, not by `d`. That is the whole point of the synchronous style: the combinational logic may glitch and settle between edges without disturbing anything.
+
+---
+
+## Appendix B
+
+**1. Write a module `inc4` that adds 1 to a 4-bit input with wrap-around, once with `assign` and once with `always @*`.**
+
+Worked answer: `assign y = x + 4'd1;` (4-bit arithmetic wraps naturally) and `always @* y = x + 4'd1;` with `output reg [3:0] y`. Both are combinational; the second uses a blocking assignment.
+
+**2. Why does `always @* case (sel) 0: y = a; 1: y = b; endcase` for a 2-bit `sel` produce a latch?**
+
+Worked answer: For a 2-bit `sel` there are four values but only two cases are listed. When `sel` is 2 or 3 the output must keep its old value, which needs memory, so synthesis builds a latch. A `default` branch (or an `else`) assigns the output on every path and removes it.
+
+**3. In `swap_blocking`, what are the values of `a` and `b` after the first clock edge following reset?**
+
+Worked answer: After reset `a = 1, b = 2`. At the first edge, `a = b` makes `a` equal to 2 at once, then `b = a` reads the new `a` and also becomes 2: both registers hold 2 and stay equal.
+
+**4. Convert the 4-bit binary values 0110 and 1011 to Gray code by hand. Check that they differ from their neighbours in one bit.**
+
+Worked answer: 0110 ^ 0011 = 0101; 1011 ^ 0101 = 1110. Neighbours: 0111 (7) gives 0100, which differs from 0101 in one bit; 1010 (10) gives 1111, which differs from 1110 in one bit.
+
+**5. What does `{{4{x[7]}}, x}` produce for `x = 8'h7F`? For `x = 8'h80`?**
+
+Worked answer: For `x = 8'h7F` it produces `12'h07F` (the top bit is 0, so four zeros are added); for `x = 8'h80` it produces `12'hF80` (the top bit is 1, so four ones are added; -128 stays -128).
+
+**6. Why does the book run every testbench in two simulators?**
+
+Worked answer: The two simulators were written independently and schedule events differently. A race in the testbench or a construct that is simulator-specific behaves differently in them, so a difference exposes the problem, while a bug that both share is still a bug in the design.
+
+---
+
+## Appendix C
+
+**1. Write -37 in 8-bit two's complement. Add 100 to it by hand in binary and check the result.**
+
+Worked answer: 37 = 00100101; invert: 11011010; add one: 11011011 (0xDB). Add 100 = 01100100: 11011011 + 01100100 = 1 00111111; dropping the carry out gives 00111111 = 63 = -37 + 100.
+
+**2. What do the 8-bit patterns 0x80, 0xFF and 0x7F mean as unsigned and as signed?**
+
+Worked answer: 0x80: unsigned 128, signed -128. 0xFF: unsigned 255, signed -1. 0x7F: 127 both ways.
+
+**3. Which format represents a value near 0.001 more finely: Q1.7, or fp16? Which represents 1000?**
+
+Worked answer: fp16 represents 0.001 much more finely (its spacing near 0.001 is about 1e-6, while Q1.7's step is 0.0078, which would store 0.001 as 0). Only fp16 can represent 1000 at all (Q1.7's range is -1 to 0.99; fp16's spacing near 1000 is 0.5).
+
+**4. Round 2.5, 3.5 and -2.5 by truncation, half up and half even.**
+
+Worked answer: 2.5: truncate 2, half up 3, half even 2. 3.5: 3, 4, 4. -2.5: truncate -2, half up -2, half even -2 (half away from zero would give -3).
+
+**5. How many bits does the sum of 1,000 int8 products need in the worst case?**
+
+Worked answer: 16 + ceil(log2 1000) = 16 + 10 = 26 signed bits.
+
+**6. A tensor has values in [-6, 6] with one outlier at 60. What is the int8 scale, and what is the quantization step of the ordinary values?**
+
+Worked answer: The int8 scale is 60 / 127 = 0.47. The ordinary values (|x| <= 6) then use only codes -12 to 12, a step of 0.47 each, so their error is up to 0.24: about 4% of their range. Without the outlier the scale would be 6 / 127 = 0.047, ten times finer.
+
+**7. Why is saturation better than wrap-around for an activation, and when would wrap-around be acceptable?**
+
+Worked answer: Saturation limits the error to the clipped part of the value and keeps the sign; wrap-around turns a large positive into a large negative. Wrap-around is acceptable (and wanted) in modular arithmetic: counters, address arithmetic, hashes.
+
+---
+
+## Appendix D
+
+**1. Compute `[2, -1, 3] . [4, 0, -2]`. Are the vectors closer to perpendicular or to the same direction?**
+
+Worked answer: 2*4 + (-1)*0 + 3*(-2) = 8 + 0 - 6 = 2. The lengths are sqrt(14) = 3.74 and sqrt(20) = 4.47, so the cosine is 2 / 16.7 = 0.12: close to perpendicular.
+
+**2. Multiply `[[1, 0], [2, 1]]` by `[[3, 1], [0, 2]]`. Multiply them in the other order and compare.**
+
+Worked answer: [[1,0],[2,1]] x [[3,1],[0,2]] = [[3, 1], [6, 4]]. In the other order: [[3,1],[0,2]] x [[1,0],[2,1]] = [[5, 1], [4, 2]]. They differ: matrix products do not commute.
+
+**3. A product of a 6 x 8 matrix with an 8 x 5 matrix: what shape is the result, and how many multiply-adds?**
+
+Worked answer: 6 x 5; 6 * 8 * 5 = 240 multiply-adds.
+
+**4. Compute the arithmetic intensity (int8) of a 1 x 1024 vector times a 1024 x 1024 matrix.**
+
+Worked answer: Multiply-adds: 1 * 1024 * 1024 = 1,048,576. Bytes: 1,024 + 1,048,576 + 1,024 = 1,050,624. Intensity: about 1.0 operation per byte.
+
+**5. Why does softmax subtract the maximum before exponentiating? Does it change the result?**
+
+Worked answer: The exponential of a large score overflows. Subtracting the maximum from every score multiplies numerator and denominator by the same factor exp(-max), so the result is unchanged.
+
+**6. Softmax of `[0, 0, 0, 0]`: what is it, and what does it say about attention with all scores equal?**
+
+Worked answer: Softmax of four equal scores is [0.25, 0.25, 0.25, 0.25]: the output of attention is the plain average of the value rows: every cached token counts equally.
+
+**7. Why does the outer-product view suit a systolic array better than the dot-product view?**
+
+Worked answer: A systolic array receives one column of the left operand and one row of the right at each step and updates a running sum in every cell; the outer-product view is exactly that sequence. The dot-product view needs a whole row and a whole column present at once for one output.
+
+---
+
+## Appendix E
+
+**1. Count the parameters of a model with 24 layers, `d = 1024`, `f = 4096` (two-matrix FFN) and a vocabulary of 50,000, with a separate output matrix.**
+
+Worked answer: Per layer: 4 * 1024^2 = 4,194,304 attention weights plus 2 * 1024 * 4096 = 8,388,608 FFN weights = 12,582,912; times 24 layers = 301,989,888. Plus the embedding and output matrices: 2 * 50,000 * 1024 = 102,400,000. Total about 404 million parameters.
+
+**2. Why does the attention of token t only look at tokens up to t? What stops it looking ahead during decode?**
+
+Worked answer: Tokens are generated left to right: at decode time the cache holds only earlier tokens (and the current one), so there is nothing ahead to look at. During prefill and training a causal mask forbids it (Chapter 16 builds that mask from slices).
+
+**3. Compute the KV cache per token of a model with 40 layers, 8 KV heads of width 128, in int8. How many requests of 8,192 tokens fit in 24 GiB?**
+
+Worked answer: 2 * 40 * 8 * 128 = 81,920 bytes = 80 KiB per token. A request of 8,192 tokens holds 640 MiB. 24 GiB / 640 MiB = 38.4, so 38 requests (ignoring the weights, which also need room).
+
+**4. Why is decode memory-bound but prefill not? Express it as operations per weight byte.**
+
+Worked answer: Decode multiplies each weight by one activation, so about 1 operation per weight byte; prefill multiplies each weight by one activation per prompt token: about as many operations per weight byte as there are tokens in the prompt (512 in the example).
+
+**5. A residual connection adds the block's output to its input. What would happen to the signal after 100 layers without them?**
+
+Worked answer: Without the identity path each layer must reproduce the whole signal as well as add to it; the signal would be distorted by every layer and, in training, gradients would shrink to nothing along 100 layers. The residual lets each block learn a small correction.
+
+**6. Greedy against sampling: which gives the same output twice, and why does a test suite care?**
+
+Worked answer: Greedy decoding gives the same output every time, so a test can compare with a known answer. Sampling gives different outputs on different runs (unless the random generator is fixed), so a test could only check statistics.
+
+---
+
+## Appendix F
+
+**1. Why does a row hit cost less than a row miss? What does the precharge do?**
+
+Worked answer: A row hit finds the row already in the row buffer and only needs the column access. A precharge closes the open row (writes it back to the cells and readies the bank), which must happen before another row can be activated; a miss pays precharge, activate and column access.
+
+**2. A DRAM channel delivers 25.6 GB/s at peak. How long does it take to stream the 7 GB of an int8 7B model once?**
+
+Worked answer: 7e9 bytes / 25.6e9 bytes per second = 0.27 s per pass, so about 3.7 tokens per second at best on one such channel.
+
+**3. Why does one request at a time give 3.8 GB/s from a memory whose peak is 25.6?**
+
+Worked answer: Each request has to wait the whole access latency (14 ns for a row hit plus the 2.5 ns burst) before the next one is issued: 64 bytes per 16.5 ns = 3.9 GB/s. With eight in flight the latencies overlap and the bus stays busy.
+
+**4. Why is a stride of 4 KiB bad for the toy model's banks? What would you change in the address mapping?**
+
+Worked answer: A stride of 4 KiB is exactly 64 lines, and the bank is the line number mod 8, so every access goes to the same bank and the banks cannot overlap. Address mappings hash several higher address bits into the bank number (for example, XOR them in) so that regular strides spread over the banks.
+
+**5. An accelerator has 1 TB/s of HBM and a 7B int8 model. What is the best decode speed at batch 1? At batch 8, if the weights are read once per step and the cache is neglected?**
+
+Worked answer: Batch 1: 1e12 / 7e9 = 143 tokens per second. Batch 8: the weights are read once per step, so each of the 8 requests still receives about 143 tokens per second and the chip delivers about 1,140 tokens per second in total (neglecting the cache, which is what Chapter 9 adds).
+
+**6. Which of the book's chip assumptions would change if the memory were real DRAM, and which would not?**
+
+Worked answer: Unchanged: the SRAM scratchpad's cycle counts, the arithmetic, the instruction-level counts, and the roofline's shape (streaming weights is the good case). Changed: the fixed 8-cycle DMA latency (a real DRAM has pattern-dependent latency and bandwidth), and anything that gathers small pieces.
+
+---
+
+## Appendix G
+
+**1. Name the stages between Verilog and a netlist, and say what each does in one sentence.**
+
+Worked answer: Elaboration (read the language and build the module hierarchy), proc (turn procedural blocks into logic and flip-flops), optimization (remove redundant logic), technology mapping (choose cells from the library), and a final optimization pass (ABC).
+
+**2. Why can simulation never prove two circuits equivalent, and what does a miter do differently?**
+
+Worked answer: Simulation checks only the inputs it tries, at most a tiny fraction of 2^n. A miter feeds both designs the same inputs and a SAT solver searches for an input on which the outputs differ; if the search ends with none, there is none, for all inputs.
+
+**3. The counterexample for the broken voter is `a = 0, b = 1, c = 1`. Compute both outputs by hand.**
+
+Worked answer: Correct voter: majority of (0, 1, 1) is 1. Broken voter: (a & b) | (a & c) = (0 & 1) | (0 & 1) = 0. They differ, so this is a counterexample.
+
+**4. Why are the three 8-bit adders identical after synthesis but the 32-bit ones not?**
+
+Worked answer: With 8 bits the carry chain is short and the logic optimizer restructures all three descriptions to the same netlist (37 cells); the extra logic of a prefix tree only pays off, and is only visible, as the width grows (at 32 bits the delays are 3.65 against 2.30 ns).
+
+**5. What does logic synthesis not know that place-and-route does? Name two things that make real timing worse than the model's.**
+
+Worked answer: Place-and-route knows where the cells are and how long the wires are, how many gates each output drives, and how late the clock arrives at each flip-flop. Any two of: wire delay, fan-out loading, clock skew and uncertainty, on-chip variation, crosstalk.
+
+**6. Why is area in "NAND2 equivalents" a reasonable unit, and what is its weakness?**
+
+Worked answer: A NAND2 is a convenient unit that is independent of the library's real sizes, so areas of designs can be compared. Its weakness is that it hides wires, congestion and the fact that flip-flops and large cells do not scale like NAND gates; it is a relative, not a physical, measure.

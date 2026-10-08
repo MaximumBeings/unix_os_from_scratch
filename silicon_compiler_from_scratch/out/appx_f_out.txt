@@ -1,0 +1,41 @@
+== 1. what a DRAM access costs: it depends on whether the row is already open (assumed timings in ns)
+  row hit  (the row is open):              column access 14.0 -> 14.0 ns to the first data
+  row empty (the bank is idle):            activate 14.0 + column access 14.0 -> 28.0 ns
+  row miss (another row is open):          precharge 14.0 + activate 14.0 + column access 14.0 -> 42.0 ns
+  one burst of 64 bytes then occupies the bus for 2.5 ns: the peak bandwidth of one channel is 25.6 GB/s
+
+== 2. access patterns on the same DRAM: sequential (streaming a weight matrix), strided (column access), random (a gather). 8 banks, open-page policy
+  pattern                         one request at a time     8 requests in flight
+  sequential 64-byte lines        3.83 GB/s ( 99% row hits)   25.34 GB/s ( 99% row hits)
+  strided by 4 KiB                3.51 GB/s ( 94% row hits)   15.06 GB/s ( 94% row hits)
+  random lines                    1.44 GB/s (  0% row hits)    7.56 GB/s (  0% row hits)
+  the strided pattern puts every access in the same bank (bank = line number mod 8, and 4 KiB is exactly 64 lines): the row hits are as good as the stream's but there is no bank parallelism, so the throughput is lower
+  peak of the channel: 25.6 GB/s. Streaming reaches a large part of it only with several requests in flight (latency hidden by parallelism); random access cannot, because most requests pay an activate
+
+== 3. open-page against closed-page policy (keep the row open after an access, or close it at once)
+  pattern                         open page  closed page
+  sequential                       25.34 GB/s     12.19 GB/s
+  random                            7.56 GB/s      6.51 GB/s
+  in this toy model open page wins for both patterns: for a stream by a factor of two (every access after the first is a row hit), for random access narrowly (a closed bank skips the precharge on the critical path but stays busy longer). Real controllers choose per workload or adaptively; the table shows only that the policy is a trade-off and that locality is what makes DRAM fast
+
+== 4. how many banks does it take? (sequential stream, 8 requests in flight)
+   1 banks:  23.49 GB/s
+   2 banks:  24.63 GB/s
+   4 banks:  25.10 GB/s
+   8 banks:  25.34 GB/s
+  16 banks:  25.38 GB/s
+
+== 5. memories are a hierarchy: smaller is faster (typical orders of magnitude, ASSUMED; they differ by process and design)
+  level                            size      latency   bandwidth per unit
+  registers                       ~1 KB 0 (same cycle)            many TB/s
+  on-chip SRAM scratchpad     ~1-100 MB      1-10 ns   TB/s (wide, close)
+  HBM / GDDR / DDR DRAM      ~10-100 GB   ~50-100 ns 25 GB/s (one DDR channel) to ~1 TB/s (HBM stack)
+  flash                             ~TB      ~100 us                 GB/s
+
+== 6. what the book's chips assume: Chapter 5's DMA has a FIXED latency (8 cycles) and one word per cycle. In this model that is the cost of a row hit followed by a stream; the real part is the pattern-dependent table above
+  at a 1 ns cycle, the assumed row-hit access of 14 ns is 14 cycles; an 8-cycle latency is a faster, hit-only memory; the chapters' cycle counts are therefore OPTIMISTIC for DRAM and exact for the SRAM scratchpad
+
+== 7. bytes per token against bandwidth (Chapter 9): the ceiling on decode speed is bandwidth divided by the bytes read per token (derived)
+  7B-class, fp16 weights (14 GB)  :    50 GB/s ->    3.6 tok/s    200 GB/s ->   14.3 tok/s   1000 GB/s ->   71.4 tok/s
+  7B-class, int8 (7 GB)           :    50 GB/s ->    7.1 tok/s    200 GB/s ->   28.6 tok/s   1000 GB/s ->  142.9 tok/s
+  7B-class, int4 (3.5 GB)         :    50 GB/s ->   14.3 tok/s    200 GB/s ->   57.1 tok/s   1000 GB/s ->  285.7 tok/s
