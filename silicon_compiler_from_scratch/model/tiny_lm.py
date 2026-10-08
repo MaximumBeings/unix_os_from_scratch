@@ -44,8 +44,9 @@ def float_generate(m, start, n):
         logits, k, v, _ = float_step(m, toks[-1], kc, vc); kc.append(k); vc.append(v); toks.append(logits.index(max(logits)))
     return toks
 # ---------------------------------------------------------------- the graph for one decode step with L tokens in context
-def build_graph(m, L):
-    g = C.Graph(); x = g.tag(g.input("x", (1, D)), "x"); w = lambda nm: g.weight(nm, m[nm])
+def build_graph(m, L, wbits=8):
+    """wbits: bits per weight (8, or 4 for Chapter 13's packed int4 weights); a dict {name: bits} sets them per matrix (anything missing is 8)."""
+    g = C.Graph(); x = g.tag(g.input("x", (1, D)), "x"); w = lambda nm: g.weight(nm, m[nm], bits=(wbits.get(nm, 8) if isinstance(wbits, dict) else wbits))
     q = g.matmul(x, w("Wq")); k = g.tag(g.matmul(x, w("Wk")), "k"); v = g.tag(g.matmul(x, w("Wv")), "v")
     if L > 1: K = g.tag(g.concat_rows(g.tag(g.input("kc", (L - 1, D)), "k"), k), "k"); Vv = g.tag(g.concat_rows(g.tag(g.input("vc", (L - 1, D)), "v"), v), "v")
     else: K, Vv = k, v
@@ -64,10 +65,10 @@ def calibrate(m, steps, starts=range(V)):
     return calib, {"x": rx, "k": rk, "v": rv}
 class Chip:
     """The host's view: compiles each context length once, then decodes token by token on the reference simulator, recording each step's program and external memory so the RTL can replay them."""
-    def __init__(self, m, steps, starts=range(V)):
-        self.m = m; self.calib, self.ranges = calibrate(m, steps, starts); self.progs = {}
+    def __init__(self, m, steps, starts=range(V), wbits=8):
+        self.wbits = wbits; self.m = m; self.calib, self.ranges = calibrate(m, steps, starts); self.progs = {}
     def program(self, L):
-        if L not in self.progs: self.progs[L] = C.compile_graph(build_graph(self.m, L), self.calib[L], ranges=self.ranges)
+        if L not in self.progs: self.progs[L] = C.compile_graph(build_graph(self.m, L, self.wbits), self.calib[L], ranges=self.ranges)
         return self.progs[L]
     def generate(self, start, n, force=None):
         """Decode n tokens from `start`. force: a list of tokens to feed instead of the chip's own choice (teacher forcing). Returns tokens, per-step records and per-step logits."""

@@ -70,4 +70,6 @@ nav:
   - "Part 5 -- Compilation: Capra and the Capstone":
       - "11. Capra, the Compiler: From a Tensor Graph to GA-2 Instructions": part11/11-the-compiler.md
       - "12. Capstone: A Tiny Transformer Decodes on the Chip": part12/12-capstone.md
+  - "Part 6 -- Case Studies":
+      - "13. int4 Weight-Only Quantization": part13/13-int4-weights.md
   - Answers to the Self-Check Questions: answers.md

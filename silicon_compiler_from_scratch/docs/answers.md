@@ -447,9 +447,56 @@ Worked answer: non-blocking assignments sample every right-hand side with the va
 
 Worked answer: the testbench raises `rst` in the middle of a cycle and samples `q` after the next rising edge. By then both the synchronous circuit (which resets at the edge) and the asynchronous one (which reset earlier) show `q = 0`, so they look identical. They differ only in *when* `q` changed, which is visible in the combinational output `wrap = en && q == 15`: in the asynchronous circuit it drops immediately when `rst` rises, in the synchronous one it stays until the edge. Only a check of `wrap` before the edge sees the difference.
 
+---
+
+## Chapter 13
+
+**1. Why `-7 .. 7`, not `-8 .. 7`?**
+
+Worked answer: the range stays symmetric, so negating a weight never overflows (`-(-8)` has no 4-bit representation), a single scale works for both signs, and zero stays exactly zero with the same step on both sides. The cost is one unused code out of sixteen (6% of the range).
+
+**2. Scale for `max|w| = 0.7`; what is `w = 0.33`?**
+
+Worked answer: scale = 0.7 / 7 = 0.1. 0.33 / 0.1 = 3.3, which rounds to 3; the dequantized value is 0.3 and the error is 0.03, below half a step (0.05).
+
+**3. Pack `[1, -1, 2, -2, 3, -3, 4, -4]`.**
+
+Worked answer: the nibbles of elements 0..7 are 1, F, 2, E, 3, D, 4, C. Element 0 is the least significant nibble, so reading from the most significant end the word is C 4 D 3 E 2 F 1 = `0xC4D3E2F1`.
+
+**4. Where do the 10 cycles of UNPACK come from?**
+
+Worked answer: one cycle to issue the read, one for the scratchpad's read latency (the data is latched), and eight writes, one per output element. The scratchpad has a single write port, so eight values cannot be written in fewer than eight cycles; 10 is therefore 8 plus the fixed overhead of 2.
+
+**5. Derive `b* = 7/u`.**
+
+Worked answer: int8 takes n/b cycles. int4 takes n/(8b) for the link plus (n/8)u for the unpack. int4 wins when n/b > n/(8b) + nu/8. Multiply by 8b/n: 8 > 1 + ub, so ub < 7 and b < 7/u.
+
+**6. Why 2.85x less traffic and not 8x?**
+
+Worked answer: only the weights are packed. The model has 2,304 weights (Wq, Wk, Wv, Wo: 4 x 256; W1 and W2: 2 x 512; Wout: 256). At step 24 the total is 3,105 words with int8 weights, so 3,105 - 2,304 = 801 words are not weights (the input, the cache and the outputs). With int4 the weights take 2,304 / 8 = 288 words and the total is 288 + 801 = 1,089, a factor of 2.85. The 801 words did not shrink.
+
+**7. Why does the designed model survive int4 and the random model not?**
+
+Worked answer: the designed model's answer is fixed by large, well-separated logits (Chapter 12 measured the gap between the best and second-best), so noise of 15-20% cannot reorder them; the random model's logits are close together, so the same noise changes the argmax in 9% of the decisions.
+
+**8. Why does a per-column scale need a different requantizer?**
+
+Worked answer: the product `x W` accumulates in integers; each output column j is multiplied by `scale_x * scale_Wj` to return to real values. With one scale per tensor, one multiplier and shift (the RQ instruction's `m` and `s`) serve every column; with per-column scales the multiplier differs by column, so RQ would need a vector of multipliers or one RQ per column.
+
+---
+
 ## Chapter 1 -- hints for the exercises
 
 1. 65,536 x 2 = 131,072 cases: still exhaustive and still fast; the 8-bit settling time in the delayed model would be 8 stages' worth.
 2. A decade counter's wrap condition is `q == 9`; mutants worth adding: wraps at 10, wraps at 15 (not changed from the original), reset loads 9.
 3. A reasonable priority is rst, then load, then en; the mutants are each swap of that order, and a missing `load` case.
 4. For the 8-bit-input adder there is no input that is not tested; for a 16-bit adder with 1,000 random cases, a mutant that breaks only when `a == 16'hFFFF && b == 16'h0001` is untouched by random testing with overwhelming probability.
+
+## Chapter 13 -- hints for the exercises
+
+1. Uniform weights have no tails, so the largest weight is only 1.7x the standard deviation instead of about 3x: fewer codes are wasted on rare large values.
+2. Per-column is unaffected by any number of outlier columns; per-group-64 equals per-column here (64 rows = one group per column).
+3. Measure each matrix alone (one at a time) and rank the logit errors; the matrices whose outputs feed the residual stream most directly usually matter most.
+4. Two outputs per cycle gives 1 + 1 + 4 = 6 cycles per word; the break-even becomes 7/6 = 1.17 words per cycle, still only a little above this chip's 1 word per cycle.
+5. Make several int4 weights of about 1,400 elements each (they need 175 staging words each) so that without release the staging areas plus the weight buffers exceed 4,096 words.
+6. One multiply and one add (or one multiply of the dequantized outputs) per output element: 32 extra operations for a 1x32 result; the result equals the dequantized per-column study up to the requantizer's own rounding.

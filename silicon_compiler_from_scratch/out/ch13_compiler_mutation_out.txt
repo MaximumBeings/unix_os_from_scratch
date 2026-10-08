@@ -1,0 +1,18 @@
+NOTE: this script deliberately breaks copies of the compiler. 'caught' is EXPECTED: it shows the int4 battery notices the mistake.
+unbroken compiler passes the battery: True
+scale: int4 weights use range/8 instead of range/7: caught
+packing: the fields are stored in reverse order: caught
+packing: the fields are not masked to 4 bits: caught
+packing: the last partial word is not padded: caught
+layout: the packed length rounds down: caught
+lowering: the UNPACK is left out: caught
+lowering: the UNPACK handles one word too few: caught
+lowering: only one packed word is loaded: caught
+layout: buffers of int4 weights are not rounded up to a multiple of 8: caught
+checks: a bit width of 5 is accepted by weight(): caught
+lowering: UNPACK reads the weight's own buffer, not the loaded words: caught
+
+int4 compiler path: 11 of 11 broken compilers caught
+
+A real gap, reported not counted:
+NOT EQUIVALENT but UNTESTED (a gap): the staging area for packed words is never given back: NOT CAUGHT

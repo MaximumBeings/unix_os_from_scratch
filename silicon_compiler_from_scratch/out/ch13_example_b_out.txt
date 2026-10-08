@@ -1,0 +1,49 @@
+== 1. error of a quantized weight matrix, by scale granularity (K=64 inputs, N=32 outputs, Gaussian weights, 200 random inputs)
+scheme          scales  int8 error  int4 error
+per-tensor           1       0.88%      16.22%
+per-column          32       0.59%      11.27%
+per-group 64        32       0.59%      11.27%
+per-group 32        64       0.54%      10.02%
+per-group 16       128       0.47%       8.61%
+per-group 8        256       0.41%       7.37%
+
+the same, when one column of W is 8 times larger than the rest (an 'outlier column')
+scheme          int8 error  int4 error
+per-tensor           2.67%      48.20%
+per-column           0.60%      12.34%
+per-group 64         0.60%      12.34%
+per-group 32         0.54%      10.73%
+per-group 16         0.49%       8.84%
+per-group 8          0.44%       7.46%
+
+== 2. the tiny language model of Chapter 12 with int4 weights (24 decode steps, start token 0)
+int8 (all weights)   tokens correct: 25/25   external words, step 1 / step 24: 2369 / 3105
+int4 (all weights)   tokens correct: 25/25   external words, step 1 / step 24: 353 / 1089
+int4 except Wout     tokens correct: 25/25   external words, step 1 / step 24: 577 / 1313
+
+== 3. the decodes replayed on the RTL (Icarus and Verilator)
+  int8 (all weights)  Icarus    PASS: 24 programs match the Python reference (memory and all five cycle counters), 192710 cycles in total (exit status 0) (exit 0)
+  int8 (all weights)  Verilator PASS: 24 programs match the Python reference (memory and all five cycle counters), 192710 cycles in total (exit status 0) (exit 0)
+  int8 (all weights)  counters identical in both simulators: True
+  int4 (all weights)  Icarus    PASS: 24 programs match the Python reference (memory and all five cycle counters), 213950 cycles in total (exit status 0) (exit 0)
+  int4 (all weights)  Verilator PASS: 24 programs match the Python reference (memory and all five cycle counters), 213950 cycles in total (exit status 0) (exit 0)
+  int4 (all weights)  counters identical in both simulators: True
+
+                       step 1  step 24  24 steps  per token   (total / DMA / vector cycles at step 24)
+int8 (all weights)       7000     9039    192710       8030   9039 / 3203 / 490
+int4 (all weights)       7885     9924    213950       8915   9924 / 1187 / 3377
+
+== 4. a generic random model: agreement with floating point, int8 against int4 (3 models x 16 starts x 12 steps)
+int8: agree 559/576 (97.0%), relative logit error mean 2.3%, worst 6.1%
+int4: agree 523/576 (90.8%), relative logit error mean 18.7%, worst 37.3%
+
+== 5. break-even external bandwidth (derived from the cycle formulas, not measured)
+n weights. int8: n words over the link, n/b cycles (b = link bandwidth in words per cycle; one int8 per word in this model).
+int4: n/8 words over the link (n/(8b) cycles) plus n/8 UNPACK words of u cycles each (n*u/8 cycles). int4 is faster when  n/b > n/(8b) + n*u/8,  i.e.  b < 7/u.
+u (cycles per packed word)    break-even b* = 7/u
+  10  as built                                0.70 words/cycle
+   8  one write per output, no overhead                 0.88 words/cycle
+   4  two write ports                         1.75 words/cycle
+   1  dequantize in the operand path                 7.00 words/cycle
+A chip at b = 1 word/cycle (this model's link) therefore never gains from the UNPACK as built; the gain exists only where the link is slower than 0.7 words per cycle, or after u falls below 7.
+Chapter 9's roofline: at batch 1 the speed is set by weight bytes alone (66 / 124 / 219 tokens/s for fp16 / int8 / int4 on a 7B model at 1 TB/s) -- that holds when dequantization is free, the case u -> 0.

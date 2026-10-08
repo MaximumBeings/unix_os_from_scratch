@@ -24,7 +24,7 @@ M = [
  ("lowering: concatenated parts are placed on top of each other", "loc[i] = (b0, off + (0 if k == 0 else N[n.ins[0]].shape[0]))", "loc[i] = (b0, off)"),
  ("lowering: a load copies only the first row", "code.append(B(\"LD\", dst=a, src=e, len=n.shape[0] * n.shape[1]))", "code.append(B(\"LD\", dst=a, src=e, len=n.shape[1]))"),
  ("lowering: an output is stored without its last row", "code.append(B(\"ST\", src=ins[0], dst=e[\"addr\"], len=n.shape[0] * n.shape[1]))", "code.append(B(\"ST\", src=ins[0], dst=e[\"addr\"], len=max(1, n.shape[0] * n.shape[1] - n.shape[1])))"),
- ("lowering: external regions of inputs and weights overlap", "P.ext[n.attrs[\"name\"]] = {\"addr\": ext_top, \"shape\": n.shape, \"node\": n.id, \"kind\": n.op}; ext_top += n.shape[0] * n.shape[1]", "P.ext[n.attrs[\"name\"]] = {\"addr\": ext_top, \"shape\": n.shape, \"node\": n.id, \"kind\": n.op}; ext_top += n.shape[0]"),
+ ("lowering: external regions of inputs and weights overlap", "\"kind\": n.op, \"words\": words}; ext_top += words", "\"kind\": n.op, \"words\": words}; ext_top += n.shape[0]"),
  ("allocator: buffers are released one step too early", "if l == n.id and bufs[b][\"addr\"] is not None", "if l <= n.id + 1 and bufs[b][\"addr\"] is not None"),
  ("allocator: free pieces are merged across a gap", "if merged and merged[-1][0] + merged[-1][1] == a:", "if merged and merged[-1][0] + merged[-1][1] <= a:"),
  ("checks: the inner-dimension limit is 640", "if k > 64:", "if k > 640:"),

@@ -1,0 +1,34 @@
+== 1. quantize eight weights to int4 (symmetric, range -7..7, scale = max|w| / 7)
+scale int4 = 0.93 / 7 = 0.13286 (one step); scale int8 = 0.00732
+   w        w/scale   int4  w4=q*scale   err4      int8   err8
+  +0.62     +4.667     +5   +0.6643   0.0443     +85   0.0024
+  -0.31     -2.333     -2   -0.2657   0.0443     -42   0.0024
+  +0.05     +0.376     +0   +0.0000   0.0500      +7   0.0013
+  +0.93     +7.000     +7   +0.9300   0.0000    +127   0.0000
+  -0.88     -6.624     -7   -0.9300   0.0500    -120   0.0013
+  +0.27     +2.032     +2   +0.2657   0.0043     +37   0.0009
+  -0.12     -0.903     -1   -0.1329   0.0129     -16   0.0028
+  +0.44     +3.312     +3   +0.3986   0.0414     +60   0.0006
+largest error: int4 0.0500 (half a step = 0.0664), int8 0.0028 (half a step = 0.00366)
+
+== 2. packing: element j goes to bits 4j+3..4j of one 32-bit word
+   nibbles (two's complement): 5 E 0 7 9 2 F 3 -> word, most significant nibble first: 3 F 2 9 7 0 E 5 = 0x3F2970E5
+   eight weights in one word: 32 bits instead of 8 x 32 (this chip stores one int8 per word) or 8 x 8 = 64 bits (packed int8): the logical storage is half of int8's
+
+== 3. on the circuit: LD the packed word, UNPACK it, multiply a 1x8 row of int8 activations by the 8x1 unpacked weights (MM), store both
+   program:
+      ld     dst=0 src=0 len=1
+      unpack dst=8 src=0 len=1
+      ld     dst=100 src=16 len=8
+      mm     dst=200 A=100 B=8 M=1 K=8 N=1 lda=8 ldb=1 ldc=1
+      st     src=8 dst=32 len=8
+      st     src=200 dst=48 len=1
+      halt
+   UNPACK result read back from the circuit: [5, -2, 0, 7, -7, 2, -1, 3]
+   the same, unpacked by hand from the nibbles: [5, -2, 0, 7, -7, 2, -1, 3]  -> identical: True
+   dot product on the circuit: 49;  by hand with the int4 integers: 49  -> identical: True
+   cycles [total, mm, dma, vec, n]: [97, 32, 40, 11, 6]  (UNPACK of one packed word costs 10 cycles: 1 read, 1 latch, 8 writes; model: [97, 32, 40, 11, 6])
+
+== 4. what the product means in real numbers: x . w with int4 weights, int8 weights, and floating point (activations x are integers here)
+   floating point +6.5600   int8 weights +6.5832 (error 0.0232)   int4 weights +6.5100 (error 0.0500)
+   one dot product is a single sample: the rounding errors of the eight weights partly cancel or add. Running example B measures the effect over many.

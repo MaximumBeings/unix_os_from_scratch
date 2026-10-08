@@ -31,4 +31,3 @@ compiler: 27 of 27 broken compilers caught
 
 A change that looks like a bug and is not:
 EQUIVALENT in effect: the allocator skips an exact-fit hole (it uses the next larger one, or fails only when memory is nearly full): NOT CAUGHT
-mut=0

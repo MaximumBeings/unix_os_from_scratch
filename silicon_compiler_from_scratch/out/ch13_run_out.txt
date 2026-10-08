@@ -1,0 +1,8 @@
+== 1. UNPACK on the RTL: directed programs and 40 random ones (seed 1), compared with the Python reference
+48 programs written to out/ga2_programs.hex
+  Icarus    PASS: 48 programs match the Python reference (memory and all five cycle counters), 26135 cycles in total (exit status 0) (exit 0)
+  Verilator PASS: 48 programs match the Python reference (memory and all five cycle counters), 26135 cycles in total (exit status 0) (exit 0)
+
+== 2. the compiler's battery: 60 random graphs, checks (a)-(d): compiled program == plain-Python meaning, cancellation-free buffers, close to floating point
+  int8 weights: worst relative error 0.0788 (bound 0.16); problems: none
+  int4 weights: worst relative error 0.3586 (bound 0.72, about twice the worst seen); problems: none

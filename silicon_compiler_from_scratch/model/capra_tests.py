@@ -9,12 +9,12 @@ Usage: capra_tests.py [nseeds]"""
 import math, os, random, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import capra as C
-def random_graph(seed):
+def random_graph(seed, wbits=8):
     R = random.Random(seed); g = C.Graph(); rows = R.randrange(1, 7); cols = R.randrange(2, 20); names = {}
     def new_input(shape, sd=1.0): nm = f"in{len(names)}"; names[nm] = (shape, sd); return g.input(nm, shape)
     def std_of(t):          # typical magnitude of a tensor, measured by running the graph so far; a partner input in an add or concat is generated at the same magnitude
         v = C.evaluate(g, sample_inputs(names, random.Random(0)))[t]; flat = [x for r in v for x in r]; return max(1e-3, math.sqrt(sum(x * x for x in flat) / len(flat)))
-    def weight(r, c): return g.weight(f"w{len(g.nodes)}", [[R.gauss(0, 1 / math.sqrt(r)) for _ in range(c)] for _ in range(r)])
+    def weight(r, c): return g.weight(f"w{len(g.nodes)}", [[R.gauss(0, 1 / math.sqrt(r)) for _ in range(c)] for _ in range(r)], bits=wbits)      # wbits=4: Chapter 13's int4 weights
     cur = new_input((rows, cols)); pool = [cur]; in_concat = set(); outputs = []; used_scores = False
     for _ in range(R.randrange(3, 8)):
         shape = g.nodes[cur].shape; kind = R.choice(["matmul", "matmul", "matmul_relu", "scores", "softmax", "add", "concat"])
@@ -35,8 +35,8 @@ def random_graph(seed):
     if len(pool) > 2 and R.random() < 0.3 and pool[1] not in in_concat: g.output(pool[1], "mid")
     return g, names
 def sample_inputs(names, R): return {nm: [[R.gauss(0, sd) for _ in range(c)] for _ in range(r)] for nm, ((r, c), sd) in names.items()}
-def check_graph(seed, bound=0.16):
-    problems = []; g, names = random_graph(seed); R = random.Random(seed * 7 + 1)
+def check_graph(seed, bound=0.16, wbits=8):
+    problems = []; g, names = random_graph(seed, wbits); R = random.Random(seed * 7 + 1)
     calib = [sample_inputs(names, R) for _ in range(30)]; test = sample_inputs(names, R)
     try: P1 = C.compile_graph(g, calib, reuse=True); P0 = C.compile_graph(g, calib, reuse=False)
     except C.CompileError as e: return [f"seed {seed}: compile error: {e}"], None
@@ -58,10 +58,10 @@ def check_graph(seed, bound=0.16):
         worst = max(worst, num / den)
     if worst > bound: problems.append(f"seed {seed}: (e) error {worst:.3f} over the bound {bound}")
     return problems, worst
-def check_many(seeds, bound=0.16):
+def check_many(seeds, bound=0.16, wbits=8):
     probs = []; worst = 0.0
     for s in seeds:
-        p, w = check_graph(s, bound); probs += p; worst = max(worst, w or 0.0)
+        p, w = check_graph(s, bound, wbits); probs += p; worst = max(worst, w or 0.0)
     return probs, worst
 def check_cancellation():
     """Directed case: add(x, y) with y close to -x, so the operands are large and their sum is tiny. The sum's scale must still hold the operands (they are rescaled to it); a scale chosen from the sum alone clips them.
