@@ -743,3 +743,201 @@ ABC: + map
 ABC: + write_blif <abc-temp-dir>/output.blif 
 
 13.23.1.2. Re-integrating ABC results.
+ABC RESULTS:             ORNOT cells:      133
+ABC RESULTS:               NOT cells:      170
+ABC RESULTS:               MUX cells:      341
+ABC RESULTS:              XNOR cells:      426
+ABC RESULTS:               NOR cells:      201
+ABC RESULTS:                OR cells:      842
+ABC RESULTS:              NAND cells:      214
+ABC RESULTS:            ANDNOT cells:     2427
+ABC RESULTS:               AND cells:       89
+ABC RESULTS:               XOR cells:     1362
+ABC RESULTS:        internal signals:     6078
+ABC RESULTS:           input signals:      127
+ABC RESULTS:          output signals:       65
+Removing temp directory.
+
+13.24. Executing OPT pass (performing simple optimizations).
+
+13.24.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module ga2_rq.
+<suppressed ~46 debug messages>
+
+13.24.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\ga2_rq'.
+<suppressed ~15 debug messages>
+Removed a total of 5 cells.
+
+13.24.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+13.24.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \ga2_rq..
+Removed 2 unused cells and 777 unused wires.
+<suppressed ~8 debug messages>
+
+13.24.5. Finished fast OPT passes.
+
+13.25. Executing HIERARCHY pass (managing design hierarchy).
+
+13.25.1. Analyzing design hierarchy..
+Top module:  \ga2_rq
+
+13.25.2. Analyzing design hierarchy..
+Top module:  \ga2_rq
+Removed 0 unused modules.
+
+13.26. Printing statistics.
+
+=== ga2_rq ===
+
+   Number of wires:               6176
+   Number of wire bits:           6729
+   Number of public wires:          30
+   Number of public wire bits:     539
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:               6292
+     $_ANDNOT_                    2427
+     $_AND_                         89
+     $_DFFE_PP_                     67
+     $_MUX_                        341
+     $_NAND_                       214
+     $_NOR_                        199
+     $_NOT_                        168
+     $_ORNOT_                      133
+     $_OR_                         839
+     $_SDFFCE_PP0P_                 24
+     $_SDFFE_PP0P_                   1
+     $_SDFF_PP0_                     2
+     $_XNOR_                       426
+     $_XOR_                       1362
+
+13.27. Executing CHECK pass (checking for obvious problems).
+Checking module ga2_rq...
+Found and reported 0 problems.
+
+14. Executing DFFLEGALIZE pass (convert FFs to types supported by the target).
+
+15. Executing DFFLIBMAP pass (mapping DFF cells to sequential cells from liberty file).
+  cell DFF (noninv, pins=3, area=5.00) is a direct match for cell type $_DFF_P_.
+  final dff cell mappings:
+    unmapped dff cell: $_DFF_N_
+    \DFF _DFF_P_ (.CK( C), .D( D), .Q( Q));
+    unmapped dff cell: $_DFF_NN0_
+    unmapped dff cell: $_DFF_NN1_
+    unmapped dff cell: $_DFF_NP0_
+    unmapped dff cell: $_DFF_NP1_
+    unmapped dff cell: $_DFF_PN0_
+    unmapped dff cell: $_DFF_PN1_
+    unmapped dff cell: $_DFF_PP0_
+    unmapped dff cell: $_DFF_PP1_
+    unmapped dff cell: $_DFFSR_NNN_
+    unmapped dff cell: $_DFFSR_NNP_
+    unmapped dff cell: $_DFFSR_NPN_
+    unmapped dff cell: $_DFFSR_NPP_
+    unmapped dff cell: $_DFFSR_PNN_
+    unmapped dff cell: $_DFFSR_PNP_
+    unmapped dff cell: $_DFFSR_PPN_
+    unmapped dff cell: $_DFFSR_PPP_
+
+15.1. Executing DFFLEGALIZE pass (convert FFs to types supported by the target).
+Mapping DFF cells in module `\ga2_rq':
+  mapped 94 $_DFF_P_ cells to \DFF cells.
+
+16. Executing ABC pass (technology mapping using ABC).
+
+16.1. Extracting gate netlist of module `\ga2_rq' to `<abc-temp-dir>/input.blif'..
+Extracted 6317 gates and 6512 wires to a netlist network with 194 inputs and 126 outputs.
+
+16.1.1. Executing ABC.
+Running ABC command: "<yosys-exe-dir>/yosys-abc" -s -f <abc-temp-dir>/abc.script 2>&1
+ABC: ABC command line: "source <abc-temp-dir>/abc.script".
+ABC: 
+ABC: + read_blif <abc-temp-dir>/input.blif 
+ABC: + read_lib -w /home/user/unix_os_from_scratch/silicon_compiler_from_scratch/lib/toy.lib 
+ABC: Parsing finished successfully.  Parsing time =     0.00 sec
+ABC: Warning: Templates are not defined.
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "DFF".
+ABC: Library "toy" from "/home/user/unix_os_from_scratch/silicon_compiler_from_scratch/lib/toy.lib" has 13 cells (1 skipped: 1 seq; 0 tri-state; 0 no func; 0 dont_use).  Time =     0.00 sec
+ABC: Memory =    0.05 MB. Time =     0.00 sec
+ABC: + strash 
+ABC: + &get -n 
+ABC: + &fraig -x 
+ABC: + &put 
+ABC: + scorr 
+ABC: Warning: The network is combinational (run "fraig" or "fraig_sweep").
+ABC: + dc2 
+ABC: + dretime 
+ABC: + strash 
+ABC: + &get -n 
+ABC: + &dch -f 
+ABC: + &nf 
+ABC: + &put 
+ABC: + write_blif <abc-temp-dir>/output.blif 
+
+16.1.2. Re-integrating ABC results.
+ABC RESULTS:               OR2 cells:      131
+ABC RESULTS:               INV cells:      358
+ABC RESULTS:              XOR2 cells:      702
+ABC RESULTS:             NAND3 cells:      235
+ABC RESULTS:             OAI21 cells:      455
+ABC RESULTS:              NOR3 cells:      111
+ABC RESULTS:             NAND2 cells:     1315
+ABC RESULTS:             XNOR2 cells:      970
+ABC RESULTS:              NOR2 cells:      678
+ABC RESULTS:              AND2 cells:      212
+ABC RESULTS:             AOI21 cells:      385
+ABC RESULTS:              MUX2 cells:      212
+ABC RESULTS:        internal signals:     6192
+ABC RESULTS:           input signals:      194
+ABC RESULTS:          output signals:      126
+Removing temp directory.
+
+17. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \ga2_rq..
+Removed 0 unused cells and 6502 unused wires.
+<suppressed ~12 debug messages>
+
+18. Printing statistics.
+
+=== ga2_rq ===
+
+   Number of wires:               5751
+   Number of wire bits:           6045
+   Number of public wires:          19
+   Number of public wire bits:     313
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:               5858
+     AND2                          212
+     AOI21                         385
+     DFF                            94
+     INV                           358
+     MUX2                          212
+     NAND2                        1315
+     NAND3                         235
+     NOR2                          678
+     NOR3                          111
+     OAI21                         455
+     OR2                           131
+     XNOR2                         970
+     XOR2                          702
+
+   Chip area for module '\ga2_rq': 8918.810000
+
+19. Executing Verilog backend.
+
+19.1. Executing BMUXMAP pass.
+
+19.2. Executing DEMUXMAP pass.
+Dumping module `\ga2_rq'.
+
+20. Executing JSON backend.
+
+Warnings: 2 unique messages, 2 total
+End of script. Logfile hash: f2e373c456, CPU: user 1.69s system 0.04s, MEM: 48.93 MB peak
+Yosys 0.33 (git sha1 2584903a060)
+Time spent: 52% 2x abc (1 sec), 12% 35x opt_expr (0 sec), ...

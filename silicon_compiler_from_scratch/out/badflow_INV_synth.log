@@ -612,4 +612,4 @@ ABC: + &nf
 ABC: ** cmd error: aborting 'source <abc-temp-dir>/abc.script'
 ABC: Error: Cannot find inverter gate in the library.
 ABC: Error: Abc_CommandAbc9Nf(): Mapping into LUTs has failed.
-ERROR: Can't open ABC output file `/tmp/yosys-abc-GjZSjC/output.blif'.
+ERROR: Can't open ABC output file `/tmp/yosys-abc-cJkZyh/output.blif'.

@@ -612,4 +612,4 @@ ABC: + &nf
 ABC: ** cmd error: aborting 'source <abc-temp-dir>/abc.script'
 ABC: Error: Cannot find buffer gate in the library.
 ABC: Error: Abc_CommandAbc9Nf(): Mapping into LUTs has failed.
-ERROR: Can't open ABC output file `/tmp/yosys-abc-ELmQm7/output.blif'.
+ERROR: Can't open ABC output file `/tmp/yosys-abc-7SSrGi/output.blif'.

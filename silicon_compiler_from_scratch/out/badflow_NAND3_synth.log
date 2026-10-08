@@ -667,6 +667,6 @@ Dumping module `\requant'.
 
 10. Executing JSON backend.
 
-End of script. Logfile hash: 4aa152a68e, CPU: user 1.66s system 0.04s, MEM: 43.86 MB peak
+End of script. Logfile hash: 4aa152a68e, CPU: user 1.28s system 0.04s, MEM: 44.11 MB peak
 Yosys 0.33 (git sha1 2584903a060)
-Time spent: 55% 2x abc (1 sec), 13% 28x opt_expr (0 sec), ...
+Time spent: 56% 2x abc (1 sec), 12% 28x opt_expr (0 sec), ...

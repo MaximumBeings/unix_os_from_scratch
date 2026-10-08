@@ -4813,6 +4813,6 @@ Dumping module `\ga2'.
 20. Executing JSON backend.
 
 Warnings: 2 unique messages, 2 total
-End of script. Logfile hash: 2c0e888455, CPU: user 21.67s system 0.17s, MEM: 237.12 MB peak
+End of script. Logfile hash: 2c0e888455, CPU: user 16.44s system 0.16s, MEM: 237.22 MB peak
 Yosys 0.33 (git sha1 2584903a060)
-Time spent: 31% 2x abc (9 sec), 19% 101x opt_expr (6 sec), ...
+Time spent: 31% 2x abc (7 sec), 19% 101x opt_expr (4 sec), ...

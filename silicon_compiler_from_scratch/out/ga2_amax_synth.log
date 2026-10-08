@@ -884,6 +884,6 @@ Dumping module `\ga2_amax'.
 20. Executing JSON backend.
 
 Warnings: 2 unique messages, 2 total
-End of script. Logfile hash: 769285ed0e, CPU: user 0.33s system 0.01s, MEM: 44.79 MB peak
+End of script. Logfile hash: 769285ed0e, CPU: user 0.29s system 0.01s, MEM: 45.24 MB peak
 Yosys 0.33 (git sha1 2584903a060)
 Time spent: 39% 2x abc (0 sec), 12% 23x opt_expr (0 sec), ...
