@@ -76,3 +76,28 @@ module ga2_amax (input clk, input rst, input start, input [127:0] ins, output re
         end
     end
 endmodule
+
+// UNPACK (Chapter 13): expand packed 4-bit weights. Each scratchpad word holds eight signed 4-bit fields (field j in bits 4j+3..4j); field j of source word i becomes the sign-extended word dst[8i + j].
+// UNPACK a=dst b=src c=number of packed source words.  dst and src must not overlap.  The scratchpad has one write port, so a source word costs 10 cycles: 1 to read it, 1 to latch it, 8 to write its fields.
+module ga2_unp (input clk, input rst, input start, input [127:0] ins, output reg busy, output reg done,
+                output [11:0] ra, input [31:0] rd, output we, output [11:0] wa, output [31:0] wd);
+    localparam S_RD = 0, S_LAT = 1, S_WR = 2;
+    reg [1:0] st; reg [11:0] src, dst, len, i; reg [2:0] j; reg [31:0] w;
+    assign ra = src + i; assign we = busy && st == S_WR; assign wa = dst + {i, 3'b000} + j;
+    wire [3:0] nib = w[4*j +: 4]; assign wd = {{28{nib[3]}}, nib};
+    always @(posedge clk) begin
+        done <= 1'b0;
+        if (rst) begin busy <= 1'b0; st <= S_RD; end
+        else if (start && !busy) begin busy <= 1'b1; dst <= ins[119:108]; src <= ins[103:92]; len <= ins[87:76]; i <= 0; j <= 0; st <= S_RD; end
+        else if (busy) case (st)
+            S_RD: st <= S_LAT;
+            S_LAT: begin w <= rd; j <= 0; st <= S_WR; end
+            S_WR: begin
+                j <= j + 1;
+                if (j == 7) begin
+                    if (i == len - 1) begin busy <= 1'b0; done <= 1'b1; end else begin i <= i + 1; st <= S_RD; end
+                end
+            end
+        endcase
+    end
+endmodule

@@ -1,5 +1,10 @@
 # 12. Capstone: A Tiny Transformer Decodes on the Chip
 
+![ch-12](../assets/art/ch-12.svg)
+
+--8<-- "docs/assets/art/ch-12.md"
+
+
 **What you will see:** everything in this book working together. A one-layer transformer written as a floating-point graph is turned by the compiler of Chapter 11 into GA-2 programs; a host loop feeds each chosen token back and keeps the KV cache of Chapter 8; the programs run on the Verilog of Chapter 7 in two simulators; and the 24 tokens that come out are the ones floating point produces and the ones a formula predicts. Then the capstone is turned on the hardware as a *test*, and it shows what an end-to-end workload can and cannot tell you about a chip.
 
 **What you need to know first:** Chapters 7-11. There is little new machinery here: this chapter is the assembly and the audit.

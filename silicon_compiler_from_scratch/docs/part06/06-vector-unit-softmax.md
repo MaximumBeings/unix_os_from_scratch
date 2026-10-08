@@ -1,5 +1,10 @@
 # 6. The Vector Unit: A Lookup-Table Exponential, a Divider, and Fixed-Point Softmax
 
+![ch-06](../assets/art/ch-06.svg)
+
+--8<-- "docs/assets/art/ch-06.md"
+
+
 **What you will understand:** the part of a transformer that is *not* a matrix product. Attention needs **softmax**, which needs an exponential and a division, and a chip with only integer multipliers must do both in integers. You will build the three pieces (an exp lookup table, a bit-serial divider, and the softmax unit that uses them), check each one against Python **bit for bit**, measure how far the result is from the real softmax, and meet a test that would have passed a bug until a new check was added.
 
 **What you need to know first:** Chapter 3 (fixed-point numbers, scales) and Chapter 5 (cycle-level thinking).

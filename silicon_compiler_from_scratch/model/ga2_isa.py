@@ -13,6 +13,7 @@ INSTRUCTION. 128 bits: op[127:124] then fields a[123:108] b[107:92] c[91:76] d[7
   op 5 SM   a=dst, b=src, c=len                           spad[a+i] = softmax(int8 spad[b..])[i], Q0.16 (Chapter 6); dst == src or disjoint
   op 6 VADD a=dst, b=src1, c=src2, d[15:0]=len           spad[a+i] = clamp(int8 spad[b+i] + int8 spad[c+i], -127, 127)
   op 7 AMAX a=dst, b=src, c=len                           spad[a] = index of the first maximum of the signed int32 spad[b..b+len-1]
+  op 8 UNPACK a=dst, b=src, c=len (added in Chapter 13)   spad[a+8i+j] = signed 4-bit field j (bits 4j+3..4j) of spad[b+i], for j in 0..7; regions must not overlap
 Operand regions of RQ, SM and VADD must be identical or disjoint (the units are pipelined, so partial overlap is undefined and the program generators never produce it).
 Instructions execute one at a time, in order."""
 import os, sys
@@ -21,7 +22,7 @@ from quant import requant
 from softmax_gold import softmax_fixed
 SPAD = 4096
 EXT = int(os.environ.get("GA2_EXT", "2048"))      # external memory words; Chapter 7's tests use 2048, the attention programs of Chapter 8 use 8192
-OPS = {"HALT": 0, "LD": 1, "ST": 2, "MM": 3, "RQ": 4, "SM": 5, "VADD": 6, "AMAX": 7}
+OPS = {"HALT": 0, "LD": 1, "ST": 2, "MM": 3, "RQ": 4, "SM": 5, "VADD": 6, "AMAX": 7, "UNPACK": 8}
 NAMES = {v: k for k, v in OPS.items()}
 FIELDS = {"a": (123, 16), "b": (107, 16), "c": (91, 16), "d": (75, 24), "e": (51, 6), "f": (45, 8), "g": (37, 8), "h": (29, 8), "fl": (21, 4), "x": (17, 18)}
 def s8(v): v &= 0xFF; return v - 256 if v & 128 else v
@@ -38,7 +39,7 @@ def decode(w):
     return ins
 # ---- the assembler: one instruction per line, key=value, in terms of the operation's own names
 ARGS = {"LD": ("dst", "src", "len"), "ST": ("src", "dst", "len"), "MM": ("dst", "A", "B", "M", "K", "N", "tb", "lda", "ldb", "ldc"), "RQ": ("dst", "src", "len", "m", "s", "relu"),
-        "SM": ("dst", "src", "len"), "VADD": ("dst", "src1", "src2", "len"), "AMAX": ("dst", "src", "len"), "HALT": ()}
+        "SM": ("dst", "src", "len"), "VADD": ("dst", "src1", "src2", "len"), "AMAX": ("dst", "src", "len"), "UNPACK": ("dst", "src", "len"), "HALT": ()}
 def full(ins): return {**{k: 0 for k in FIELDS}, **ins}
 def build(op, **k): return full(_build(op, **k))
 def _build(op, **k):
@@ -48,7 +49,7 @@ def _build(op, **k):
     if op == "ST": return {"op": op, "a": k["src"], "b": k["dst"], "c": k["len"]}
     if op == "MM": return {"op": op, "a": k["dst"], "b": k["A"], "c": k["B"], "f": k["M"], "g": k["K"], "h": k["N"], "fl": k.get("tb", 0), "d": k.get("lda", k["K"]) | (k.get("ldb", 0) << 12), "x": k.get("ldc", k["N"])}
     if op == "RQ": return {"op": op, "a": k["dst"], "b": k["src"], "c": k["len"], "d": k["m"], "e": k["s"], "fl": k.get("relu", 0)}
-    if op in ("SM", "AMAX"): return {"op": op, "a": k["dst"], "b": k["src"], "c": k["len"]}
+    if op in ("SM", "AMAX", "UNPACK"): return {"op": op, "a": k["dst"], "b": k["src"], "c": k["len"]}
     if op == "VADD": return {"op": op, "a": k["dst"], "b": k["src1"], "c": k["src2"], "d": k["len"]}
     return {"op": "HALT"}
 def assemble(text):
@@ -69,6 +70,7 @@ def disassemble(ins):
     if op == "SM": return f"SM   dst={a} src={b} len={c}"
     if op == "VADD": return f"VADD dst={a} src1={b} src2={c} len={d & 0xFFFF}"
     if op == "AMAX": return f"AMAX dst={a} src={b} len={c}"
+    if op == "UNPACK": return f"UNPACK dst={a} src={b} len={c}"
     return "HALT"
 # ---- the reference simulator
 class Machine:
@@ -99,12 +101,16 @@ class Machine:
                 for i in range(n): sp[a + i] = r[i]
             elif op == "AMAX":
                 v = [s32(sp[b + i]) for i in range(c)]; sp[a] = v.index(max(v))
+            elif op == "UNPACK":
+                for i in range(c):
+                    w = sp[b + i]
+                    for j in range(8): nib = (w >> (4 * j)) & 15; sp[a + 8 * i + j] = (nib - 16 if nib & 8 else nib) & 0xFFFFFFFF
         return self
 # ---- the cycle model: how many clock cycles each instruction takes, derived from the structure of each unit
 # per instruction: 1 fetch + 1 issue + the unit's busy time (WAIT).  The unit times are formulas in the operands; the constants K_* are read off single-instruction runs of the circuit
 # (Chapter 7 does this), then FIXED, and checked on random programs to the cycle.
 LAT = 8
-K = {"LD": 1, "ST": 2, "MM": 7, "RQ": 2, "SM": 6, "VADD": 2, "AMAX": 3}
+K = {"LD": 1, "ST": 2, "MM": 7, "RQ": 2, "SM": 6, "VADD": 2, "AMAX": 3, "UNPACK": 1}
 def wait_cycles(ins):
     op = ins["op"]; a, b, c, d, e, f, g, h, fl, x = (ins[k] for k in "a b c d e f g h fl x".split())
     if op == "LD": return c + LAT + K["LD"]
@@ -114,8 +120,9 @@ def wait_cycles(ins):
     if op == "SM": return 3 * c + 41 + K["SM"]
     if op == "VADD": return 2 * (d & 0xFFFF) + K["VADD"]
     if op == "AMAX": return c + K["AMAX"]
+    if op == "UNPACK": return 10 * c + K["UNPACK"]
     return 0
-UNIT = {"LD": "dma", "ST": "dma", "MM": "mm", "RQ": "vec", "SM": "vec", "VADD": "vec", "AMAX": "vec"}
+UNIT = {"LD": "dma", "ST": "dma", "MM": "mm", "RQ": "vec", "SM": "vec", "VADD": "vec", "AMAX": "vec", "UNPACK": "vec"}
 def cycle_counts(prog):
     """Predicted [total, mm, dma, vec, n_inst] counters for a whole program ending in HALT (the HALT costs fetch + issue)."""
     cnt = {"mm": 0, "dma": 0, "vec": 0}; total = 0; n = 0

@@ -1,5 +1,10 @@
 # 9. Batching and Bandwidth: Why Decoding Is Slow, and What Helps
 
+![ch-09](../assets/art/ch-09.svg)
+
+--8<-- "docs/assets/art/ch-09.md"
+
+
 **What you will understand:** the one idea that explains most of the economics of running a language model: **decoding is limited by memory traffic, not by arithmetic.** You will measure it on the chip, build the standard remedy (batching several requests so they share the weights), see exactly how much of the problem it fixes and what it cannot touch, state the limit with a **roofline**, and test the batched program builder with the oracle that batching makes possible: *a request must get the same answer whether or not other requests ride along.*
 
 **What you need to know first:** Chapter 7 (the chip and its counters) and Chapter 8 (the decode step).

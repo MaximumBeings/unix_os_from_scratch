@@ -1,5 +1,10 @@
 # 1. The Flow: One Circuit Through Four Tools, and a Way to Test the Tests
 
+![ch-01](../assets/art/ch-01.svg)
+
+--8<-- "docs/assets/art/ch-01.md"
+
+
 **What you will understand:** the loop every chip team lives in, on the smallest circuit that still has all of its parts. You will write a 4-bit adder in Verilog, check it **exhaustively** against an answer key written in Python, run it in **two simulators** that share no code, have **Yosys** turn it into gates and tell you how many, and then **break the circuit on purpose** to find out whether your test would have noticed. Every later chapter is this loop with a bigger circuit.
 
 **What you need to know first:** nothing about hardware. If you can read a few lines of C you can read the Verilog. Install the tools first (see Getting Started).

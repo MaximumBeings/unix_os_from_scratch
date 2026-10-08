@@ -1,5 +1,10 @@
 # 10. Synthesis, Timing and Gate-Level Verification
 
+![ch-10](../assets/art/ch-10.svg)
+
+--8<-- "docs/assets/art/ch-10.md"
+
+
 **What you will understand:** what happens between "the Verilog passes its tests" and "there is a netlist of gates you could manufacture": **synthesis** to a standard-cell library, **area and timing** read off the result, and the three ways a chip team checks that the netlist still does what the RTL did: **gate-level simulation**, **fault grading**, and **equivalence checking**. Along the way the flow hits a famous trap (X-pessimism) and the tests find a bug in the *testbench*.
 
 **What you need to know first:** Chapters 1-9. Every number below is for a **toy cell library** invented for this book (areas in NAND2 equivalents, one made-up delay per cell). It is a scale for comparing designs and a way to exercise a real flow, not a process: no number here predicts a real chip's area, speed or power.

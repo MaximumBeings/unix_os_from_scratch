@@ -8,7 +8,7 @@ module ga2 (input clk, input rst, input start, output reg halted,
             output wr_valid, output [15:0] wr_addr, output [31:0] wr_data,
             output reg [31:0] cyc_total, output reg [31:0] cyc_mm, output reg [31:0] cyc_dma, output reg [31:0] cyc_vec, output reg [31:0] n_inst);
     localparam IDLE = 0, FETCH = 1, ISSUE = 2, WAIT = 3, HALT = 4;
-    localparam OP_HALT = 0, OP_LD = 1, OP_ST = 2, OP_MM = 3, OP_RQ = 4, OP_SM = 5, OP_VADD = 6, OP_AMAX = 7;
+    localparam OP_HALT = 0, OP_LD = 1, OP_ST = 2, OP_MM = 3, OP_RQ = 4, OP_SM = 5, OP_VADD = 6, OP_AMAX = 7, OP_UNPACK = 8;
     reg [2:0] st; reg [15:0] pc; reg [127:0] ins; wire [3:0] op = ins[127:124];
     assign imem_addr = pc;
     // scratchpad and the unit ports
@@ -30,13 +30,15 @@ module ga2 (input clk, input rst, input start, output reg halted,
     ga2_vadd u_va (.clk(clk), .rst(rst), .start(go && op == OP_VADD), .ins(ins), .busy(va_busy), .done(va_done), .ra(va_ra), .rd(sp_rd), .we(va_we), .wa(va_wa), .wd(va_wd));
     wire am_we; wire [11:0] am_ra, am_wa; wire [31:0] am_wd;
     ga2_amax u_am (.clk(clk), .rst(rst), .start(go && op == OP_AMAX), .ins(ins), .busy(am_busy), .done(am_done), .ra(am_ra), .rd(sp_rd), .we(am_we), .wa(am_wa), .wd(am_wd));
+    wire un_we; wire [11:0] un_ra, un_wa; wire [31:0] un_wd; wire un_busy, un_done;
+    ga2_unp u_un (.clk(clk), .rst(rst), .start(go && op == OP_UNPACK), .ins(ins), .busy(un_busy), .done(un_done), .ra(un_ra), .rd(sp_rd), .we(un_we), .wa(un_wa), .wd(un_wd));
     // the scratchpad ports belong to the unit named by the instruction in flight
     reg [3:0] cur;
-    assign sp_ra = (cur == OP_ST) ? st_ra : (cur == OP_MM) ? mm_ra : (cur == OP_RQ) ? rq_ra : (cur == OP_SM) ? sm_ra : (cur == OP_VADD) ? va_ra : (cur == OP_AMAX) ? am_ra : 12'd0;
-    assign sp_we = (cur == OP_LD) ? ld_we : (cur == OP_MM) ? mm_we : (cur == OP_RQ) ? rq_we : (cur == OP_SM) ? sm_we : (cur == OP_VADD) ? va_we : (cur == OP_AMAX) ? am_we : 1'b0;
-    assign sp_wa = (cur == OP_LD) ? ld_wa : (cur == OP_MM) ? mm_wa : (cur == OP_RQ) ? rq_wa : (cur == OP_SM) ? sm_wa : (cur == OP_VADD) ? va_wa : am_wa;
-    assign sp_wd = (cur == OP_LD) ? ld_wd : (cur == OP_MM) ? mm_wd : (cur == OP_RQ) ? rq_wd : (cur == OP_SM) ? sm_wd : (cur == OP_VADD) ? va_wd : am_wd;
-    wire unit_done = (cur == OP_LD && ld_done) || (cur == OP_ST && st_done) || (cur == OP_MM && mm_done) || (cur == OP_RQ && rq_done) || (cur == OP_SM && sm_done) || (cur == OP_VADD && va_done) || (cur == OP_AMAX && am_done);
+    assign sp_ra = (cur == OP_ST) ? st_ra : (cur == OP_MM) ? mm_ra : (cur == OP_RQ) ? rq_ra : (cur == OP_SM) ? sm_ra : (cur == OP_VADD) ? va_ra : (cur == OP_AMAX) ? am_ra : (cur == OP_UNPACK) ? un_ra : 12'd0;
+    assign sp_we = (cur == OP_LD) ? ld_we : (cur == OP_MM) ? mm_we : (cur == OP_RQ) ? rq_we : (cur == OP_SM) ? sm_we : (cur == OP_VADD) ? va_we : (cur == OP_AMAX) ? am_we : (cur == OP_UNPACK) ? un_we : 1'b0;
+    assign sp_wa = (cur == OP_LD) ? ld_wa : (cur == OP_MM) ? mm_wa : (cur == OP_RQ) ? rq_wa : (cur == OP_SM) ? sm_wa : (cur == OP_VADD) ? va_wa : (cur == OP_UNPACK) ? un_wa : am_wa;
+    assign sp_wd = (cur == OP_LD) ? ld_wd : (cur == OP_MM) ? mm_wd : (cur == OP_RQ) ? rq_wd : (cur == OP_SM) ? sm_wd : (cur == OP_VADD) ? va_wd : (cur == OP_UNPACK) ? un_wd : am_wd;
+    wire unit_done = (cur == OP_LD && ld_done) || (cur == OP_ST && st_done) || (cur == OP_MM && mm_done) || (cur == OP_RQ && rq_done) || (cur == OP_SM && sm_done) || (cur == OP_VADD && va_done) || (cur == OP_AMAX && am_done) || (cur == OP_UNPACK && un_done);
     always @(posedge clk) begin
         if (rst) begin st <= IDLE; halted <= 1'b0; cur <= 4'd15; end
         else case (st)

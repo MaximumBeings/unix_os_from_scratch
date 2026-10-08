@@ -1,5 +1,10 @@
 # Silicon Compiler from Scratch
 
+![index](assets/art/index.svg)
+
+--8<-- "docs/assets/art/index.md"
+
+
 **An open-source LLM-inference accelerator, from Verilog to the compiler that targets it.**
 
 This book builds a small neural-network accelerator the way a chip team would, in the order a chip team would, and then builds the compiler that turns a model into programs for it. Everything runs on a laptop with three open-source tools: **Icarus Verilog** and **Verilator** (two independent simulators) and **Yosys** (synthesis). No vendor tools, no FPGA board, no licences.

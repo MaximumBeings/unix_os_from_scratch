@@ -1,5 +1,10 @@
 # 7. GA-2: An Instruction Set, a Sequencer, and the Whole Chip
 
+![ch-07](../assets/art/ch-07.svg)
+
+--8<-- "docs/assets/art/ch-07.md"
+
+
 **What you will understand:** how the pieces of Chapters 3-6 become one machine that runs *programs*. You will meet the instruction set (eight instructions, 128 bits each), write an assembler for it, build the execution units and the sequencer that drives them, check the whole chip against a Python reference simulator on 78 programs (memory contents **and** cycle counts, to the cycle), break it 49 ways, and learn what a test generator must never produce.
 
 **What you need to know first:** Chapters 1-6. This chapter is mostly wiring and control, so the arithmetic is already trusted: the matrix unit *is* the Chapter 4 array, the requantizer *is* Chapter 3's circuit, the softmax *is* Chapter 6's algorithm.

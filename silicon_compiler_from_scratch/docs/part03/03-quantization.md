@@ -1,5 +1,10 @@
 # 3. Quantization: int8 Numbers, the Requantizer, and What Accuracy It Costs
 
+![ch-03](../assets/art/ch-03.svg)
+
+--8<-- "docs/assets/art/ch-03.md"
+
+
 **What you will understand:** why inference chips compute in 8-bit integers, how a real number becomes an int8 (and why the range is -127..127), how the 32-bit accumulator of a matrix product is brought back to 8 bits by a circuit called the **requantizer**, and how much accuracy all this costs, measured, including the case where one outlier ruins everything else.
 
 **What you need to know first:** Chapter 2 (two's complement, the MAC, overflow).

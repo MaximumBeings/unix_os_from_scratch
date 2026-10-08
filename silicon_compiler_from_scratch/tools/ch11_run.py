@@ -3,7 +3,7 @@
 import math, os, random, re, sys
 os.environ["GA2_EXT"] = "8192"
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "model"))
-import hw, ga2_isa as I, ga2_progs as G, compiler as C, compiler_tests as T
+import hw, ga2_isa as I, ga2_progs as G, capra as C, capra_tests as T
 F = ["rtl/sram.v", "rtl/dma.v", "rtl/systolic.v", "rtl/requant.v", "rtl/exp_lut.v", "rtl/divu.v", "rtl/rowmem.v", "rtl/ga2_vec.v", "rtl/ga2_sm.v", "rtl/ga2_mm.v", "rtl/ga2.v", "tb/extmem_rw.v", "tb/ga2_tb.v"]
 def line(out): return ([l for l in out.splitlines() if l.startswith(("PASS", "FAIL", "MISMATCH"))] or out.strip().splitlines()[-2:])[0]
 def dump(g):

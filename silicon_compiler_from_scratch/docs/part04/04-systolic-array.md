@@ -1,5 +1,10 @@
 # 4. The Systolic Array: N x N Multiplies Per Cycle, and the Schedule That Makes It Work
 
+![ch-04](../assets/art/ch-04.svg)
+
+--8<-- "docs/assets/art/ch-04.md"
+
+
 **What you will understand:** how a grid of multiply-accumulate units computes a whole matrix product without anyone ever fetching a value twice. You will build an output-stationary systolic array in Verilog (any size N), see the exact cycle on which each product happens, derive its utilization from the schedule, check the circuit against ordinary matrix multiplication for six array shapes in two simulators, and break it sixteen ways to see whether the tests notice.
 
 **What you need to know first:** Chapter 2 (the MAC) and Chapter 3 (int8 and the int32 accumulator).

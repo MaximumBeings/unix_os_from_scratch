@@ -1,5 +1,10 @@
 # Getting Started
 
+![getting-started](assets/art/getting-started.svg)
+
+--8<-- "docs/assets/art/getting-started.md"
+
+
 Everything in this book runs on **Python 3 and three open-source programs**. There is nothing to buy and nothing to license.
 
 ## What you need

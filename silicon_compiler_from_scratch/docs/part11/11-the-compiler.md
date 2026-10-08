@@ -1,6 +1,11 @@
-# 11. The Compiler: From a Tensor Graph to GA-2 Instructions
+# 11. Capra, the Compiler: From a Tensor Graph to GA-2 Instructions
 
-**What you will understand:** how a model, written as a graph of tensor operations in floating point, becomes a program for the chip of Chapter 7 that no human wrote: how the compiler **chooses an int8 scale for every tensor**, **cuts big matrix products into the 4 x 4 tiles** the hardware can do, **places tensors in the 4,096-word scratchpad and reuses the space** as soon as they are dead, and **emits** instructions. You will also see how a compiler is tested: against a plain-Python interpreter, against the meaning of each number, against its own allocator, and against graphs it must refuse.
+![ch-11](../assets/art/ch-11.svg)
+
+--8<-- "docs/assets/art/ch-11.md"
+
+
+**What you will understand:** how **Capra** (named for *Capra*, the genus of the wild goats and ibexes) turns a model, written as a graph of tensor operations in floating point, becomes a program for the chip of Chapter 7 that no human wrote: how the compiler **chooses an int8 scale for every tensor**, **cuts big matrix products into the 4 x 4 tiles** the hardware can do, **places tensors in the 4,096-word scratchpad and reuses the space** as soon as they are dead, and **emits** instructions. You will also see how a compiler is tested: against a plain-Python interpreter, against the meaning of each number, against its own allocator, and against graphs it must refuse.
 
 **What you need to know first:** Chapters 3 (quantization), 7 (the ISA) and 8-9 (programs written by hand, which is what this chapter automates).
 
@@ -21,10 +26,10 @@
 
 The input is a small **graph IR**: tensors are 2-D, and the operations are `input`, `weight`, `matmul` (optionally with the second operand transposed and a constant factor), `softmax` (per row), `add`, `relu`, `concat_rows`, `argmax` (per row) and `output`. That is exactly what a transformer decode step needs; Chapter 12 uses it for one.
 
-## The compiler: `model/compiler.py`
+## Capra: `model/capra.py`
 
 ```python
---8<-- "model/compiler.py"
+--8<-- "model/capra.py"
 ```
 
 What it decides, in order:
@@ -57,10 +62,10 @@ Two interpreters accompany it (`interpret` and `stagewise_problems`), written fo
 
 ## How a compiler is tested
 
-A compiler's output is a program, and "does the program run" is not the question; the question is whether it computes the right thing for *every* graph. The battery in `model/compiler_tests.py` generates random graphs (random shapes, matmul chains, fused relus, self-products, softmax heads, residual adds, concatenations, argmax outputs), compiles each twice (with and without buffer reuse), and applies five checks:
+A compiler's output is a program, and "does the program run" is not the question; the question is whether it computes the right thing for *every* graph. The battery in `model/capra_tests.py` generates random graphs (random shapes, matmul chains, fused relus, self-products, softmax heads, residual adds, concatenations, argmax outputs), compiles each twice (with and without buffer reuse), and applies five checks:
 
 ```python
---8<-- "model/compiler_tests.py"
+--8<-- "model/capra_tests.py"
 ```
 
 - **(a) The allocator.** The program with buffer reuse and the one that keeps every buffer alive must give identical outputs. A buffer freed too early, or two live buffers given overlapping space, makes them differ.

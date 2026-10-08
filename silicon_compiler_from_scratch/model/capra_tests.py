@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Chapter 11: the compiler's test battery. A generator of random graphs and the checks applied to each:
+"""Chapter 11: Capra's test battery. A generator of random graphs and the checks applied to each:
   (a) ALLOCATOR: the program compiled with buffer reuse and the one compiled with every buffer kept alive give identical outputs;
   (b) MEANING: the outputs of the reference simulator equal the integer interpreter's, exactly;
   (c) EVERY TENSOR: with reuse off, every tensor read back from the scratchpad equals the interpreter's;
   (d) SCALES: every tensor is within one level of the real-number meaning of its operation (stagewise_problems);
   (e) ACCURACY: the dequantized outputs stay within a bound of the floating-point result on inputs NOT used for calibration.
-Usage: compiler_tests.py [nseeds]"""
+Usage: capra_tests.py [nseeds]"""
 import math, os, random, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import compiler as C
+import capra as C
 def random_graph(seed):
     R = random.Random(seed); g = C.Graph(); rows = R.randrange(1, 7); cols = R.randrange(2, 20); names = {}
     def new_input(shape, sd=1.0): nm = f"in{len(names)}"; names[nm] = (shape, sd); return g.input(nm, shape)
@@ -77,7 +77,7 @@ def check_cancellation():
         if n.op != "output" and C.read_tensor(P0, m0, n.id) != ints[n.id]: problems.append(f"cancellation: (c) tensor {n.id} ({n.op}) differs from the interpreter")
     return problems + ["cancellation: (d) " + q for q in C.stagewise_problems(P0, ints)]
 def check_errors():
-    """Things the compiler must REFUSE. A compiler that quietly accepts them produces wrong code. Returns the list of cases it wrongly accepted."""
+    """Things Capra must REFUSE. A compiler that quietly accepts them produces wrong code. Returns the list of cases it wrongly accepted."""
     R = random.Random(0); wrong = []
     def W(r, c): return [[R.gauss(0, 0.1) for _ in range(c)] for _ in range(r)]
     def attempt(name, build, inputs):

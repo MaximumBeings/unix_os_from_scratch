@@ -13,7 +13,7 @@ THE HOST.  The host picks the embedding row (the chip has no gather instruction)
 import math, os, random, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 os.environ.setdefault("GA2_EXT", "8192")
-import compiler as C, ga2_isa as I
+import capra as C, ga2_isa as I
 V = D = 16; HID = 32
 def f_next(t): return (5 * t + 3) % 16
 def hadamard(n):

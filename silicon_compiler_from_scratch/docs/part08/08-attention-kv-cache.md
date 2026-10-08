@@ -1,5 +1,10 @@
 # 8. Attention and the KV Cache: One Decode Step, From Hidden State to Output
 
+![ch-08](../assets/art/ch-08.svg)
+
+--8<-- "docs/assets/art/ch-08.md"
+
+
 **What you will understand:** what a language model actually computes to produce one token, why it keeps a **KV cache**, and what the cache costs and saves, measured in cycles on the chip of Chapter 7. You will write the decode step as a GA-2 program (the hand-written forerunner of the compiler of Chapter 11), run it on the RTL, compare its answer with floating-point attention, see where the quantization error comes from, and then test the *program builder* by mutation, where three different kinds of check turn out to have three different blind spots.
 
 **What you need to know first:** Chapters 3 (quantization), 6 (softmax) and 7 (the GA-2 instruction set).

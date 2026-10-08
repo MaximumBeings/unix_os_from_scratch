@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Chapter 11: a compiler from a tensor graph to GA-2 programs.
+"""Chapter 11: CAPRA, a compiler from a tensor graph to GA-2 programs (named for the goat genus, Capra).
 PIPELINE.   graph IR  ->  float evaluation (calibration)  ->  scale planning  ->  tiling  ->  scratchpad allocation  ->  instruction emission  ->  a Program that runs on the reference simulator or the RTL.
 THE IR.     Tensors are 2-D (rows, cols). Nodes: input, weight, matmul (optionally with B transposed and a constant factor), softmax (per row), add, relu, concat_rows, argmax (per row), output.
 WHAT THE COMPILER DECIDES FOR THE USER: every tensor's int8 scale (from calibration data), every requantizer's multiplier and shift, how a big matrix product is cut into 4x4 output tiles, where each tensor lives in the scratchpad

@@ -1,5 +1,10 @@
 # 5. The Scratchpad, the DMA Engine, and Double Buffering
 
+![ch-05](../assets/art/ch-05.svg)
+
+--8<-- "docs/assets/art/ch-05.md"
+
+
 **What you will understand:** why an accelerator has its own small memory instead of a cache, how a DMA engine moves data without the compute units waiting on it, and how **double buffering** hides memory latency behind arithmetic. You will build all three, derive the cycle count of the whole stream as a formula, check the formula against the circuit to the cycle on eight shapes, and see which shapes of test are needed to catch the bugs in the controller.
 
 **What you need to know first:** Chapters 1-4. No new arithmetic: this chapter is about *time*.

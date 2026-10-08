@@ -1,5 +1,10 @@
 # Answers to the Self-Check Questions
 
+![answers](assets/art/answers.svg)
+
+--8<-- "docs/assets/art/answers.md"
+
+
 Worked answers, chapter by chapter.
 
 ---

@@ -1,5 +1,10 @@
 # 2. The MAC and Number Formats: Two's Complement, Overflow, and the Tests That Found Three Holes
 
+![ch-02](../assets/art/ch-02.svg)
+
+--8<-- "docs/assets/art/ch-02.md"
+
+
 **What you will understand:** how an 8-bit signed number is stored, why the multiply-accumulate (MAC) unit is the atom of every matrix engine, what happens when a sum does not fit (wrap or saturate), and what the same multiplier costs when it is written two different ways. You will also see a test suite that *looked* complete have three holes, found by breaking the circuit on purpose.
 
 **What you need to know first:** Chapter 1 (the flow: golden model, two simulators, Yosys, mutation).

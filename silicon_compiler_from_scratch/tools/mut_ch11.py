@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Chapter 11: test the tests of the COMPILER. Break model/compiler.py one line at a time and run the battery: 60 random graphs under checks (a)-(e), the five graphs the compiler must refuse, and a directed cancellation case. 'caught' = some check reports a problem or the compiler crashes."""
+"""Chapter 11: test the tests of the COMPILER. Break model/capra.py one line at a time and run the battery: 60 random graphs under checks (a)-(e), the five graphs the compiler must refuse, and a directed cancellation case. 'caught' = some check reports a problem or the compiler crashes."""
 import concurrent.futures, os, shutil, subprocess, sys, tempfile
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); SRC = open(os.path.join(ROOT, "model", "compiler.py")).read()
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); SRC = open(os.path.join(ROOT, "model", "capra.py")).read()
 M = [
  ("tiling: edge tiles are always 4 x 4", "mt, nt = min(4, m - i0), min(4, nn - j0)", "mt, nt = 4, 4"),
  ("tiling: the A tile offset ignores the row length", "A=ins[0] + i0 * k,", "A=ins[0] + i0,"),
@@ -34,8 +34,8 @@ M = [
 EQUIV = [("EQUIVALENT in effect: the allocator skips an exact-fit hole (it uses the next larger one, or fails only when memory is nearly full)", "if sz >= n:", "if sz > n:")]
 def check(label, old, new):
     if SRC.count(old) != 1: return label, "BAD ANCHOR (%d occurrences)" % SRC.count(old)
-    d = tempfile.mkdtemp(prefix="mut11_"); shutil.copytree(os.path.join(ROOT, "model"), os.path.join(d, "model")); open(os.path.join(d, "model", "compiler.py"), "w").write(SRC.replace(old, new))
-    code = "import sys; sys.path.insert(0,'model'); import compiler_tests as T; p,w=T.check_many(range(60)); e=T.check_errors(); c=T.check_cancellation(); sys.exit(1 if (p or e or c) else 0)"
+    d = tempfile.mkdtemp(prefix="mut11_"); shutil.copytree(os.path.join(ROOT, "model"), os.path.join(d, "model")); open(os.path.join(d, "model", "capra.py"), "w").write(SRC.replace(old, new))
+    code = "import sys; sys.path.insert(0,'model'); import capra_tests as T; p,w=T.check_many(range(60)); e=T.check_errors(); c=T.check_cancellation(); sys.exit(1 if (p or e or c) else 0)"
     try: r = subprocess.run([sys.executable, "-c", code], cwd=d, capture_output=True, text=True, timeout=900).returncode != 0
     except subprocess.TimeoutExpired: r = True
     shutil.rmtree(d, ignore_errors=True); return label, r
