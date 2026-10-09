@@ -25,7 +25,7 @@ module fir_tb;
             @(negedge clk); x = vec[k][31:16]; #1;
             if (y !== vec[k][15:0]) begin errs++; if (errs < 6) $display("MISMATCH cycle %0d: y %0d expected %0d", k, y, $signed(vec[k][15:0])); end
         end
-        if (errs == 0) $display("PASS: %s FIR, %0d cycles, RND=%0d SAT=%0d", `FORM ? "transposed" : "direct", NC, `RND, `SAT); else $display("FAIL: %0d problems", errs);
+        if (errs == 0) begin if (`FORM) $display("PASS: transposed FIR, %0d cycles, RND=%0d SAT=%0d", NC, `RND, `SAT); else $display("PASS: direct FIR, %0d cycles, RND=%0d SAT=%0d", NC, `RND, `SAT); end else $display("FAIL: %0d problems", errs);
         $finish;
     end
 endmodule
