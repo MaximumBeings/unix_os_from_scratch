@@ -4,7 +4,7 @@
 `timescale 1ps/1ps
 module cdc_sync #(parameter int W = 1) (input logic clk, input logic [W-1:0] d, output logic [W-1:0] q);
     localparam longint WINDOW = 1800;
-    logic [W-1:0] m, dold, dprev; longint tchg [W]; logic [31:0] rng = 32'h9e3779b9;
+    logic [W-1:0] m = '0, q_r = '0, dold, dprev; longint tchg [W]; logic [31:0] rng = 32'h9e3779b9;
     initial begin dprev = d; dold = d; for (int i = 0; i < W; i++) tchg[i] = -100000; end
     always @(d) begin
         for (int i = 0; i < W; i++) if (d[i] !== dprev[i]) begin dold[i] = dprev[i]; tchg[i] = $time; end
@@ -15,6 +15,7 @@ module cdc_sync #(parameter int W = 1) (input logic clk, input logic [W-1:0] d, 
             rng = rng ^ (rng << 13); rng = rng ^ (rng >> 17); rng = rng ^ (rng << 5);
             if (($time - tchg[i]) < WINDOW && rng[7]) begin m[i] <= dold[i]; end else m[i] <= d[i];
         end
-        q <= m;
+        q_r <= m;
     end
+    assign q = q_r;
 endmodule

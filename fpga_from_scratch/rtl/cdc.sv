@@ -2,7 +2,7 @@
 // Chapter 3: the clock-domain-crossing circuits. All use cdc_sync (rtl/cdc_sync.sv) for the crossing itself.
 // cdc_naive_pulse: a one-cycle pulse sent through a plain two-flop synchronizer. A pulse shorter than the destination clock period can be missed entirely.
 module cdc_naive_pulse (input logic aclk, input logic bclk, input logic a_pulse, output logic b_pulse);
-    logic a_q, b_sync, b_prev;
+    logic a_q = 1'b0, b_sync, b_prev = 1'b0;                        // initial values: the FPGA loads them at configuration
     always_ff @(posedge aclk) a_q <= a_pulse;                      // the source flip-flop
     cdc_sync #(1) s (.clk(bclk), .d(a_q), .q(b_sync));
     always_ff @(posedge bclk) b_prev <= b_sync;
@@ -10,7 +10,7 @@ module cdc_naive_pulse (input logic aclk, input logic bclk, input logic a_pulse,
 endmodule
 // cdc_toggle_pulse: the pulse becomes a TOGGLE (every pulse flips a flip-flop); the level is synchronized; an edge detector in the destination turns each change back into one pulse. Pulses must be at least three destination clocks apart (the toggle must settle before the next).
 module cdc_toggle_pulse (input logic aclk, input logic bclk, input logic a_pulse, output logic b_pulse);
-    logic tog, b_sync, b_prev;
+    logic tog = 1'b0, b_sync, b_prev = 1'b0;
     always_ff @(posedge aclk) tog <= tog ^ a_pulse;
     cdc_sync #(1) s (.clk(bclk), .d(tog), .q(b_sync));
     always_ff @(posedge bclk) b_prev <= b_sync;
