@@ -1,6 +1,6 @@
 // Chapter 3 testbench for cdc_afifo: two unrelated clocks, a random producer and a random consumer, a scoreboard that checks every word and the occupancy.
 //  Compile with rtl/cdc_sync.sv (ideal synchronizer: every capture is clean) or with tb/cdc_sync_meta.sv (metastability model). Defines: GRAY (1/0), WP and RP (clock periods in ps), PW and PR (percent chance per cycle of offering a word / asking for one), NWR (words to send).
-//  Checks: (0) the occupancy each side believes (from the synchronized far pointer) is never wrong in the dangerous direction: the reader's count never exceeds the true occupancy and the writer's never falls below it; (1) every word read equals the word written, in order (catches reads of empty entries and overwritten entries); (2) a write accepted when the FIFO really holds DEPTH words is an overflow; (3) a read accepted when it holds nothing is an underflow; (4) all NWR words arrive before a time limit.
+//  Checks: (0) the occupancy each side believes (from the synchronized far pointer) is never wrong in the dangerous direction: the reader's count never exceeds the true occupancy and the writer's never falls below it; (1) every word read equals the word written, in order (catches reads of empty entries and overwritten entries); (2) a write accepted when the FIFO really holds DEPTH words is an overflow; (3) a read accepted when it holds nothing is an underflow; (4) all NWR words arrive before a time limit; (5) after the words are through, a reset of both sides in the middle of operation leaves the FIFO empty, not full and with both counts at zero, while the reset is held and after it is released.
 `timescale 1ps/1ps
 `ifndef GRAY
 `define GRAY 1
@@ -25,7 +25,7 @@
 `endif
 module cdc_fifo_tb;
     localparam int W = 8, AW = 3, DEPTH = 1 << AW, NWR = `NWR;
-    int rlevel_over = 0, wlevel_under = 0;
+    int rlevel_over = 0, wlevel_under = 0, reset_bad = 0;
     logic wclk = 0, rclk = 0, wrst_n = 0, rrst_n = 0, wr_en = 0, rd_en = 0; logic [W-1:0] wr_data = '0, rd_data; logic full, empty; logic [AW:0] wlevel, rlevel;
     cdc_afifo #(.W(W), .AW(AW), .GRAY(`GRAY), .REG(`REG)) dut (.wclk(wclk), .wrst_n(wrst_n), .wr_en(wr_en), .wr_data(wr_data), .full(full), .rclk(rclk), .rrst_n(rrst_n), .rd_en(rd_en), .rd_data(rd_data), .empty(empty), .wlevel(wlevel), .rlevel(rlevel));
     always #(`WP / 2) wclk = ~wclk;
@@ -60,9 +60,14 @@ module cdc_fifo_tb;
             repeat (200000) begin @(posedge rclk); if (nr >= NWR) disable waitdone; end
         end
         #20000;
-        if (nr == NWR && nw == NWR && bad_data == 0 && rlevel_over == 0 && wlevel_under == 0 && overflow == 0 && underflow == 0)
+        // a reset in the MIDDLE of operation: both sides in reset, the FIFO must read as empty (and not full, with both counts zero) while reset is held and again after it is released
+        wr_en = 0; rd_en = 0; wrst_n = 0; rrst_n = 0; repeat (8) @(posedge wclk); repeat (8) @(posedge rclk); #500;
+        if (empty !== 1'b1 || full !== 1'b0 || wlevel !== 0 || rlevel !== 0) reset_bad++;
+        wrst_n = 1; rrst_n = 1; repeat (8) @(posedge wclk); repeat (8) @(posedge rclk); #500;
+        if (empty !== 1'b1 || full !== 1'b0 || wlevel !== 0 || rlevel !== 0) reset_bad++;
+        if (nr == NWR && nw == NWR && bad_data == 0 && rlevel_over == 0 && wlevel_under == 0 && reset_bad == 0 && overflow == 0 && underflow == 0)
             $display("PASS: %0d words in order, max occupancy %0d of %0d, full seen %0d cycles, empty seen %0d cycles", nr, maxocc, DEPTH, full_seen, empty_seen);
-        else $display("FAIL: written %0d read %0d, wrong words %0d, overflows %0d, underflows %0d, reader over-counted %0d times, writer under-counted %0d times", nw, nr, bad_data, overflow, underflow, rlevel_over, wlevel_under);
+        else $display("FAIL: written %0d read %0d, wrong words %0d, overflows %0d, underflows %0d, reader over-counted %0d times, writer under-counted %0d times, mid-run reset not clean %0d times", nw, nr, bad_data, overflow, underflow, rlevel_over, wlevel_under, reset_bad);
         $finish;
     end
 endmodule
