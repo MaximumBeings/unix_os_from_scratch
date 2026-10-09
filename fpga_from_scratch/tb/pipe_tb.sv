@@ -1,4 +1,4 @@
-// Chapter 4 testbench for pipe: a random valid/data stream against the golden model, cycle by cycle. Every output must appear exactly S + 1 cycles after its input, carry the function of that input, and the valid bit must be low in every other cycle. Defines: S (stages), NC (cycles).
+// Chapter 4 testbench for pipe: a random valid/data stream against the golden model, cycle by cycle (valid is held high during reset, which must discard it). Every output must appear exactly S + 1 cycles after its input, carry the function of that input, and the valid bit must be low in every other cycle. Defines: S (stages), NC (cycles).
 `timescale 1ns/1ps
 `ifndef S
 `define S 3
@@ -13,7 +13,8 @@ module pipe_tb;
     always #5 clk = ~clk;
     initial begin
         $readmemh("out/pipe_vec.hex", vec);
-        repeat (3) @(negedge clk); rst = 0;
+        in_valid = 1; in_data = 16'hBEEF;                           // the input is VALID during reset: reset must discard it
+        repeat (3) @(negedge clk); rst = 0; in_valid = 0;
         for (k = 0; k < NC; k = k + 1) begin
             @(negedge clk); in_valid = vec[k][36]; in_data = vec[k][35:20]; #1;
             if (out_valid !== vec[k][16] || (vec[k][16] && out_data !== vec[k][15:0])) begin errs++; if (errs < 6) $display("MISMATCH cycle %0d: valid %b/%b data %h/%h", k, out_valid, vec[k][16], out_data, vec[k][15:0]); end
