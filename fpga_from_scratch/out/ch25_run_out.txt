@@ -13,3 +13,32 @@
 == 3. the tracker against the model: ready, answer, release, live count and fault in every cycle
   scenario  NT |  cycles  answers  releases |  Icarus  Verilator
   clean      1 |     303      194        64 |    PASS       PASS
+  clean      2 |     303      205        69 |    PASS       PASS
+  clean      4 |     303      203        65 |    PASS       PASS
+  clean      5 |     303      219        79 |    PASS       PASS
+  clean      8 |     303      212        76 |    PASS       PASS
+  full       1 |     303      255        28 |    PASS       PASS
+  full       2 |     303      257        33 |    PASS       PASS
+  full       4 |     303      254        30 |    PASS       PASS
+  full       5 |     303      261        25 |    PASS       PASS
+  full       8 |     303      248        18 |    PASS       PASS
+  near       1 |     303      192        54 |    PASS       PASS
+  near       2 |     303      202        71 |    PASS       PASS
+  near       4 |     303      208        76 |    PASS       PASS
+  near       5 |     303      218        79 |    PASS       PASS
+  near       8 |     303      212        74 |    PASS       PASS
+  burst      1 |     303      183        83 |    PASS       PASS
+  burst      2 |     303      183        83 |    PASS       PASS
+  burst      4 |     303      171        80 |    PASS       PASS
+  burst      5 |     303      174        86 |    PASS       PASS
+  burst      8 |     303      203        97 |    PASS       PASS
+  fault      1 |     303      219        48 |    PASS       PASS
+  fault      2 |     303      223        56 |    PASS       PASS
+  fault      4 |     303      233        62 |    PASS       PASS
+  fault      5 |     303      228        67 |    PASS       PASS
+  fault      8 |     303      222        67 |    PASS       PASS
+  random     1 |     303      215        47 |    PASS       PASS
+  random     2 |     303      224        58 |    PASS       PASS
+  random     4 |     303      211        53 |    PASS       PASS
+  random     5 |     303      211        56 |    PASS       PASS
+  random     8 |     303      234        61 |    PASS       PASS
