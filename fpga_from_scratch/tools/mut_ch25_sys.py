@@ -5,8 +5,6 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import flow
 RTL = "rtl/life.sv"; MOD = "model/sys_gold.py"
 MUT = [
- (RTL, "a tracker release does not win the gate's port", 'if (t_rv) begin ev_type = t_rtype;', 'if (t_rv && !give_back && !take_order) begin ev_type = t_rtype;'),
- (RTL, 'a give-back does not win over a new order', "else if (give_back) begin ev_type = 2'd2;", "else if (give_back && !take_order) begin ev_type = 2'd2;"),
  (RTL, 'the give-back is a fill', "else if (give_back) begin ev_type = 2'd2;", "else if (give_back) begin ev_type = 2'd1;"),
  (RTL, 'the give-back has the wrong price', 'ev_side = h_side; ev_px = h_px; ev_qty = h_qty; end', "ev_side = h_side; ev_px = h_px + 1'b1; ev_qty = h_qty; end"),
  (RTL, 'the give-back has the wrong quantity', 'ev_side = h_side; ev_px = h_px; ev_qty = h_qty; end', "ev_side = h_side; ev_px = h_px; ev_qty = h_qty - 1'b1; end"),

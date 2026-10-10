@@ -50,6 +50,10 @@ def gen(kind, rng, nt, n=400):
     return cy
 KINDS = ("flow", "tight", "dups", "faults", "cancels", "random")
 def make(kind, seed, nt): return gen(kind, random.Random(seed * 1000 + sum(map(ord, kind))), nt)
+def collide(k):
+    """directed: a rollback (duplicate token) waits for the gate's port while the report of a fill makes the tracker release: the release goes first. k delays the report."""
+    u = dict(maxlong=100, maxshort=100, maxqty=50, maxonot=10000, maxnot=100000, cap=5); o = lambda t: dict(tok=t, acct=0, sym=0, side=0, px=20, qty=10)
+    return [dict(cfg=(a, u)) for a in range(4)] + [dict(band=(s, 1, 100)) for s in range(4)] + [dict(arm=1), {}, {}, dict(ord=o(1)), {}, {}, {}, {}, {}, dict(ord=o(1))] + [{}] * k + [dict(rep=(LG.FILL, dict(tok=1, qty=4)))] + [{}] * 12
 def battery():
     """The mutation runs' test: three table sizes, six mixes, Icarus. -> None or the first difference."""
     for nt in CONFIGS:
@@ -57,6 +61,8 @@ def battery():
             try: ok = same(make(kind, nt, nt), nt)
             except Exception as x: return f"crash {type(x).__name__}"
             if not ok: return f"{kind}, NT {nt}"
+    for k in range(14):
+        if not same(collide(k), 2): return f"collision, delay {k}"
     return None
 def battery_model():
     q = subprocess.run([sys.executable, "model/sys_gold.py"], cwd=R_, capture_output=True, text=True, timeout=300)
@@ -73,9 +79,12 @@ if __name__ == "__main__":
     for kind in KINDS:
         r = SG.run(make(kind, 1, 4), 4); S = r["sys"]; d = Counter((RG.RN + [""] * 5)[x[3]] if x[3] < 16 else "TRK_" + LG.RN[x[3] - 16] for x in r["rows"] if x[2]); gk = Counter(RG.RN[x[9]] for x in r["rows"] if x[7] and x[8] == 1 or x[7] and x[8] == 2)
         print(f"  {kind:7s} orders answered {sum(d.values()):3d}: " + ", ".join(f"{k} {n}" for k, n in sorted(d.items())) + f" | quiet cycles checked {S.checks}, books differ in {S.bad} | fault {r['rows'][-1][16]}")
+    print("  collision cases (rollback and a tracker release want the gate's port in the same cycle), report delay 0..13: " + str(sum(SG.run(collide(k), 2)["sys"].collide > 0 for k in range(14))) + " of 14 collide")
     print("\n== 3. the joined design against the model: every output, every cycle")
     print(f"  {'mix':8s} {'NT':>3s} | {'cycles':>7s} {'orders':>7s} {'sent':>5s} {'rolled back':>11s} | {'Icarus':>7s} {'Verilator':>10s}")
     for kind in KINDS:
         for nt in CONFIGS:
             cy = make(kind, 1, nt); res = SG.run(cy, nt); i = same(cy, nt); v = same(cy, nt, "verilator"); ds = [x for x in res["rows"] if x[2]]
             print(f"  {kind:8s} {nt:3d} | {len(res['rows']):7d} {len(ds):7d} {sum(x[3] == 0 for x in ds):5d} {sum(x[3] >= 16 for x in ds):11d} | {'PASS' if i else 'FAIL':>7s} {'PASS' if v else 'FAIL':>10s}")
+    ci = [same(collide(k), 2) for k in range(14)]; cv = [same(collide(k), 2, "verilator") for k in range(14)]
+    print(f"  collision 0..13 | {'PASS' if all(ci) else 'FAIL':>7s} {'PASS' if all(cv) else 'FAIL':>10s}")
