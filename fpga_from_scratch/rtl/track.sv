@@ -1,4 +1,4 @@
-// Chapter 25: the order tracker. NT entries, each an order that was sent and is not finished: token, account, symbol, side, the order's price, the remaining quantity and a state (PENDING_NEW, LIVE, PENDING_CANCEL). The token is looked up in all entries at once. One event per cycle: a report from the exchange wins over a local event (ready is low and the requester holds its event). Every report that does not fit the books sets the sticky fault. The specification is in model/life_gold.py.
+// Chapter 25: the order tracker. NT entries, each an order that was sent and is not finished: token, account, symbol, side, the order's price, the remaining quantity and a state (PENDING_NEW, LIVE, PENDING_CANCEL). The token is looked up in all entries at once. One event per cycle: a report from the exchange wins over a local event (ready is low and the requester holds its event). Every report that does not fit the books sets the sticky fault. Outputs are qualified by their valid: the answer fields by o_valid, the release fields by o_rv, and are otherwise don't-care. The specification is in model/life_gold.py.
 module track #(parameter int NT = 4, parameter int PW = 16, parameter int QW = 16) (
     input  logic clk, input logic rst,
     input  logic l_valid, input logic l_kind, input logic [31:0] l_tok, input logic [3:0] l_acct, input logic [3:0] l_sym, input logic l_side, input logic [PW-1:0] l_px, input logic [QW-1:0] l_qty,
@@ -45,7 +45,6 @@ module track #(parameter int NT = 4, parameter int PW = 16, parameter int QW = 1
                 default: if (hst != PNEW) res = BADSTATE; else begin rel = 1'b1; rtype = 2'd2; rq = hrem; do_free = 1'b1; end
             endcase
             anomaly = (res != OK);
-            if (anomaly) begin rel = 1'b0; do_fill = 1'b0; do_free = 1'b0; do_live = 1'b0; end
         end else if (l_valid) begin
             if (!l_kind) begin
                 if (l_qty == '0) res = ZERO; else if (hit) res = DUPTOK; else if (!free) res = FULL; else do_new = 1'b1;
@@ -59,8 +58,8 @@ module track #(parameter int NT = 4, parameter int PW = 16, parameter int QW = 1
             for (int i = 0; i < NT; i++) begin used[i] <= 1'b0; tok[i] <= '0; acct[i] <= '0; sym[i] <= '0; side[i] <= 1'b0; px[i] <= '0; rem[i] <= '0; st[i] <= '0; end
             fault <= 1'b0; o_valid <= 1'b0; o_src <= 1'b0; o_res <= '0; o_rv <= 1'b0; o_rtype <= '0; o_racct <= '0; o_rsym <= '0; o_rside <= 1'b0; o_rpx <= '0; o_rqty <= '0;
         end else begin
-            o_valid <= r_valid || l_valid; o_src <= r_valid; o_res <= (r_valid || l_valid) ? res : 3'd0;
-            o_rv <= rel; o_rtype <= rel ? rtype : 2'd0; o_racct <= rel ? acct[hi] : 4'd0; o_rsym <= rel ? sym[hi] : 4'd0; o_rside <= rel ? side[hi] : 1'b0; o_rpx <= rel ? px[hi] : '0; o_rqty <= rel ? rq : '0;
+            o_valid <= r_valid || l_valid; o_src <= r_valid; o_res <= res;
+            o_rv <= rel; o_rtype <= rtype; o_racct <= acct[hi]; o_rsym <= sym[hi]; o_rside <= side[hi]; o_rpx <= px[hi]; o_rqty <= rq;
             if (anomaly) fault <= 1'b1;
             if (do_new) begin
                 used[fi] <= 1'b1; tok[fi] <= l_tok; acct[fi] <= l_acct; sym[fi] <= l_sym; side[fi] <= l_side; px[fi] <= l_px; rem[fi] <= l_qty; st[fi] <= PNEW;

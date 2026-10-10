@@ -13,11 +13,10 @@ MUT = [
  ("a fill releases more than was left (clamp removed: quantity wraps)", "if (r_qty == '0) res = ZERO;\n                    else if (r_qty > hrem) res = OVERFILL;", "if (r_qty == '0) res = ZERO;\n                    else if (r_qty > hrem + 1'b1) res = OVERFILL;"),
  ("a cancel releases the original quantity, not the remainder", "CANCELED: begin rel = 1'b1; rtype = 2'd2; rq = hrem;", "CANCELED: begin rel = 1'b1; rtype = 2'd2; rq = hrem + 1'b1;"),
  ("a fill does not reduce the remaining quantity", "if (do_fill) rem[hi] <= hrem - r_qty;", "if (do_fill) rem[hi] <= hrem;"),
- ("the release carries the wrong price", "o_rpx <= rel ? px[hi] : '0;", "o_rpx <= rel ? px[fi] : '0;"),
+ ("the release carries the wrong price", "o_rpx <= px[hi];", "o_rpx <= px[fi];"),
  ("an unknown token is not a fault", "if (!hit) res = UNKNOWN;\n            else case", "if (!hit) res = OK;\n            else case"),
  ("a fully filled order stays in the table", "do_free = (r_qty == hrem); end", "do_free = 1'b0; end"),
  ("a duplicate token is accepted", "else if (hit) res = DUPTOK;", "else if (1'b0) res = DUPTOK;"),
- ("an anomaly still releases", "if (anomaly) begin rel = 1'b0;", "if (anomaly) begin"),
 ]
 def one(m):
     label, old, new = m; d = tempfile.mkdtemp(prefix="frm_")

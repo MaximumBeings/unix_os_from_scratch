@@ -41,7 +41,7 @@ def gen(kind, rng, nt, n=300):
             elif kind in ("fault", "random"):
                 live = [x for x in T.e if x]
                 if live and rng.random() < .6:
-                    x = rng.choice(live); w = rng.choice(["over", "zero", "ack", "rej"])
+                    x = rng.choice(live); w = rng.choice(["over", "zero", "ack", "rej"]) if x["rem"] < 65535 else "zero"
                     rep = (G.FILL, dict(tok=x["tok"], qty=x["rem"] + 1)) if w == "over" else (G.FILL, dict(tok=x["tok"], qty=0)) if w == "zero" else (G.ACK, dict(tok=x["tok"])) if (w == "ack" and x["st"] != G.PNEW) else (G.REJECT, dict(tok=x["tok"])) if x["st"] != G.PNEW else (G.FILL, dict(tok=x["tok"], qty=x["rem"] + 1))
                 else: rep = (rng.choice([G.ACK, G.FILL, G.CANCELED, G.REJECT]), dict(tok=rng.choice(pool + [rng.getrandbits(32)]), qty=rng.randint(0, 5)))
         if rep: d["rep"] = rep

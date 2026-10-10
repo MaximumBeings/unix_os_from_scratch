@@ -60,7 +60,6 @@ module track_props (
         // T3, T5: the release
         assert (o_rv == e_rv);
         if (e_rv) assert (o_rtype == e_type && o_rqty == e_q && o_racct == e_a && o_rsym == e_s && o_rside == e_sd && o_rpx == e_p);
-        if (!e_rv) assert (o_rqty == 0 && o_rtype == 0);
         // T1: released + remaining = original for every open order; nothing over-released
         for (i = 0; i < 4; i++) if (open_[i]) assert (relsum[i] < {1'b0, orig[i]});
         // T2: an order that left the table was released exactly its original quantity (a cancel releases the remainder)
