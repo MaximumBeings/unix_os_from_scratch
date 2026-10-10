@@ -31,3 +31,4 @@
   random     1 |     419     124     4           1 |    PASS       PASS
   random     2 |     419      81    54           5 |    PASS       PASS
   random     4 |     419     109    21           3 |    PASS       PASS
+  collision 0..13 |    PASS       PASS
