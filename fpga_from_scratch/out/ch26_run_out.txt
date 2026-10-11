@@ -20,3 +20,22 @@
   mix         | cycles orders bytes sent |  Icarus  Verilator
   normal      |   6023     13        403 |    PASS       PASS
   dense       |   5214      8        248 |    PASS       PASS
+  dense_clean |   4925      7        217 |    PASS       PASS
+  slow        |   8980     10        310 |    PASS       PASS
+  refuse      |   5941     15        248 |    PASS       PASS
+  close       |   6220     14         62 |    PASS       PASS
+  faults      |   5909      9        279 |    PASS       PASS
+  burst       |   4606      2         62 |    PASS       PASS
+  slowsig     |   5190     19        589 |    PASS       PASS
+  collide     |   6190     11        341 |    PASS       PASS
+  hand        |    488      1         31 |    PASS       PASS
+
+== 4. the cycle budget: from the last byte of the message to the first byte of the order (all orders of all mixes)
+  stage                               min   mean  max
+  queue wait (accepted - pushed - 1)    0   28.3  199
+  order book (n of the event)          11   11.9   15
+  signal + trigger (F + 4)             16   20.2   36
+  gate + tracker (offer to answer)      5    5.0    5
+  transmitter (answer to first byte)    1    1.1    2
+  TOTAL last byte in -> first byte out   35   68.5  256
+  by the type of the message that caused the order: ADD 90 orders (total 35..256)
