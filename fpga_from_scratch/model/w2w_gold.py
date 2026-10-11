@@ -191,7 +191,7 @@ def directed_dead2():
         X.step(cycles[c], mev.get(c))
         if X.rej_pend and at is None: at = c
     assert at is not None
-    cycles[at]["rep"] = (LG.FILL, dict(tok=1, qty=2))
+    cycles[at + 1]["rep"] = (LG.FILL, dict(tok=1, qty=2))                                      # X.rej_pend after the step of cycle `at` is what cycle at + 1 sees
     return cycles, mev
 def directed_queue():
     """Five DELETE messages (unknown references) in one packet, 21 cycles apart, with a queue of TWO entries and F = 32. An unknown reference costs the book 1 + K + 2 = 7 cycles, and the strategy slot is held for n + F + 4 = 43 cycles from the accept. The first is accepted at E1 + 1; the second and third are queued (E1 + 21, E1 + 42); the second is accepted when the slot frees, E1 + 1 + 43 + 1 = E1 + 45, and the fourth is queued (E1 + 63); the fifth arrives at E1 + 84 with the queue full (the third and fourth) and is DROPPED. The accepts are E1 + 1, 45, 89 and 133."""

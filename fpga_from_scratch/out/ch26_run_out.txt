@@ -24,4 +24,3 @@
 
 == 3. the whole design against the model: every cycle, every output (queue, counters, book, strategy, lifecycle, bytes on the wire)
   mix         | cycles orders bytes sent |  Icarus  Verilator
-  normal      |   6597     13        310 |    PASS       PASS
