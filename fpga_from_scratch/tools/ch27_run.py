@@ -63,9 +63,9 @@ def make(kind, seed):
     if kind == "reset":
         c, m, kw = prep(cm); R0 = 2600; c[R0]["rst_in"] = 1; c[R0 + 1]["rst_in"] = 1
         i = R0
-        while i < len(c) and not (i > R0 + RSTN + 4 and "s" in c[i] and c[i]["s"][1] == 1): c[i].pop("s", None); i += 1        # the bytes of the packet the reset cut are not fed: the parser would ignore them, and they would be decoded by the model's parser as messages
+        while i < len(c) and not (i > R0 + RSTN + 4 and "s" in c[i] and c[i]["s"][0] and c[i]["s"][1] == 1): c[i].pop("s", None); i += 1        # the bytes of the packet the reset cut are not fed: the parser would ignore them, and they would be decoded by the model's parser as messages
         kw.update(ft=400)
-        return c, {k: v for k, v in m.items() if k < R0 or k > i + 60}, kw
+        return c, {k: v for k, v in m.items() if k < R0 or k > i}, kw
     raise KeyError(kind)
 KINDS = ("normal", "dense", "slow", "refuse", "close", "faults", "collide", "slowsig", "narrow", "hand", "feedloss", "stall", "trip", "extkill", "holdtrip", "go_early", "reset")
 def battery():

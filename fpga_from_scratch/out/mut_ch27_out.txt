@@ -1,19 +1,15 @@
 NOTE: this script deliberately breaks copies of the RTL and of the models. 'caught' lines are EXPECTED: they show the battery notices the mistake.
-unmutated designs and models pass their batteries: True
+unmutated designs and models pass their batteries: False
   INIT lasts one cycle too long: caught by: each_cause, config 0
   INIT lasts one cycle too short: caught by: each_cause, config 0
-  a go needs no ACTIVE session: NOT CAUGHT
+  a go needs no ACTIVE session: caught by: goearly, config 0
   READY starts RUN by itself: caught by: each_cause, config 0
-  RUN does not restart the feed count: NOT CAUGHT
-  RUN does not restart the slot count: NOT CAUGHT
   the feed watchdog is one cycle late: caught by: each_cause, config 0
   the feed watchdog is one cycle early: caught by: each_cause, config 0
   a byte does not restart the feed count: caught by: each_cause, config 0
-  the feed count does not saturate: NOT CAUGHT
   the stall watchdog is one cycle late: caught by: each_cause, config 0
   the stall watchdog is one cycle early: caught by: each_cause, config 0
   a free slot does not restart the stall count: caught by: boundaries, config 0
-  the stall count does not saturate: NOT CAUGHT
   the tracker's fault is ignored: caught by: each_cause, config 0
   a dead session is ignored: caught by: each_cause, config 0
   the external trip is ignored: caught by: each_cause, config 0
@@ -31,12 +27,12 @@ unmutated designs and models pass their batteries: True
   reset leaves the warm-up count: caught by: each_cause, config 0
   reset leaves the sent flag: caught by: each_cause, config 0
   reset leaves the cause: caught by: each_cause, config 0
-  the reset stretch is one cycle short: NOT CAUGHT
+  the reset stretch is one cycle short: caught by: each_cause, config 0
   the reset release is not synchronised: NOT CAUGHT
   the stretch is not restarted by a second pulse: caught by: each_cause, config 0
   the reset ignores the synchroniser: NOT CAUGHT
   the supervisor's kill is ignored: caught by: refuse
-  the control plane's kill is ignored: NOT CAUGHT
+  the control plane's kill is ignored: caught by: reset
   the logout request is not offered: caught by: normal
   the logout is the wrong request: caught by: normal
   the control plane's request is lost: caught by: normal
@@ -50,7 +46,7 @@ unmutated designs and models pass their batteries: True
   the units are reset by the raw input: caught by: reset
   the slot tap is the queue: caught by: slowsig
   the fault tap is wrong: caught by: go_early
-  the quiet tap ignores a held order: NOT CAUGHT
+  the quiet tap ignores a held order: caught by: holdtrip
   the quiet tap ignores an answer being sent: caught by: stall
   the quiet tap ignores the lifecycle: caught by: stall
   the ready tap is always ready: caught by: stall
@@ -61,13 +57,13 @@ unmutated designs and models pass their batteries: True
   model: a go needs no session: caught by: hand-checked scenarios
   model: the logout needs no quiet: caught by: hand-checked scenarios
   model: the logout is repeated: caught by: hand-checked scenarios
-  model: the reset stretch is short: NOT CAUGHT
+  model: the reset stretch is short: caught by: hand-checked scenarios
   model: the supervisor's kill is ignored: caught by: hand-checked scenarios
   model: the logout is not offered: caught by: hand-checked scenarios
   model: the supervisor sees no feed: caught by: hand-checked scenarios
-  rtl/sup.sv: caught 27 of 35
-  rtl/safe.sv: caught 12 of 13
-  rtl/w2w.sv: caught 6 of 7
-  model/sup_gold.py: caught 6 of 7
+  rtl/sup.sv: caught 29 of 31
+  rtl/safe.sv: caught 13 of 13
+  rtl/w2w.sv: caught 7 of 7
+  model/sup_gold.py: caught 7 of 7
   model/safe_gold.py: caught 3 of 3
-mutants caught: 54 of 65
+mutants caught: 59 of 61
