@@ -63,9 +63,10 @@ def scenarios(rng, cfg):
         if rng.random() < .01: d["rst_in"] = 1
         r.append(d)
     out["random"] = boot[:4] + r
+    out["goearly"] = boot[:-1] + [dict(go=1, sess=4)] * 3 + [dict(go=1, sess=0)] + [dict(go=1, sess=2, feed=1)] + [dict(feed=1)] * 3 + [dict(go=1, trip=0, fault=0)] * 2 + [dict()] * (ft + 6) + [dict(rst=1)] + [dict(go=1)] * 3
     out["pulses"] = [dict(rst_in=1)] + [dict()] * (rstn + 6) + [dict(rst_in=1)] * 3 + [dict()] * (rstn + 6) + [dict(rst_in=1)] + [dict()] * 2 + [dict(rst_in=1)] + [dict()] * (rstn + 8)
     return out
-KINDS = ("each_cause", "boundaries", "random", "pulses")
+KINDS = ("each_cause", "boundaries", "random", "goearly", "pulses")
 def make(kind, ci, seed=1): return scenarios(random.Random(seed * 100 + ci), CONFIGS[ci])[kind]
 def battery():
     for ci, cfg in enumerate(CONFIGS):

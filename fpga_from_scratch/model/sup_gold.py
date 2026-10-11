@@ -3,7 +3,7 @@
 THE SUPERVISOR is a state machine with four states and a latched cause. The inputs of a cycle: go (a pulse from the control plane), trip (a pulse: an external trip), feed (the feed carried a byte), slot (the strategy slot is held), fault (the tracker's sticky fault), sess (the transmitter's session state; ACTIVE = 2), tx_ready, quiet (nothing in flight: the lifecycle is idle, no order is held, no answer is being sent).
   INIT   after reset, for WARM cycles (the cycle count is the first cycle after reset = 0: READY is visible from cycle WARM). The units are clearing their RAMs; nothing may leave.
   READY  waiting: `go` with the session ACTIVE makes it RUN (visible the next cycle).
-  RUN    orders may leave. Two counters: fc counts the cycles since the last feed byte (cleared by a byte, held at FT), sc counts the cycles the slot has been held (cleared when it is free, held at ST). In every RUN cycle the five causes are evaluated: f_t (fc >= FT: the feed has been silent for FT cycles; fc is the count BEFORE this cycle's byte, so a byte in the cycle fc reaches FT does not save the session), s_t (sc >= ST), trip, fault, and the session is not ACTIVE. If any is true the state becomes SAFE in the next cycle and `cause` is latched with a bit for every cause that was true (bit 0 feed, 1 stall, 2 external trip, 3 fault, 4 session).
+  RUN    orders may leave. Two counters: fc counts the cycles since the last feed byte (cleared by a byte), sc counts the cycles the slot has been held (cleared when it is free); both are 0 on entering RUN and need no saturation, since a count that reaches its limit leaves RUN in the next cycle. In every RUN cycle the five causes are evaluated: f_t (fc >= FT: the feed has been silent for FT cycles; fc is the count BEFORE this cycle's byte, so a byte in the cycle fc reaches FT does not save the session), s_t (sc >= ST), trip, fault, and the session is not ACTIVE. If any is true the state becomes SAFE in the next cycle and `cause` is latched with a bit for every cause that was true (bit 0 feed, 1 stall, 2 external trip, 3 fault, 4 session).
   SAFE   absorbing: only a reset leaves it. The logout request `cq` is offered in every SAFE cycle in which it has not yet been accepted, the session is ACTIVE, the transmitter is ready and nothing is in flight; the cycle it is offered is counted as accepted (the transmitter takes it when it is ready).
   kill = (state != RUN) in every cycle (a level the gate samples when an order is offered).
 Time: the state, kill, cq and cause visible in cycle c are those after the updates of cycles up to c - 1 (cq is a function of the state and of the inputs of cycle c).
@@ -26,9 +26,9 @@ class Sup:
             self.cnt += 1
             if self.cnt >= self.warm: self.state = READY
         elif self.state == READY:
-            if go and sess == ACTIVE: self.state = RUN; self.fc = 0; self.sc = 0
+            if go and sess == ACTIVE: self.state = RUN
         elif self.state == RUN:
-            self.fc = 0 if feed else (self.fc if f_t else self.fc + 1); self.sc = (self.sc if s_t else self.sc + 1) if slot else 0
+            self.fc = 0 if feed else self.fc + 1; self.sc = self.sc + 1 if slot else 0
             if now: self.state = SAFE; self.cause = now
         else:
             if cq: self.sent = 1
@@ -38,13 +38,11 @@ class RstGen:
     def __init__(self, rstn=8): self.rstn = rstn; self.r1 = 1; self.r2 = 1; self.cnt = rstn
     def step(self, rst_in):
         """-> rst_u visible in this cycle (rst_in is sampled before the edge; asserting is immediate)"""
-        if rst_in: self.r1 = 1; self.r2 = 1; self.cnt = self.rstn
+        if rst_in: self.r1 = 1; self.r2 = 1
         out = int(self.r2 or self.cnt != 0)
-        if not rst_in:
-            nr2 = self.r1; self.r1 = 0
-            if self.r2: self.cnt = self.rstn
-            elif self.cnt: self.cnt -= 1
-            self.r2 = nr2
+        if self.r2: self.cnt = self.rstn                                                  # the stretch counter is loaded at every edge while r2 is high (also while rst_in is)
+        elif self.cnt: self.cnt -= 1
+        if not rst_in: self.r2 = self.r1; self.r1 = 0
         return out
 def selftest():
     # the supervisor, worked by hand: FT 5, ST 4, WARM 3

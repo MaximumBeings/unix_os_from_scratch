@@ -16,9 +16,9 @@ module sup #(parameter int FT = 100, parameter int ST = 100, parameter int WARM 
         else begin
             case (state)
                 INIT: begin cnt <= cnt + 1'b1; if (cnt + 1'b1 >= CW'(WARM)) state <= READY; end
-                READY: if (go && sess == ACTIVE) begin state <= RUN; fc <= '0; sc <= '0; end
+                READY: if (go && sess == ACTIVE) state <= RUN;                                       // fc and sc are 0 here: nothing counts outside RUN, and a reset clears them
                 RUN: begin
-                    fc <= feed ? '0 : (f_t ? fc : fc + 1'b1); sc <= slot ? (s_t ? sc : sc + 1'b1) : '0;
+                    fc <= feed ? '0 : fc + 1'b1; sc <= slot ? sc + 1'b1 : '0;                      // no saturation: a count that reaches its limit leaves RUN in the next cycle
                     if (now != 5'd0) begin state <= SAFE; cause <= now; end
                 end
                 default: if (cq_valid) sent <= 1'b1;
@@ -29,10 +29,8 @@ endmodule
 // rst_gen: the reset the units see. The external reset asserts at once (asynchronously) and releases synchronously, two clocks after it goes away, and then is stretched by RSTN more clocks, so that every unit sees a reset that is long enough for its RAM-clearing and a release that is aligned to the clock.
 module rst_gen #(parameter int RSTN = 8) (input logic clk, input logic rst_in, output logic rst_u);
     logic r1, r2; logic [$clog2(RSTN+1)-1:0] cnt;
-    always_ff @(posedge clk or posedge rst_in) begin
-        if (rst_in) begin r1 <= 1'b1; r2 <= 1'b1; cnt <= ($bits(cnt))'(RSTN); end
-        else begin r1 <= 1'b0; r2 <= r1; if (r2) cnt <= ($bits(cnt))'(RSTN); else if (cnt != '0) cnt <= cnt - 1'b1; end
-    end
+    always_ff @(posedge clk or posedge rst_in) if (rst_in) begin r1 <= 1'b1; r2 <= 1'b1; end else begin r1 <= 1'b0; r2 <= r1; end      // asserts at once, releases two clocks after the input goes away
+    always_ff @(posedge clk) if (r2) cnt <= ($bits(cnt))'(RSTN); else if (cnt != '0) cnt <= cnt - 1'b1;                                  // the stretch (loaded while r2 is high; it needs no reset of its own: r2 holds rst_u high until it is loaded)
     assign rst_u = r2 || (cnt != '0);
 endmodule
 // sup_syn: the supervisor and the reset generator behind a handful of pins, ONLY for the place-and-route runs.

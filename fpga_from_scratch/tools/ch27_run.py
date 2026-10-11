@@ -46,6 +46,18 @@ def make(kind, seed):
     if kind == "stall":
         c, m, kw = prep(C26.make("slowsig", seed)); kw.update(ft=400, st=60); return c, m, kw                    # F = 32: the slot is held n + 36 cycles: more than 60 for the longer events
     if kind == "trip": c, m, kw = prep(cm); c[2000]["trip"] = 1; kw.update(ft=400); return c, m, kw
+    if kind == "extkill":
+        c, m, kw = prep(cm)
+        for i in range(2000, 2200): c[i]["kill"] = 1                                          # the control plane's own kill, while the supervisor is in RUN
+        kw.update(ft=400); return c, m, kw
+    if kind == "holdtrip":
+        c, m, kw = prep(C26.make("narrow", seed)); kw.update(ft=400, w=1)
+        X = WG.W2W(**{k: v for k, v in kw.items() if k in ("qd", "f", "w")}); hit = None
+        for i in range(len(c)):
+            X.step(c[i], m.get(i))
+            if X.snd_hold and hit is None: hit = i
+        if hit is not None: c[hit - 1]["trip"] = 1                                         # a trip in the cycle before an order is held for the transmitter: the logout must wait for it
+        return c, m, kw
     if kind == "go_early":
         c, m, kw = prep(cm); c[GO_AT]["go"] = 0; c[10]["go"] = 1; c[GO_AT + 300]["go"] = 1; kw.update(ft=400); return c, m, kw                            # a go while INIT and a go with no session: ignored; the real go 300 cycles late
     if kind == "reset":
@@ -55,7 +67,7 @@ def make(kind, seed):
         kw.update(ft=400)
         return c, {k: v for k, v in m.items() if k < R0 or k > i + 60}, kw
     raise KeyError(kind)
-KINDS = ("normal", "dense", "slow", "refuse", "close", "faults", "collide", "slowsig", "narrow", "hand", "feedloss", "stall", "trip", "go_early", "reset")
+KINDS = ("normal", "dense", "slow", "refuse", "close", "faults", "collide", "slowsig", "narrow", "hand", "feedloss", "stall", "trip", "extkill", "holdtrip", "go_early", "reset")
 def battery():
     for i, k in enumerate(KINDS):
         try: ok = same(make(k, i + 1))
