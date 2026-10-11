@@ -16,7 +16,7 @@
   feedloss    6512          48    101    1801      feed           0               0       1     ok
   stall       5271          48    101    3307     stall          17               1       1     ok
   trip        6425          48    101    2001      trip           2               0       1     ok
-  extkill     6210          48    101    6099      feed          12               0       1     ok
+  extkill     6210          48    101     804     fault           1               0       1     ok
   holdtrip    5592          48    101     936      trip           2               1       1     ok
   go_early    6591          48    401     683     fault           0               0       1     ok
   reset       6132          48    101       -         -           0               0       0     ok

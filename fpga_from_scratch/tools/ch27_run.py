@@ -47,9 +47,13 @@ def make(kind, seed):
         c, m, kw = prep(C26.make("slowsig", seed)); kw.update(ft=400, st=60); return c, m, kw                    # F = 32: the slot is held n + 36 cycles: more than 60 for the longer events
     if kind == "trip": c, m, kw = prep(cm); c[2000]["trip"] = 1; kw.update(ft=400); return c, m, kw
     if kind == "extkill":
-        c, m, kw = prep(cm)
-        for i in range(2000, 2200): c[i]["kill"] = 1                                          # the control plane's own kill, while the supervisor is in RUN
-        kw.update(ft=400); return c, m, kw
+        c, m, kw = prep(cm); kw.update(ft=400)
+        X = WG.W2W(**{k: v for k, v in kw.items() if k in ("qd", "f", "w")}); offers = []
+        for i in range(len(c)):
+            row = X.step(c[i], m.get(i))
+            if row[7]: offers.append(i)                                                       # the strategy offers an order in this cycle
+        for o in offers[1:4]: c[o - 1]["kill"] = 1; c[o]["kill"] = 1; c[o + 1]["kill"] = 1     # the control plane's own kill, around three of the offers (the first is left alone)
+        return c, m, kw
     if kind == "holdtrip":
         c, m, kw = prep(C26.make("narrow", seed)); kw.update(ft=400, w=1)
         X = WG.W2W(**{k: v for k, v in kw.items() if k in ("qd", "f", "w")}); hit = None
