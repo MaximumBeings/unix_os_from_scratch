@@ -10,7 +10,7 @@ xs = [20, 150, 280, 420, 560, 700, 840]
 def blk(i, y, w, lines, col): f.box(xs[i], y, w, 90, lines, C[col + "2"], C[col], 11, True)
 blk(0, 100, 110, ["parser", "Ch 16", "1 byte/cycle"], "blue"); blk(1, 100, 110, ["adapter + FIFO", "QD entries", "drops if full"], "gray")
 blk(2, 100, 120, ["order book", "Ch 20", "n cycles"], "green"); blk(3, 40, 120, ["signal", "Ch 22", "F + 4 cycles"], "purple"); blk(3, 170, 120, ["trigger", "Ch 21", "4 + PIPE cycles"], "purple")
-blk(4, 100, 120, ["strategy", "one message in the", "slot (a to d)"], "orange"); blk(5, 100, 120, ["lifecycle", "Ch 25: gate +", "tracker, 5 cycles"], "blue"); blk(6, 100, 130, ["transmitter", "Ch 24", "first byte +1"], "green")
+blk(4, 100, 120, ["strategy", "one message in", "the slot"], "orange"); blk(5, 100, 120, ["lifecycle", "Ch 25: gate +", "tracker, 5 cycles"], "blue"); blk(6, 100, 130, ["transmitter", "Ch 24", "first byte +1"], "green")
 for a, b in ((130, 150), (260, 280), (400, 420), (540, 560), (680, 700), (820, 840)): f.arrow(a, 145, b, 145, C["ink"], 1.6)
 f.arrow(400, 130, 418, 85, C["ink"], 1.2); f.arrow(400, 160, 418, 210, C["ink"], 1.2); f.arrow(540, 85, 558, 130, C["ink"], 1.2); f.arrow(540, 210, 558, 160, C["ink"], 1.2)
 f.arrow(900, 192, 900, 300, C["red"], 1.4, dash="4 3"); f.text(700, 318, "a refusal by the transmitter comes back as a REJECT to the tracker, which gives the gate's charge back", 11, C["red"], italic=True)

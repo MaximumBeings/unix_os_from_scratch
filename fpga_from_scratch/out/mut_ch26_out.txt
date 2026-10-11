@@ -67,8 +67,8 @@ unmutated design and model pass their batteries: True
   a refusal is not turned into a reject: caught by: refuse
   a refusal count is not kept: caught by: refuse
   the reject names the wrong token: caught by: refuse
-  an exchange report does not win over the reject: NOT CAUGHT
-  a waiting reject is lost when a report arrives: NOT CAUGHT
+  an exchange report does not win over the reject: caught by: dead2
+  a waiting reject is lost when a report arrives: caught by: dead2
   the hold is never set: caught by: normal
   the hold is never released: caught by: normal
   reset leaves the token counter at 0: caught by: normal
@@ -83,6 +83,6 @@ unmutated design and model pass their batteries: True
   model: the buy threshold is strict: caught by: hand-checked scenarios
   model: the ask is the bid: caught by: hand-checked scenarios
   model: a refusal is not a reject: caught by: hand-checked scenarios
-  rtl/w2w.sv: caught 71 of 74
+  rtl/w2w.sv: caught 73 of 74
   model/w2w_gold.py: caught 8 of 9
-mutants caught: 79 of 83
+mutants caught: 81 of 83

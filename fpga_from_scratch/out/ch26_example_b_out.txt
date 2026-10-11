@@ -1,5 +1,5 @@
 == 1. the closed form: total = wait + n + F + 11 + x, for every order of every mix (the mixes of ch26_run.py); x = cycles from the gate's answer to the first byte (1 if the transmitter is ready, more if it is still sending)
-  orders checked 104, closed form wrong for 0; x = 1 for 99 of them (the transmitter was ready) and up to 4 otherwise; (total - F) from 23 to 165 cycles
+  orders checked 105, closed form wrong for 0; x = 1 for 100 of them (the transmitter was ready) and up to 4 otherwise; (total - F) from 23 to 165 cycles
 
 == 2. what the book costs by type of event (cycles n of Chapter 20's rules; 4000 events from the generator, D = 8, NB = 8, K = 4, 4 symbols)
   event     result  count  min   mean  max
