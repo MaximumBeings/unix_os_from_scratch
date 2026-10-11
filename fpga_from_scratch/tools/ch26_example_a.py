@@ -22,10 +22,11 @@ def per_unit():
     return rows
 if __name__ == "__main__":
     print("== 1. LUTs and flip-flops of each unit (Yosys synth_ice40 -noflatten; the pin wrapper's shift register is in w2w_syn)")
-    rows = per_unit(); print(f"  {'module':24s} {'LUT4':>6s} {'FF':>6s} {'RAM4K':>6s}")
+    rows = per_unit(); print(f"  {'module':32s} {'LUT4':>6s} {'FF':>6s} {'RAM4K':>6s}")
     for m, d in sorted(rows.items(), key=lambda kv: -kv[1].get("SB_LUT4", 0)):
         if not d: continue
-        print(f"  {m:24s} {d.get('SB_LUT4', 0):6d} {sum(v for k, v in d.items() if k.startswith('SB_DFF')):6d} {sum(v for k, v in d.items() if k.startswith('SB_RAM')):6d}")
+        m = "TOTAL (all units + pin wrapper)" if m == "w2w_syn" else re.sub(r"^\$paramod\$[0-9a-f]+\\", "", m)
+        print(f"  {m:32s} {d.get('SB_LUT4', 0):6d} {sum(v for k, v in d.items() if k.startswith('SB_DFF')):6d} {sum(v for k, v in d.items() if k.startswith('SB_RAM')):6d}")
     with cf.ThreadPoolExecutor(4) as ex: res = dict(ex.map(job, [(c, f) for c in CASES for f in ("ice40", "ecp5")]))
     print("\n== 2. the whole design placed (nextpnr seed 1, asked for 300 MHz), flat")
     print(f"  {'QD':>3s} {'F':>3s} | {'iCE40 LUT':>9s} {'FF':>6s} {'LCs':>6s} {'Fmax':>6s} | {'ECP5 LUT':>8s} {'FF':>6s} {'Fmax':>6s}")

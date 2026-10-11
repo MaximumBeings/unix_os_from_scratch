@@ -181,6 +181,18 @@ def directed_dead():
     """The `hand` scenario with the server falling silent after one heartbeat: the session is DEAD (no heartbeat for 3 HB cycles) before the order, the transmitter refuses it, the design turns the refusal into a REJECT, and the tracker gives the gate's charge back."""
     c, m = directed(); rng = random.Random(5)
     return _build([_a(rng, 1, 11, "S", 10, 1001), _a(rng, 1, 12, "B", 100, 999)], hb_until=100)
+def directed_dead2():
+    """The session dies between two orders and an exchange report arrives in the very cycle the design's own REJECT is waiting for the report port. Messages: the `hand` pair (the first order is sent while the session is alive), then the same bid again as a new order (ref 13) after the session has died: the transmitter refuses the second order; the design turns it into a REJECT; the exchange's FILL of 2 shares of the first order is made to arrive in the cycle the REJECT is pending: the report wins the port, the REJECT waits one cycle and is applied. Afterwards: the first order has 8 shares left (the gate's open buys: 8), the second order is gone, no fault."""
+    rng = random.Random(5)
+    msgs = [_a(rng, 1, 11, "S", 10, 1001), _a(rng, 1, 12, "B", 100, 999), _a(rng, 1, 13, "B", 100, 999)]
+    c0, m0 = _build(msgs); es = sorted(m0); cycles, mev = _build(msgs, hb_until=es[1] + 30)
+    X = W2W(); at = None
+    for c in range(len(cycles)):
+        X.step(cycles[c], mev.get(c))
+        if X.rej_pend and at is None: at = c
+    assert at is not None
+    cycles[at]["rep"] = (LG.FILL, dict(tok=1, qty=2))
+    return cycles, mev
 def directed_queue():
     """Five DELETE messages (unknown references) in one packet, 21 cycles apart, with a queue of TWO entries and F = 32. An unknown reference costs the book 1 + K + 2 = 7 cycles, and the strategy slot is held for n + F + 4 = 43 cycles from the accept. The first is accepted at E1 + 1; the second and third are queued (E1 + 21, E1 + 42); the second is accepted when the slot frees, E1 + 1 + 43 + 1 = E1 + 45, and the fourth is queued (E1 + 63); the fifth arrives at E1 + 84 with the queue full (the third and fourth) and is DROPPED. The accepts are E1 + 1, 45, 89 and 133."""
     rng = random.Random(5)
@@ -197,6 +209,8 @@ def selftest():
     assert [o[1:] for o in X.orders] == [(1, 0, 1001), (2, 1, 999)], X.orders
     cycles, mev = directed_dead(); r = run(cycles, mev); X = r["w2w"]
     assert len(X.orders) == 1 and X.refused == 1 and X.S.T.nlive() == 0 and X.S.g.ob[0][1] == 0 and X.S.g.notional[0] == 0 and r["rows"][-1][14 + 18 + 5] == SS.DEAD and not any(p[1] == SS.ORDER for p in X.X.packets)
+    cycles, mev = directed_dead2(); r = run(cycles, mev); X = r["w2w"]
+    assert [o[1] for o in X.orders] == [1, 2] and X.refused == 1 and X.S.T.nlive() == 1 and X.S.T.e[0] is not None and X.S.T.e[0]["rem"] == 8 and X.S.g.ob[0][1] == 8 and not X.S.T.fault and X.S.g.notional[0] == 8 * 1001
     cycles, mev, kw = directed_queue(); X = run(cycles, mev, **kw)["w2w"]; E1 = sorted(mev)[0]
     assert X.drops == 1 and X.accs == [E1 + 1, E1 + 45, E1 + 89, E1 + 133], (X.drops, X.accs, E1)
     return True

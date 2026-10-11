@@ -1,12 +1,1 @@
 == 1. LUTs and flip-flops of each unit (Yosys synth_ice40 -noflatten; the pin wrapper's shift register is in w2w_syn)
-  module                     LUT4     FF  RAM4K
-  w2w_syn                    9975   8971     26
-  $paramod$6d6b349578a74ce09191e220b2c90b75efd09917\risk   2852   1764      0
-  $paramod$5e19ffaa4102e5d75cb9a85e517b8366e3bab713\sig   2034   1934      0
-  $paramod$ab96ea9983dd5071d176d15f89ccf246bbcc33e8\book2   1832   1243     11
-  $paramod$6ce3011c8edba93a85582115b94f9276a0797536\sess    844    612      0
-  $paramod$367ae78953075f3cfdf46e91a616f018b93d7f81\trig    814    875      6
-  $paramod$7b5a5e29cbd7f10f0c5efc192c42e5838a7a64cc\track    683    354      0
-  $paramod$f6054119562cfdab9a58b9d145415eb8b40dd7a2\w2w    459    306      9
-  mold_itch                   264    705      0
-  $paramod$031fe0a49bc285729d332b807e38e44ad5117423\life    149    118      0

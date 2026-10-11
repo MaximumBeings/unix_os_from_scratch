@@ -43,7 +43,7 @@ def msg_of(rng, e, ns):
     return IG.build_msg(rng, "U", locate=loc, ref=e["ref"], newref=e["ref2"], shares=e["sh"], price=e["px"])
 RULE, preamble = WG.RULE, WG.preamble
 def make(kind, seed, nev=100):
-    if kind in ("hand", "edge", "dead"): c_, m_ = dict(hand=WG.directed, edge=WG.directed_edge, dead=WG.directed_dead)[kind](); return c_, m_, {}
+    if kind in ("hand", "edge", "dead", "dead2"): c_, m_ = dict(hand=WG.directed, edge=WG.directed_edge, dead=WG.directed_dead, dead2=WG.directed_dead2)[kind](); return c_, m_, {}
     if kind == "queue": return WG.directed_queue()
     rng = random.Random(seed * 100 + sum(map(ord, kind))); ns = NS
     evs = BG.gen_events(rng, nev, ns=ns, d=8, nb=8, k=4, faults=0.04 if kind != "faults" else 0.1, sh_max=300, **(dict(p_add=0.4) if kind != "burst" else dict(p_add=0.06, p_red=0.8, p_del=0.1)))
@@ -78,7 +78,7 @@ def make(kind, seed, nev=100):
                 if kind == "faults" and rng.random() < .12: cy["rep"] = (LG.FILL, dict(tok=x["tok"], qty=x["rem"] + 1))
         X.step(cy, mev.get(c))
     return cycles, mev, KW.get(kind, {})
-KINDS = ("normal", "dense", "dense_clean", "slow", "refuse", "close", "faults", "burst", "slowsig", "collide", "narrow", "openbook", "hand", "edge", "dead", "queue")
+KINDS = ("normal", "dense", "dense_clean", "slow", "refuse", "close", "faults", "burst", "slowsig", "collide", "narrow", "openbook", "hand", "edge", "dead", "dead2", "queue")
 def battery():
     """The mutation runs' test: seven mixes, Icarus. -> None or the first difference."""
     for i, kind in enumerate(KINDS):

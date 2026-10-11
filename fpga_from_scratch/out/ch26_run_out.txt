@@ -19,16 +19,9 @@
   hand                2     0     2       1     1      0     1       0 OK 1
   edge                5     0     5       2     2      0     2       0 OK 2
   dead                2     0     2       1     1      0     0       1 OK 1
+  dead2               3     0     3       2     2      0     1       1 OK 2
   queue               5     1     4       0     0      0     0       0 
 
 == 3. the whole design against the model: every cycle, every output (queue, counters, book, strategy, lifecycle, bytes on the wire)
   mix         | cycles orders bytes sent |  Icarus  Verilator
   normal      |   6597     13        310 |    PASS       PASS
-  dense       |   5502      7        186 |    PASS       PASS
-  dense_clean |   4925     14        434 |    PASS       PASS
-  slow        |  10055     12        341 |    PASS       PASS
-  refuse      |   6058     16        186 |    PASS       PASS
-  close       |   6352     23        124 |    PASS       PASS
-  faults      |   6704      6         62 |    PASS       PASS
-  burst       |   4993      3         93 |    PASS       PASS
-  slowsig     |   5691     27        806 |    PASS       PASS
