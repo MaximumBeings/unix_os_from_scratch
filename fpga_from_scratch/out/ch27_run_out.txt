@@ -23,3 +23,20 @@
 
 == 3. the supervised design against the model: every cycle, every output
   scenario  |  Icarus  Verilator
+  normal    |    PASS       PASS
+  dense     |    PASS       PASS
+  slow      |    PASS       PASS
+  refuse    |    PASS       PASS
+  close     |    PASS       PASS
+  faults    |    PASS       PASS
+  collide   |    PASS       PASS
+  slowsig   |    PASS       PASS
+  narrow    |    PASS       PASS
+  hand      |    PASS       PASS
+  feedloss  |    PASS       PASS
+  stall     |    PASS       PASS
+  trip      |    PASS       PASS
+  extkill   |    PASS       PASS
+  holdtrip  |    PASS       PASS
+  go_early  |    PASS       PASS
+  reset     |    PASS       PASS
