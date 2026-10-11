@@ -8,3 +8,4 @@
 == 3. supervisor and reset generator against the model, every cycle, every output
     FT   ST WARM RSTN scenario    | cycles trips in SAFE |  Icarus  Verilator
    100  100   48    8 each_cause  |    606     5      46 |    PASS       PASS
+   100  100   48    8 boundaries  |   1704     6     466 |    PASS       PASS
