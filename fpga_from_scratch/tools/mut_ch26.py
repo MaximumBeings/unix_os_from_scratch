@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Chapter 26: test the tests. Two families. (1) mutants of rtl/w2w.sv (the glue: adapter, queue, slot, strategy, send and reject logic), battery `ch26_run.py --battery`: the whole design against its model, every output of every cycle, on eleven traffic mixes, Icarus. (2) mutants of model/w2w_gold.py, battery `--battery-model`: its self-test (the stepped transmitter against model/sess_gold.py on random sessions, and the one scenario worked by hand, with its times). The units inside (parser, book, signal, trigger, gate, tracker, transmitter) were mutation-tested in their own chapters and are not mutated again here."""
+"""Chapter 26: test the tests. Two families. (1) mutants of rtl/w2w.sv (the glue: adapter, queue, slot, strategy, send and reject logic), battery `ch26_run.py --battery`: the whole design against its model, every output of every cycle, on sixteen traffic mixes (twelve generated, four worked by hand), Icarus. (2) mutants of model/w2w_gold.py, battery `--battery-model`: its self-test (the stepped transmitter against model/sess_gold.py on random sessions, and the one scenario worked by hand, with its times). The units inside (parser, book, signal, trigger, gate, tracker, transmitter) were mutation-tested in their own chapters and are not mutated again here."""
 import concurrent.futures as cf, os, shutil, subprocess, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import flow
@@ -74,9 +74,8 @@ MUT = [
  (RTL, 'the reject names the wrong token', '.r_tok(r_valid ? r_tok : o_tok)', '.r_tok(r_valid ? r_tok : tokc)'),
  (RTL, 'an exchange report does not win over the reject', ".r_kind(r_valid ? r_kind : 2'd3), .r_tok(r_valid ? r_tok : o_tok), .r_qty(r_valid ? r_qty : 16'd0)", ".r_kind(rej_pend ? 2'd3 : r_kind), .r_tok(rej_pend ? o_tok : r_tok), .r_qty(rej_pend ? 16'd0 : r_qty)"),
  (RTL, 'a waiting reject is lost when a report arrives', "else if (rej_pend && !r_valid) rej_pend <= 1'b0;", "else if (rej_pend) rej_pend <= 1'b0;"),
- (RTL, 'the hold is never set', "begin snd_hold <= 1'b1; if (snd_hold", "begin snd_hold <= 1'b0; if (snd_hold"),
+ (RTL, 'the hold is never set', "if (snd_now && !tx_ready && !cq_valid) snd_hold <= 1'b1;", "if (snd_now && !tx_ready && !cq_valid) snd_hold <= 1'b0;"),
  (RTL, 'the hold is never released', "else if (snd_hold && tx_ready) snd_hold <= 1'b0;", "else if (1'b0) snd_hold <= 1'b0;"),
- (RTL, 'a lost order is not counted', "lost <= lost + 1'b1;", 'lost <= lost;'),
  (RTL, 'reset leaves the token counter at 0', "tokc <= 32'd1; o_tok", "tokc <= 32'd0; o_tok"),
  (RTL, 'reset leaves the queue count', "if (rst) begin fcnt <= '0; fhd", 'if (rst) begin fhd'),
  (RTL, 'reset leaves the slot', "drops <= '0; slot <= 1'b0; tokc", "drops <= '0; tokc"),

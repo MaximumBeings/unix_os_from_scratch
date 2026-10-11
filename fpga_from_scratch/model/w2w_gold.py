@@ -7,7 +7,7 @@ THE PATH OF A MESSAGE (cycle numbers are the testbench's; cycle 0 is the first a
  SIGNAL, TRIGGER  both are offered the result in cycle r (the trigger with the event as accepted: type, symbol index as the key, side, price, shares). The signal answers in cycle d = r + F + 4, the trigger in r + 4 + TPIPE (its `fire` is kept until d).
  STRATEGY in cycle d, with the slot busy from a to d (one message at a time between the book and here, so the FIFO and the slot are the only queues): if the trigger fired, the book applied the event (result OK), both sides are present, not crossed or locked, and the signal's imbalance is at least +THR (buy at the ask) or at most -THR (sell at the bid), an order of OQ shares at that price is offered to the lifecycle in cycle d ONLY: if the lifecycle is not ready (an order or a release is using it) the order is missed and counted. The order's token is a counter that counts the orders taken.
  LIFECYCLE the gate and tracker of Chapter 25 (model/sys_gold.py): an accepted order is answered (d_valid, d_res = 0 means send) 5 cycles after it is offered if both accept.
- TRANSMITTER an answer of 0 is offered to the transmitter in the cycle it appears and, if the transmitter is not ready, in every following cycle until it accepts (the order sent is the one taken last; a second answer of 0 while one is held is LOST and counted). A transmitter that refuses (session not ACTIVE) makes the design report a REJECT of that token to the tracker (an exchange report wins the report port; the REJECT waits), which gives the gate's charge back.
+ TRANSMITTER an answer of 0 is offered to the transmitter in the cycle it appears and, if the transmitter is not ready, in every following cycle until it accepts (the order sent is the one taken last; one held order is enough: the next answer is at least 24 cycles later and the transmitter is busy for at most 31). A transmitter that refuses (session not ACTIVE) makes the design report a REJECT of that token to the tracker (an exchange report wins the report port; the REJECT waits), which gives the gate's charge back.
  The first byte of an order is on the wire in the cycle after the transmitter accepts it.
 Every cycle the testbench prints the queue, the counters, the book's, the strategy's, the lifecycle's and the transmitter's outputs; the model reproduces every one."""
 import os, random, sys
@@ -69,11 +69,11 @@ class W2W:
         self.table = TG.Table(tnb, tk); self.rules = [TG.new_rule() for _ in range(4)]; self.tnb = tnb
         self.t_fire = 0; self.r_okres = 0; self.r_sym = 0
         self.S = SYG.Sys(nt, na, ns, 4); self.X = SessStep(w, ns, hb, tl)
-        self.tokc = 1; self.o_tok = 0; self.o = None; self.miss = 0; self.lost = 0; self.refused = 0; self.rej_pend = 0; self.snd_hold = 0; self.ord_q = 0; self.c = 0; self.ans_prev = (0, 0); self.orders = []
-        self.xrow = (0,) * 9; self.cur = None; self.log = {}
+        self.tokc = 1; self.o_tok = 0; self.o = None; self.miss = 0; self.refused = 0; self.rej_pend = 0; self.snd_hold = 0; self.ord_q = 0; self.c = 0; self.ans_prev = (0, 0); self.orders = []
+        self.xrow = (0,) * 9; self.cur = None; self.log = {}; self.accs = []; self.waits = []; self.ns_list = []
     def step(self, cy, mev):
         """cy: the control plane and exchange inputs of this cycle; mev: the parser message in this cycle (a book event or None, already filtered by the adapter's rules) -> the tuple the testbench prints"""
-        c = self.c; S = self.S; pre = (self.drops, self.miss, self.lost, self.refused, self.snd_hold, self.rej_pend, self.tokc & 0xFFFF)        # the registers as the testbench sees them in this cycle
+        c = self.c; S = self.S; pre = (self.drops, self.miss, self.refused, self.snd_hold, self.rej_pend, self.tokc & 0xFFFF)        # the registers as the testbench sees them in this cycle
         # ---- the adapter and the queue
         full = len(self.fifo) == self.qd; push = 0
         if mev is not None:
@@ -118,7 +118,7 @@ class W2W:
         # ---- the registers at the end of the cycle
         if push: self.fifo.append((mev, c))
         if acc:
-            e, pc = self.fifo.pop(0); cyc, r_, s_ = self.book.event(e); self.busy_until = c + cyc; self.pend = (c + cyc, r_, s_, self.book.top(s_)); self.h = e; self.slot = 1; self.cur = dict(E=pc, a=c, n=cyc, r=c + cyc, d=c + cyc + self.f + 4, t=e["t"], res=r_)
+            e, pc = self.fifo.pop(0); cyc, r_, s_ = self.book.event(e); self.busy_until = c + cyc; self.pend = (c + cyc, r_, s_, self.book.top(s_)); self.h = e; self.slot = 1; self.accs.append(c); self.waits.append(c - (pc + 1)); self.ns_list.append(cyc); self.cur = dict(E=pc, a=c, n=cyc, r=c + cyc, d=c + cyc + self.f + 4, t=e["t"], res=r_)
         elif sgv: self.slot = 0
         if res_now is not None:
             _, r_, s_, top = res_now; bpx, bsh, apx, ash = top[0], top[1], top[2], top[3]
@@ -135,44 +135,70 @@ class W2W:
         rv, ores = xrow[7], xrow[8]
         if rv and self.ord_q and ores != 0: self.rej_pend = 1; self.refused += 1
         elif self.rej_pend and "rep" not in cy: self.rej_pend = 0
-        if snd_now and not tx_ready and cq is None:
-            if self.snd_hold and d_valid and d_res == 0: self.lost += 1
-            self.snd_hold = 1
+        if snd_now and not tx_ready and cq is None: self.snd_hold = 1
         elif self.snd_hold and tx_ready: self.snd_hold = 0
         self.ord_q = self.ord_q_new
         self.c += 1
         return (fcnt, pre[0], push, int(acc), bkv, bkres if bkv else 0, sgv, ordv, ordacc) + pre[1:] + tuple(srow) + tuple(xrow)
 NS = 4; P0 = 120; SHT = 30          # symbols, the cycle the feed starts, the trigger's share threshold
 
-RULE = lambda: dict(TG.new_rule(), en=1, tmask=0b00001, symany=0, symmask=(1 << NS) - 1, sideany=1, pxop=TG.ANY, shop=TG.GE, shval=SHT)      # the trigger: an ADD of SHT shares or more in a symbol of the table
+RULE = lambda: dict(TG.new_rule(), en=1, tmask=0b00001, symany=0, symmask=0b0111, sideany=1, pxop=TG.ANY, shop=TG.GE, shval=SHT)      # the trigger: an ADD of SHT shares or more in a symbol of the table
 def preamble(rng):
     cy = [dict() for _ in range(P0)]; c = 10
     for i in range(NS): cy[c + i]["sc"] = (0, i, int.from_bytes(b"SY%dX" % i, "big"))
     cy[c + 4]["sc"] = (1, 0, int.from_bytes(b"USER", "big")); cy[c + 5]["sc"] = (2, 0, int.from_bytes(b"PASS", "big")); cy[c + 6]["sc"] = (3, 0, int.from_bytes(b"FIRM", "big")); cy[c + 7]["sc"] = (4, 0, 0x5943); cy[c + 8]["sc"] = (5, 0, 1000)
     u = dict(maxlong=rng.randint(800, 4000), maxshort=rng.randint(800, 4000), maxqty=200, maxonot=2000 * 1100, maxnot=60000000, cap=8)
-    for a in range(4): cy[c + a]["cfg"] = (a, dict(u))
-    for s_ in range(NS): cy[c + 4 + s_]["band"] = (s_, 800, 1200)
+    for a in range(4): cy[c + a]["cfg"] = (a, dict(u) if a == 0 else dict(u, maxqty=5))                    # only account 0 may send an order of 10 shares
+    for s_ in range(NS): cy[c + 4 + s_]["band"] = (s_, 800, 1200 if s_ < 3 else 900)                       # symbol 3's band excludes the prices traded: the gate refuses (BAND)
     t = TG.Table(8, 2)
     for key in range(NS): addr = t.place(key); t.write(addr, 1, key, key); cy[c + 10 + key]["tl"] = (addr, 1, key, key)
-    cy[c + 15]["tc"] = (0, RULE()); cy[c + 30]["arm"] = 1; cy[c + 40]["cq"] = SS.LOGINQ; cy[c + 60]["rx"] = ("A", 1000)
+    cy[c + 15]["tc"] = (0, RULE())
+    cy[c + 16]["tc"] = (1, dict(TG.new_rule(), en=1, tmask=0b00010, symmask=0b1111, sideany=1, shop=TG.GE, shval=40))                                  # an EXEC of 40 shares or more, any symbol
+    cy[c + 17]["tc"] = (2, dict(TG.new_rule(), en=1, tmask=0b10000, symmask=0b1111, sideany=1, pxop=TG.GE, pxval=1000, shop=TG.GE, shval=20))            # a REPLACE at 1000 or more, 20 shares or more
+    cy[c + 18]["tc"] = (3, dict(TG.new_rule(), en=1, tmask=0b00001, symmask=0b1111, sideany=0, side=1, shop=TG.GE, shval=150))                         # an ADD on the ask side of 150 shares or more
+    cy[c + 30]["arm"] = 1; cy[c + 40]["cq"] = SS.LOGINQ; cy[c + 60]["rx"] = ("A", 1000)
     return cy
+def _build(msgs, hb_until=None, between=(60, 60), packets=None, tail=160):
+    """a scenario from a list of messages, one per packet (or the packet sizes given), the trading session kept alive by server heartbeats until hb_until"""
+    rng = random.Random(5); pk = []; i = 0
+    for n in (packets or [1] * len(msgs)): pk.append(dict(data=IG.build_packet(rng, msgs[i:i + n]), eop=True, reset_at=None)); i += n
+    lines, info = IG.schedule(rng, pk, gap=0.0, stray=0.0, between=between); mev = parse_events(info, NS, shift=P0)
+    cycles = preamble(rng) + [dict() for _ in range(len(lines) + tail)]
+    for j, (v, sop, eop, d, _) in enumerate(lines): cycles[P0 + j]["s"] = (v, sop, eop, d)
+    for c in range(80, len(cycles), 30):
+        if hb_until is None or c < hb_until: cycles[c]["rx"] = ("H", 0)
+    return cycles, mev
+def _a(rng, loc, ref, side, sh, px): return IG.build_msg(rng, "A", locate=loc, ref=ref, side=ord(side), shares=sh, price=px)
 def directed():
     """One scenario worked by hand, and the numbers it must give. The feed: an ADD of an ask (10 shares at 1001) and then an ADD of a bid (100 shares at 999), each in its own packet. The second message fires the trigger (100 >= SHT shares), the book then has both sides, the imbalance is (100 - 10) / 110 = 0.82 >= 0.25, so a BUY of OQ shares at the ask (1001) is offered. Hand-derived times, with E the cycle the second message appears (the cycle after its last byte): accepted at E + 1 (the queue is empty and the book idle); an ADD on an empty side takes 1 (accept) + (K + 2 = 6) (lookup) + 2 (level search at index 0) + 1 (write level) + 1 (write order) = 11 cycles, so the result is at r = E + 12; the signal answers F + 4 = 16 cycles later, d = E + 28, when the order is offered; the gate and tracker answer 5 cycles after that; the transmitter accepts it in that cycle and the first byte is on the wire in the next: E + 28 + 5 + 1 = E + 34; the 31 bytes leave as 8, 8, 8, 7."""
     rng = random.Random(5)
-    msgs = [IG.build_msg(rng, "A", locate=1, ref=11, side=ord("S"), shares=10, price=1001), IG.build_msg(rng, "A", locate=1, ref=12, side=ord("B"), shares=100, price=999)]
-    pk = [dict(data=IG.build_packet(rng, [m]), eop=True, reset_at=None) for m in msgs]
-    lines, info = IG.schedule(rng, pk, gap=0.0, stray=0.0, between=(60, 60)); mev = parse_events(info, NS, shift=P0)
-    cycles = preamble(rng) + [dict() for _ in range(len(lines) + 120)]
-    for j, (v, sop, eop, d, _) in enumerate(lines): cycles[P0 + j]["s"] = (v, sop, eop, d)
-    for c in range(80, len(cycles), 30): cycles[c]["rx"] = ("H", 0)
-    return cycles, mev
+    return _build([_a(rng, 1, 11, "S", 10, 1001), _a(rng, 1, 12, "B", 100, 999)])
+def directed_edge():
+    """The threshold exactly: symbol 1 gets an ask of 70 and a bid of 90 (w = 90 / 160 = 9 / 16, imbalance +512 = +THR: a BUY at 1001); symbol 2 a bid of 70 and an ask of 90 (imbalance -512 = -THR: a SELL at 999); then the bid of symbol 1 is added AGAIN (the book answers DUPREF, changes nothing, the trigger fires again): no third order."""
+    rng = random.Random(5)
+    return _build([_a(rng, 1, 21, "S", 70, 1001), _a(rng, 1, 22, "B", 90, 999), _a(rng, 1, 22, "B", 90, 999), _a(rng, 2, 31, "B", 70, 999), _a(rng, 2, 32, "S", 90, 1001)])
+def directed_dead():
+    """The `hand` scenario with the server falling silent after one heartbeat: the session is DEAD (no heartbeat for 3 HB cycles) before the order, the transmitter refuses it, the design turns the refusal into a REJECT, and the tracker gives the gate's charge back."""
+    c, m = directed(); rng = random.Random(5)
+    return _build([_a(rng, 1, 11, "S", 10, 1001), _a(rng, 1, 12, "B", 100, 999)], hb_until=100)
+def directed_queue():
+    """Five DELETE messages (unknown references) in one packet, 21 cycles apart, with a queue of TWO entries and F = 32. An unknown reference costs the book 1 + K + 2 = 7 cycles, and the strategy slot is held for n + F + 4 = 43 cycles from the accept. The first is accepted at E1 + 1; the second and third are queued (E1 + 21, E1 + 42); the second is accepted when the slot frees, E1 + 1 + 43 + 1 = E1 + 45, and the fourth is queued (E1 + 63); the fifth arrives at E1 + 84 with the queue full (the third and fourth) and is DROPPED. The accepts are E1 + 1, 45, 89 and 133."""
+    rng = random.Random(5)
+    c, m = _build([IG.build_msg(rng, "D", locate=0, ref=999) for _ in range(5)], packets=[5], tail=300)
+    return c, m, dict(qd=2, f=32)
 def selftest():
     cycles, mev = directed(); r = run(cycles, mev); X = r["w2w"]; rows = r["rows"]; E = sorted(mev)[1]
     assert len(X.orders) == 1 and X.orders[0][1:] == (1, 0, 1001), X.orders
     lg = X.log[1]; assert (lg["E"], lg["a"], lg["n"], lg["r"], lg["d"], lg["ca"], lg["cx"]) == (E, E + 1, 11, E + 12, E + 28, E + 33, E + 33), lg
-    beats = [(c, row[15 + 18 + 4], row[15 + 18 + 1], row[15 + 18 + 3]) for c, row in enumerate(rows) if row[15 + 18 + 1] and c > E + 30]
+    beats = [(c, row[14 + 18 + 4], row[14 + 18 + 1], row[14 + 18 + 3]) for c, row in enumerate(rows) if row[14 + 18 + 1] and c > E + 30]
     beats = beats[:4]; assert [b[0] for b in beats] == [E + 34 + i for i in range(4)] and [b[1] for b in beats] == [8, 8, 8, 7] and [b[3] for b in beats] == [0, 0, 0, 1], beats
-    assert X.S.g.ob[0][1] == 10 and X.S.T.nlive() == 1 and X.drops == 0 and X.miss == 0 and rows[E + 40][15 + 18 + 5] == SS.ACTIVE
+    assert X.S.g.ob[0][1] == 10 and X.S.T.nlive() == 1 and X.drops == 0 and X.miss == 0 and rows[E + 40][14 + 18 + 5] == SS.ACTIVE
+    cycles, mev = directed_edge(); X = run(cycles, mev)["w2w"]
+    assert [o[1:] for o in X.orders] == [(1, 0, 1001), (2, 1, 999)], X.orders
+    cycles, mev = directed_dead(); r = run(cycles, mev); X = r["w2w"]
+    assert len(X.orders) == 1 and X.refused == 1 and X.S.T.nlive() == 0 and X.S.g.ob[0][1] == 0 and X.S.g.notional[0] == 0 and r["rows"][-1][14 + 18 + 5] == SS.DEAD and not any(p[1] == SS.ORDER for p in X.X.packets)
+    cycles, mev, kw = directed_queue(); X = run(cycles, mev, **kw)["w2w"]; E1 = sorted(mev)[0]
+    assert X.drops == 1 and X.accs == [E1 + 1, E1 + 45, E1 + 89, E1 + 133], (X.drops, X.accs, E1)
     return True
 def parse_events(packets, ns, shift=0):
     """cycle -> book event, for the messages the adapter keeps"""

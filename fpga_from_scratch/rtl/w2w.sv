@@ -75,7 +75,7 @@ module w2w #(parameter int NS = 4, parameter int NA = 4, parameter int NT = 4, p
         .cfg_b_valid(cfg_b_valid), .cfg_b_idx(cfg_b_idx), .cfg_lo(cfg_lo), .cfg_hi(cfg_hi), .ctl_arm(ctl_arm), .ctl_disarm(ctl_disarm), .ext_kill(ext_kill),
         .d_valid(d_valid), .d_res(d_res), .d_tok(d_tok), .c_valid(c_valid), .c_res(c_res), .rk_valid(rk_valid), .rk_kind(rk_kind), .rk_res(rk_res), .rk_pos(rk_pos), .rk_ob(rk_ob), .rk_os(rk_os), .rk_not(rk_not), .rk_tok(rk_tok), .t_live(t_live), .t_fault(t_fault), .st_o(st_o));
     // ---- the transmitter: an order the gate and the tracker accepted (answer 0) is sent; held if the transmitter is not ready
-    logic snd_hold; logic [15:0] lost; logic ord_q; logic [15:0] miss, refused;
+    logic snd_hold; logic ord_q; logic [15:0] miss, refused;
     wire snd_now = (d_valid && d_res == 5'd0) || snd_hold;
     logic tx_ready, rv_, ov_; logic [8*W-1:0] od_; logic ol_; logic [3:0] on_; logic [2:0] ostate; logic [31:0] oexp; logic [1:0] ores;
     wire tx_in_valid = cq_valid || snd_now;
@@ -84,7 +84,7 @@ module w2w #(parameter int NS = 4, parameter int NA = 4, parameter int NT = 4, p
         .o_valid(o_valid), .o_data(o_data), .o_last(o_last), .o_nb(o_nb), .o_state(ostate), .o_exp(oexp), .o_rv(rv_), .o_res(ores));
     // ---- state
     always_ff @(posedge clk) begin
-        if (rst) begin fcnt <= '0; fhd <= '0; ftl <= '0; drops <= '0; slot <= 1'b0; tokc <= 32'd1; o_tok <= '0; o_sym <= '0; o_side <= 1'b0; o_px <= '0; miss <= '0; rej_pend <= 1'b0; snd_hold <= 1'b0; lost <= '0; ord_q <= 1'b0; refused <= '0; end
+        if (rst) begin fcnt <= '0; fhd <= '0; ftl <= '0; drops <= '0; slot <= 1'b0; tokc <= 32'd1; o_tok <= '0; o_sym <= '0; o_side <= 1'b0; o_px <= '0; miss <= '0; rej_pend <= 1'b0; snd_hold <= 1'b0; ord_q <= 1'b0; refused <= '0; end
         else begin
             if (fq_push) begin fq[ftl] <= {ad_t, f_ref[31:0], f_newref[31:0], f_locate[SW-1:0], ad_side, ad_px, ad_sh}; ftl <= (ftl == ($clog2(QD))'(QD - 1)) ? '0 : ftl + 1'b1; end
             if (ad_ok && fq_full) drops <= drops + 1'b1;
@@ -97,8 +97,24 @@ module w2w #(parameter int NS = 4, parameter int NA = 4, parameter int NT = 4, p
             ord_q <= snd_now && tx_ready && !cq_valid;
             if (rv_ && ord_q && ores != 2'd0) begin rej_pend <= 1'b1; refused <= refused + 1'b1; end
             else if (rej_pend && !r_valid) rej_pend <= 1'b0;
-            if (snd_now && !tx_ready && !cq_valid) begin snd_hold <= 1'b1; if (snd_hold && d_valid && d_res == 5'd0) lost <= lost + 1'b1; end
+            // one held order is enough: the next answer comes at least 24 cycles after this one (the strategy slot lasts n + F + 4 cycles) and the transmitter is busy for at most 31 (W = 1)
+            if (snd_now && !tx_ready && !cq_valid) snd_hold <= 1'b1;
             else if (snd_hold && tx_ready) snd_hold <= 1'b0;
         end
     end
+endmodule
+// w2w_syn: the whole design behind a handful of pins, ONLY so that it can be placed: the 498 input bits (the layout of tb/w2w_tb.sv) are shifted in serially, the 76 output bits registered and folded into one 16-bit word.
+module w2w_syn #(parameter int QD = 8, parameter int F = 12) (input logic clk, input logic rst, input logic si, input logic sh, output logic [15:0] info);
+    logic [497:0] iv; logic o_valid, o_last; logic [63:0] o_data; logic [3:0] o_nb;
+    always_ff @(posedge clk) if (sh) iv <= {iv[496:0], si};
+    w2w #(.QD(QD), .F(F)) u (.clk(clk), .rst(rst), .s_valid(iv[0]), .s_sop(iv[1]), .s_eop(iv[2]), .s_data(iv[10:3]),
+        .r_valid(iv[11]), .r_kind(iv[13:12]), .r_tok(iv[45:14]), .r_qty(iv[61:46]),
+        .tc_valid(iv[62]), .tc_rule(iv[66:63]), .tc_en(iv[67]), .tc_neg(iv[68]), .tc_tmask(iv[73:69]), .tc_symany(iv[74]), .tc_sideany(iv[75]), .tc_side(iv[76]), .tc_pxop(iv[79:77]), .tc_shop(iv[82:80]), .tc_symmask(iv[114:83]), .tc_pxval(iv[146:115]), .tc_shval(iv[178:147]),
+        .tl_valid(iv[179]), .tl_addr(iv[191:180]), .tl_key(iv[223:192]), .tl_idx(iv[228:224]), .tl_val(iv[229]),
+        .cfg_a_valid(iv[230]), .cfg_a_idx(iv[234:231]), .cfg_maxlong(iv[250:235]), .cfg_maxshort(iv[266:251]), .cfg_maxqty(iv[282:267]), .cfg_maxonot(iv[322:283]), .cfg_maxnot(iv[364:323]), .cfg_cap(iv[372:365]),
+        .cfg_b_valid(iv[373]), .cfg_b_idx(iv[377:374]), .cfg_lo(iv[393:378]), .cfg_hi(iv[409:394]), .ctl_arm(iv[410]), .ctl_disarm(iv[411]), .ext_kill(iv[412]),
+        .sc_valid(iv[413]), .sc_what(iv[416:414]), .sc_sym(iv[420:417]), .sc_data(iv[452:421]), .rx_valid(iv[453]), .rx_type(iv[461:454]), .rx_seq(iv[493:462]), .cq_valid(iv[494]), .cq_kind(iv[497:495]),
+        .o_valid(o_valid), .o_data(o_data), .o_last(o_last), .o_nb(o_nb));
+    logic [15:0] x, r1; always_comb x = o_data[15:0] ^ o_data[31:16] ^ o_data[47:32] ^ o_data[63:48] ^ {o_nb, o_last, o_valid, 10'd0};
+    always_ff @(posedge clk) begin r1 <= x; info <= r1; end
 endmodule

@@ -5,7 +5,7 @@ from collections import Counter
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "model"))
 import flow, itch_gold as IG, book2_gold as BG, trig_gold as TG, life_gold as LG, risk_gold as RG, sess_gold as SS, w2w_gold as WG
 R_ = flow.ROOT; F_ = ["rtl/mold_itch.sv", "rtl/book2.sv", "rtl/sig.sv", "rtl/trig.sv", "rtl/risk.sv", "rtl/track.sv", "rtl/life.sv", "rtl/sess.sv", "rtl/w2w.sv", "tb/w2w_tb.sv"]
-NS, P0, SHT = WG.NS, WG.P0, WG.SHT; KW = dict(slowsig=dict(qd=4, f=32))
+NS, P0, SHT = WG.NS, WG.P0, WG.SHT; KW = dict(slowsig=dict(qd=4, f=32), narrow=dict(w=1))
 def write_stim(path, cycles):
     """one line per cycle, 498 bits as 125 hex digits (layout: see tb/w2w_tb.sv)"""
     with open(path, "w") as f:
@@ -27,7 +27,7 @@ def write_stim(path, cycles):
     return len(cycles)
 def rows_rtl(cycles, simu="icarus", rtl=F_, kw={}):
     n = write_stim(os.path.join(R_, "out", "w2w_stim.hex"), cycles + [dict() for _ in range(8)])
-    o = (flow.sim_icarus if simu == "icarus" else flow.sim_verilator)(rtl, "w2w_tb", defines=(f"NC={n}", f"QD={kw.get('qd', 8)}", f"F={kw.get('f', 12)}"))[1]
+    o = (flow.sim_icarus if simu == "icarus" else flow.sim_verilator)(rtl, "w2w_tb", defines=(f"NC={n}", f"QD={kw.get('qd', 8)}", f"F={kw.get('f', 12)}", f"W={kw.get('w', 8)}"))[1]
     try: return [tuple(int(x) for x in l.split()[2:]) for l in o.splitlines() if l.startswith("C ")]
     except ValueError: return [("x",)]
 def same(cyc_mev, simu="icarus", rtl=F_):
@@ -43,17 +43,19 @@ def msg_of(rng, e, ns):
     return IG.build_msg(rng, "U", locate=loc, ref=e["ref"], newref=e["ref2"], shares=e["sh"], price=e["px"])
 RULE, preamble = WG.RULE, WG.preamble
 def make(kind, seed, nev=100):
-    if kind == "hand": c_, m_ = WG.directed(); return c_, m_, {}
+    if kind in ("hand", "edge", "dead"): c_, m_ = dict(hand=WG.directed, edge=WG.directed_edge, dead=WG.directed_dead)[kind](); return c_, m_, {}
+    if kind == "queue": return WG.directed_queue()
     rng = random.Random(seed * 100 + sum(map(ord, kind))); ns = NS
     evs = BG.gen_events(rng, nev, ns=ns, d=8, nb=8, k=4, faults=0.04 if kind != "faults" else 0.1, sh_max=300, **(dict(p_add=0.4) if kind != "burst" else dict(p_add=0.06, p_red=0.8, p_del=0.1)))
     msgs = [msg_of(rng, e, ns) for e in evs]
     if kind != "dense_clean":
         for _ in range(4): msgs.insert(rng.randrange(len(msgs)), IG.build_msg(rng, rng.choice("SP"), locate=rng.randrange(ns)))                    # messages the adapter does not use
-        msgs.insert(rng.randrange(len(msgs)), IG.build_msg(rng, "A", locate=ns + rng.randrange(5), ref=5000 + rng.randrange(50), shares=10, price=1000))      # a symbol the design does not trade
+        for _ in range(6): msgs.insert(rng.randrange(len(msgs)), IG.build_msg(rng, "A", locate=ns, ref=5000 + rng.randrange(50), side=rng.choice(b"BS"), shares=200, price=rng.randint(990, 1010)))      # a symbol the design does not trade (the first one past its table)
+        for _ in range(3): msgs.insert(rng.randrange(len(msgs)), IG.build_msg(rng, "A", locate=rng.randrange(ns), ref=6000 + rng.randrange(50), shares=200, price=1000) + b"\0")       # a known type with the wrong length (the parser's error 2)
         i = rng.randrange(len(msgs)); msgs[i] = bytes([ord("Z")]) + msgs[i][1:]                                                                        # an unknown message type
     pk = []; i = 0
     while i < len(msgs): n = rng.randint(1, 4); pk.append(dict(data=IG.build_packet(rng, msgs[i:i + n]), eop=True, reset_at=None)); i += n
-    between = {"normal": (0, 40), "dense": (0, 1), "dense_clean": (0, 1), "collide": (0, 40), "burst": (0, 0), "slowsig": (0, 1), "slow": (40, 120), "refuse": (0, 40), "close": (0, 40), "faults": (0, 40)}[kind]
+    between = {"normal": (0, 40), "dense": (0, 1), "dense_clean": (0, 1), "collide": (0, 40), "burst": (0, 0), "slowsig": (0, 1), "narrow": (0, 2), "openbook": (0, 40), "slow": (40, 120), "refuse": (0, 40), "close": (0, 40), "faults": (0, 40)}[kind]
     lines, info = IG.schedule(rng, pk, gap=0.03 if kind not in ("slow", "burst") else (0.2 if kind == "slow" else 0.0), stray=0.0, between=between)
     mev = WG.parse_events(info, ns, shift=P0); total = P0 + len(lines) + 500
     cycles = preamble(rng) + [dict() for _ in range(total - P0)]
@@ -62,20 +64,21 @@ def make(kind, seed, nev=100):
     for c in range(80, total, 30):
         if dead_at is None or c < dead_at: cycles[c]["rx"] = ("H", 0)
     if kind == "close": cycles[P0 + len(lines) // 3]["rx"] = ("Z", 0)
+    if kind == "normal": cycles[P0 + len(lines) // 2]["cq"] = SS.LOGINQ                                                                                    # a second login: the transmitter refuses it, and that is not an order
     X = WG.W2W(**KW.get(kind, {})); rows = []
     for c in range(total):
         cy = cycles[c]
         if "rx" not in cy and "rep" not in cy and c > P0:
             live = [x for x in X.S.T.e if x and 'cx' in X.log.get(x['tok'], {})]                                   # only orders that reached the wire can be reported on
-            decide_next = kind == "collide" and (c + 1) in X.sig_at                                              # a report one cycle before a decision: the tracker's release will be using the gate's port when the order is offered
-            if live and (rng.random() < .06 or (decide_next and rng.random() < .8)):
+            decide_next = (kind == "collide" and (c + 1) in X.sig_at) or (kind in ("refuse", "close") and X.rej_pend)                                              # a report one cycle before a decision: the tracker's release will be using the gate's port when the order is offered
+            if kind != "openbook" and live and (rng.random() < .06 or (decide_next and rng.random() < .8)):
                 x = rng.choice(live); k = rng.choice([LG.FILL, LG.FILL, LG.ACK, LG.CANCELED]) if x["st"] == LG.PNEW else rng.choice([LG.FILL, LG.FILL, LG.CANCELED])
                 if x["st"] != LG.PNEW and k == LG.ACK: k = LG.FILL
                 q = rng.choice([x["rem"], 1, rng.randint(1, x["rem"])]); cy["rep"] = (k, dict(tok=x["tok"], qty=q))
                 if kind == "faults" and rng.random() < .12: cy["rep"] = (LG.FILL, dict(tok=x["tok"], qty=x["rem"] + 1))
         X.step(cy, mev.get(c))
     return cycles, mev, KW.get(kind, {})
-KINDS = ("normal", "dense", "dense_clean", "slow", "refuse", "close", "faults", "burst", "slowsig", "collide", "hand")
+KINDS = ("normal", "dense", "dense_clean", "slow", "refuse", "close", "faults", "burst", "slowsig", "collide", "narrow", "openbook", "hand", "edge", "dead", "queue")
 def battery():
     """The mutation runs' test: seven mixes, Icarus. -> None or the first difference."""
     for i, kind in enumerate(KINDS):
@@ -95,11 +98,11 @@ if __name__ == "__main__":
     print(f"  w2w (all units): Verilator warnings {len(w_)}, Yosys check problems {len([l for l in y.splitlines() if 'Found and reported' in l and ' 0 problems' not in l])}")
     print("\n== 2. the model's self-test and what the traffic contains (seed 1)")
     print("  " + subprocess.run([sys.executable, "model/w2w_gold.py"], cwd=R_, capture_output=True, text=True).stdout.strip())
-    print(f"  {'mix':11s} {'msgs kept':>9s} {'drops':>5s} {'books':>5s} {'fired':>5s} {'orders taken':>12s} {'missed':>6s} {'sent':>5s} {'refused':>7s} {'lost':>4s} {'gate answers':>12s}")
+    print(f"  {'mix':11s} {'msgs kept':>9s} {'drops':>5s} {'books':>5s} {'offered':>7s} {'taken':>5s} {'missed':>6s} {'sent':>5s} {'refused':>7s} {'gate answers':>12s}")
     for i, kind in enumerate(KINDS):
         cyc, mev, kw = make(kind, i + 1); r = WG.run(cyc, mev, **kw); X = r["w2w"]; rows = r["rows"]
-        sent = sum(1 for p in X.X.packets if p[1] == SS.ORDER); gate = Counter(RG.RN[row[24]] for row in rows if row[22] and row[23] == 0)
-        print(f"  {kind:11s} {len(mev):9d} {X.drops:5d} {sum(row[4] for row in rows):5d} {sum(1 for row in rows if row[7]):5d} {len(X.orders):12d} {X.miss:6d} {sent:5d} {X.refused:7d} {X.lost:4d} " + ", ".join(f"{k} {n}" for k, n in sorted(gate.items())))
+        sent = sum(1 for p in X.X.packets if p[1] == SS.ORDER); gate = Counter(RG.RN[row[23]] for row in rows if row[21] and row[22] == 0)
+        print(f"  {kind:11s} {len(mev):9d} {X.drops:5d} {sum(row[4] for row in rows):5d} {sum(1 for row in rows if row[7]):7d} {len(X.orders):5d} {X.miss:6d} {sent:5d} {X.refused:7d} " + ", ".join(f"{k} {n}" for k, n in sorted(gate.items())))
     print("\n== 3. the whole design against the model: every cycle, every output (queue, counters, book, strategy, lifecycle, bytes on the wire)")
     print(f"  {'mix':11s} | {'cycles':>6s} {'orders':>6s} {'bytes sent':>10s} | {'Icarus':>7s} {'Verilator':>10s}")
     for i, kind in enumerate(KINDS):
