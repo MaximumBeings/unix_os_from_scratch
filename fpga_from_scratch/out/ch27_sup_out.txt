@@ -1,0 +1,10 @@
+== 1. lint gate (Verilator -Wall --lint-only, Yosys 'check')
+  sup: Verilator warnings 0, Yosys check problems 0
+  rst_gen: Verilator warnings 0, Yosys check problems 0
+
+== 2. the model's hand-checked scenarios (python3 model/sup_gold.py)
+  selftest True
+
+== 3. supervisor and reset generator against the model, every cycle, every output
+    FT   ST WARM RSTN scenario    | cycles trips in SAFE |  Icarus  Verilator
+   100  100   48    8 each_cause  |    606     5      46 |    PASS       PASS

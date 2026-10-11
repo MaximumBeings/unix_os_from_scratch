@@ -32,7 +32,7 @@ module w2w_tb;
         .cfg_a_valid(cfg_a_valid), .cfg_a_idx(cfg_a_idx), .cfg_maxlong(cfg_maxlong), .cfg_maxshort(cfg_maxshort), .cfg_maxqty(cfg_maxqty), .cfg_maxonot(cfg_maxonot), .cfg_maxnot(cfg_maxnot), .cfg_cap(cfg_cap),
         .cfg_b_valid(cfg_b_valid), .cfg_b_idx(cfg_b_idx), .cfg_lo(cfg_lo), .cfg_hi(cfg_hi), .ctl_arm(ctl_arm), .ctl_disarm(ctl_disarm), .ext_kill(ext_kill),
         .sc_valid(sc_valid), .sc_what(sc_what), .sc_sym(sc_sym), .sc_data(sc_data), .rx_valid(rx_valid), .rx_type(rx_type), .rx_seq(rx_seq), .cq_valid(cq_valid), .cq_kind(cq_kind),
-        .o_valid(o_valid), .o_data(o_data), .o_last(o_last), .o_nb(o_nb));
+        .o_valid(o_valid), .o_data(o_data), .o_last(o_last), .o_nb(o_nb), .tap_slot(), .tap_fault(), .tap_sess(), .tap_txready(), .tap_quiet());
     always #4 clk = ~clk;
     wire signed [17:0] pos_s = dut.rk_pos;
     always @(posedge clk) if (run) begin
